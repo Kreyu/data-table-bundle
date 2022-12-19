@@ -1,0 +1,22 @@
+{
+    "name": "kreyu/data-table-bundle",
+    "description": "Streamlines creation process of the data tables",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Sebastian Wróblewski",
+            "email": "kontakt@swroblewski.pl"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "knplabs/knp-paginator-bundle": "^6.0",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/translation": "^6.0",
+        "symfony/twig-bundle": "^6.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.13",
+        "kubawerlos/php-cs-fixer-custom-fixers": "^3.11"
+    }
+}

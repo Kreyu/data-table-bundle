@@ -1,0 +1,21 @@
+{% block data_table_text %}
+    <span>{{- value -}}</span>
+{% endblock %}
+
+{% block data_table_number %}
+    <div class="text-end">
+        <span>{{- value -}}</span>
+    </div>
+{% endblock %}
+
+{% block data_table_link %}
+    <a href="{{ url }}">
+        <span>{{- value -}}</span>
+    </a>
+{% endblock %}
+
+{% block data_table_collection %}
+    {% for _value in value %}
+        {{- render_data_table_column_value(data_table, prototype, _value) -}}
+    {% endfor %}
+{% endblock %}

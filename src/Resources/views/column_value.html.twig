@@ -1,0 +1,10 @@
+{# @var \Kreyu\Bundle\Test\DataTableBundle\Column\ResolvedColumnInterface column #}
+{# @var mixed value #}
+
+{% set template = '@KreyuDataTable/data_table_types.html.twig' %}
+
+{% if block(block_name, template) is defined %}
+    {{- block(block_name, template) -}}
+{% else %}
+    {{- value -}}
+{% endif %}

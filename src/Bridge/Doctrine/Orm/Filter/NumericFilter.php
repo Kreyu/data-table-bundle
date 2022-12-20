@@ -7,9 +7,18 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
-class StringFilter extends AbstractFilter
+class NumericFilter extends AbstractFilter
 {
+    public function getFormOptions(): array
+    {
+        return array_merge(parent::getFormOptions(), [
+            'field_type' => NumberType::class,
+        ]);
+    }
+
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
         $value = $data->getValue();
@@ -18,14 +27,11 @@ class StringFilter extends AbstractFilter
         $exprMethod = match ($operator) {
             Operator::EQUAL => 'eq',
             Operator::NOT_EQUAL => 'neq',
-            Operator::CONTAINS => 'like',
-            Operator::NOT_CONTAINS => 'notLike',
+            Operator::GREATER_EQUAL => 'gte',
+            Operator::GREATER_THAN => 'gt',
+            Operator::LESS_EQUAL => 'lte',
+            Operator::LESS_THAN => 'lt',
             default => throw new \InvalidArgumentException('Operator not supported'),
-        };
-
-        $parameterValue = match ($operator) {
-            Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
-            default => $value,
         };
 
         $parameterName = $this->generateUniqueParameterName($query);
@@ -34,7 +40,7 @@ class StringFilter extends AbstractFilter
 
         $query
             ->andWhere($expression)
-            ->setParameter($parameterName, $parameterValue);
+            ->setParameter($parameterName, $value);
     }
 
     protected function getSupportedOperators(): array
@@ -42,8 +48,10 @@ class StringFilter extends AbstractFilter
         return [
             Operator::EQUAL,
             Operator::NOT_EQUAL,
-            Operator::CONTAINS,
-            Operator::NOT_CONTAINS,
+            Operator::GREATER_EQUAL,
+            Operator::GREATER_THAN,
+            Operator::LESS_EQUAL,
+            Operator::LESS_THAN,
         ];
     }
 }

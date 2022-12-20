@@ -14,7 +14,7 @@ class DataTableTypeChain implements DataTableTypeChainInterface
     public function __construct(iterable $types)
     {
         foreach ($types as $type) {
-            $this->types[get_class($type)] = $type;
+            $this->types[$type::class] = $type;
         }
     }
 

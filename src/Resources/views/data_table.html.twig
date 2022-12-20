@@ -1,12 +1,17 @@
-{{ render_data_table_filter_form(data_table) }}
-
-{#<form>
-    {% for filter in data_table.filters %}
-
-    {% endfor %}
-
-    <button class="btn btn-outline-primary">Filtruj</button>
-</form>#}
+{% if data_table.filtersForm.count > 0 %}
+    <div class="mb-4">
+        {{ form_start(data_table.filtersForm) }}
+            <div class="row">
+                {% for child in data_table.filtersForm.children %}
+                    <div class="col-12 col-lg-3 col-md-6">
+                        {{ form_row(child) }}
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="btn btn-primary">Filtruj</button>
+        {{ form_end(data_table.filtersForm) }}
+    </div>
+{% endif %}
 
 <table class="table">
     <thead>
@@ -28,11 +33,16 @@
 </table>
 
 {% if data_table.pagination.pageCount > 1 %}
+    {% set current_page = app.request.query.get(data_table.pageParameterName) %}
+
     <div>
         <ul class="pagination m-0 ms-auto">
             <li class="page-item {% if not data_table.pagination.hasPreviousPage %}disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ data_table.pagination.hasPreviousPage ? path(app.request.get('_route'), app.request.query.all|merge({ page: data_table.pagination.currentPageNumber - 1 })) : '#' }}">
+                   href="{{ data_table.pagination.hasPreviousPage ? path(
+                       app.request.get('_route'),
+                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber - 1 })
+                   ) : '#' }}">
                     ‹
                 </a>
             </li>
@@ -40,7 +50,7 @@
             {% for page_number in 1..data_table.pagination.pageCount %}
                 <li class="page-item {% if data_table.pagination.currentPageNumber == page_number %}active{% endif %}">
                     <a class="page-link"
-                       href="{{ path(app.request.get('_route'), app.request.query.all|merge({ page: page_number })) }}">
+                       href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (data_table.pageParameterName): page_number })) }}">
                         {{ page_number }}
                     </a>
                 </li>
@@ -48,7 +58,10 @@
 
             <li class="page-item {% if not data_table.pagination.hasNextPage %}disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ data_table.pagination.hasNextPage ? path(app.request.get('_route'), app.request.query.all|merge({ page: data_table.pagination.currentPageNumber + 1 })) : '#' }}">
+                   href="{{ data_table.pagination.hasNextPage ? path(
+                       app.request.get('_route'),
+                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber + 1 })
+                   ) : '#' }}">
                     ›
                 </a>
             </li>

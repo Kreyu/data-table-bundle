@@ -7,25 +7,26 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-class StringFilter extends AbstractFilter
+class EntityFilter extends AbstractFilter
 {
+    public function getFormOptions(): array
+    {
+        return array_merge(parent::getFormOptions(), [
+            'field_type' => EntityType::class,
+        ]);
+    }
+
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
-        $value = $data->getValue();
+        $value = (array) $data->getValue();
         $operator = $data->getOperator() ?? Operator::EQUAL;
 
         $exprMethod = match ($operator) {
-            Operator::EQUAL => 'eq',
-            Operator::NOT_EQUAL => 'neq',
-            Operator::CONTAINS => 'like',
-            Operator::NOT_CONTAINS => 'notLike',
+            Operator::EQUAL, Operator::CONTAINS => 'in',
+            Operator::NOT_EQUAL, Operator::NOT_CONTAINS => 'notIn',
             default => throw new \InvalidArgumentException('Operator not supported'),
-        };
-
-        $parameterValue = match ($operator) {
-            Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
-            default => $value,
         };
 
         $parameterName = $this->generateUniqueParameterName($query);
@@ -34,7 +35,7 @@ class StringFilter extends AbstractFilter
 
         $query
             ->andWhere($expression)
-            ->setParameter($parameterName, $parameterValue);
+            ->setParameter($parameterName, $value);
     }
 
     protected function getSupportedOperators(): array

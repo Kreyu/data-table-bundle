@@ -1,0 +1,19 @@
+{% block kreyu_data_table_filter_row %}
+    <div class="row">
+        {{ form_label(form) }}
+
+        {% if form.operator.vars.visible %}
+            <div class="col-12 col-md-8">
+                {{ form_row(form.value) }}
+            </div>
+            <div class="col-12 col-md-4">
+                {{ form_row(form.operator) }}
+            </div>
+        {% else %}
+            <div class="col-12">
+                {{ form_row(form.value) }}
+                {{ form_row(form.operator, { attr: { class: 'd-none' } }) }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

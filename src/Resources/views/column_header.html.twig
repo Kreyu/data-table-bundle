@@ -1,4 +1,4 @@
-{# @var \Kreyu\Bundle\Test\DataTableBundle\DataTableInterface data_table #}
+{# @var \Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface data_table #}
 
 {% macro render_label(context) %}
     {% if context.translation_domain is not same as false %}
@@ -9,14 +9,21 @@
 {% endmacro %}
 
 {% if sort_field %}
-    {% set sort_direction = app.request.query.get(data_table.sortDirectionParameterName) %}
-    {% set opposite_sort_direction = sort_direction == 'desc' ? 'asc' : 'desc' %}
+    {% set query_parameters = app.request.query.all() %}
 
-    <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (data_table.sortFieldParameterName): sort_field, (data_table.sortDirectionParameterName): opposite_sort_direction })) }}">
+    {% set current_sort_field = query_parameters[data_table.sortParameterName]['field']|default(null) %}
+    {% set current_sort_direction = query_parameters[data_table.sortParameterName]['direction']|default(null) %}
+
+    {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
+
+    <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
+        (data_table.sortParameterName ~ '[field]'): sort_field,
+        (data_table.sortParameterName ~ '[direction]'): opposite_sort_direction
+    })) }}">
         {{ _self.render_label(_context) }}
 
-        {% if sort_field == app.request.query.get(data_table.sortFieldParameterName) %}
-            {% if sort_direction == 'asc' %}˄{% else %}˅{% endif %}
+        {% if sort_field == current_sort_field %}
+            {% if current_sort_direction == 'asc' %}˄{% else %}˅{% endif %}
         {% endif %}
     </a>
 {% else %}

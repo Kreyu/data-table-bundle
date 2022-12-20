@@ -1,0 +1,9 @@
+# Operators
+EQUAL: równa się
+CONTAINS: zawiera
+NOT_CONTAINS: nie zawiera
+NOT_EQUAL: różne od
+GREATER_EQUAL: większe lub równe
+LESS_EQUAL: mniejsze lub równe
+GREATER_THAN: większe od
+LESS_THAN: mniejsze od

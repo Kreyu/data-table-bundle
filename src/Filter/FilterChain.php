@@ -14,7 +14,7 @@ class FilterChain implements FilterChainInterface
     public function __construct(iterable $filters)
     {
         foreach ($filters as $type) {
-            $this->filters[get_class($type)] = $type;
+            $this->filters[$type::class] = $type;
         }
     }
 

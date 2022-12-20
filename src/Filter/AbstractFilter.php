@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Form\Type\OperatorType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 
 abstract class AbstractFilter implements FilterInterface
 {
@@ -14,7 +17,38 @@ abstract class AbstractFilter implements FilterInterface
     public function initialize(string $name, array $options = []): void
     {
         $this->name = $name;
-        $this->options = $options;
+
+        $this->configureOptions($optionsResolver = new OptionsResolver());
+
+        $this->options = $optionsResolver->resolve($options);
+    }
+
+    protected function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setDefaults([
+                'label' => $this->getName(),
+                'field_name' => $this->getName(),
+                'field_type' => TextType::class,
+                'field_options' => [],
+                'operator_type' => OperatorType::class,
+                'operator_options' => [],
+            ])
+            ->setRequired([
+                'label',
+                'field_name',
+                'field_type',
+                'field_options',
+                'operator_type',
+                'operator_options',
+            ])
+            ->setAllowedTypes('label', ['string', TranslatableMessage::class])
+            ->setAllowedTypes('field_name', ['string'])
+            ->setAllowedTypes('field_type', ['string'])
+            ->setAllowedTypes('field_options', ['array'])
+            ->setAllowedTypes('operator_type', ['string'])
+            ->setAllowedTypes('operator_options', ['array'])
+        ;
     }
 
     public function getName(): string
@@ -37,76 +71,36 @@ abstract class AbstractFilter implements FilterInterface
         return $this->options[$key] ?? $default;
     }
 
-    public function setOption(string $key, mixed $value): void
-    {
-        $this->options[$key] = $value;
-    }
-
-    public function getFieldName(): ?string
-    {
-        $fieldName = $this->getOption('field_name');
-
-        if (null === $fieldName) {
-            throw new \RuntimeException(sprintf(
-                'The option `field_name` must be set for field: `%s`',
-                $this->getName()
-            ));
-        }
-
-        return $fieldName;
-    }
-
-    public function getFieldMapping(): array
-    {
-        $fieldMapping = $this->getOption('field_mapping');
-
-        if (null === $fieldMapping) {
-            throw new \RuntimeException(sprintf(
-                'The option `field_mapping` must be set for field: `%s`',
-                $this->getName()
-            ));
-        }
-
-        return $fieldMapping;
-    }
-
-    public function getAssociationMapping(): array
-    {
-        $associationMapping = $this->getOption('association_mapping');
-
-        if (null === $associationMapping) {
-            throw new \RuntimeException(sprintf(
-                'The option `association_mapping` must be set for field: `%s`',
-                $this->getName()
-            ));
-        }
-
-        return $associationMapping;
-    }
-
-    public function getFieldType(): string
-    {
-        return $this->getOption('field_type', TextType::class);
-    }
-
-    public function getFieldOptions(): array
-    {
-        return $this->getOption('field_options', []);
-    }
-
-    public function setFieldOption(string $key, mixed $value): void
-    {
-        $this->options['field_options'][$key] = $value;
-    }
-
     public function getLabel(): string
     {
         return (string) $this->getOption('label');
     }
 
-    public function setLabel(string $label): void
+    public function getFieldName(): string
     {
-        $this->setOption('label', $label);
+        return $this->getOption('field_name');
+    }
+
+    public function getFieldType(): string
+    {
+        return $this->getOption('field_type');
+    }
+
+    public function getFieldOptions(): array
+    {
+        return $this->getOption('field_options');
+    }
+
+    public function getOperatorType(): string
+    {
+        return $this->getOption('operator_type');
+    }
+
+    public function getOperatorOptions(): array
+    {
+        return $this->getOption('operator_options') + [
+            'choices' => $this->getSupportedOperators(),
+        ];
     }
 
     public function getFormOptions(): array
@@ -114,7 +108,14 @@ abstract class AbstractFilter implements FilterInterface
         return [
             'field_type' => $this->getFieldType(),
             'field_options' => $this->getFieldOptions(),
+            'operator_type' => $this->getOperatorType(),
+            'operator_options' => $this->getOperatorOptions(),
             'label' => $this->getLabel(),
         ];
     }
+
+    /**
+     * @return array<Operator>
+     */
+    protected abstract function getSupportedOperators(): array;
 }

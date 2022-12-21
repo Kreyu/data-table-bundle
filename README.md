@@ -7,6 +7,8 @@ Streamlines creation process of the data tables.
 First, create data table type class, and define its columns and filters:
 
 ```php
+// src/DataTable/Type/ProductType.php
+
 class ProductType extends AbstractType
 {
     public function __construct(
@@ -86,6 +88,8 @@ class ProductType extends AbstractType
 then, use it in a controller:
 
 ```php
+// src/Controller/ProductController.php
+
 class ProductController extends AbstractController
 {
     use DataTableControllerTrait;

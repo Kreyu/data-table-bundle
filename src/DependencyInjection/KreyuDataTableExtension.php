@@ -11,14 +11,18 @@ use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class KreyuDataTableExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yaml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('columns.php');
+        $loader->load('core.php');
+        $loader->load('filters.php');
+        $loader->load('twig.php');
 
         $container
             ->registerForAutoconfiguration(ColumnTypeInterface::class)

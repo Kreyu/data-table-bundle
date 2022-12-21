@@ -7,3 +7,7 @@ GREATER_EQUAL: większe lub równe
 LESS_EQUAL: mniejsze lub równe
 GREATER_THAN: większe od
 LESS_THAN: mniejsze od
+
+# Boolean type
+Yes: Tak
+No: Nie

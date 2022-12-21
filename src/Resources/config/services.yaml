@@ -87,6 +87,10 @@ services:
     tags:
       - { name: kreyu_data_table.column_type }
 
+  Kreyu\Bundle\DataTableBundle\Column\Type\BooleanType:
+    tags:
+      - { name: kreyu_data_table.column_type }
+
   Kreyu\Bundle\DataTableBundle\Column\Type\CollectionType:
     tags:
       - { name: kreyu_data_table.column_type }

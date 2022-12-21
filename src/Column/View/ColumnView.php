@@ -16,9 +16,9 @@ class ColumnView implements ColumnViewInterface
         return $this->variables;
     }
 
-    public function getVariable(string $name): mixed
+    public function getVariable(string $name, mixed $default = null): mixed
     {
-        return $this->variables[$name] ?? null;
+        return $this->variables[$name] ?? $default;
     }
 
     public function hasVariable(string $name): bool

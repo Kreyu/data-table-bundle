@@ -7,10 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Form\Type\OperatorType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CallbackFilter extends AbstractFilter
@@ -31,7 +27,7 @@ class CallbackFilter extends AbstractFilter
 
         $resolver
             ->setRequired('callback')
-            ->setAllowedTypes('callback', ['callable', \Closure::class])
+            ->setAllowedTypes('callback', ['callable'])
         ;
     }
 

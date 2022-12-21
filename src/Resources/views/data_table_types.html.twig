@@ -19,3 +19,13 @@
         {{- render_data_table_column_value(data_table, prototype, _value) -}}
     {% endfor %}
 {% endblock %}
+
+{% block data_table_template %}
+    {{ include(template_path, template_vars) }}
+{% endblock %}
+
+{% block data_table_actions %}
+    {% for action in actions %}
+        {{ include(action.template_path, action.template_vars) }}
+    {% endfor %}
+{% endblock %}

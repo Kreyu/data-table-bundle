@@ -30,6 +30,7 @@ abstract class AbstractType implements ColumnTypeInterface
                 'sort_field' => null,
                 'block_name' => 'data_table_'.$this->getBlockPrefix(),
                 'block_prefix' => $this->getBlockPrefix(),
+                'mapped' => true,
                 'value' => null,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
@@ -39,7 +40,7 @@ abstract class AbstractType implements ColumnTypeInterface
             ->setAllowedTypes('sort_field', ['null', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
-            ->setAllowedTypes('value', ['null', 'string', 'callable']);
+            ->setAllowedTypes('mapped', ['bool']);
     }
 
     public function getBlockPrefix(): string

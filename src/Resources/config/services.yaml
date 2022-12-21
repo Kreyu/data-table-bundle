@@ -91,6 +91,14 @@ services:
     tags:
       - { name: kreyu_data_table.column_type }
 
+  Kreyu\Bundle\DataTableBundle\Column\Type\TemplateType:
+    tags:
+      - { name: kreyu_data_table.column_type }
+
+  Kreyu\Bundle\DataTableBundle\Column\Type\ActionsType:
+    tags:
+      - { name: kreyu_data_table.column_type }
+
   kreyu_data_table.twig.column_renderer_extension:
     class: Kreyu\Bundle\DataTableBundle\Bridge\Twig\ColumnRendererExtension
     tags:

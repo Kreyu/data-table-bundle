@@ -12,7 +12,9 @@
         {% else %}
             <div class="col-12">
                 {{ form_row(form.value) }}
-                {{ form_row(form.operator, { attr: { class: 'd-none' } }) }}
+                <div style="display: none;">
+                    {{ form_row(form.operator) }}
+                </div>
             </div>
         {% endif %}
     </div>

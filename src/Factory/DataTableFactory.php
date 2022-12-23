@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Mapper\Factory\ColumnMapperFactoryInterf
 use Kreyu\Bundle\DataTableBundle\DataTable;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Query\Factory\ProxyQueryFactoryChainInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeChainInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
@@ -17,47 +16,44 @@ use Symfony\Component\Form\FormFactoryInterface;
 class DataTableFactory implements DataTableFactoryInterface
 {
     public function __construct(
-        private readonly DataTableTypeChainInterface     $dataTableTypeChain,
-        private readonly ProxyQueryFactoryChainInterface $proxyQueryFactoryChain,
-        private readonly ColumnMapperFactoryInterface    $columnMapperFactory,
-        private readonly FilterMapperFactoryInterface    $filterMapperFactory,
-        private readonly FormFactoryInterface            $formFactory,
+        private readonly DataTableTypeChainInterface $dataTableTypeChain,
+        private readonly ColumnMapperFactoryInterface $columnMapperFactory,
+        private readonly FilterMapperFactoryInterface $filterMapperFactory,
+        private readonly FormFactoryInterface $formFactory,
     ) {
     }
 
-    public function create(string $typeClass, mixed $data): DataTableInterface
+    public function create(string $typeClass): DataTableInterface
     {
         if (null === $type = $this->dataTableTypeChain->get($typeClass)) {
             throw new InvalidArgumentException(sprintf('Data table type "%s" not found in the chain', $typeClass));
         }
 
-        return $this->doCreate($type->getName(), $type, $data);
+        return $this->doCreate($type->getName(), $type);
     }
 
-    public function createNamed(string $name, string $typeClass, mixed $data): DataTableInterface
+    public function createNamed(string $name, string $typeClass): DataTableInterface
     {
         if (null === $type = $this->dataTableTypeChain->get($typeClass)) {
             throw new InvalidArgumentException(sprintf('Data table type "%s" not found in the chain', $typeClass));
         }
 
-        return $this->doCreate($name, $type, $data);
+        return $this->doCreate($name, $type);
     }
 
-    private function doCreate(string $name, DataTableTypeInterface $type, mixed $data): DataTableInterface
+    private function doCreate(string $name, DataTableTypeInterface $type): DataTableInterface
     {
-        $proxyQueryFactory = $this->proxyQueryFactoryChain->getDataCompatibleFactory($data);
-        $proxyQuery = $proxyQueryFactory->create($data);
+        $query = $type->createQuery();
 
         $columnMapper = $this->columnMapperFactory->create();
         $filterMapper = $this->filterMapperFactory->create();
 
-        $type->configureQuery($proxyQuery);
         $type->configureColumns($columnMapper);
         $type->configureFilters($filterMapper);
 
         return new DataTable(
             name: $name,
-            query: $proxyQuery,
+            query: $query,
             columns: $columnMapper->all(),
             filters: $filterMapper->all(),
             formFactory: $this->formFactory,

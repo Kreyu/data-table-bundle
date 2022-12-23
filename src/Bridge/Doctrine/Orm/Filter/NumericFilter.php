@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumericFilter extends AbstractFilter

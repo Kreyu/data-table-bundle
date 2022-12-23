@@ -15,7 +15,7 @@ abstract class AbstractFilter extends BaseAbstractFilter
 
     public function apply(BaseProxyQueryInterface $query, FilterData $data): void
     {
-        /** @noinspection PhpConditionAlreadyCheckedInspection - false positive */
+        /* @noinspection PhpConditionAlreadyCheckedInspection - false positive */
         if (!$query instanceof ProxyQueryInterface) {
             throw new \InvalidArgumentException();
         }
@@ -32,6 +32,6 @@ abstract class AbstractFilter extends BaseAbstractFilter
 
     protected function generateUniqueParameterName(ProxyQueryInterface $query): string
     {
-        return str_replace('.', '_', $this->getName()) . '_' . $query->getUniqueParameterId();
+        return str_replace('.', '_', $this->getName()).'_'.$query->getUniqueParameterId();
     }
 }

@@ -6,11 +6,9 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Form\Type\FilterType;
-use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\View\DataTableView;
 use Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +26,11 @@ class DataTable implements DataTableInterface
         private readonly FormFactoryInterface $formFactory,
     ) {
         $this->filtersForm = $this->buildFiltersForm();
+    }
+
+    public function configureQuery(callable $callback): void
+    {
+        $callback($this->query, $this);
     }
 
     public function getColumns(): array

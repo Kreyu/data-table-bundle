@@ -27,9 +27,6 @@ interface DataTableInterface
      */
     public function getFilters(): array;
 
-    /**
-     * @return FormInterface
-     */
     public function getFiltersForm(): FormInterface;
 
     public function sort(string $field, string $direction): void;
@@ -41,4 +38,6 @@ interface DataTableInterface
     public function handleRequest(Request $request): void;
 
     public function createView(): DataTableViewInterface;
+
+    public function configureQuery(callable $callback): void;
 }

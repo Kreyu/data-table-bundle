@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Kreyu\Bundle\DataTableBundle\Bridge\Twig\ColumnRendererExtension;
 use Kreyu\Bundle\DataTableBundle\Bridge\Twig\DataTableRendererExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $configurator) {

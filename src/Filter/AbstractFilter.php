@@ -117,5 +117,5 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * @return array<Operator>
      */
-    protected abstract function getSupportedOperators(): array;
+    abstract protected function getSupportedOperators(): array;
 }

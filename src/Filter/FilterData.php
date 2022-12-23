@@ -8,7 +8,7 @@ class FilterData
 {
     public function __construct(
         private readonly null|Operator $operator,
-        private readonly mixed         $value,
+        private readonly mixed $value,
     ) {
     }
 

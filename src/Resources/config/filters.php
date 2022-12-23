@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterChain;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 

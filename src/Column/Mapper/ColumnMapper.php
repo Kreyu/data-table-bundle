@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Mapper;
 
-use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactoryInterface;
 
 class ColumnMapper implements ColumnMapperInterface
 {

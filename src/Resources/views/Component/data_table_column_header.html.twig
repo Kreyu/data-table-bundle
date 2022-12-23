@@ -1,0 +1,31 @@
+{# @var \Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface view #}
+
+{% macro render_label(context) %}
+    {% if context.translation_domain is not same as false %}
+        {{- context.label|trans(context.label_translation_parameters, context.translation_domain) -}}
+    {% else %}
+        {{- context.label -}}
+    {% endif %}
+{% endmacro %}
+
+{% if sort_field %}
+    {% set query_parameters = app.request.query.all() %}
+
+    {% set current_sort_field = query_parameters[data_table.sortParameterName]['field']|default(null) %}
+    {% set current_sort_direction = query_parameters[data_table.sortParameterName]['direction']|default(null) %}
+
+    {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
+
+    <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
+        (data_table.sortParameterName ~ '[field]'): sort_field,
+        (data_table.sortParameterName ~ '[direction]'): opposite_sort_direction
+    })) }}">
+        {{ _self.render_label(_context) }}
+
+        {% if sort_field == current_sort_field %}
+            {% if current_sort_direction == 'asc' %}˄{% else %}˅{% endif %}
+        {% endif %}
+    </a>
+{% else %}
+    {{ _self.render_label(_context) }}
+{% endif %}

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Form\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\View\DataTableView;
 use Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface;

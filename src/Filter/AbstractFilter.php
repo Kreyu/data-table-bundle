@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
-use Kreyu\Bundle\DataTableBundle\Form\Type\OperatorType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;

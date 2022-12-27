@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kreyu\Bundle\DataTableBundle\Form\Type;
+namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\AbstractType;

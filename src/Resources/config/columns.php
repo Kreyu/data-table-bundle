@@ -6,8 +6,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\Factory\ColumnMapperFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\Factory\ColumnMapperFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Renderer\ColumnRendererInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Renderer\HtmlColumnRenderer;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionType;
@@ -37,13 +35,6 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.column.mapper.factory', ColumnMapperFactory::class)
         ->args([service('kreyu_data_table.column.factory')])
         ->alias(ColumnMapperFactoryInterface::class, 'kreyu_data_table.column.mapper.factory');
-
-    $services
-        ->set('kreyu_data_table.column.renderer.html', HtmlColumnRenderer::class)
-        ->arg('$columnHeaderViewFactory', service('kreyu_data_table.column.view.factory.column_header'))
-        ->arg('$columnValueViewFactory', service('kreyu_data_table.column.view.factory.column_value'))
-        ->arg('$twig', service('twig'))
-        ->alias(ColumnRendererInterface::class, 'kreyu_data_table.column.renderer.html');
 
     $services
         ->set('kreyu_data_table.column.view.factory.column_header', ColumnHeaderViewFactory::class)

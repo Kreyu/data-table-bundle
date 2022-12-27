@@ -17,7 +17,7 @@
     <thead>
         <tr>
             {% for column in data_table.columns %}
-                <th>{{ render_data_table_column_header(data_table, column) }}</th>
+                <th>{{ data_table_column_header(data_table, column) }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -25,7 +25,7 @@
         {% for item in data_table.pagination.items %}
             <tr>
                 {% for column in data_table.columns %}
-                    <td>{{ render_data_table_column_value(data_table, column, item) }}</td>
+                    <td>{{ data_table_column_value(data_table, column, item) }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}

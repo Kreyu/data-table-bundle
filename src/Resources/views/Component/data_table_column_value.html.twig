@@ -1,9 +1,0 @@
-{# @var \Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface view #}
-
-{% set template = '@KreyuDataTable/data_table_types.html.twig' %}
-
-{% if block(block_name, template) is defined %}
-    {{- block(block_name, template) -}}
-{% else %}
-    {{- value -}}
-{% endif %}

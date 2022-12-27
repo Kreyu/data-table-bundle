@@ -56,10 +56,10 @@ class MakeDataTable extends AbstractMaker
 
         $generator->generateClass(
             $dataTableClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/DataTableType.tpl.php',
+            __DIR__.'/../Resources/skeleton/DataTableType.tpl.php',
             [
                 'use_statements' => $useStatements,
-            ]
+            ],
         );
 
         $generator->writeChanges();

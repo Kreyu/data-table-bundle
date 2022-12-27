@@ -1,12 +1,12 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 declare(strict_types=1);
 
-namespace <?= $namespace; ?>;
+namespace <?php echo $namespace; ?>;
 
-<?= $use_statements; ?>
+<?php echo $use_statements; ?>
 
-class <?= $class_name; ?> extends AbstractType
+class <?php echo $class_name; ?> extends AbstractType
 {
     public function createQuery(): ProxyQueryInterface
     {

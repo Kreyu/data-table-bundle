@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Factory\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\Factory\DataTableFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Maker\MakeDataTable;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeChain;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 

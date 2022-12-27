@@ -26,4 +26,8 @@ return static function (ContainerConfigurator $configurator) {
             service('form.factory'),
         ])
         ->alias(DataTableFactoryInterface::class, 'kreyu_data_table.factory');
+
+    $services
+        ->set('kreyu_data_table.maker', MakeDataTable::class)
+        ->tag('maker.command');
 };

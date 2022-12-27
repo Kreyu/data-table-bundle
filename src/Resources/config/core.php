@@ -19,9 +19,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.factory', DataTableFactory::class)
-        ->arg('$dataTableTypeChain', service('kreyu_data_table.type_chain'))
-        ->arg('$columnMapperFactory', service('kreyu_data_table.column.mapper.factory'))
-        ->arg('$filterMapperFactory', service('kreyu_data_table.filter.mapper.factory'))
-        ->arg('$formFactory', service('form.factory'))
+        ->args([
+            service('kreyu_data_table.type_chain'),
+            service('kreyu_data_table.column.mapper.factory'),
+            service('kreyu_data_table.filter.mapper.factory'),
+            service('form.factory'),
+        ])
         ->alias(DataTableFactoryInterface::class, 'kreyu_data_table.factory');
 };

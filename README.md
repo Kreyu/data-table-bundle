@@ -7,7 +7,7 @@ Streamlines creation process of the data tables.
 Run this command to install the bundle:
 
 ```shell
-$ composer require kreyu/data-table-bundle
+composer require kreyu/data-table-bundle
 ```
 
 ## Usage

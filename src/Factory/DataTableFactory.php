@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeChainInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DataTableFactory implements DataTableFactoryInterface
 {
@@ -23,33 +24,39 @@ class DataTableFactory implements DataTableFactoryInterface
     ) {
     }
 
-    public function create(string $typeClass): DataTableInterface
+    public function create(string $typeClass, array $options = []): DataTableInterface
     {
         if (null === $type = $this->dataTableTypeChain->get($typeClass)) {
             throw new InvalidArgumentException(sprintf('Data table type "%s" not found in the chain', $typeClass));
         }
 
-        return $this->doCreate($type->getName(), $type);
+        return $this->doCreate($type->getName(), $type, $options);
     }
 
-    public function createNamed(string $name, string $typeClass): DataTableInterface
+    public function createNamed(string $name, string $typeClass, array $options = []): DataTableInterface
     {
         if (null === $type = $this->dataTableTypeChain->get($typeClass)) {
             throw new InvalidArgumentException(sprintf('Data table type "%s" not found in the chain', $typeClass));
         }
 
-        return $this->doCreate($name, $type);
+        return $this->doCreate($name, $type, $options);
     }
 
-    private function doCreate(string $name, DataTableTypeInterface $type): DataTableInterface
+    private function doCreate(string $name, DataTableTypeInterface $type, array $options): DataTableInterface
     {
         $query = $type->createQuery();
+
+        $optionsResolver = new OptionsResolver();
+
+        $type->configureOptions($optionsResolver);
+
+        $options = $optionsResolver->resolve($options);
 
         $columnMapper = $this->columnMapperFactory->create();
         $filterMapper = $this->filterMapperFactory->create();
 
-        $type->configureColumns($columnMapper);
-        $type->configureFilters($filterMapper);
+        $type->configureColumns($columnMapper, $options);
+        $type->configureFilters($filterMapper, $options);
 
         return new DataTable(
             name: $name,

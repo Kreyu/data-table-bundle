@@ -28,11 +28,6 @@ class DataTable implements DataTableInterface
         $this->filtersForm = $this->buildFiltersForm();
     }
 
-    public function configureQuery(callable $callback): void
-    {
-        $callback($this->query, $this);
-    }
-
     public function getColumns(): array
     {
         return $this->columns;

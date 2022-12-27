@@ -7,14 +7,17 @@ namespace Kreyu\Bundle\DataTableBundle\Type;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface DataTableTypeInterface
 {
     public function createQuery(): ProxyQueryInterface;
 
-    public function configureColumns(ColumnMapperInterface $columns): void;
+    public function configureOptions(OptionsResolver $resolver): void;
 
-    public function configureFilters(FilterMapperInterface $filters): void;
+    public function configureColumns(ColumnMapperInterface $columns, array $options): void;
+
+    public function configureFilters(FilterMapperInterface $filters, array $options): void;
 
     public function getName(): ?string;
 }

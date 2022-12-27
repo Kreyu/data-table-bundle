@@ -38,6 +38,4 @@ interface DataTableInterface
     public function handleRequest(Request $request): void;
 
     public function createView(): DataTableViewInterface;
-
-    public function configureQuery(callable $callback): void;
 }

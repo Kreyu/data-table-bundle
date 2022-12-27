@@ -12,10 +12,10 @@ interface DataTableFactoryInterface
     /**
      * @param class-string<DataTableTypeInterface> $typeClass
      */
-    public function create(string $typeClass): DataTableInterface;
+    public function create(string $typeClass, array $options = []): DataTableInterface;
 
     /**
      * @param class-string<DataTableTypeInterface> $typeClass
      */
-    public function createNamed(string $name, string $typeClass): DataTableInterface;
+    public function createNamed(string $name, string $typeClass, array $options = []): DataTableInterface;
 }

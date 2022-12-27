@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactoryInterface;
 
-interface ColumnFactoryAwareTypeInterface
+interface ColumnFactoryAwareInterface
 {
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): void;
 }

@@ -16,9 +16,9 @@ class FilterMapper implements FilterMapperInterface
     ) {
     }
 
-    public function add(string $name, ?string $type = null, array $options = []): static
+    public function add(string $name, string $typeClass, array $options = []): static
     {
-        $this->filters[$name] = $this->filterFactory->create($name, $type, $options);
+        $this->filters[$name] = $this->filterFactory->create($name, $typeClass, $options);
 
         return $this;
     }

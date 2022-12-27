@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Factory\ColumnFactoryInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionType extends AbstractType implements ColumnFactoryAwareTypeInterface
+class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
 {
     private ?ColumnFactoryInterface $columnFactory = null;
 

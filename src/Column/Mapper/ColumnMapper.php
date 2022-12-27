@@ -16,9 +16,9 @@ class ColumnMapper implements ColumnMapperInterface
     ) {
     }
 
-    public function add(string $name, ?string $type = null, array $options = []): static
+    public function add(string $name, string $typeClass, array $options = []): static
     {
-        $this->columns[$name] = $this->columnFactory->create($name, $type, $options);
+        $this->columns[$name] = $this->columnFactory->create($name, $typeClass, $options);
 
         return $this;
     }

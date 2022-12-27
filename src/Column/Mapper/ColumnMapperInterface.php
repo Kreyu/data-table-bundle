@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Column\Mapper;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 
 interface ColumnMapperInterface
 {
-    public function add(string $name, ?string $type = null, array $options = []): static;
+    /**
+     * @param class-string<ColumnTypeInterface> $typeClass
+     */
+    public function add(string $name, string $typeClass, array $options = []): static;
 
     public function get(string $name): ?ColumnInterface;
 

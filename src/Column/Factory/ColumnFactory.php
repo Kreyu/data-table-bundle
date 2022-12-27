@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Factory;
 
 use Kreyu\Bundle\DataTableBundle\Column\Column;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnFactoryAwareTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnFactoryAwareInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeChain;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
@@ -28,7 +28,7 @@ class ColumnFactory implements ColumnFactoryInterface
             throw new InvalidArgumentException(sprintf('Could not load type "%s".', $typeClass));
         }
 
-        if ($type instanceof ColumnFactoryAwareTypeInterface) {
+        if ($type instanceof ColumnFactoryAwareInterface) {
             $type->setColumnFactory($this);
         }
 

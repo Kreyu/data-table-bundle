@@ -8,7 +8,10 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 
 interface FilterMapperInterface
 {
-    public function add(string $name, ?string $type = null, array $options = []): static;
+    /**
+     * @param class-string<FilterInterface> $typeClass
+     */
+    public function add(string $name, string $typeClass, array $options = []): static;
 
     public function get(string $name): ?FilterInterface;
 

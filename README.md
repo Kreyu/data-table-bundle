@@ -4,9 +4,9 @@ Streamlines creation process of the data tables.
 
 ## Installation
 
-In applications using [Symfony Flex](), run this command to install the data table feature before using it:
+Run this command to install the bundle:
 
-```
+```shell
 $ composer require kreyu/data-table-bundle
 ```
 
@@ -17,33 +17,43 @@ The recommended workflow when working with this bundle is the following:
 1. **Build the data table** in a dedicated data table class;
 2. **Render the data table** in a template, so the user can paginate, sort and filter it;
 
-### Data table types
-
-Before creating your first data table, it's important to understand the concept of "data table type".  
-Type classes work as a "blueprint", that defines table columns, filters, and its source, e.g. a Doctrine query.
-
 ## Building data tables
 
-### Creating data tables in controllers
-
-[//]: # (TODO: Add this section)
+Most common way to use the bundle, is to create the data tables in the controllers.  
+Controllers should use the [DataTableControllerTrait](), to gain access to the helper methods.
 
 ### Creating data table classes
 
-Data table classes are the [data table types]() that implement [DataTableTypeInterface]().  
+It is always recommended to put as little logic in controllers as possible. 
+That's why definition of the data table can be delegated to dedicated classes, instead of defining them in controller actions.
+Besides, data tables defined in classes can be reused in multiple actions and services.
+
+Data table classes are the [data table types]() that implement [DataTableTypeInterface](). 
 However, it's better to extend from [AbstractType](), which already implements the interface and provides some utilities:
 
 ```php
 // src/DataTable/Type/ProjectType.php
 namespace App\DataTable\Type;
 
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
 
 class ProjectType extends AbstractType
 {
+    public function __construct(
+        private readonly ProjectRepository $repository,
+    ) {
+    }
+    
+    public function createQuery(): ProxyQueryInterface
+    {
+        return new ProxyQuery($this->repository->createQueryBuilder('project'));
+    }
+
     public function configureColumns(ColumnMapperInterface $columns): void
     {
         $columns
@@ -54,10 +64,16 @@ class ProjectType extends AbstractType
 }
 ```
 
-[//]: # (TODO: Add maker command to create data table types)
+In this example, you've defined a data table with Doctrine query as a data source, with two columns - `name` and `quantity` - corresponding to the `name` and `quantity` properties
+of the `Project` class. You've also assigned each a [column type]() (e.g. `TextType` and `NumberType`), represented by its fully qualified class name.
 
-The data table class contains all the directions needed to create the data table.  
-In the controller, use the [DataTableControllerTrait](), to gain access to the `createDataTable()` helper:
+To make life easier and quickly generate data table classes, use the following maker command:
+
+```shell
+$ bin/console make:data-table
+```
+
+Now, having the data table type class, let's use the [DataTableControllerTrait](), to gain access to the `createDataTable` method:
 
 ```php
 // src/Controller/ProductController.php
@@ -81,9 +97,9 @@ class ProjectController extends AbstractController
 }
 ```
 
-**Important**: Notice the `handleRequest` method- it works as a handy tool to apply pagination, sorting and filters to the query.  
-It automatically extracts parameters from the request and calls `sort`, `filter` and `paginate` methods.  
-If you're using data tables in place without request (e.g. console command), use above methods manually.
+Notice the `handleRequest` method- it works as a handy tool to apply pagination, sorting and filters to the query. 
+It automatically extracts parameters from the request and calls `sort`, `filter` and `paginate` methods. 
+If you're using data tables in place without request (e.g. console command), use those methods manually.
 
 ## Rendering data tables
 
@@ -113,7 +129,9 @@ class ProjectController extends AbstractController
 }
 ```
 
-Then, use some data [table helper functions]() to render the data table contents:
+Notice the `createView` method- it creates a read-only view object of a data table, that can be easily displayed in the template.
+
+Inside the template, use [data table helper functions]() to render the data table contents:
 
 ```html
 {# templates/project/index.html.twig #}

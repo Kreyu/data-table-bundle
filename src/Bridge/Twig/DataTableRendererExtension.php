@@ -16,7 +16,7 @@ class DataTableRendererExtension extends AbstractExtension
     {
         return [
             new TwigFunction(
-                'render_data_table',
+                'data_table',
                 [$this, 'renderDataTable'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),

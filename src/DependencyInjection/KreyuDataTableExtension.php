@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Query\Factory\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,10 +29,6 @@ class KreyuDataTableExtension extends Extension
         $container
             ->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('kreyu_data_table.filter');
-
-        $container
-            ->registerForAutoconfiguration(ProxyQueryFactoryInterface::class)
-            ->addTag('kreyu_data_table.proxy_query_factory');
 
         $container
             ->registerForAutoconfiguration(DataTableTypeInterface::class)

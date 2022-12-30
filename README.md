@@ -2,6 +2,22 @@
 
 Streamlines creation process of the data tables.
 
+- [Installation](#installation)
+- [Usage](#usage)
+- [Building data tables](#building-data-tables)
+  - [Creating data table classes](#creating-data-table-classes)
+- [Rendering data tables](#rendering-data-tables)
+- [Other common data table features](#other-common-data-table-features)
+  - [Passing options to data tables](#passing-options-to-data-tables)
+- [Columns](#columns)
+  - [Available column types](#available-column-types)
+  - [Creating custom column type](#creating-custom-column-type)
+- [Filters](#filters)
+  - [Available filters](#available-filters)
+  - [Creating custom filter](#creating-custom-filter)
+    - [Doctrine ORM](#doctrine-orm)
+  - [Filter operators](#filter-operators)
+
 ## Installation
 
 Run this command to install the bundle:
@@ -227,15 +243,67 @@ class ProjectType extends AbstractType
 }
 ```
 
-## Column types
+## Columns
 
-For list of available column types and instructions on how to create a custom type, see [columns types reference](docs/column/types-reference.md).
+### Available column types
+
+The following column types are natively available in the bundle:
+
+- Text types
+  - [TextType](docs/column/types/text.md)
+  - [NumberType](docs/column/types/number.md)
+  - [BooleanType](docs/column/types/boolean.md)
+  - [LinkType](docs/column/types/link.md)
+- Special docs/column/types
+  - [CollectionType](docs/column/types/collection.md)
+  - [TemplateType](docs/column/types/template.md)
+  - [ActionsType](docs/column/types/actions.md)
+- Other
+  - [AbstractType](docs/column/types/abstract.md)
+
+### Creating custom column type
+
+To create a custom column type, create a class that extends `Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType`.
+
+When using default container configuration, that type should be ready to use.  
+If not, remember to tag this class as `kreyu_data_table.column_type`:
+
+```yaml
+App\DataTable\Column\Type\MyCustomType:
+  tags:
+    - { name: 'kreyu_data_table.column_type' }
+```
 
 ## Filters
 
-For list of available filters and instructions on how to create a custom filter, see [filters reference](docs/filter/reference.md).
+### Available filters
 
-### Operators
+The following filters are natively available in the bundle:
+
+- Doctrine ORM
+  - [StringFilter](docs/filter/doctrine/orm/string.md)
+  - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
+  - [EntityFilter](docs/filter/doctrine/orm/entity.md)
+  - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
+- Other
+  - [AbstractFilter](docs/filter/other/abstract.md)
+
+### Creating custom filter
+
+#### Doctrine ORM
+
+To create a custom filter, create a class that extends `Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\AbstractFilter`.
+
+When using default container configuration, that filter should be ready to use.  
+If not, remember to tag this class as `kreyu_data_table.filter`:
+
+```yaml
+App\DataTable\Filter\MyCustomFilter:
+  tags:
+    - { name: 'kreyu_data_table.filter' }
+```
+
+### Filter operators
 
 Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
 
@@ -279,5 +347,5 @@ If you wish to override the operator selector completely, create custom form typ
 ## TODO
 
 - [ ] Personalization (to let user change the columns visibility and order);
-- [ ] Filter & personalization persister (to save filters & personalization applied by the user); 
+- [ ] Filter & personalization persistence (to save filters & personalization applied by the user); 
 - [ ] Export to excel (both with and without personalization & applied filters);

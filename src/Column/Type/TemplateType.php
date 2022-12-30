@@ -13,11 +13,13 @@ class TemplateType extends AbstractType
         parent::configureOptions($resolver);
 
         $resolver
+            ->setRequired([
+                'template_path',
+            ])
             ->setDefaults([
-                'template_path' => null,
                 'template_vars' => [],
             ])
-            ->setAllowedTypes('template_path', ['null', 'string'])
+            ->setAllowedTypes('template_path', ['string'])
             ->setAllowedTypes('template_vars', ['array'])
         ;
     }

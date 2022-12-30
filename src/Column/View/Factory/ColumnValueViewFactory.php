@@ -29,7 +29,7 @@ class ColumnValueViewFactory implements ColumnValueViewFactoryInterface
         $options['mapped'] ??= true;
         $options['property_path'] ??= $column->getName();
 
-        if ($options['mapped'] && (is_array($value) || is_object($value))) {
+        if (false !== $options['property_path'] && (is_array($value) || is_object($value))) {
             $value = $this->propertyAccessor->getValue($value, $options['property_path']);
         }
 
@@ -49,7 +49,7 @@ class ColumnValueViewFactory implements ColumnValueViewFactoryInterface
         // Resolve array options recursively, so that depth doesn't matter.
         if (is_array($optionValue)) {
             $optionValue = array_map(
-                fn ($entryValue) => $this->resolveOptionValue($entryValue, $value),
+                fn (mixed $entryValue) => $this->resolveOptionValue($entryValue, $value),
                 $optionValue,
             );
         }

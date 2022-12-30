@@ -13,7 +13,11 @@ class LinkType extends AbstractType
         parent::configureOptions($resolver);
 
         $resolver
-            ->setDefault('url', '#')
-            ->setAllowedTypes('url', ['string', 'callable']);
+            ->setDefaults([
+                'href' => '#',
+                'target' => '_self',
+            ])
+            ->setAllowedTypes('href', ['string', 'callable'])
+            ->setAllowedTypes('target', ['string', 'callable']);
     }
 }

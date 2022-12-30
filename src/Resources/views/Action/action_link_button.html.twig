@@ -1,1 +1,1 @@
-<a href="{{ url }}" class="btn btn-primary">{{ label|raw }}</a>
+<a href="{{ url|default('#') }}" class="{{ class|default('btn btn-primary') }}">{{- label|default('')|raw -}}</a>

@@ -12,14 +12,14 @@
 
 {% block data_table_boolean %}
     {% if value %}
-        <span class="badge bg-green">{{ label_true|trans }}</span>
+        <span class="badge bg-green">{{ label_true|trans({}, translation_domain) }}</span>
     {% else %}
-        <span class="badge bg-red">{{ label_false|trans }}</span>
+        <span class="badge bg-red">{{ label_false|trans({}, translation_domain) }}</span>
     {% endif %}
 {% endblock %}
 
 {% block data_table_link %}
-    <a href="{{ url }}">
+    <a href="{{- href -}}" target="{{- target -}}">
         <span>{{- value -}}</span>
     </a>
 {% endblock %}

@@ -6,8 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use function Symfony\Component\Translation\t;
-
 use Symfony\Component\Translation\TranslatableMessage;
 
 class BooleanType extends AbstractType
@@ -18,8 +16,8 @@ class BooleanType extends AbstractType
 
         $resolver
             ->setDefaults([
-                'label_true' => t('Yes', domain: 'KreyuDataTable'),
-                'label_false' => t('No', domain: 'KreyuDataTable'),
+                'label_true' => 'Yes',
+                'label_false' => 'No',
             ])
             ->setAllowedTypes('label_true', ['string', TranslatableMessage::class])
             ->setAllowedTypes('label_false', ['string', TranslatableMessage::class]);

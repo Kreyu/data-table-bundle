@@ -25,22 +25,20 @@ abstract class AbstractType implements ColumnTypeInterface
             ->setDefaults([
                 'label' => null,
                 'label_translation_parameters' => [],
-                'translation_domain' => null,
+                'translation_domain' => 'KreyuDataTable',
                 'property_path' => null,
-                'sort_field' => null,
+                'sort_field' => false,
                 'block_name' => 'data_table_'.$this->getBlockPrefix(),
                 'block_prefix' => $this->getBlockPrefix(),
-                'mapped' => true,
                 'value' => null,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_parameters', ['array'])
-            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', 'callable'])
-            ->setAllowedTypes('property_path', ['null', 'bool', 'string'])
-            ->setAllowedTypes('sort_field', ['null', 'string'])
+            ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
+            ->setAllowedTypes('translation_domain', ['bool', 'string'])
+            ->setAllowedTypes('property_path', ['null', 'string'])
+            ->setAllowedTypes('sort_field', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
-            ->setAllowedTypes('block_prefix', ['null', 'string'])
-            ->setAllowedTypes('mapped', ['bool']);
+            ->setAllowedTypes('block_prefix', ['null', 'string']);
     }
 
     public function getBlockPrefix(): string

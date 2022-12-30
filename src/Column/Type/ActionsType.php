@@ -13,16 +13,18 @@ class ActionsType extends AbstractType
         parent::configureOptions($resolver);
 
         $resolver
-            ->setDefault('mapped', false)
+            ->setDefault('property_path', false)
             ->setDefault('actions', function (OptionsResolver $resolver) {
                 $resolver
                     ->setPrototype(true)
+                    ->setRequired([
+                        'template_path',
+                    ])
                     ->setDefaults([
-                        'template_path' => null,
                         'template_vars' => [],
                     ])
-                    ->setAllowedTypes('template_path', ['null', 'string'])
-                    ->setAllowedTypes('template_vars', ['array'])
+                    ->setAllowedTypes('template_path', ['string', 'callable'])
+                    ->setAllowedTypes('template_vars', ['array', 'callable'])
                 ;
             })
         ;

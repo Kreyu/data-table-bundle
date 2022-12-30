@@ -229,17 +229,8 @@ class ProjectType extends AbstractType
 
 ## Column types
 
-[//]: # (Add this section)
+See [columns types reference](docs/column-types.md).
 
-### Available column types
-
-* [ActionsType](src/Column/Type/ActionsType.php) - to display row actions,
-* [BooleanType](src/Column/Type/BooleanType.php) - to display boolean badge with "yes" or "no",
-* [CollectionType](src/Column/Type/CollectionType.php) - to display collection of data, e.g. product categories,
-* [LinkType](src/Column/Type/LinkType.php) - to display link of given url,
-* [NumberType](src/Column/Type/NumberType.php) - to display text formatted as a number (aligned to right),
-* [TemplateType](src/Column/Type/TemplateType.php) - to display given twig template,
-* [TextType](src/Column/Type/TextType.php) - to display text.
 
 ## Filters
 
@@ -290,3 +281,9 @@ If you wish to override the operator selector completely, create custom form typ
 * [EntityFilter](src/Bridge/Doctrine/Orm/Filter/EntityFilter.php) - to filter by an entity; displays entity select field,
 * [NumericFilter](src/Bridge/Doctrine/Orm/Filter/NumericFilter.php) - to filter by number (supports gt, gte, lt, lte operators)
 * [StringFilter](src/Bridge/Doctrine/Orm/Filter/StringFilter.php) - to filter by string
+
+## TODO
+
+- [ ] Personalization (to let user change the columns visibility and order);
+- [ ] Filter & personalization persister (to save filters & personalization applied by the user); 
+- [ ] Export to excel (both with and without personalization & applied filters);

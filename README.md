@@ -1,5 +1,8 @@
 # DataTableBundle
 
+[![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
+[![PHP Version Require](http://poser.pugx.org/kreyu/data-table-bundle/require/php)](https://packagist.org/packages/kreyu/data-table-bundle)
+
 Streamlines creation process of the data tables in Symfony 6.
 
 - [Installation](#installation)

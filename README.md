@@ -229,9 +229,11 @@ class ProjectType extends AbstractType
 
 ## Column types
 
-See [columns types reference](docs/column/types-reference.md).
+For list of available column types and instructions on how to create a custom type, see [columns types reference](docs/column/types-reference.md).
 
 ## Filters
+
+For list of available filters and instructions on how to create a custom filter, see [filters reference](docs/filter/reference.md).
 
 ### Operators
 
@@ -273,13 +275,6 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 ```
 
 If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. Options passed as `operator_options` are used in that type.
-
-### Available filter types
-
-* [CallbackFilter](src/Bridge/Doctrine/Orm/Filter/CallbackFilter.php) - to filter by criteria manually applied to the query in a callback,
-* [EntityFilter](src/Bridge/Doctrine/Orm/Filter/EntityFilter.php) - to filter by an entity; displays entity select field,
-* [NumericFilter](src/Bridge/Doctrine/Orm/Filter/NumericFilter.php) - to filter by number (supports gt, gte, lt, lte operators)
-* [StringFilter](src/Bridge/Doctrine/Orm/Filter/StringFilter.php) - to filter by string
 
 ## TODO
 

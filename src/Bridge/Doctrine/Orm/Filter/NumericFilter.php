@@ -8,14 +8,15 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumericFilter extends AbstractFilter
 {
-    public function getFormOptions(): array
+    protected function configureOptions(OptionsResolver $resolver): void
     {
-        return array_merge(parent::getFormOptions(), [
-            'field_type' => NumberType::class,
-        ]);
+        parent::configureOptions($resolver);
+
+        $resolver->setDefault('field_type', NumberType::class);
     }
 
     protected function filter(ProxyQueryInterface $query, FilterData $data): void

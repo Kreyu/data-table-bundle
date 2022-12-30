@@ -28,19 +28,13 @@ abstract class AbstractFilter implements FilterInterface
         $resolver
             ->setDefaults([
                 'label' => $this->getName(),
+                'label_translation_parameters' => [],
+                'translation_domain' => 'KreyuDataTable',
                 'field_name' => $this->getName(),
                 'field_type' => TextType::class,
                 'field_options' => [],
                 'operator_type' => OperatorType::class,
                 'operator_options' => [],
-            ])
-            ->setRequired([
-                'label',
-                'field_name',
-                'field_type',
-                'field_options',
-                'operator_type',
-                'operator_options',
             ])
             ->setAllowedTypes('label', ['string', TranslatableMessage::class])
             ->setAllowedTypes('field_name', ['string'])

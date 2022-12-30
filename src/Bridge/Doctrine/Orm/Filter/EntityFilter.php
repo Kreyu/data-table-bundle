@@ -8,9 +8,17 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityFilter extends AbstractFilter
 {
+    protected function configureOptions(OptionsResolver $resolver): void
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefault('field_type', EntityType::class);
+    }
+
     public function getFormOptions(): array
     {
         return array_merge(parent::getFormOptions(), [

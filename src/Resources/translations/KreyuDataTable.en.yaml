@@ -7,6 +7,8 @@ GREATER_EQUAL: greater or equal
 LESS_EQUAL: lesser or equal
 GREATER_THAN: greater than
 LESS_THAN: lesser than
+STARTS_WITH: starts with
+ENDS_WITH: ends with
 
 # Boolean type
 Yes: Yes

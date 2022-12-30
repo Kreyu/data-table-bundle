@@ -14,4 +14,6 @@ enum Operator: string
     case LESS_EQUAL = 'less-equal';
     case GREATER_THAN = 'greater-than';
     case LESS_THAN = 'less-than';
+    case STARTS_WITH = 'starts-with';
+    case ENDS_WITH = 'ends-with';
 }

@@ -18,13 +18,15 @@ class StringFilter extends AbstractFilter
         $exprMethod = match ($operator) {
             Operator::EQUAL => 'eq',
             Operator::NOT_EQUAL => 'neq',
-            Operator::CONTAINS => 'like',
+            Operator::CONTAINS, Operator::STARTS_WITH, Operator::ENDS_WITH => 'like',
             Operator::NOT_CONTAINS => 'notLike',
             default => throw new \InvalidArgumentException('Operator not supported'),
         };
 
         $parameterValue = match ($operator) {
             Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
+            Operator::STARTS_WITH => "%$value",
+            Operator::ENDS_WITH => "$value%",
             default => $value,
         };
 
@@ -44,6 +46,8 @@ class StringFilter extends AbstractFilter
             Operator::NOT_EQUAL,
             Operator::CONTAINS,
             Operator::NOT_CONTAINS,
+            Operator::STARTS_WITH,
+            Operator::ENDS_WITH,
         ];
     }
 }

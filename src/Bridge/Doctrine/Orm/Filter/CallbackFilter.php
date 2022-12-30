@@ -11,21 +11,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CallbackFilter extends AbstractFilter
 {
-    public function getFormOptions(): array
-    {
-        return array_merge(parent::getFormOptions(), [
-            'operator_options' => [
-                'visible' => false,
-                'choices' => [],
-            ],
-        ]);
-    }
-
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver
+            ->setDefault('operator_options', [
+                'visible' => false,
+                'choices' => [],
+            ])
             ->setRequired('callback')
             ->setAllowedTypes('callback', ['callable'])
         ;

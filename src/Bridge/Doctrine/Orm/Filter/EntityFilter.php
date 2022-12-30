@@ -19,13 +19,6 @@ class EntityFilter extends AbstractFilter
         $resolver->setDefault('field_type', EntityType::class);
     }
 
-    public function getFormOptions(): array
-    {
-        return array_merge(parent::getFormOptions(), [
-            'field_type' => EntityType::class,
-        ]);
-    }
-
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
         $value = (array) $data->getValue();

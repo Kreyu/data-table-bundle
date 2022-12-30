@@ -35,11 +35,11 @@ However, it's better to extend from [AbstractType](), which already implements t
 // src/DataTable/Type/ProjectType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\NumericFilter;use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\StringFilter;use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
 
 class ProjectType extends AbstractType
@@ -54,23 +54,31 @@ class ProjectType extends AbstractType
         return new ProxyQuery($this->repository->createQueryBuilder('project'));
     }
 
-    public function configureColumns(ColumnMapperInterface $columns): void
+    public function configureColumns(ColumnMapperInterface $columns, array $options): void
     {
         $columns
             ->add('name', TextType::class)
             ->add('quantity', NumberType::class)
         ;
     }
+    
+    public function configureFilters(FilterMapperInterface $filters, array $options): void
+    {
+        $filters
+            ->add('name', StringFilter::class)
+            ->add('quantity', NumericFilter::class)
+        ;
+    }
 }
 ```
 
-In this example, you've defined a data table with Doctrine query as a data source, with two columns - `name` and `quantity` - corresponding to the `name` and `quantity` properties
+In this example, you've defined a data table with Doctrine query as a data source, with two columns and filters - `name` and `quantity` - corresponding to the `name` and `quantity` properties
 of the `Project` class. You've also assigned each a [column type]() (e.g. `TextType` and `NumberType`), represented by its fully qualified class name.
 
 To make life easier and quickly generate data table classes, use the following maker command:
 
 ```shell
-$ bin/console make:data-table
+bin/console make:data-table
 ```
 
 Now, having the data table type class, let's use the [DataTableControllerTrait](), to gain access to the `createDataTable` method:
@@ -232,7 +240,47 @@ class ProjectType extends AbstractType
 
 ## Filters
 
-[//]: # (Add this section)
+### Operators
+
+Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
+
+Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
+
+By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
+
+```php
+public function configureFilters(FilterMapperInterface $filters, array $options): void
+{
+    $filters
+        // StringFilter uses Operator::EQUAL by default
+        ->add('name', StringFilter::class, [
+            'field_name' => 'product.name',
+            'operator_options' => [
+                'choices' => [
+                    Operator::CONTAINS,
+                ],
+            ],
+        ])
+    ;
+```
+
+If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
+
+```php
+public function configureFilters(FilterMapperInterface $filters, array $options): void
+{
+    $filters
+        ->add('quantity', NumericFilter::class, [
+            'label' => t('Ilość'),
+            'field_name' => 'product.quantity',
+            'operator_options' => [
+                'visible' => true,
+            ],
+        ])
+    ;
+```
+
+If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. Options passed as `operator_options` are used in that type.
 
 ### Available filter types
 

@@ -35,11 +35,14 @@ However, it's better to extend from [AbstractType](), which already implements t
 // src/DataTable/Type/ProjectType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\NumericFilter;use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\StringFilter;use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\StringFilter;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
-use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
 
 class ProjectType extends AbstractType

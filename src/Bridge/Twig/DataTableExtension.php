@@ -32,12 +32,12 @@ class DataTableExtension extends AbstractExtension
             new TwigFunction(
                 'data_table_column_header',
                 [$this, 'renderColumnHeader'],
-                ['is_safe' => ['html']],
+                ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
                 'data_table_column_value',
                 [$this, 'renderColumnValue'],
-                ['is_safe' => ['html']],
+                ['needs_environment' => true, 'is_safe' => ['html']],
             ),
         ];
     }

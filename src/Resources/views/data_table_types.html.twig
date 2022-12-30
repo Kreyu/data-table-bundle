@@ -26,7 +26,7 @@
 
 {% block data_table_collection %}
     {% for _value in value %}
-        {{- render_data_table_column_value(data_table, prototype, _value) -}}
+        {{- data_table_column_value(data_table, prototype, _value) -}}
     {% endfor %}
 {% endblock %}
 

@@ -229,8 +229,7 @@ class ProjectType extends AbstractType
 
 ## Column types
 
-See [columns types reference](docs/column-types.md).
-
+See [columns types reference](docs/column/types-reference.md).
 
 ## Filters
 

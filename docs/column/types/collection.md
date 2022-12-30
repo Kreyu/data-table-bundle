@@ -1,6 +1,6 @@
 # CollectionType
 
-The [CollectionType](../../src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
+The [CollectionType](../../../src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
 
 **Note**: this type implements `ColumnFactoryAwareInterface`, which gives ability to use the column factory.
 

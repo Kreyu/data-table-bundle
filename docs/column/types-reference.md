@@ -5,14 +5,14 @@
 The following column types are natively available in the bundle:
 
 - Text types
-  - [TextType](column-types/text.md)
-  - [NumberType](column-types/number.md)
-  - [BooleanType](column-types/boolean.md)
-  - [LinkType](column-types/link.md)
+  - [TextType](column/column-types/text.md)
+  - [NumberType](column/column-types/number.md)
+  - [BooleanType](column/column-types/boolean.md)
+  - [LinkType](column/column-types/link.md)
 - Special types
-  - [CollectionType](column-types/collection.md)
-  - [TemplateType](column-types/template.md)
-  - [ActionsType](column-types/actions.md)
+  - [CollectionType](column/column-types/collection.md)
+  - [TemplateType](column/column-types/template.md)
+  - [ActionsType](column/column-types/actions.md)
 
 ## Creating custom column types
 

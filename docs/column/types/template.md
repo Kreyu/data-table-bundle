@@ -1,6 +1,6 @@
 # TemplateType
 
-The [TemplateType](../../src/Column/Type/TemplateType.php) represents a column with value displayed as a link.
+The [TemplateType](../../../src/Column/Type/TemplateType.php) represents a column with value displayed as a link.
 
 ## Options
 

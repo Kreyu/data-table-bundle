@@ -1,6 +1,6 @@
 # NumberType
 
-The [NumberType](../../src/Column/Type/NumberType.php) column represents the numeric column, with value aligned to the right.
+The [NumberType](../../../src/Column/Type/NumberType.php) column represents the numeric column, with value aligned to the right.
 
 ## Options
 

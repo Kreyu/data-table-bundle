@@ -271,7 +271,6 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 {
     $filters
         ->add('quantity', NumericFilter::class, [
-            'label' => t('Ilość'),
             'field_name' => 'product.quantity',
             'operator_options' => [
                 'visible' => true,

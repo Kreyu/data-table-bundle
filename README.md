@@ -1,6 +1,6 @@
 # DataTableBundle
 
-Streamlines creation process of the data tables.
+Streamlines creation process of the data tables in Symfony 6.
 
 - [Installation](#installation)
 - [Usage](#usage)

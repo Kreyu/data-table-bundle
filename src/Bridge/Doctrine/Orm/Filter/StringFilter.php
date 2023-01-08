@@ -12,31 +12,18 @@ class StringFilter extends AbstractFilter
 {
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
-        $value = $data->getValue();
         $operator = $data->getOperator() ?? Operator::EQUAL;
+        $value = $data->getValue();
 
-        $exprMethod = match ($operator) {
-            Operator::EQUAL => 'eq',
-            Operator::NOT_EQUAL => 'neq',
-            Operator::CONTAINS, Operator::STARTS_WITH, Operator::ENDS_WITH => 'like',
-            Operator::NOT_CONTAINS => 'notLike',
-            default => throw new \InvalidArgumentException('Operator not supported'),
-        };
-
-        $parameterValue = match ($operator) {
-            Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
-            Operator::STARTS_WITH => "%$value",
-            Operator::ENDS_WITH => "$value%",
-            default => $value,
-        };
+        $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
 
         $parameterName = $this->generateUniqueParameterName($query);
 
-        $expression = $query->expr()->{$exprMethod}($this->getFieldName(), ":$parameterName");
+        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFieldName(), ":$parameterName");
 
         $query
             ->andWhere($expression)
-            ->setParameter($parameterName, $parameterValue);
+            ->setParameter($parameterName, $this->getParameterValue($operator, $value));
     }
 
     protected function getSupportedOperators(): array
@@ -49,5 +36,26 @@ class StringFilter extends AbstractFilter
             Operator::STARTS_WITH,
             Operator::ENDS_WITH,
         ];
+    }
+
+    private function getExpressionBuilderMethodName(Operator $operator): string
+    {
+        return match ($operator) {
+            Operator::EQUAL => 'eq',
+            Operator::NOT_EQUAL => 'neq',
+            Operator::CONTAINS, Operator::STARTS_WITH, Operator::ENDS_WITH => 'like',
+            Operator::NOT_CONTAINS => 'notLike',
+            default => throw new \InvalidArgumentException('Operator not supported'),
+        };
+    }
+
+    private function getParameterValue(Operator $operator, mixed $value): string
+    {
+        return (string) match ($operator) {
+            Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
+            Operator::STARTS_WITH => "$value%",
+            Operator::ENDS_WITH => "%$value",
+            default => $value,
+        };
     }
 }

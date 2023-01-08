@@ -21,18 +21,14 @@ class EntityFilter extends AbstractFilter
 
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
-        $value = (array) $data->getValue();
         $operator = $data->getOperator() ?? Operator::EQUAL;
+        $value = (array) $data->getValue();
 
-        $exprMethod = match ($operator) {
-            Operator::EQUAL, Operator::CONTAINS => 'in',
-            Operator::NOT_EQUAL, Operator::NOT_CONTAINS => 'notIn',
-            default => throw new \InvalidArgumentException('Operator not supported'),
-        };
+        $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
 
         $parameterName = $this->generateUniqueParameterName($query);
 
-        $expression = $query->expr()->{$exprMethod}($this->getFieldName(), ":$parameterName");
+        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFieldName(), ":$parameterName");
 
         $query
             ->andWhere($expression)
@@ -47,5 +43,14 @@ class EntityFilter extends AbstractFilter
             Operator::CONTAINS,
             Operator::NOT_CONTAINS,
         ];
+    }
+
+    private function getExpressionBuilderMethodName(Operator $operator): string
+    {
+        return match ($operator) {
+            Operator::EQUAL, Operator::CONTAINS => 'in',
+            Operator::NOT_EQUAL, Operator::NOT_CONTAINS => 'notIn',
+            default => throw new \InvalidArgumentException('Operator not supported'),
+        };
     }
 }

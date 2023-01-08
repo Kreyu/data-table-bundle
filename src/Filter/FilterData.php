@@ -14,8 +14,14 @@ class FilterData
 
     public static function fromArray(array $data): self
     {
+        $operator = $data['operator'] ?? '';
+
+        if (!$operator instanceof Operator) {
+            $operator = Operator::tryFrom($operator);
+        }
+
         return new self(
-            operator: Operator::tryFrom($data['operator'] ?? ''),
+            operator: $operator,
             value: $data['value'] ?? '',
         );
     }

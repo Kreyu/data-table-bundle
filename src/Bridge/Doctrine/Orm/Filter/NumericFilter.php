@@ -21,22 +21,14 @@ class NumericFilter extends AbstractFilter
 
     protected function filter(ProxyQueryInterface $query, FilterData $data): void
     {
-        $value = $data->getValue();
         $operator = $data->getOperator() ?? Operator::EQUAL;
+        $value = $data->getValue();
 
-        $exprMethod = match ($operator) {
-            Operator::EQUAL => 'eq',
-            Operator::NOT_EQUAL => 'neq',
-            Operator::GREATER_EQUAL => 'gte',
-            Operator::GREATER_THAN => 'gt',
-            Operator::LESS_EQUAL => 'lte',
-            Operator::LESS_THAN => 'lt',
-            default => throw new \InvalidArgumentException('Operator not supported'),
-        };
+        $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
 
         $parameterName = $this->generateUniqueParameterName($query);
 
-        $expression = $query->expr()->{$exprMethod}($this->getFieldName(), ":$parameterName");
+        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFieldName(), ":$parameterName");
 
         $query
             ->andWhere($expression)
@@ -53,5 +45,18 @@ class NumericFilter extends AbstractFilter
             Operator::LESS_EQUAL,
             Operator::LESS_THAN,
         ];
+    }
+
+    private function getExpressionBuilderMethodName(Operator $operator): string
+    {
+        return match ($operator) {
+            Operator::EQUAL => 'eq',
+            Operator::NOT_EQUAL => 'neq',
+            Operator::GREATER_EQUAL => 'gte',
+            Operator::GREATER_THAN => 'gt',
+            Operator::LESS_EQUAL => 'lte',
+            Operator::LESS_THAN => 'lt',
+            default => throw new \InvalidArgumentException('Operator not supported'),
+        };
     }
 }

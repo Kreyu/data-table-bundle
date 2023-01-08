@@ -27,6 +27,7 @@
 {% block data_table_collection %}
     {% for _value in value %}
         {{- data_table_column_value(data_table, prototype, _value) -}}
+        <span>{% if not loop.last %}{{ separator }}{% endif %}</span>
     {% endfor %}
 {% endblock %}
 

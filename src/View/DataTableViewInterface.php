@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\View;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Symfony\Component\Form\FormView;
 
 interface DataTableViewInterface
@@ -30,4 +31,10 @@ interface DataTableViewInterface
     public function getPageParameterName(): string;
 
     public function getPerPageParameterName(): string;
+
+    public function hasPersonalizationEnabled(): bool;
+
+    public function getPersonalizationData(): ?PersonalizationData;
+
+    public function getPersonalizationForm(): FormView;
 }

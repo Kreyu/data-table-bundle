@@ -1,5 +1,7 @@
 {# @var \Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface data_table #}
 
+{% trans_default_domain 'KreyuDataTable' %}
+
 {% macro render_label(context) %}
     {% if context.translation_domain is not same as false %}
         {{- context.label|trans(context.label_translation_parameters, context.translation_domain) -}}

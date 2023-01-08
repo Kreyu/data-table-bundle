@@ -1,9 +1,10 @@
 # DataTableBundle
 
-[![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
-[![PHP Version Require](http://poser.pugx.org/kreyu/data-table-bundle/require/php)](https://packagist.org/packages/kreyu/data-table-bundle)
+[//]: # ([![Latest Stable Version]&#40;http://poser.pugx.org/kreyu/data-table-bundle/v&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
+[//]: # ([![PHP Version Require]&#40;http://poser.pugx.org/kreyu/data-table-bundle/require/php&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
 
-Streamlines creation process of the data tables in Symfony 6.
+Streamlines creation process of the data tables in Symfony 6.  
+Heavily inspired by the [Symfony Form](https://github.com/symfony/form) & [Sonata Admin Bundle](https://github.com/sonata-project/SonataAdminBundle) datagrid.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -12,6 +13,7 @@ Streamlines creation process of the data tables in Symfony 6.
 - [Rendering data tables](#rendering-data-tables)
 - [Other common data table features](#other-common-data-table-features)
   - [Passing options to data tables](#passing-options-to-data-tables)
+  - [Using Twig helper functions](#using-twig-helper-functions)
 - [Columns](#columns)
   - [Available column types](#available-column-types)
   - [Creating custom column type](#creating-custom-column-type)
@@ -39,7 +41,7 @@ The recommended workflow when working with this bundle is the following:
 ## Building data tables
 
 Most common way to use the bundle, is to create the data tables in the controllers.  
-Controllers should use the [DataTableControllerTrait](), to gain access to the helper methods.
+Controllers should use the [DataTableControllerTrait](src/DataTableControllerTrait.php), to gain access to the helper methods.
 
 ### Creating data table classes
 
@@ -47,8 +49,8 @@ It is always recommended to put as little logic in controllers as possible.
 That's why definition of the data table can be delegated to dedicated classes, instead of defining them in controller actions.
 Besides, data tables defined in classes can be reused in multiple actions and services.
 
-Data table classes are the [data table types]() that implement [DataTableTypeInterface](). 
-However, it's better to extend from [AbstractType](), which already implements the interface and provides some utilities:
+Data table classes are the data table types that implement [DataTableTypeInterface](src/DataTableInterface.php). 
+However, it's better to extend from [AbstractType](src/Type/AbstractType.php), which already implements the interface and provides some utilities:
 
 ```php
 // src/DataTable/Type/ProjectType.php
@@ -103,7 +105,7 @@ To make life easier and quickly generate data table classes, use the following m
 bin/console make:data-table
 ```
 
-Now, having the data table type class, let's use the [DataTableControllerTrait](), to gain access to the `createDataTable` method:
+Now, having the data table type class, let's use the [DataTableControllerTrait](src/DataTableControllerTrait.php), to gain access to the `createDataTable` method:
 
 ```php
 // src/Controller/ProductController.php
@@ -161,20 +163,20 @@ class ProjectController extends AbstractController
 
 Notice the `createView` method- it creates a read-only view object of a data table, that can be easily displayed in the template.
 
-Inside the template, use [data table helper functions]() to render the data table contents:
+Inside the template, use [data table twig helper functions](#using-twig-helper-functions) to render the data table contents:
 
 ```html
 {# templates/project/index.html.twig #}
 {{ data_table(data_table) }}
 ```
 
-That's it. The [data_table() function]() renders all the data table filters, columns and pagination.
+That's it. The `data_table` function renders all the data table filters, columns and pagination.
 
 ## Other common data table features
 
 ### Passing options to data tables
 
-If you [create data tables in classes](), when building the data table in the controller, you can pass custom options to it as the second optional argument of `createDataTable()`:
+If you [create data tables in classes](#creating-data-table-classes), when building the data table in the controller, you can pass custom options to it as the second optional argument of `createDataTable()`:
 
 ```php
 // src/Controller/ProductController.php
@@ -245,6 +247,19 @@ class ProjectType extends AbstractType
     }
 }
 ```
+
+### Using Twig helper functions
+
+Functions are defined in the [DataTableExtension class](src/Bridge/Twig/DataTableExtension.php).
+
+| Function                          | Arguments                                                                                       | Description                                                             |
+|:----------------------------------|:------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------|
+| `data_table`                      | 1) `DataTableViewInterface $dataTable`                                                          | Renders whole data table, including filter form, columns and pagination |
+| `data_table_column_header`        | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`                        | Renders column header                                                   |
+| `data_table_column_value`         | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`<br/> 3) `mixed $value` | Renders column value. Gets a raw value, outputs a formatted value       |
+| `data_table_filter_form`          | 1) `DataTableViewInterface $dataTable`                                                          | Renders filter form                                                     |
+| `data_table_personalization_form` | 1) `DataTableViewInterface $dataTable`                                                          | Renders personalization form                                            |
+| `data_table_pagination`           | 1) `DataTableViewInterface $dataTable`                                                          | Renders pagination                                                      |
 
 ## Columns
 
@@ -328,6 +343,7 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
             ],
         ])
     ;
+}
 ```
 
 If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
@@ -343,9 +359,11 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
             ],
         ])
     ;
+}
 ```
 
-If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. Options passed as `operator_options` are used in that type.
+If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. 
+Options passed as `operator_options` are used in that type.
 
 ## TODO
 

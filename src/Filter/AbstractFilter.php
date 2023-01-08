@@ -34,7 +34,10 @@ abstract class AbstractFilter implements FilterInterface
                 'field_type' => TextType::class,
                 'field_options' => [],
                 'operator_type' => OperatorType::class,
-                'operator_options' => [],
+                'operator_options' => [
+                    'visible' => false,
+                    'choices' => $this->getSupportedOperators(),
+                ],
             ])
             ->setAllowedTypes('label', ['string', TranslatableMessage::class])
             ->setAllowedTypes('field_name', ['string'])

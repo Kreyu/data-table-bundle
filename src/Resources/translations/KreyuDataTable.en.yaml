@@ -13,3 +13,12 @@ ENDS_WITH: ends with
 # Boolean type
 Yes: Yes
 No: No
+
+# Personalization
+Personalization: Personalization
+Drag items between columns to show/hide relevant data in the list or change their order: Drag items between columns to show/hide relevant data in the list or change their order
+Visible columns: Visible columns
+Hidden columns: Hidden columns
+
+# Misc
+Filter: Filter

@@ -72,7 +72,7 @@ class ProxyQuery implements ProxyQueryInterface
             items: $paginator->getIterator(),
             currentPageNumber: $this->queryBuilder->getFirstResult() + 1,
             totalItemCount: $paginator->count(),
-            itemNumberPerPage: $this->queryBuilder->getMaxResults(),
+            itemNumberPerPage: $this->queryBuilder->getMaxResults() ?? 25,
         );
     }
 

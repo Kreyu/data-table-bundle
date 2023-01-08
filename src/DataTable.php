@@ -6,6 +6,12 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationType;
+use Kreyu\Bundle\DataTableBundle\Personalization\Persistence\PersonalizationPersisterInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\Persistence\PersonalizationPersisterSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\View\DataTableView;
 use Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface;
@@ -17,15 +23,41 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class DataTable implements DataTableInterface
 {
     private FormInterface $filtersForm;
+    private FormInterface $personalizationForm;
 
     public function __construct(
-        private readonly null|string $name,
+        private readonly string $name,
         private readonly ProxyQueryInterface $query,
         private readonly array $columns,
         private readonly array $filters,
         private readonly FormFactoryInterface $formFactory,
+        private readonly ?FilterPersisterInterface $filterPersister,
+        private readonly ?FilterPersisterSubjectInterface $filterPersisterSubject,
+        private readonly ?PersonalizationPersisterInterface $personalizationPersister,
+        private readonly ?PersonalizationPersisterSubjectInterface $personalizationPersisterSubject,
+        private readonly ?PersonalizationData $personalizationData,
     ) {
         $this->filtersForm = $this->buildFiltersForm();
+        $this->personalizationForm = $this->buildPersonalizationForm();
+
+        if ($this->filterPersister && $this->filterPersisterSubject) {
+            $filters = $this->filterPersister->get($this->filterPersisterSubject, $this);
+
+            if (!empty($filters)) {
+                $this->filter($filters);
+            }
+        }
+
+        if ($this->personalizationPersister && $this->personalizationPersisterSubject) {
+            $personalization = $this->personalizationPersister->get($this->personalizationPersisterSubject, $this);
+
+            $this->personalize($personalization->toFormData());
+        }
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function getColumns(): array
@@ -40,6 +72,9 @@ class DataTable implements DataTableInterface
 
     public function filter(array $data): void
     {
+        $this->filtersForm = $this->buildFiltersForm();
+        $this->filtersForm->submit($data);
+
         foreach ($this->filters as $filter) {
             $filterFormName = $filter->getFormName();
 
@@ -50,7 +85,9 @@ class DataTable implements DataTableInterface
             }
         }
 
-        $this->filtersForm->submit($data);
+        if (null !== $this->filterPersister && null !== $this->filterPersisterSubject) {
+            $this->filterPersister->save($this->filterPersisterSubject, $this, $data);
+        }
     }
 
     public function sort(string $field, string $direction): void
@@ -63,9 +100,26 @@ class DataTable implements DataTableInterface
         $this->query->paginate($page, $perPage);
     }
 
+    public function personalize(array $data): void
+    {
+        $this->personalizationForm = $this->buildPersonalizationForm();
+        $this->personalizationForm->submit($data);
+
+        $personalizationData = $this->personalizationForm->getViewData();
+
+        if (null !== $this->personalizationPersister && null !== $this->personalizationPersisterSubject) {
+            $this->personalizationPersister->save($this->personalizationPersisterSubject, $this, $personalizationData);
+        }
+    }
+
     public function getFiltersForm(): FormInterface
     {
         return $this->filtersForm;
+    }
+
+    public function getPersonalizationForm(): FormInterface
+    {
+        return $this->personalizationForm;
     }
 
     public function handleRequest(Request $request): void
@@ -78,7 +132,9 @@ class DataTable implements DataTableInterface
 
         $filters = $propertyAccessor->getValue($parameters, "[$filterFormName]") ?? [];
 
-        $this->filter($filters);
+        if (!empty($filters)) {
+            $this->filter($filters);
+        }
 
         $sortParameterName = $this->getSortParameterName();
 
@@ -87,6 +143,12 @@ class DataTable implements DataTableInterface
 
         if (null !== $sortField && null !== $sortDirection) {
             $this->sort($sortField, $sortDirection);
+        }
+
+        $personalization = $request->request->all($this->getPersonalizationFormName());
+
+        if (!empty($personalization)) {
+            $this->personalize($personalization);
         }
 
         $pageParameterName = $this->getPageParameterName();
@@ -118,6 +180,16 @@ class DataTable implements DataTableInterface
         return $this->getParameterName(DataTableInterface::FILTER_PARAMETER);
     }
 
+    public function getPersonalizationFormName(): string
+    {
+        return $this->getParameterName('personalization');
+    }
+
+    public function getPersonalizationData(): ?PersonalizationData
+    {
+        return $this->personalizationData;
+    }
+
     public function createView(): DataTableViewInterface
     {
         return new DataTableView(
@@ -125,9 +197,11 @@ class DataTable implements DataTableInterface
             filters: $this->filters,
             pagination: $this->query->getPagination(),
             filtersForm: $this->filtersForm->createView(),
+            personalizationForm: $this->personalizationForm->createView(),
             sortParameterName: $this->getSortParameterName(),
             pageParameterName: $this->getPageParameterName(),
             perPageParameterName: $this->getPerPageParameterName(),
+            personalizationData: $this->personalizationData,
         );
     }
 
@@ -145,6 +219,22 @@ class DataTable implements DataTableInterface
         foreach ($this->filters as $filter) {
             $formBuilder->add($filter->getFormName(), FilterType::class, $filter->getFormOptions());
         }
+
+        return $formBuilder->getForm();
+    }
+
+    private function buildPersonalizationForm(): FormInterface
+    {
+        $formBuilder = $this->formFactory->createNamedBuilder(
+            name: $this->getPersonalizationFormName(),
+            type: PersonalizationType::class,
+            options: [
+                'csrf_protection' => false,
+            ],
+        );
+
+        $formBuilder->setMethod('POST');
+        $formBuilder->setData($this->getPersonalizationData());
 
         return $formBuilder->getForm();
     }

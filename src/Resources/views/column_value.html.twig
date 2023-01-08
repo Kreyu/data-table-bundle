@@ -1,4 +1,6 @@
-{% set template = '@KreyuDataTable/data_table_types.html.twig' %}
+{% trans_default_domain 'KreyuDataTable' %}
+
+{% set template = '@KreyuDataTable/data_table_theme.html.twig' %}
 
 {% if block(block_name, template) is defined %}
     {{- block(block_name, template) -}}

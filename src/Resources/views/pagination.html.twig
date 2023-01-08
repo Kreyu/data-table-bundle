@@ -1,0 +1,36 @@
+{% if data_table.pagination.pageCount > 1 %}
+    {% set current_page = app.request.query.get(data_table.pageParameterName) %}
+
+    <div>
+        <ul class="pagination m-0 ms-auto">
+            <li class="page-item {% if not data_table.pagination.hasPreviousPage %}disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ data_table.pagination.hasPreviousPage ? path(
+                       app.request.get('_route'),
+                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber - 1 })
+                   ) : '#' }}">
+                    ‹
+                </a>
+            </li>
+
+            {% for page_number in 1..data_table.pagination.pageCount %}
+                <li class="page-item {% if data_table.pagination.currentPageNumber == page_number %}active{% endif %}">
+                    <a class="page-link"
+                       href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (data_table.pageParameterName): page_number })) }}">
+                        {{ page_number }}
+                    </a>
+                </li>
+            {% endfor %}
+
+            <li class="page-item {% if not data_table.pagination.hasNextPage %}disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ data_table.pagination.hasNextPage ? path(
+                       app.request.get('_route'),
+                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber + 1 })
+                   ) : '#' }}">
+                    ›
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endif %}

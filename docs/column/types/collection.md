@@ -34,11 +34,17 @@ $columns
                 return $this->urlGenerator->generate('tag_show', [
                     'id' => $tag->getId(),
                 ]);
-            },  
+            },
         ],    
     ])
 ;
 ```
+
+### `separator`
+
+**type**: `null` or `string` **default**: `','`
+
+Sets the value displayed between every item in the collection.
 
 ### `prototype`
 

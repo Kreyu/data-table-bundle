@@ -11,6 +11,10 @@ use Kreyu\Bundle\DataTableBundle\Filter\Factory\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterChain;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\CacheFilterPersister;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterSubjectProviderInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Persistence\TokenStorageFilterPersisterSubjectProvider;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -32,6 +36,11 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.filter.chain', FilterChain::class)
         ->args([tagged_iterator('kreyu_data_table.filter')]);
+
+    $services
+        ->set('kreyu_data_table.filter.persister_subject_provider.token_storage', TokenStorageFilterPersisterSubjectProvider::class)
+        ->args([service('security.token_storage')])
+        ->alias(FilterPersisterSubjectProviderInterface::class, 'kreyu_data_table.filter.persister_subject_provider.token_storage');
 
     $services
         ->set('kreyu_data_table.filter.doctrine.orm.callback', CallbackFilter::class)

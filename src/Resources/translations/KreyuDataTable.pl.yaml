@@ -13,3 +13,13 @@ ENDS_WITH: kończy się z
 # Boolean type
 Yes: Tak
 No: Nie
+
+# Personalization
+Personalization: Personalizacja
+Drag items between columns to show/hide relevant data in the list or change their order: Przeciągaj elementy pomiędzy kolumnami, aby pokazać/ukryć odpowiednie dane na liście, lub zmienić ich kolejność
+Visible columns: Widoczne kolumny
+Hidden columns: Ukryte kolumny
+
+# Misc
+Filter: Filtruj
+Apply: Zastosuj

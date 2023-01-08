@@ -21,10 +21,12 @@ class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
             ->setDefaults([
                 'entry_type' => TextType::class,
                 'entry_options' => [],
+                'separator' => ',',
                 'prototype' => null,
             ])
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])
+            ->setAllowedTypes('separator', ['null', 'string'])
             ->setAllowedTypes('prototype', ['null', ColumnInterface::class])
             ->addNormalizer('prototype', function (Options $options): ?ColumnInterface {
                 return $this->columnFactory?->create(uniqid(), $options['entry_type'], $options['entry_options']);

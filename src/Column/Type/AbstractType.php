@@ -35,7 +35,7 @@ abstract class AbstractType implements ColumnTypeInterface
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('translation_domain', ['bool', 'string'])
-            ->setAllowedTypes('property_path', ['null', 'string'])
+            ->setAllowedTypes('property_path', ['null', 'bool', 'string'])
             ->setAllowedTypes('sort_field', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string']);

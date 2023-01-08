@@ -20,6 +20,7 @@ class KreyuDataTableExtension extends Extension
         $loader->load('columns.php');
         $loader->load('core.php');
         $loader->load('filters.php');
+        $loader->load('personalization.php');
         $loader->load('twig.php');
 
         $container

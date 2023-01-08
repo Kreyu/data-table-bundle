@@ -19,3 +19,26 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{% block kreyu_data_table_personalization_column_collection_row %}
+    {{ form_label(form) }}
+
+    <div class="list-group list-group-flush">
+        <ul id="{{ form.vars.id }}" class="personalization-columns card p-2" data-visible="{{ form.vars.visible }}">
+            {% for child in form.children %}
+                {{ form_row(child) }}
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_personalization_column_row %}
+    {% set column = form.vars.data.column %}
+
+    <li class="list-group-item" data-column-name="{{ column.name }}">
+        {{ column.options.label }}
+
+        {{ form_widget(form.order) }}
+        {{ form_widget(form.visible) }}
+    </li>
+{% endblock %}

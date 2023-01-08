@@ -17,6 +17,8 @@ interface DataTableInterface
     public const SORT_PARAMETER = 'sort';
     public const FILTER_PARAMETER = 'filter';
 
+    public function getName(): string;
+
     /**
      * @return array<ColumnInterface>
      */

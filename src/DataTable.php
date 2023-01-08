@@ -24,6 +24,7 @@ class DataTable implements DataTableInterface
 {
     private FormInterface $filtersForm;
     private FormInterface $personalizationForm;
+    private PersonalizationData $personalizationData;
 
     public function __construct(
         private readonly string $name,
@@ -35,9 +36,10 @@ class DataTable implements DataTableInterface
         private readonly ?FilterPersisterSubjectInterface $filterPersisterSubject,
         private readonly ?PersonalizationPersisterInterface $personalizationPersister,
         private readonly ?PersonalizationPersisterSubjectInterface $personalizationPersisterSubject,
-        private readonly ?PersonalizationData $personalizationData,
     ) {
         $this->filtersForm = $this->buildFiltersForm();
+
+        $this->personalizationData = new PersonalizationData($this->columns);
         $this->personalizationForm = $this->buildPersonalizationForm();
 
         if ($this->filterPersister && $this->filterPersisterSubject) {
@@ -201,6 +203,7 @@ class DataTable implements DataTableInterface
             sortParameterName: $this->getSortParameterName(),
             pageParameterName: $this->getPageParameterName(),
             perPageParameterName: $this->getPerPageParameterName(),
+            personalizationFormName: $this->getPersonalizationFormName(),
             personalizationData: $this->personalizationData,
         );
     }

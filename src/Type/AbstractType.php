@@ -36,10 +36,6 @@ abstract class AbstractType implements DataTableTypeInterface
     {
     }
 
-    public function configurePersonalizationData(PersonalizationData $personalization, array $options): void
-    {
-    }
-
     public function getFilterPersister(): ?FilterPersisterInterface
     {
         return $this->filterPersister;
@@ -90,7 +86,7 @@ abstract class AbstractType implements DataTableTypeInterface
         return $this->getPersonalizationPersisterSubjectProvider()?->provide();
     }
 
-    public function hasPersonalization(): bool
+    public function hasPersonalizationEnabled(): bool
     {
         return true;
     }

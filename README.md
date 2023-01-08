@@ -255,7 +255,8 @@ Functions are defined in the [DataTableExtension class](src/Bridge/Twig/DataTabl
 | Function                          | Arguments                                                                                       | Description                                                             |
 |:----------------------------------|:------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------|
 | `data_table`                      | 1) `DataTableViewInterface $dataTable`                                                          | Renders whole data table, including filter form, columns and pagination |
-| `data_table_column_header`        | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`                        | Renders column header                                                   |
+| `data_table_column_label`         | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`                        | Renders column label                                                    |
+| `data_table_column_header`        | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`                        | Renders column header - same as label, but with sortable behavior       |
 | `data_table_column_value`         | 1) `DataTableViewInterface $dataTable`<br/> 2) `ColumnInterface $column`<br/> 3) `mixed $value` | Renders column value. Gets a raw value, outputs a formatted value       |
 | `data_table_filter_form`          | 1) `DataTableViewInterface $dataTable`                                                          | Renders filter form                                                     |
 | `data_table_personalization_form` | 1) `DataTableViewInterface $dataTable`                                                          | Renders personalization form                                            |
@@ -367,6 +368,8 @@ Options passed as `operator_options` are used in that type.
 
 ## TODO
 
-- [ ] Personalization (to let user change the columns visibility and order);
-- [ ] Filter & personalization persistence (to save filters & personalization applied by the user); 
+- [X] Personalization (to let user change the columns visibility and order);
+- [X] Filter & personalization persistence (to save filters & personalization applied by the user);
+- [ ] Personalization docs
+- [ ] Filter & personalization persistence docs
 - [ ] Export to excel (both with and without personalization & applied filters);

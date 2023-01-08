@@ -10,7 +10,9 @@
                     </div>
                 {% endfor %}
             </div>
-            <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
+            <div class="text-end">
+                <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
+            </div>
         {{ form_end(data_table.filtersForm) }}
     </div>
 {% endif %}

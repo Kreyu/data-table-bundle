@@ -42,3 +42,9 @@ $columns
 ## Inherited options
 
 See [abstract column type documentation](abstract.md).
+
+## Overridden options
+
+### `display_personalization_button`
+
+**type**: `bool` **default**: `true`

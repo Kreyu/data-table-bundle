@@ -19,12 +19,17 @@ class DataTableView implements DataTableViewInterface
         private readonly string $sortParameterName,
         private readonly string $pageParameterName,
         private readonly string $perPageParameterName,
+        private readonly string $personalizationFormName,
         private readonly ?PersonalizationData $personalizationData,
     ) {
     }
 
     public function getColumns(): array
     {
+        if ($this->personalizationData) {
+            return $this->personalizationData->getComputedColumns();
+        }
+
         return $this->columns;
     }
 
@@ -58,6 +63,11 @@ class DataTableView implements DataTableViewInterface
         return $this->perPageParameterName;
     }
 
+    public function getPersonalizationFormName(): string
+    {
+        return $this->personalizationFormName;
+    }
+
     public function hasPersonalizationEnabled(): bool
     {
         return null !== $this->personalizationData;
@@ -70,6 +80,8 @@ class DataTableView implements DataTableViewInterface
 
     public function getPersonalizationForm(): FormView
     {
+        $this->personalizationForm->vars['data_table'] = $this;
+
         return $this->personalizationForm;
     }
 }

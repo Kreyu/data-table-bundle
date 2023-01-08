@@ -16,6 +16,8 @@ class PersonalizationType extends AbstractType
 {
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
+        $view->vars['attr']['id'] = $form->getName();
+
         usort($view['columns']->children, function (FormView $a, FormView $b) {
             return $a->vars['data']->getOrder() <=> $b->vars['data']->getOrder();
         });
@@ -30,10 +32,10 @@ class PersonalizationType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefault('data_class', PersonalizationData::class)
-            ->setDefault('translation_domain', 'KreyuDataTable')
-        ;
+        $resolver->setDefaults([
+            'data_class' => PersonalizationData::class,
+            'translation_domain' => 'KreyuDataTable',
+        ]);
     }
 
     public function getBlockPrefix(): string

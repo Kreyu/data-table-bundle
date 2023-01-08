@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Mapper\Factory\ColumnMapperFactoryInterf
 use Kreyu\Bundle\DataTableBundle\DataTable;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\Factory\FilterMapperFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeChainInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
@@ -59,14 +58,6 @@ class DataTableFactory implements DataTableFactoryInterface
         $type->configureColumns($columnMapper, $options);
         $type->configureFilters($filterMapper, $options);
 
-        $personalizationData = null;
-
-        if ($type->hasPersonalization()) {
-            $personalizationData = new PersonalizationData($columnMapper->all());
-
-            $type->configurePersonalizationData($personalizationData, $options);
-        }
-
         return new DataTable(
             name: $name,
             query: $query,
@@ -77,7 +68,6 @@ class DataTableFactory implements DataTableFactoryInterface
             filterPersisterSubject: $type->getFilterPersisterSubject(),
             personalizationPersister: $type->getPersonalizationPersister(),
             personalizationPersisterSubject: $type->getPersonalizationPersisterSubject(),
-            personalizationData: $personalizationData,
         );
     }
 }

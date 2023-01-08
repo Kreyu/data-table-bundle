@@ -30,6 +30,11 @@ class DataTableExtension extends AbstractExtension
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
+                'data_table_column_label',
+                [$this, 'renderColumnLabel'],
+                ['needs_environment' => true, 'is_safe' => ['html']],
+            ),
+            new TwigFunction(
                 'data_table_column_header',
                 [$this, 'renderColumnHeader'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
@@ -65,6 +70,16 @@ class DataTableExtension extends AbstractExtension
         return $environment->render('@KreyuDataTable/data_table.html.twig', [
             'data_table' => $dataTable,
         ]);
+    }
+
+    /**
+     * @throws TwigException
+     */
+    public function renderColumnLabel(Environment $environment, DataTableViewInterface $dataTable, ColumnInterface $column): string
+    {
+        $view = $this->columnHeaderViewFactory->create($dataTable, $column);
+
+        return $environment->render('@KreyuDataTable/column_label.html.twig', $view->getVariables());
     }
 
     /**

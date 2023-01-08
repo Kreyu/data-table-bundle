@@ -83,3 +83,9 @@ $columns
 ```
 
 Because property accessor is not called, the value passed as the first argument is a "raw" row value (and for most cases it will be an entity).
+
+### `display_personalization_button`
+
+**type**: `bool` **default**: `false`
+
+If this value is true, a button will be visible next to the column header. Clicking it opens the personalization modal.

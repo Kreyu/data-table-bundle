@@ -1,48 +1,43 @@
 {% with { form: data_table.personalizationForm } %}
-    <div class="card">
-        <div class="card-header">
-            {{ 'Personalization'|trans({}, 'KreyuDataTable') }}
-        </div>
-        <div class="card-body">
-            {{ form_start(form) }}
-                <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
+    {{ form_start(form) }}
+        <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
 
-                <div class="row my-3">
-                    {% set children = form.children.columns %}
+        <div class="row my-3">
+            {% set children = form.children.columns %}
 
-                    <div class="col-6">
-                        <div class="list-group list-group-flush card">
-                            <div class="card-header">
-                                {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
-                            </div>
-
-                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
-                                {% for child in children|filter(child => child.vars.value.visible) %}
-                                    {{ form_row(child) }}
-                                {% endfor %}
-                            </ul>
-                        </div>
+            <div class="col-6">
+                <div class="list-group list-group-flush card">
+                    <div class="card-header">
+                        {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
                     </div>
 
-                    <div class="col-6">
-                        <div class="list-group list-group-flush card">
-                            <div class="card-header">
-                                {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
-                            </div>
-
-                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
-                                {% for child in children|filter(child => not child.vars.value.visible) %}
-                                    {{ form_row(child) }}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
+                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
+                        {% for child in children|filter(child => child.vars.value.visible) %}
+                            {{ form_row(child) }}
+                        {% endfor %}
+                    </ul>
                 </div>
+            </div>
 
-                <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
-            {{ form_end(form, { render_rest: false }) }}
+            <div class="col-6">
+                <div class="list-group list-group-flush card">
+                    <div class="card-header">
+                        {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
+                    </div>
+
+                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
+                        {% for child in children|filter(child => not child.vars.value.visible) %}
+                            {{ form_row(child) }}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="text-end">
+            <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
+        </div>
+    {{ form_end(form, { render_rest: false }) }}
 
     <script>
         $(function () {

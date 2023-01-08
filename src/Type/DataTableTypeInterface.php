@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Type;
 use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -26,7 +25,7 @@ interface DataTableTypeInterface
 
     public function getFilterPersisterSubjectProvider(): ?FilterPersisterSubjectProviderInterface;
 
-    public function hasPersonalization(): bool;
+    public function hasPersonalizationEnabled(): bool;
 
     public function getName(): string;
 }

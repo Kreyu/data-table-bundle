@@ -32,6 +32,8 @@ interface DataTableViewInterface
 
     public function getPerPageParameterName(): string;
 
+    public function getPersonalizationFormName(): string;
+
     public function hasPersonalizationEnabled(): bool;
 
     public function getPersonalizationData(): ?PersonalizationData;

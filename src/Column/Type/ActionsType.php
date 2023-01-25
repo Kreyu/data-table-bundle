@@ -10,8 +10,6 @@ class ActionsType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
-
         $resolver
             ->setDefaults([
                 'property_path' => false,

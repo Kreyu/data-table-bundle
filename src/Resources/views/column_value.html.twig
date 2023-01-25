@@ -2,8 +2,8 @@
 
 {% set template = '@KreyuDataTable/data_table_theme.html.twig' %}
 
-{% if block(block_name, template) is defined %}
-    {{- block(block_name, template) -}}
+{% if block(vars.block_name, template) is defined %}
+    {{- block(vars.block_name, template) -}}
 {% else %}
-    {{- value -}}
+    {{- vars.value -}}
 {% endif %}

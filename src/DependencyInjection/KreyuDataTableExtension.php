@@ -4,35 +4,63 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
+use Exception;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class KreyuDataTableExtension extends Extension
+class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * @throws Exception
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('columns.php');
         $loader->load('core.php');
-        $loader->load('filters.php');
+        $loader->load('extensions.php');
+        $loader->load('filtration.php');
         $loader->load('personalization.php');
         $loader->load('twig.php');
 
         $container
+            ->registerForAutoconfiguration(DataTableTypeInterface::class)
+            ->addTag('kreyu_data_table.type')
+        ;
+
+        $container
             ->registerForAutoconfiguration(ColumnTypeInterface::class)
-            ->addTag('kreyu_data_table.column_type');
+            ->addTag('kreyu_data_table.column_type')
+        ;
 
         $container
             ->registerForAutoconfiguration(FilterInterface::class)
-            ->addTag('kreyu_data_table.filter');
+            ->addTag('kreyu_data_table.filter')
+        ;
 
         $container
-            ->registerForAutoconfiguration(DataTableTypeInterface::class)
-            ->addTag('kreyu_data_table.type');
+            ->registerForAutoconfiguration(PersistenceAdapterInterface::class)
+            ->addTag('kreyu_data_table.persistence.adapter')
+        ;
+    }
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        $container->prependExtensionConfig('framework', [
+            'cache' => [
+                'pools' => [
+                    'kreyu_data_table.persistence.cache.default' => [
+                        'adapter' => 'cache.adapter.filesystem',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

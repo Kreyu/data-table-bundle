@@ -1,15 +1,17 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
-{% block filters %}
+{#{% block filters %}
     {{ data_table_filters_form(data_table) }}
-{% endblock %}
+{% endblock %}#}
+
+{# @var \Kreyu\Bundle\DataTableBundle\DataTableView data_table #}
 
 {% block table %}
     <table class="table table-vcenter">
         {% block table_head %}
             <thead>
                 <tr>
-                    {% for column in data_table.columns %}
+                    {% for column in data_table.vars.columns %}
                         <th>{{ data_table_column_header(data_table, column) }}</th>
                     {% endfor %}
                 </tr>
@@ -17,23 +19,23 @@
         {% endblock %}
         {% block table_body %}
             <tbody>
-                {% for item in data_table.pagination.items %}
+                {% for item in data_table.vars.pagination.items %}
                     {% block table_row %}
                         <tr>
-                            {% for column in data_table.columns %}
+                            {% for column in columns %}
                                 {% block table_cell %}
-                                    <td>{{ data_table_column_value(data_table, column, item) }}</td>
+                                    <td>{{ data_table_column_value(column, item) }}</td>
                                 {% endblock %}
                             {% endfor %}
                         </tr>
                     {% endblock %}
                 {% endfor %}
             </tbody>
-        {% endblock %}
+        {% endblock %}}
     </table>
 {% endblock %}
 
-{% block pagination %}
+{#{% block pagination %}
     {{ data_table_pagination(data_table) }}
 {% endblock %}
 
@@ -65,4 +67,4 @@
             </div>
         {% endblock %}
     </div>
-{% endblock %}
+{% endblock %}#}

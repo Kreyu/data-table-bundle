@@ -12,8 +12,6 @@ class BooleanType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
-
         $resolver
             ->setDefaults([
                 'label_true' => 'Yes',

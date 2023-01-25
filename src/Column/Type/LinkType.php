@@ -10,8 +10,6 @@ class LinkType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
-
         $resolver
             ->setDefaults([
                 'href' => '#',

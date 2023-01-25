@@ -5,14 +5,16 @@
 {% if sort_field %}
     {% set query_parameters = app.request.query.all() %}
 
-    {% set current_sort_field = query_parameters[data_table.sortParameterName]['field']|default(null) %}
-    {% set current_sort_direction = query_parameters[data_table.sortParameterName]['direction']|default(null) %}
+    {% set sort_parameter_name = data_table.sort_parameter_name %}
+
+    {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
+    {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
 
     {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
 
     <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
-        (data_table.sortParameterName ~ '[field]'): sort_field,
-        (data_table.sortParameterName ~ '[direction]'): opposite_sort_direction
+        (sort_parameter_name ~ '[field]'): sort_field,
+        (sort_parameter_name ~ '[direction]'): opposite_sort_direction
     })) }}">
         {{ include('@KreyuDataTable/column_label.html.twig', _context) }}
 
@@ -24,6 +26,7 @@
     {{ include('@KreyuDataTable/column_label.html.twig', _context) }}
 {% endif %}
 
+{#
 {% if display_personalization_button %}
     <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.personalizationFormName }}">🔧</a>
-{% endif %}
+{% endif %}#}

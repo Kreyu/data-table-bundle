@@ -6,6 +6,21 @@
 Streamlines creation process of the data tables in Symfony 6.  
 Heavily inspired by the [Symfony Form](https://github.com/symfony/form) & [Sonata Admin Bundle](https://github.com/sonata-project/SonataAdminBundle) datagrid.
 
+Features:
+
+- class-based data table definition to reduce repeated codebase;
+- source data pagination, filtration and sorting (supports persistence);
+- personalization (supports persistence), where user is able to:
+  - show/hide desired columns;
+  - change order of the columns;
+- exporting, where user is able to:
+  - select desired output format;
+  - decide whether the records should be included only from currently displayed page, or from the whole table;
+  - decide whether the personalization should be included;
+- Doctrine ORM support by default, but open to custom implementation;
+
+## Table of contents
+
 - [Installation](#installation)
 - [Usage](#usage)
 - [Building data tables](#building-data-tables)
@@ -17,11 +32,19 @@ Heavily inspired by the [Symfony Form](https://github.com/symfony/form) & [Sonat
 - [Columns](#columns)
   - [Available column types](#available-column-types)
   - [Creating custom column type](#creating-custom-column-type)
-- [Filters](#filters)
+- [Filtration](#filtration)
+  - Persistence
+    - Configuring default cache persister
+    - Creating a custom filtration persister
+    - Differentiating persistence data per subject
+    - Retrieving persistence data subjects
+    - Passing the persistence subject directly
   - [Available filters](#available-filters)
   - [Creating custom filter](#creating-custom-filter)
     - [Doctrine ORM](#doctrine-orm)
   - [Filter operators](#filter-operators)
+
+#### Persistence
 
 ## Installation
 
@@ -293,7 +316,208 @@ App\DataTable\Column\Type\MyCustomType:
     - { name: 'kreyu_data_table.column_type' }
 ```
 
-## Filters
+
+## Persistence
+
+This bundle provides persistence feature, ready to use with data table sorting, pagination, filtration and personalization.
+
+### Persistence adapters
+
+Adapters are classes that allows writing (to) and reading (from) the persistent data source.  
+By default, there's only one adapter integrating with Symfony Cache contracts.
+
+#### Using built-in cache adapter
+
+Built-in cache adapter accepts two arguments in constructor:
+
+- cache implementing Symfony's `Symfony\Contracts\Cache\CacheInterface`
+- prefix string used to differentiate different data sets, e.g. filtration persistence uses `filtration` prefix
+
+In service container, it is registered as an [abstract service](https://symfony.com/doc/current/service_container/parent_services.html):
+
+```shell
+bin/console debug:container kreyu_data_table.persistence.adapter.cache
+```
+
+Creating new services based on the abstract adapter can be performed in service container.
+
+#### Creating custom adapters
+
+To create a custom adapter, create a class that implements `PersistenceAdapterInterface`:
+
+```php
+// src/DataTable/Persistence/DatabasePersistenceAdapter.php
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+
+class DatabasePersistenceAdapter implements PersistenceAdapterInterface
+{
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private string $prefix,
+    ) {
+    }
+    
+    public function read(DataTableInterface $dataTable, PersistenceSubjectInterface $subject): mixed
+    {
+        // ...
+    }
+
+    public function write(DataTableInterface $dataTable, PersistenceSubjectInterface $subject, mixed $data): void
+    {
+        // ...
+    }
+}
+```
+
+... and register it in the container as an abstract service:
+
+```yaml
+services:
+  app.data_table.persistence.database:
+      class: App\DataTable\Persistence\DatabasePersistenceAdapter
+      abstract: true
+      arguments:
+        - '@doctrine.orm.entity_manager'
+```
+
+
+
+### Persistence subjects
+
+Persistence subject can be any object that implements `PersistenceSubjectInterface`.
+
+In most cases, the persistence subject will be a User entity, so don't forget to implement the required interface:
+
+```php
+// src/Entity/User.php
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+
+class User implements PersistenceSubjectInterface
+{
+    private ?int $id = null;
+    
+    public function getDataTablePersistenceIdentifier(): string
+    {
+        return (string) $this->id;
+    }
+}
+```
+
+The value returned in the `getDataTablePersistenceIdentifier()` is used in [persistence adapters](#adapters)
+to associate persistent data with the subject.
+
+### Persistence subject providers
+
+Persistence subject providers are classes that allows retrieving the [persistence subjects](#persistence-subjects).  
+Those classes contain `provide` method, that should return the subject, or throw an `PersistenceSubjectNotFoundException`.  
+By default, there's only one provider, integrating with Symfony token storage, to retrieve currently logged-in user.
+
+#### Creating custom persistence subject providers
+
+To create a custom subject provider, create a class that implements `PersistenceSubjectProviderInterface`:
+
+```php
+// src/DataTable/Persistence/StaticPersistenceSubjectProvider.php
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+
+class StaticPersistenceSubjectProvider implements PersistenceSubjectProviderInterface
+{
+    public function provide(): PersistenceSubjectInterface
+    {
+        return new class implements PersistenceSubjectInterface
+        {
+            public function getDataTablePersistenceIdentifier(): string
+            {
+                return 'static';
+            }
+        }
+    }
+}
+```
+
+When using default container configuration, that provider should be ready to use.  
+If not, consider tagging this class as `kreyu_data_table.persistence.subject_provider`:
+
+```yaml
+services:
+  app.data_table.persistence.subject_provider.static:
+    class: App\DataTable\Persistence\StaticPersistenceSubjectProvider
+    tags:
+      - { name: kreyu_data_table.persistence.subject_provider }
+```
+
+## Filtration
+
+Source data can be filtered by the criteria given by the user.
+
+This feature can be disabled by overriding the `isFiltrationEnabled()` method of the data table type class:
+
+```php
+// src/DataTable/Type/ProjectType.php
+class ProjectType extends AbstractType
+{
+    public function isFiltrationEnabled(): bool
+    {
+        return false;
+    }
+}
+```
+
+### Filtration criteria persistence
+
+By default, filtration criteria applied by the user is saved to the cache for later use.
+
+This feature can be disabled by overriding the `isFiltrationPersistenceEnabled()` method of the data table type class:
+
+```php
+// src/DataTable/Type/ProjectType.php
+class ProjectType extends AbstractType
+{
+    public function isFiltrationPersistenceEnabled(): bool
+    {
+        return false;
+    }
+}
+```
+
+#### Configuring the filtration persistence adapter
+
+To read about the persistence adapters, see [persistence adapters](#persistence-adapters) section.
+
+For filtration, by default, there's a cache adapter service already pre-configured:
+
+```shell
+bin/console debug:container kreyu_data_table.filtration.persistence.adapter.cache
+```
+
+Recommended way to change the filtration persistence adapter used by the data table type class, is to use setter injection:
+
+```yaml
+# config/services.yaml
+services:
+  App\DataTable\Type\ProjectType:
+    calls:
+      - setFiltrationPersistenceAdapter: ['@kreyu_data_table.filtration.persistence.adapter.cache']
+```
+
+#### Passing the persistence subject directly
+
+In some cases, it may be more handy to provide a persistence subject directly, instead of using a provider.
+To do so, override the `getFiltrationPersistenceSubject()` method of the data table type class:
+
+```php
+// src/DataTable/Type/ProjectType.php
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+
+class ProjectType extends AbstractType
+{
+    public function getFiltrationPersistenceSubject(): PersistenceSubjectInterface
+    {
+        // return the subject directly
+    }
+}
+```
 
 ### Available filters
 
@@ -306,6 +530,79 @@ The following filters are natively available in the bundle:
   - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
 - Other
   - [AbstractFilter](docs/filter/other/abstract.md)
+
+### Creating custom filter
+
+#### Doctrine ORM
+
+To create a custom filter, create a class that extends `Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\AbstractFilter`.
+
+When using default container configuration, that filter should be ready to use.  
+If not, remember to tag this class as `kreyu_data_table.filter`:
+
+```yaml
+# config/services.yaml
+services:
+  App\DataTable\Filter\MyCustomFilter:
+    tags:
+      - { name: 'kreyu_data_table.filter' }
+```
+
+### Filter operators
+
+Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
+
+Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
+
+By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
+
+```php
+public function configureFilters(FilterMapperInterface $filters, array $options): void
+{
+    $filters
+        // StringFilter uses Operator::EQUAL by default
+        ->add('name', StringFilter::class, [
+            'field_name' => 'product.name',
+            'operator_options' => [
+                'choices' => [
+                    Operator::CONTAINS,
+                ],
+            ],
+        ])
+    ;
+}
+```
+
+If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
+
+```php
+public function configureFilters(FilterMapperInterface $filters, array $options): void
+{
+    $filters
+        ->add('quantity', NumericFilter::class, [
+            'field_name' => 'product.quantity',
+            'operator_options' => [
+                'visible' => true,
+            ],
+        ])
+    ;
+}
+```
+
+If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. 
+Options passed as `operator_options` are used in that type.
+
+### Available filters
+
+The following filters are natively available in the bundle:
+
+- Doctrine ORM
+    - [StringFilter](docs/filter/doctrine/orm/string.md)
+    - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
+    - [EntityFilter](docs/filter/doctrine/orm/entity.md)
+    - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
+- Other
+    - [AbstractFilter](docs/filter/other/abstract.md)
 
 ### Creating custom filter
 
@@ -363,13 +660,5 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 }
 ```
 
-If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option. 
+If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
 Options passed as `operator_options` are used in that type.
-
-## TODO
-
-- [X] Personalization (to let user change the columns visibility and order);
-- [X] Filter & personalization persistence (to save filters & personalization applied by the user);
-- [ ] Personalization docs
-- [ ] Filter & personalization persistence docs
-- [ ] Export to excel (both with and without personalization & applied filters);

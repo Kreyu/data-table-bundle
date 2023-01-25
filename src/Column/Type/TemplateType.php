@@ -10,8 +10,6 @@ class TemplateType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
-
         $resolver
             ->setRequired([
                 'template_path',

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Factory\DataTableFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -13,31 +13,31 @@ trait DataTableControllerTrait
     private null|DataTableFactoryInterface $dataTableFactory = null;
 
     /**
-     * @param class-string<DataTableTypeInterface> $typeClass
+     * @param class-string<DataTableTypeInterface> $type
      */
-    public function createDataTable(string $typeClass, array $options = []): DataTableInterface
+    protected function createDataTable(string $type, ?ProxyQueryInterface $query = null, array $options = []): DataTableInterface
     {
         if (null === $this->dataTableFactory) {
             throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
         }
 
-        return $this->dataTableFactory->create($typeClass, $options);
+        return $this->dataTableFactory->create($type, $query, $options);
     }
 
     /**
-     * @param class-string<DataTableTypeInterface> $typeClass
+     * @param class-string<DataTableTypeInterface> $type
      */
-    public function createNamedDataTable(string $name, string $typeClass, array $options = []): DataTableInterface
+    protected function createNamedDataTable(string $name, string $type, ?ProxyQueryInterface $query = null, array $options = []): DataTableInterface
     {
         if (null === $this->dataTableFactory) {
             throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
         }
 
-        return $this->dataTableFactory->createNamed($name, $typeClass, $options);
+        return $this->dataTableFactory->createNamed($name, $type, $query, $options);
     }
 
     #[Required]
-    public function setDataTableFactory(DataTableFactoryInterface $dataTableFactory): void
+    public function setDataTableFactory(?DataTableFactoryInterface $dataTableFactory): void
     {
         $this->dataTableFactory = $dataTableFactory;
     }

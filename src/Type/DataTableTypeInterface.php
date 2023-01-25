@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Persistence\FilterPersisterSubjectProviderInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface DataTableTypeInterface
 {
-    public function createQuery(): ProxyQueryInterface;
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void;
+
+    public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
 
     public function configureOptions(OptionsResolver $resolver): void;
 
-    public function configureColumns(ColumnMapperInterface $columns, array $options): void;
-
-    public function configureFilters(FilterMapperInterface $filters, array $options): void;
-
-    public function getFilterPersister(): ?FilterPersisterInterface;
-
-    public function getFilterPersisterSubjectProvider(): ?FilterPersisterSubjectProviderInterface;
-
-    public function hasPersonalizationEnabled(): bool;
-
     public function getName(): string;
+
+    /**
+     * @return null|class-string<DataTableTypeInterface>
+     */
+    public function getParent(): ?string;
 }

@@ -4,40 +4,32 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\View\DataTableViewInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
+use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 interface DataTableInterface
 {
-    public const PAGE_PARAMETER = 'page';
-    public const PER_PAGE_PARAMETER = 'limit';
-    public const SORT_PARAMETER = 'sort';
-    public const FILTER_PARAMETER = 'filter';
+    public function getConfig(): DataTableConfigInterface;
 
-    public function getName(): string;
+    public function sort(SortingData $sortingData): void;
 
-    /**
-     * @return array<ColumnInterface>
-     */
-    public function getColumns(): array;
+    public function filter(FiltrationData $filtrationData): void;
 
-    /**
-     * @return array<FilterInterface>
-     */
-    public function getFilters(): array;
+    public function paginate(PaginationData $paginationData): void;
 
-    public function getFiltersForm(): FormInterface;
+    public function personalize(PersonalizationData $personalizationData): void;
 
-    public function sort(string $field, string $direction): void;
+    public function handleRequest(mixed $request): void;
 
-    public function filter(array $data): void;
+    public function getPagination(): PaginationInterface;
 
-    public function paginate(int $page, int $perPage): void;
+    public function getFiltrationForm(): FormInterface;
 
-    public function handleRequest(Request $request): void;
+    public function getPersonalizationForm(): FormInterface;
 
-    public function createView(): DataTableViewInterface;
+    public function createView(): DataTableView;
 }

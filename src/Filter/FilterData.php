@@ -4,25 +4,43 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class FilterData
 {
     public function __construct(
-        private readonly null|Operator $operator,
-        private readonly mixed $value,
+        private null|Operator $operator,
+        private mixed $value,
     ) {
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data = []): self
     {
-        $operator = $data['operator'] ?? '';
+        ($resolver = new OptionsResolver())
+            ->setDefaults([
+                'operator' => null,
+                'value' => null,
+            ])
+            ->setAllowedTypes('operator', ['null', 'string', Operator::class])
+            ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
+                if (null === $value) {
+                    return null;
+                }
 
-        if (!$operator instanceof Operator) {
-            $operator = Operator::tryFrom($operator);
-        }
+                if ($value instanceof Operator) {
+                    return $value;
+                }
+
+                return Operator::tryFrom((string) $value);
+            })
+        ;
+
+        $data = $resolver->resolve($data);
 
         return new self(
-            operator: $operator,
-            value: $data['value'] ?? '',
+            operator: $data['operator'],
+            value: $data['value'],
         );
     }
 

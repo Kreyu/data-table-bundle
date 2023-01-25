@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 
-class PersonalizationData
+class PersonalizationData implements \ArrayAccess
 {
     private array $columns;
 
@@ -134,5 +134,25 @@ class PersonalizationData
     public function setColumnHidden(string|ColumnInterface $column): self
     {
         return $this->setColumnVisibility($column, false);
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return array_key_exists($offset, $this->columns);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        dd($offset);
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+
     }
 }

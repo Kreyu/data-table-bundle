@@ -1,59 +1,71 @@
-{% with { form: data_table.personalizationForm } %}
-    {{ form_start(form) }}
-        <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
+{% block personalization_form %}
+    {% with { form: data_table.personalizationForm } %}
+        <div class="personalization-form">
+            {{ form_start(form) }}
+                {{ form_row(form._token) }}
 
-        <div class="row my-3">
-            {% set children = form.children.columns %}
+                {% block personalization_form_help %}
+                    <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
+                {% endblock %}
 
-            <div class="col-6">
-                <div class="list-group list-group-flush card">
-                    <div class="card-header">
-                        {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
+                {% block personalization_form_content %}
+                    <div class="row my-3">
+                        {% set children = form.children.columns %}
+
+                        {% block personalization_form_visible_columns %}
+                            <div class="col-6">
+                                <div class="list-group list-group-flush card">
+                                    <div class="card-header">
+                                        {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
+                                    </div>
+
+                                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
+                                        {% for child in children|filter(child => child.vars.value.visible) %}
+                                            {{ form_row(child) }}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endblock %}
+
+                        {% block personalization_form_hidden_columns %}
+                            <div class="col-6">
+                                <div class="list-group list-group-flush card">
+                                    <div class="card-header">
+                                        {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
+                                    </div>
+
+                                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
+                                        {% for child in children|filter(child => not child.vars.value.visible) %}
+                                            {{ form_row(child) }}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endblock %}
                     </div>
 
-                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
-                        {% for child in children|filter(child => child.vars.value.visible) %}
-                            {{ form_row(child) }}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+                    {% block personalization_form_submit %}
+                        <div class="text-end">
+                            <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
+                        </div>
+                    {% endblock %}
+                {% endblock %}
+            {{ form_end(form, { render_rest: false }) }}
 
-            <div class="col-6">
-                <div class="list-group list-group-flush card">
-                    <div class="card-header">
-                        {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
-                    </div>
+            <script>
+                if (window.jQuery && typeof PersonalizationForm === 'function') {
+                    $(function () {
+                        const form = new PersonalizationForm(
+                            '#{{ form.vars.id }}_visible',
+                            '#{{ form.vars.id }}_hidden',
+                            '.personalization-columns',
+                        );
 
-                    <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
-                        {% for child in children|filter(child => not child.vars.value.visible) %}
-                            {{ form_row(child) }}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="text-end">
-            <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
-        </div>
-    {{ form_end(form, { render_rest: false }) }}
-
-    <script>
-        $(function () {
-            const $sortable = $('#{{ form.vars.id }}_visible, #{{ form.vars.id }}_hidden');
-
-            $sortable.sortable({
-                connectWith: '.personalization-columns',
-                update: function (event) {
-                    $(event.target).find('.ui-sortable-handle').each(function () {
-                        $(this).find('[name$="[order]"]').val($(this).index());
+                        form.initialize();
                     });
-                },
-                receive: function (event, ui) {
-                    $(ui.item).find('[name$="[visible]"]').val(parseInt($(event.target).data('visible')));
                 }
-            });
-        });
-    </script>
-{% endwith %}
+            </script>
+        </div>
+    {% endwith %}
+{% endblock %}

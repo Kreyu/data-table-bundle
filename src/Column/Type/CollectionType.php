@@ -6,31 +6,42 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Symfony\Component\OptionsResolver\Options;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
 {
     private ?ColumnFactoryInterface $columnFactory = null;
 
+    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    {
+        $view->vars['children'] = [];
+
+        foreach ($view->vars['value'] as $index => $data) {
+            $child = $this->columnFactory->create(
+                $column->getName() . '__' . ($index + 1),
+                $options['entry_type'],
+                $options['entry_options'],
+            );
+
+            $child->setData($data);
+
+            $view->vars['children'][] = $child->createView($view->parent);
+        }
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
-
         $resolver
             ->setDefaults([
                 'entry_type' => TextType::class,
                 'entry_options' => [],
                 'separator' => ',',
-                'prototype' => null,
             ])
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])
             ->setAllowedTypes('separator', ['null', 'string'])
-            ->setAllowedTypes('prototype', ['null', ColumnInterface::class])
-            ->addNormalizer('prototype', function (Options $options): ?ColumnInterface {
-                return $this->columnFactory?->create(uniqid(), $options['entry_type'], $options['entry_options']);
-            });
+        ;
     }
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): void

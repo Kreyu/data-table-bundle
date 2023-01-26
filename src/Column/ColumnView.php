@@ -12,6 +12,8 @@ class ColumnView
         'attr' => [],
     ];
 
+    public array $children = [];
+
     public function __construct(
         public ?DataTableView $parent = null,
     ) {

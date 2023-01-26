@@ -8,6 +8,9 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\HeadersView;
+use Kreyu\Bundle\DataTableBundle\Renderer\TwigDataTableRenderer;
+use Kreyu\Bundle\DataTableBundle\RowView;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
@@ -22,6 +25,11 @@ class DataTableExtension extends AbstractExtension
             new TwigFunction(
                 'data_table',
                 [$this, 'renderDataTable'],
+                ['needs_environment' => true, 'is_safe' => ['html']],
+            ),
+            new TwigFunction(
+                'data_table_row',
+                [$this, 'renderRow'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
@@ -57,18 +65,24 @@ class DataTableExtension extends AbstractExtension
         ];
     }
 
+    public function renderHeaders(Environment $environment, HeadersView $view): string
+    {
+        return $environment->render('@KreyuDataTable/headers.html.twig', $view->vars);
+    }
+
+    public function renderRow(Environment $environment, RowView $view): string
+    {
+        return $environment->render('@KreyuDataTable/row.html.twig', $view->vars);
+    }
+
     /**
      * @throws TwigException
      */
-    public function renderDataTable(Environment $environment, DataTableInterface|DataTableView $dataTable): string
+    public function renderDataTable(Environment $environment, DataTableView $view): string
     {
-        if ($dataTable instanceof DataTableInterface) {
-            $dataTable = $dataTable->createView();
-        }
+        dump($view);
 
-        return $environment->render('@KreyuDataTable/data_table.html.twig', [
-            'data_table' => $dataTable,
-        ]);
+        return $environment->render('@KreyuDataTable/data_table.html.twig', $view->vars);
     }
 
     /**
@@ -92,39 +106,20 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException
      */
-    public function renderColumnHeader(Environment $environment, DataTableInterface|DataTableView $dataTable, ColumnInterface|ColumnView $column): string
+    public function renderColumnHeader(Environment $environment, ColumnView $view): string
     {
-        if ($column instanceof ColumnInterface) {
-            if ($dataTable instanceof DataTableInterface) {
-                $dataTable = $dataTable->createView();
-            }
-
-            $column = $column->createView(parent: $dataTable);
-        }
-
         return $environment->render('@KreyuDataTable/column_header.html.twig', [
-            'column' => $column,
+            'vars' => $view->vars,
+            'parent' => $view->parent,
         ]);
     }
 
     /**
      * @throws TwigException
      */
-    public function renderColumnValue(Environment $environment, DataTableInterface|DataTableView $dataTable, ColumnInterface|ColumnView $column, mixed $data): string
+    public function renderColumnValue(Environment $environment, ColumnView $view): string
     {
-        if ($column instanceof ColumnInterface) {
-            $column->setData($data);
-
-            if ($dataTable instanceof DataTableInterface) {
-                $dataTable = $dataTable->createView();
-            }
-
-            $column = $column->createView($data, $dataTable);
-        }
-
-        return $environment->render('@KreyuDataTable/column_value.html.twig', [
-            'column' => $column,
-        ]);
+        return $environment->render('@KreyuDataTable/column_value.html.twig', $view->vars);
     }
 
     /**

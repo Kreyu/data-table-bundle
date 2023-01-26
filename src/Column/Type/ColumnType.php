@@ -6,40 +6,52 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 final class ColumnType implements ColumnTypeInterface
 {
     public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
     {
-        $data = $column->getData();
+        $resolver = clone $column->getType()->getOptionsResolver();
 
-        if (null !== $data) {
-            $options['data'] = $data;
-        }
+        $resolver
+            ->setDefaults([
+                'data' => $column->getData(),
+                'value' => $column->getData(),
+                'property_path' => $column->getName(),
+                'block_prefix' => $column->getType()->getBlockPrefix(),
+                'block_name' => 'data_table_' . $column->getType()->getBlockPrefix(),
+            ])
+        ;
 
-        foreach ($options as $key => $value) {
-            $view->vars[$key] = $value;
-        }
+        $options = $resolver->resolve(array_filter($options));
 
-        if (is_array($data) || is_object($data)) {
-            $propertyPath = $options['property_path'] ?? $column->getName();
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $value = $options['value'];
+        $formatter = $options['formatter'];
+        $propertyPath = $options['property_path'];
+        $propertyAccessor = $options['property_accessor'];
 
-            $propertyData = $propertyAccessor->getValue($data, $propertyPath);
-
-            foreach ($view->vars as $key => $value) {
-                if (is_callable($value)) {
-                    $view->vars[$key] = $value($propertyData);
-                }
+        if (false !== $propertyPath && (is_array($value) || is_object($value))) {
+            if ($propertyAccessor->isReadable($value, $propertyPath)) {
+                $value = $propertyAccessor->getValue($value, $propertyPath);
             }
-
-            $view->vars['data'] = $propertyData;
         }
 
-        $view->vars['data_table'] = $view->parent;
+        if (is_callable($formatter)) {
+            $options['value'] = $formatter($value);
+        } else {
+            $options['value'] = $value;
+        }
+
+        $normalizableOptions = array_diff_key($options, ['formatter' => true]);
+
+        $view->vars = $this->normalizeOptions($normalizableOptions, $value);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -51,19 +63,22 @@ final class ColumnType implements ColumnTypeInterface
                 'translation_domain' => 'KreyuDataTable',
                 'property_path' => null,
                 'sort_field' => false,
-                'block_name' => 'data_table_'.$this->getBlockPrefix(),
-                'block_prefix' => $this->getBlockPrefix(),
+                'block_name' => null,
+                'block_prefix' => null,
                 'value' => null,
                 'display_personalization_button' => false,
+                'property_accessor' => PropertyAccess::createPropertyAccessor(),
+                'formatter' => null,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('translation_domain', ['bool', 'string'])
-            ->setAllowedTypes('property_path', ['null', 'bool', 'string'])
+            ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('sort_field', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('display_personalization_button', ['bool'])
+            ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
         ;
     }
 
@@ -75,5 +90,22 @@ final class ColumnType implements ColumnTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function normalizeOptions(array $options, mixed $value): array
+    {
+        foreach ($options as $key => $option) {
+            if (is_array($option)) {
+                $option = $this->normalizeOptions($option, $value);
+            }
+
+            if ($option instanceof \Closure) {
+                $option = $option($value);
+            }
+
+            $options[$key] = $option;
+        }
+
+        return $options;
     }
 }

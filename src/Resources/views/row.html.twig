@@ -1,0 +1,7 @@
+{% trans_default_domain 'KreyuDataTable' %}
+
+<tr>
+    {% for column in columns %}
+        <td>{{ data_table_column_value(column) }}</td>
+    {% endfor %}
+</tr>

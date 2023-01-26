@@ -19,5 +19,5 @@ interface ColumnInterface
 
     public function setData(mixed $data): void;
 
-    public function createView(mixed $data = null, DataTableView $parent = null): ColumnView;
+    public function createView(DataTableView $parent = null): ColumnView;
 }

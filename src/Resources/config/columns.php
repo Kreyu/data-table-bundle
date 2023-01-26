@@ -62,6 +62,7 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.column.type.collection', CollectionType::class)
         ->tag('kreyu_data_table.column.type')
+        ->call('setColumnFactory', [service('kreyu_data_table.column.factory')])
     ;
 
     $services

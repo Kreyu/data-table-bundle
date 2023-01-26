@@ -18,6 +18,7 @@ class BooleanType extends AbstractType
                 'label_false' => 'No',
             ])
             ->setAllowedTypes('label_true', ['string', TranslatableMessage::class])
-            ->setAllowedTypes('label_false', ['string', TranslatableMessage::class]);
+            ->setAllowedTypes('label_false', ['string', TranslatableMessage::class])
+        ;
     }
 }

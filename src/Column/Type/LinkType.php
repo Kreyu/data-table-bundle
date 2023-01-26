@@ -16,6 +16,7 @@ class LinkType extends AbstractType
                 'target' => '_self',
             ])
             ->setAllowedTypes('href', ['string', 'callable'])
-            ->setAllowedTypes('target', ['string', 'callable']);
+            ->setAllowedTypes('target', ['string', 'callable'])
+        ;
     }
 }

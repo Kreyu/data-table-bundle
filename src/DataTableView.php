@@ -9,4 +9,9 @@ class DataTableView
     public array $vars = [
         'attr' => [],
     ];
+
+    public function createRowView(mixed $data = null): RowView
+    {
+        return new RowView($this, $data);
+    }
 }

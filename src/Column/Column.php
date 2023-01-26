@@ -43,9 +43,9 @@ class Column implements ColumnInterface
         $this->data = $data;
     }
 
-    public function createView(mixed $data = null, DataTableView $parent = null): ColumnView
+    public function createView(DataTableView $parent = null): ColumnView
     {
-        $view = $this->type->createView($this, $data, $parent);
+        $view = $this->type->createView($this, $parent);
 
         $this->type->buildView($view, $this, $this->options);
 

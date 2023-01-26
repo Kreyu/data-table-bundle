@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\HeadersView;
+use Kreyu\Bundle\DataTableBundle\RowView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class DataTableType implements DataTableTypeInterface
@@ -41,7 +41,6 @@ final class DataTableType implements DataTableTypeInterface
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
         $view->vars += [
-            'data_table' => $dataTable,
             'columns' => $dataTable->getConfig()->getColumns(),
             'filters' => $dataTable->getConfig()->getFilters(),
             'personalization_enabled' => $options['personalization_enabled'],
@@ -55,6 +54,17 @@ final class DataTableType implements DataTableTypeInterface
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'pagination' => $dataTable->getPagination(),
         ];
+
+        $items = $dataTable->getPagination()->getItems();
+
+        $rows = [];
+
+        foreach ($items as $item) {
+            $rows[] = new RowView($view, $item);
+        }
+
+        $view->vars['headers'] = new HeadersView($view);
+        $view->vars['rows'] = $rows;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

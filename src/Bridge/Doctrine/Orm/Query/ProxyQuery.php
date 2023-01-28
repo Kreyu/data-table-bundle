@@ -45,10 +45,9 @@ class ProxyQuery implements ProxyQueryInterface
 
     public function sort(SortingData $sortingData): void
     {
-        $this->queryBuilder->orderBy(
-            $sortingData->getField(),
-            $sortingData->getDirection(),
-        );
+        foreach ($sortingData->getFields() as $field) {
+            $this->queryBuilder->orderBy($field->getName(), $field->getDirection());
+        }
     }
 
     public function paginate(PaginationData $paginationData): void

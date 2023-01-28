@@ -217,7 +217,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $paginationData = $this->config->getDefaultPaginationData();
+        $paginationData = new PaginationData(1, 25);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
@@ -240,7 +240,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $sortingData = $this->config->getDefaultSortingData();
+        $sortingData = new SortingData();
 
         if ($this->config->isSortingPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {

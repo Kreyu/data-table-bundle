@@ -7,13 +7,18 @@ namespace Kreyu\Bundle\DataTableBundle\Extension\Core;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\AbstractTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectNotFoundException;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class FiltrationFormFactoryExtension extends AbstractTypeExtension
+class FiltrationExtension extends AbstractTypeExtension
 {
     public function __construct(
         private FormFactoryInterface $formFactory,
+        private PersistenceAdapterInterface $persistenceAdapter,
+        private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
 
@@ -21,8 +26,14 @@ class FiltrationFormFactoryExtension extends AbstractTypeExtension
     {
         $builder
             ->setFiltrationEnabled(true)
+            ->setFiltrationPersistenceEnabled(true)
             ->setFiltrationFormFactory($this->formFactory)
+            ->setFiltrationPersistenceAdapter($this->persistenceAdapter)
         ;
+
+        try {
+            $builder->setFiltrationPersistenceSubject($this->persistenceSubjectProvider->provide());
+        } catch (PersistenceSubjectNotFoundException) {}
     }
 
     public static function getExtendedTypes(): iterable

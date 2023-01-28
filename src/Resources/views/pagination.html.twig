@@ -1,32 +1,32 @@
-{% if data_table.pagination.pageCount > 1 %}
-    {% set current_page = app.request.query.get(data_table.pageParameterName) %}
+{% if page_count > 1 %}
+    {% set current_page = app.request.query.get(page_parameter_name) %}
 
     <div>
         <ul class="pagination m-0 ms-auto">
-            <li class="page-item {% if not data_table.pagination.hasPreviousPage %}disabled{% endif %}">
+            <li class="page-item {% if not has_previous_page %}disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ data_table.pagination.hasPreviousPage ? path(
+                   href="{{ has_previous_page ? path(
                        app.request.get('_route'),
-                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber - 1 })
+                       app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })
                    ) : '#' }}">
                     ‹
                 </a>
             </li>
 
-            {% for page_number in 1..data_table.pagination.pageCount %}
-                <li class="page-item {% if data_table.pagination.currentPageNumber == page_number %}active{% endif %}">
+            {% for page_number in 1..page_count %}
+                <li class="page-item {% if current_page_number == page_number %}active{% endif %}">
                     <a class="page-link"
-                       href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (data_table.pageParameterName): page_number })) }}">
+                       href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) }}">
                         {{ page_number }}
                     </a>
                 </li>
             {% endfor %}
 
-            <li class="page-item {% if not data_table.pagination.hasNextPage %}disabled{% endif %}">
+            <li class="page-item {% if not has_next_page %}disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ data_table.pagination.hasNextPage ? path(
+                   href="{{ has_next_page ? path(
                        app.request.get('_route'),
-                       app.request.query.all|merge({ (data_table.pageParameterName): data_table.pagination.currentPageNumber + 1 })
+                       app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })
                    ) : '#' }}">
                     ›
                 </a>

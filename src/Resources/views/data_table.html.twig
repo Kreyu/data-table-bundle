@@ -30,9 +30,9 @@
     </table>
 {% endblock %}
 
-{#{% block pagination %}
-    {{ data_table_pagination(data_table) }}
-{% endblock %}#}
+{% block pagination %}
+    {{ data_table_pagination(pagination) }}
+{% endblock %}
 
 {% block personalization_modal %}
     <div class="modal modal-blur" id="{{ personalization_form.name }}" tabindex="-1" style="display: none;" aria-hidden="true">

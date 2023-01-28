@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\HeadersView;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\RowView;
 use Symfony\Component\Form\FormInterface;
 use Twig\Environment;
@@ -74,39 +75,6 @@ class DataTableExtension extends AbstractExtension
         return $environment->render('@KreyuDataTable/headers.html.twig', $view->vars);
     }
 
-    public function renderRow(Environment $environment, RowView $view): string
-    {
-        return $environment->render('@KreyuDataTable/row.html.twig', $view->vars);
-    }
-
-    /**
-     * @throws TwigException
-     */
-    public function renderDataTable(Environment $environment, DataTableView $view): string
-    {
-        dump($view);
-
-        return $environment->render('@KreyuDataTable/data_table.html.twig', $view->vars);
-    }
-
-    /**
-     * @throws TwigException
-     */
-    public function renderColumnLabel(Environment $environment, DataTableInterface|DataTableView $dataTable, ColumnInterface|ColumnView $column): string
-    {
-        if ($column instanceof ColumnInterface) {
-            if ($dataTable instanceof DataTableInterface) {
-                $dataTable = $dataTable->createView();
-            }
-
-            $column = $column->createView(parent: $dataTable);
-        }
-
-        return $environment->render('@KreyuDataTable/column_label.html.twig', [
-            'column' => $column,
-        ]);
-    }
-
     /**
      * @throws TwigException
      */
@@ -115,12 +83,26 @@ class DataTableExtension extends AbstractExtension
         return $environment->render('@KreyuDataTable/column_header.html.twig', $view->vars);
     }
 
+
+    public function renderRow(Environment $environment, RowView $view): string
+    {
+        return $environment->render('@KreyuDataTable/row.html.twig', $view->vars);
+    }
+
     /**
      * @throws TwigException
      */
     public function renderColumnValue(Environment $environment, ColumnView $view): string
     {
         return $environment->render('@KreyuDataTable/column_value.html.twig', $view->vars);
+    }
+
+    /**
+     * @throws TwigException
+     */
+    public function renderDataTable(Environment $environment, DataTableView $view): string
+    {
+        return $environment->render('@KreyuDataTable/data_table.html.twig', $view->vars);
     }
 
     /**
@@ -146,10 +128,8 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException
      */
-    public function renderPagination(Environment $environment, DataTableViewInterface $dataTable): string
+    public function renderPagination(Environment $environment, PaginationView $view): string
     {
-        return $environment->render('@KreyuDataTable/pagination.html.twig', [
-            'data_table' => $dataTable,
-        ]);
+        return $environment->render('@KreyuDataTable/pagination.html.twig', $view->vars);
     }
 }

@@ -2,10 +2,10 @@
 
 {% trans_default_domain 'KreyuDataTable' %}
 
-{#{% if sort_field %}
+{% if sort_field %}
     {% set query_parameters = app.request.query.all() %}
 
-    {% set sort_parameter_name = parent.sort_parameter_name %}
+    {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
 
     {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
     {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
@@ -22,9 +22,9 @@
             {% if current_sort_direction == 'asc' %}˄{% else %}˅{% endif %}
         {% endif %}
     </a>
-{% else %}#}
+{% else %}
     {{ include('@KreyuDataTable/column_label.html.twig', _context) }}
-{#{% endif %}#}
+{% endif %}
 
 {% if display_personalization_button %}
     <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">🔧</a>

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Extension\Core\ColumnFactoryExtension;
 use Kreyu\Bundle\DataTableBundle\Extension\Core\FilterFactoryExtension;
+use Kreyu\Bundle\DataTableBundle\Extension\Core\FiltrationFormFactoryExtension;
 use Kreyu\Bundle\DataTableBundle\Extension\Core\HttpFoundationExtension;
+use Kreyu\Bundle\DataTableBundle\Extension\Core\PersonalizationExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -24,8 +26,24 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
+        ->set('kreyu_data_table.type_extension.filtration_form_factory', FiltrationFormFactoryExtension::class)
+        ->args([service('form.factory')])
+        ->tag('kreyu_data_table.type_extension')
+    ;
+
+    $services
         ->set('kreyu_data_table.type_extension.http_foundation', HttpFoundationExtension::class)
         ->args([service('kreyu_data_table.request_handler.http_foundation')])
+        ->tag('kreyu_data_table.type_extension')
+    ;
+
+    $services
+        ->set('kreyu_data_table.type_extension.personalization', PersonalizationExtension::class)
+        ->args([
+            service('form.factory'),
+            service('kreyu_data_table.personalization.persistence.adapter.cache'),
+            service('kreyu_data_table.persistence.static_subject_provider'),
+        ])
         ->tag('kreyu_data_table.type_extension')
     ;
 };

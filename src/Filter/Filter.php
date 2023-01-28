@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class Filter implements FilterInterface
 {
@@ -16,6 +17,11 @@ class Filter implements FilterInterface
     ) {
     }
 
+    public function apply(ProxyQueryInterface $query, FilterData $data): void
+    {
+        $this->type->apply($query, $data, $this);
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -24,6 +30,17 @@ class Filter implements FilterInterface
     public function getFormName(): string
     {
         return str_replace('.', '__', $this->getName());
+    }
+
+    public function getFormOptions(): array
+    {
+        return [
+            'field_type' => $this->options['field_type'],
+            'field_options' => $this->options['field_options'],
+            'operator_type' => $this->options['operator_type'],
+            'operator_options' => $this->options['operator_options'],
+            'label' => $this->options['label'],
+        ];
     }
 
     public function getQueryPath(): string

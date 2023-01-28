@@ -50,7 +50,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         if ($filtrationData->isEmpty()) {
             return;
         }
-        
+
         $dataTable->filter($filtrationData);
     }
 
@@ -86,13 +86,19 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $personalizationData = (array) $request->request->get($dataTable->getConfig()->getPersonalizationParameterName());
+        $formData = $request->request->all($dataTable->getConfig()->getPersonalizationParameterName());
 
-        if (empty($personalizationData)) {
+        if (empty($formData)) {
             return;
         }
 
-        $dataTable->personalize(new PersonalizationData($personalizationData));
+        $personalizationData = new PersonalizationData(
+            columns: $dataTable->getConfig()->getColumns(),
+        );
+
+        $personalizationData->fromFormData($formData);
+
+        $dataTable->personalize($personalizationData);
     }
 
     private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed

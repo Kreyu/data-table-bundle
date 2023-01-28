@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-
 class HeadersView
 {
-    public array $columns;
+    public array $vars = [];
 
     public function __construct(
         public DataTableView $parent,
@@ -16,7 +14,7 @@ class HeadersView
         $columns = (clone $this->parent)->vars['columns'];
 
         foreach ($columns as $column) {
-            $this->columns[$column->getName()] = $column->createView($this->parent);
+            $this->vars['columns'][$column->getName()] = $column->createView($this->parent);
         }
     }
 }

@@ -1,39 +1,30 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
-{#{% block filters %}
-    {{ data_table_filters_form(data_table) }}
-{% endblock %}#}
+{% block filters %}
+    {% if filtration_enabled %}
+        {{ data_table_filters_form(filtration_form) }}
+    {% endif %}
+{% endblock %}
 
 {% block table %}
     <table class="table table-vcenter">
         {% block table_head %}
             <thead>
                 <tr>
-                    {% for name, column in headers.columns %}
+                    {{ data_table_headers(headers) }}
+                    {#{% for name, column in headers.columns %}
                         <th data-column-name="{{ name }}">{{ column.vars.label }}</th>
-                    {% endfor %}
+                    {% endfor %}#}
                 </tr>
             </thead>
         {% endblock %}
         {% block table_body %}
             <tbody>
-                {% for row in rows %}
-                    {{ data_table_row(row) }}
-                {% endfor %}
-
-                {#{% for row in data_table.vars.rows %}
-                    {% set row = data_table.createRowView(item) %}
-
-                    {% block table_row %}
-                        <tr>
-                            {% for column in row.columns %}
-                                {% block table_cell %}
-                                    <td>{{ data_table_column_value(column) }}</td>
-                                {% endblock %}
-                            {% endfor %}
-                        </tr>
-                    {% endblock %}
-                {% endfor %}#}
+                <tr>
+                    {% for row in rows %}
+                        {{ data_table_row(row) }}
+                    {% endfor %}
+                </tr>
             </tbody>
         {% endblock %}
     </table>
@@ -41,10 +32,10 @@
 
 {#{% block pagination %}
     {{ data_table_pagination(data_table) }}
-{% endblock %}
+{% endblock %}#}
 
 {% block personalization_modal %}
-    <div class="modal modal-blur" id="{{ data_table.personalizationFormName }}" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal modal-blur" id="{{ personalization_form.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
         {% block personalization_modal_dialog %}
             <div class="modal-dialog modal-dialog-centered" role="document">
                 {% block personalization_modal_content %}
@@ -63,7 +54,7 @@
                         {% endblock %}
                         {% block personalization_modal_body %}
                             <div class="modal-body">
-                                {{ data_table_personalization_form(data_table) }}
+                                {{ data_table_personalization_form(personalization_form) }}
                             </div>
                         {% endblock %}
                     </div>
@@ -71,4 +62,4 @@
             </div>
         {% endblock %}
     </div>
-{% endblock %}#}
+{% endblock %}

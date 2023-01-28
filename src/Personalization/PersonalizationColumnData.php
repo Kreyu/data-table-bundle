@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-
-class PersonalizationColumn
+class PersonalizationColumnData
 {
     public function __construct(
-        private readonly ColumnInterface $column,
+        private string $name,
         private int $order,
         private bool $visible,
     ) {
     }
 
-    public function getColumn(): ColumnInterface
+    public function getName(): string
     {
-        return $this->column;
+        return $this->name;
     }
 
     public function getOrder(): int

@@ -21,12 +21,8 @@
 {% endblock %}
 
 {% block kreyu_data_table_personalization_column_row %}
-    {% set column = form.vars.data.column %}
-    {% set data_table = form.parent.parent.vars.data_table %}
-
-    <li class="list-group-item" data-column-name="{{ column.name }}">
-        {{ data_table_column_label(data_table, column) }}
-
+    <li class="list-group-item" data-column-name="{{ form.vars.data.name }}">
+        {{ form.vars.data.name }}
         {{ form_widget(form.order) }}
         {{ form_widget(form.visible) }}
     </li>

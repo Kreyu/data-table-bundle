@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PersonalizationType extends AbstractType
+class PersonalizationDataType extends AbstractType
 {
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
@@ -26,7 +26,7 @@ class PersonalizationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('columns', CollectionType::class, [
-            'entry_type' => PersonalizationColumnType::class,
+            'entry_type' => PersonalizationColumnDataType::class,
         ]);
     }
 

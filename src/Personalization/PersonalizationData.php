@@ -22,8 +22,8 @@ class PersonalizationData implements \ArrayAccess
                 continue;
             }
 
-            $this->columns[$column->getName()] = new PersonalizationColumn(
-                column: $column,
+            $this->columns[$column->getName()] = new PersonalizationColumnData(
+                name: $column->getName(),
                 order: $index++,
                 visible: true,
             );
@@ -37,7 +37,7 @@ class PersonalizationData implements \ArrayAccess
         ];
 
         foreach ($this->getColumns() as $personalizationColumn) {
-            $data['columns'][$personalizationColumn->getColumn()->getName()] = [
+            $data['columns'][$personalizationColumn->getName()] = [
                 'order' => $personalizationColumn->getOrder(),
                 'visible' => $personalizationColumn->isVisible(),
             ];
@@ -49,10 +49,10 @@ class PersonalizationData implements \ArrayAccess
     public function fromFormData(array $data): void
     {
         foreach ($this->getColumns() as $personalizationColumn) {
-            $columnArray = $data['columns'][$personalizationColumn->getColumn()->getName()];
+            $columnData = $data['columns'][$personalizationColumn->getName()];
 
-            $personalizationColumn->setOrder(filter_var($columnArray['order'], FILTER_VALIDATE_INT));
-            $personalizationColumn->setVisible(filter_var($columnArray['visible'], FILTER_VALIDATE_BOOLEAN));
+            $personalizationColumn->setOrder(filter_var($columnData['order'], FILTER_VALIDATE_INT));
+            $personalizationColumn->setVisible(filter_var($columnData['visible'], FILTER_VALIDATE_BOOLEAN));
         }
     }
 
@@ -68,13 +68,38 @@ class PersonalizationData implements \ArrayAccess
     {
         $columns = $this->columns;
 
-        $columns = array_filter($columns, fn (PersonalizationColumn $column) => $column->isVisible());
+        $columns = array_filter($columns, fn (PersonalizationColumnData $column) => $column->isVisible());
 
-        usort($columns, function (PersonalizationColumn $a, PersonalizationColumn $b) {
+        usort($columns, function (PersonalizationColumnData $a, PersonalizationColumnData $b) {
             return $a->getOrder() <=> $b->getOrder();
         });
 
-        return array_map(fn (PersonalizationColumn $column) => $column->getColumn(), $columns);
+        return array_map(fn (PersonalizationColumnData $column) => $column->getColumn(), $columns);
+    }
+
+    /**
+     * @param  array<ColumnInterface> $columns
+     * @return array<ColumnInterface>
+     */
+    public function compute(array $columns): array
+    {
+        $columns = array_filter(
+            $columns,
+            fn (ColumnInterface $column) => $this->isColumnVisible($column),
+        );
+        
+        usort($columns, fn (ColumnInterface $a, ColumnInterface $b) => $this->getColumnOrder($a) <=> $this->getColumnOrder($b));
+        
+        return $columns;
+    }
+
+    public function getColumnOrder(string|ColumnInterface $column): int
+    {
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return $this->columns[$column]->getOrder();
     }
 
     public function setColumnOrder(string|ColumnInterface $column, int $order): self

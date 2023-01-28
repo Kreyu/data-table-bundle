@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FilterType extends AbstractType
+class FilterDataType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -17,10 +18,12 @@ class FilterType extends AbstractType
             ->add('operator', $options['operator_type'], $options['operator_options'] + [
                 'label' => false,
                 'required' => false,
+                'getter' => fn (FilterData $data) => $data->getOperator(),
             ])
             ->add('value', $options['field_type'], $options['field_options'] + [
                 'label' => false,
                 'required' => false,
+                'getter' => fn (FilterData $data) => $data->getValue(),
             ])
         ;
     }
@@ -29,6 +32,7 @@ class FilterType extends AbstractType
     {
         $resolver->setDefaults([
             'required' => false,
+            'data_class' => FilterData::class,
             'operator_type' => OperatorType::class,
             'operator_options' => [
                 'visible' => false,

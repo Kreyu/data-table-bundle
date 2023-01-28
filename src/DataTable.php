@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterDataType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
-use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationType;
+use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
@@ -150,7 +151,7 @@ class DataTable implements DataTableInterface
 
     public function getFiltrationForm(): FormInterface
     {
-        return $this->filtrationForm ??= $this->buildPersonalizationForm();
+        return $this->filtrationForm ??= $this->buildFiltrationForm();
     }
 
     public function getPersonalizationForm(): FormInterface
@@ -174,14 +175,24 @@ class DataTable implements DataTableInterface
     {
         $formBuilder = $this->config->getFiltrationFormFactory()->createNamedBuilder(
             name: $this->config->getFiltrationParameterName(),
+            type: FiltrationDataType::class,
             options: [
                 'method' => 'GET',
                 'csrf_protection' => false,
+                'filters' => $this->config->getFilters(),
             ],
         );
 
         foreach ($this->config->getFilters() as $filter) {
-            $formBuilder->add($filter->getFormName(), FilterType::class, $filter->getFormOptions());
+            $formBuilder->add(
+                $filter->getFormName(),
+                FilterDataType::class,
+                $filter->getFormOptions() + [
+                    'getter' => function (FiltrationData $data, FormInterface $form) use ($filter) {
+                        return $data->getFilterData($filter);
+                    }
+                ],
+            );
         }
 
         return $formBuilder->getForm();
@@ -191,7 +202,7 @@ class DataTable implements DataTableInterface
     {
         $formBuilder = $this->config->getPersonalizationFormFactory()->createNamedBuilder(
             name: $this->config->getPersonalizationParameterName(),
-            type: PersonalizationType::class,
+            type: PersonalizationDataType::class,
             options: [
                 'method' => 'POST',
             ],
@@ -256,7 +267,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $filtrationData = $this->config->getDefaultFiltrationData();
+        $filtrationData = new FiltrationData();
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
@@ -279,7 +290,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $personalizationData = $this->config->getDefaultPersonalizationData();
+        $personalizationData = new PersonalizationData($this->getConfig()->getColumns());
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {

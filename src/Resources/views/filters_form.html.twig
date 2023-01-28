@@ -1,10 +1,10 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
-{% if data_table.filtrationForm.count > 0 %}
+{% if form.count > 0 %}
     <div class="mb-4">
-        {{ form_start(data_table.filtrationForm) }}
+        {{ form_start(form) }}
             <div class="row">
-                {% for child in data_table.filtrationForm.children %}
+                {% for child in form.children %}
                     <div class="col-12 col-lg-3 col-md-6">
                         {{ form_row(child) }}
                     </div>
@@ -13,6 +13,6 @@
             <div class="text-end">
                 <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
             </div>
-        {{ form_end(data_table.filtrationForm) }}
+        {{ form_end(form) }}
     </div>
 {% endif %}

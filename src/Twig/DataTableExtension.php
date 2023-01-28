@@ -9,9 +9,8 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\HeadersView;
-use Kreyu\Bundle\DataTableBundle\Renderer\TwigDataTableRenderer;
 use Kreyu\Bundle\DataTableBundle\RowView;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Form\FormInterface;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
 use Twig\Extension\AbstractExtension;
@@ -25,6 +24,11 @@ class DataTableExtension extends AbstractExtension
             new TwigFunction(
                 'data_table',
                 [$this, 'renderDataTable'],
+                ['needs_environment' => true, 'is_safe' => ['html']],
+            ),
+            new TwigFunction(
+                'data_table_headers',
+                [$this, 'renderHeaders'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
@@ -108,10 +112,7 @@ class DataTableExtension extends AbstractExtension
      */
     public function renderColumnHeader(Environment $environment, ColumnView $view): string
     {
-        return $environment->render('@KreyuDataTable/column_header.html.twig', [
-            'vars' => $view->vars,
-            'parent' => $view->parent,
-        ]);
+        return $environment->render('@KreyuDataTable/column_header.html.twig', $view->vars);
     }
 
     /**
@@ -125,20 +126,20 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException
      */
-    public function renderFiltersForm(Environment $environment, DataTableViewInterface $dataTable): string
+    public function renderFiltersForm(Environment $environment, FormInterface $form): string
     {
         return $environment->render('@KreyuDataTable/filters_form.html.twig', [
-            'data_table' => $dataTable,
+            'form' => $form->createView(),
         ]);
     }
 
     /**
      * @throws TwigException
      */
-    public function renderPersonalizationForm(Environment $environment, DataTableViewInterface $dataTable): string
+    public function renderPersonalizationForm(Environment $environment, FormInterface $form): string
     {
         return $environment->render('@KreyuDataTable/personalization_form.html.twig', [
-            'data_table' => $dataTable,
+            'form' => $form->createView(),
         ]);
     }
 

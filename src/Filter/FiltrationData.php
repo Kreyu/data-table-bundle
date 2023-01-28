@@ -37,7 +37,7 @@ class FiltrationData
 
     public function isEmpty(): bool
     {
-        return empty($this->data);
+        return empty($this->filters);
     }
 
     public function hasFilter(FilterInterface $filter): bool

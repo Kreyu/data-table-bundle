@@ -7,6 +7,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Maker\MakeDataTable;
+use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
@@ -51,6 +52,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.persistence.token_storage_subject_provider', TokenStoragePersistenceSubjectProvider::class)
+        ->args([service('security.token_storage')])
+    ;
+
+    $services
+        ->set('kreyu_data_table.persistence.static_subject_provider', StaticPersistenceSubjectProvider::class)
         ->args([service('security.token_storage')])
     ;
 

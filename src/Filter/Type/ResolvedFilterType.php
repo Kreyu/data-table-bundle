@@ -6,8 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedFilterType implements ResolvedFilterTypeInterface
@@ -50,6 +52,17 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
 
         foreach ($this->typeExtensions as $extension) {
             $extension->buildView($view, $filter, $options);
+        }
+    }
+
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
+    {
+        $this->parent?->apply($query, $data, $filter);
+
+        $this->innerType->apply($query, $data, $filter);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->apply($query, $data, $filter);
         }
     }
 

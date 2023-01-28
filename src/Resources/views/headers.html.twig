@@ -2,8 +2,14 @@
 
 {% set template = '@KreyuDataTable/data_table_theme.html.twig' %}
 
-{% if block(block_name, template) is defined %}
+<tr>
+    {% for column in columns %}
+        <td>{{ data_table_column_header(column) }}</td>
+    {% endfor %}
+</tr>
+
+{#{% if block(block_name, template) is defined %}
     {{- block(block_name, template) -}}
 {% else %}
     {{- value -}}
-{% endif %}
+{% endif %}#}

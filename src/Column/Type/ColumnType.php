@@ -43,15 +43,21 @@ final class ColumnType implements ColumnTypeInterface
             }
         }
 
-        if (is_callable($formatter)) {
-            $options['value'] = $formatter($value);
-        } else {
-            $options['value'] = $value;
+        if (null !== $column->getData()) {
+            if (is_callable($formatter)) {
+                $options['value'] = $formatter($value);
+            } else {
+                $options['value'] = $value;
+            }
+
+            $normalizableOptions = array_diff_key($options, ['formatter' => true]);
+
+            $options = $this->normalizeOptions($normalizableOptions, $value);
         }
 
-        $normalizableOptions = array_diff_key($options, ['formatter' => true]);
+        $options['data_table'] = $view->parent;
 
-        $view->vars = $this->normalizeOptions($normalizableOptions, $value);
+        $view->vars = $options;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\HeadersView;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\RowView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -40,19 +42,30 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
+        $columns = $dataTable->getConfig()->getColumns();
+
+        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
+            /** @var PersonalizationData $personalizationData */
+            $personalizationData = $dataTable->getPersonalizationForm()->getData();
+
+            $columns = $personalizationData->compute($columns);
+        }
+
         $view->vars += [
-            'columns' => $dataTable->getConfig()->getColumns(),
+            'columns' => $columns,
             'filters' => $dataTable->getConfig()->getFilters(),
-            'personalization_enabled' => $options['personalization_enabled'],
-            'filtration_enabled' => $options['filtration_enabled'],
-            'sorting_enabled' => $options['sorting_enabled'],
-            'pagination_enabled' => $options['pagination_enabled'],
+            'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
+            'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
+            'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
+            'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'page_parameter_name' => $dataTable->getConfig()->getPageParameterName(),
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'pagination' => $dataTable->getPagination(),
+            'filtration_form' => $dataTable->getFiltrationForm(),
+            'personalization_form' => $dataTable->getPersonalizationForm(),
         ];
 
         $items = $dataTable->getPagination()->getItems();

@@ -6,7 +6,7 @@
 Streamlines creation process of the data tables in Symfony applications.  
 
 > ### ️ℹ️ Note
-> This bundle was heavily inspired by the [Symfony Form](https://github.com/symfony/form) component.
+> This bundle structure was heavily inspired by the [Symfony Form](https://github.com/symfony/form) component.
 
 ### Features
 
@@ -19,23 +19,37 @@ Streamlines creation process of the data tables in Symfony applications.
 
 ## Table of contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Building data tables](#building-data-tables)
-	- [Creating data table classes](#creating-data-table-classes)
-- [Rendering data tables](#rendering-data-tables)
-- [Other common data table features](#other-common-data-table-features)
-	- [Passing options to data tables](#passing-options-to-data-tables)
-- [Columns](#columns)
-	- [Available column types](#available-column-types)
-	- [Creating custom column type](#creating-custom-column-type)
-- [Filtration](#filtration)
-	- [Available filters](#available-filters)
-	- [Creating custom filter](#creating-custom-filter)
-		- [Doctrine ORM](#doctrine-orm)
-	- [Filter operators](#filter-operators)
-
-#### Persistence
+* [Installation](#installation)
+* [Usage](#usage)
+* [Building data tables](#building-data-tables)
+	* [Creating data tables in controllers](#creating-data-tables-in-controllers)
+	* [Creating data table classes](#creating-data-table-classes)
+* [Rendering data tables](#rendering-data-tables)
+* [Processing data tables](#processing-data-tables)
+* [Other common data table features](#other-common-data-table-features)
+	* [Passing options to data tables](#passing-options-to-data-tables)
+* [Columns](#columns)
+	* [Available column types](#available-column-types)
+	* [Creating custom column type](#creating-custom-column-type)
+* [Filtration](#filtration)
+	* [Filtration criteria persistence](#filtration-criteria-persistence)
+		* [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
+		* [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
+	* [Available filters](#available-filters)
+	* [Creating custom filter](#creating-custom-filter)
+		* [Doctrine ORM](#doctrine-orm)
+	* [Filter operators](#filter-operators)
+	* [Available filters](#available-filters-1)
+	* [Creating custom filter](#creating-custom-filter-1)
+		* [Doctrine ORM](#doctrine-orm-1)
+	* [Filter operators](#filter-operators-1)
+* [Persistence](#persistence-1)
+	* [Persistence adapters](#persistence-adapters)
+		* [Using built-in cache adapter](#using-built-in-cache-adapter)
+		* [Creating custom adapters](#creating-custom-adapters)
+	* [Persistence subjects](#persistence-subjects)
+	* [Persistence subject providers](#persistence-subject-providers)
+		* [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
 
 ## Installation
 
@@ -110,6 +124,11 @@ class ProductController extends AbstractController
 In this example, you've added two columns to your data table - `id` and `name` - corresponding to the `id` and `name` properties of the `Product` class.
 You've also assigned each a [column type]() (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
 
+> ### 💡 Important note
+> Notice the use of the `ProxyQuery` class, which wraps the query builder.
+> Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
+> Although only the [Doctrine ORM proxy query class]() is provided out-of-the-box, [creating custom proxy query classes]() is easy. 
+
 ### Creating data table classes
 
 It is always recommended to put as little logic in controllers as possible.
@@ -139,6 +158,7 @@ class ProductType extends AbstractType
     }
 }
 ```
+
 > ### 💡 Important note
 > Install the [MakerBundle](https://symfony.com/bundles/SymfonyMakerBundle/current/index.html) in your project to generate data table classes using the `make:data-table` command.
 
@@ -150,7 +170,8 @@ In controllers using the [DataTableControllerTrait](src/DataTableControllerTrait
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;use App\Repository\ProductRepository;
+use App\DataTable\Type\ProductType;
+use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
@@ -182,7 +203,8 @@ Now that the data table has been created, the next step is to render it:
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;use App\Repository\ProductRepository;
+use App\DataTable\Type\ProductType;
+use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
@@ -663,11 +685,11 @@ Supported operators are defined in the protected `getSupportedOperators()` metho
 By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
 
 ```php
-public function configureFilters(FilterMapperInterface $filters, array $options): void
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
 {
-    $filters
+    $builder
         // StringFilter uses Operator::EQUAL by default
-        ->add('name', StringFilter::class, [
+        ->addFilter('name', StringType::class, [
             'field_name' => 'product.name',
             'operator_options' => [
                 'choices' => [
@@ -682,7 +704,7 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
 
 ```php
-public function configureFilters(FilterMapperInterface $filters, array $options): void
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
 {
     $filters
         ->add('quantity', NumericFilter::class, [
@@ -734,7 +756,7 @@ Supported operators are defined in the protected `getSupportedOperators()` metho
 By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
 
 ```php
-public function configureFilters(FilterMapperInterface $filters, array $options): void
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
 {
     $filters
         // StringFilter uses Operator::EQUAL by default
@@ -753,10 +775,10 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
 
 ```php
-public function configureFilters(FilterMapperInterface $filters, array $options): void
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
 {
-    $filters
-        ->add('quantity', NumericFilter::class, [
+    $builder
+        ->addFilter('quantity', NumericFilter::class, [
             'field_name' => 'product.quantity',
             'operator_options' => [
                 'visible' => true,
@@ -768,3 +790,11 @@ public function configureFilters(FilterMapperInterface $filters, array $options)
 
 If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
 Options passed as `operator_options` are used in that type.
+
+## Learn more
+
+There's a lot more to learn and a lot of _powerful_ tricks in the data tables:
+
+Advanced Features:
+
+- [How to Create a Custom Column Type](docs/create_custom_column_type.md)

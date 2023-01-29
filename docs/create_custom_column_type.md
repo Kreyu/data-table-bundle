@@ -258,6 +258,10 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
 {% endblock %}
 ```
 
+Every block is prefixed with `data_table_` by default.
+Last part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityType` -> `quantity`).
+This can be controlled by overriding the `getBlockPrefix()` method in `QuantityType`.
+
 ## Passing Variables to the Column Type Template
 
 The bundle passes a series of variables to the template used to render the column type.

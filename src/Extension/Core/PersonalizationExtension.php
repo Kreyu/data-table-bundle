@@ -23,16 +23,15 @@ class PersonalizationExtension extends AbstractTypeExtension
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->setPersonalizationEnabled(true)
-            ->setPersonalizationPersistenceEnabled(true)
-            ->setPersonalizationFormFactory($this->formFactory)
-            ->setPersonalizationPersistenceAdapter($this->persistenceAdapter)
-        ;
+        $builder->setPersonalizationFormFactory($this->formFactory);
 
-        try {
-            $builder->setPersonalizationPersistenceSubject($this->persistenceSubjectProvider->provide());
-        } catch (PersistenceSubjectNotFoundException) {}
+        if ($builder->isPersonalizationEnabled() && $builder->isPersonalizationPersistenceEnabled()) {
+            $builder->setPersonalizationPersistenceAdapter($this->persistenceAdapter);
+
+            try {
+                $builder->setPersonalizationPersistenceSubject($this->persistenceSubjectProvider->provide());
+            } catch (PersistenceSubjectNotFoundException) {}
+        }
     }
 
     public static function getExtendedTypes(): iterable

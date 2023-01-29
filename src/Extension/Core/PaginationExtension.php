@@ -21,11 +21,11 @@ class PaginationExtension extends AbstractTypeExtension
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->setPaginationEnabled(true)
-            ->setPaginationPersistenceEnabled(true)
-            ->setPaginationPersistenceAdapter($this->persistenceAdapter)
-        ;
+        if (!$builder->isPaginationEnabled() || !$builder->isPaginationPersistenceEnabled()) {
+            return;
+        }
+
+        $builder->setPaginationPersistenceAdapter($this->persistenceAdapter);
 
         try {
             $builder->setPaginationPersistenceSubject($this->persistenceSubjectProvider->provide());

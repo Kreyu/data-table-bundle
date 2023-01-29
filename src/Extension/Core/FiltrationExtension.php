@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Extension\Core;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\AbstractTypeExtension;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -24,16 +23,15 @@ class FiltrationExtension extends AbstractTypeExtension
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->setFiltrationEnabled(true)
-            ->setFiltrationPersistenceEnabled(true)
-            ->setFiltrationFormFactory($this->formFactory)
-            ->setFiltrationPersistenceAdapter($this->persistenceAdapter)
-        ;
+        $builder->setFiltrationFormFactory($this->formFactory);
 
-        try {
-            $builder->setFiltrationPersistenceSubject($this->persistenceSubjectProvider->provide());
-        } catch (PersistenceSubjectNotFoundException) {}
+        if ($builder->isFiltrationEnabled() && $builder->isFiltrationPersistenceEnabled()) {
+            $builder->setFiltrationPersistenceAdapter($this->persistenceAdapter);
+
+            try {
+                $builder->setFiltrationPersistenceSubject($this->persistenceSubjectProvider->provide());
+            } catch (PersistenceSubjectNotFoundException) {}
+        }
     }
 
     public static function getExtendedTypes(): iterable

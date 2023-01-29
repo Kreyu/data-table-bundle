@@ -21,11 +21,11 @@ class SortingExtension extends AbstractTypeExtension
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->setSortingEnabled(true)
-            ->setSortingPersistenceEnabled(true)
-            ->setSortingPersistenceAdapter($this->persistenceAdapter)
-        ;
+        if (!$builder->isSortingEnabled() || !$builder->isSortingPersistenceEnabled()) {
+            return;
+        }
+
+        $builder->setSortingPersistenceAdapter($this->persistenceAdapter);
 
         try {
             $builder->setSortingPersistenceSubject($this->persistenceSubjectProvider->provide());

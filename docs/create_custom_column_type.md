@@ -1,6 +1,6 @@
 # How to Create a Custom Column Type
 
-This bundle comes with multiple column types, ready to use in your applications.
+This bundle comes with multiple column types, ready to use in your applications.  
 However, it's common to create custom column types to solve specific purposes in your projects.
 
 ## Creating Column Types Based on Built-in Types

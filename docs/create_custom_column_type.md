@@ -217,8 +217,8 @@ class ProductType extends AbstractType
             ->addColumn('quantity', QuantityType::class, [
                 'unit_from' => 'g',
                 'unit_to' => 't',
-                // decimals, decimal_separator and thousands_separator options are not configured explicitly,
-                // so their default value will be used
+                // decimals, decimal_separator and thousands_separator options
+                // are not configured explicitly, so their default value will be used
             ])
         ;
     }

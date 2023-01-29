@@ -28,7 +28,7 @@ class ProductType extends AbstractType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-        	// ...
+            // ...
             ->addColumn('category', LinkType::class, [
                 'href' => function (Category $category): string {
                     return $this->urlGenerator->generate('app_category_show', [
@@ -39,8 +39,8 @@ class ProductType extends AbstractType
                     return $category->getName();
                 },
             ])
-		;
-	}
+        ;
+    }
 }
 ```
 
@@ -70,7 +70,7 @@ class CategoryLinkType extends AbstractType
     
     public function configureOptions(OptionsResolver $resolver): void
     {
-    	$resolver->setDefaults([
+        $resolver->setDefaults([
             'href' => function (Category $category): string {
                 return $this->urlGenerator->generate('app_category_show', [
                     'id' => $category->getId(),
@@ -79,13 +79,13 @@ class CategoryLinkType extends AbstractType
             'formatter' => function (Category $category): string {
                 return $category->getName();
             },
-    	]);
-	}
-	
-	public function getParent(): ?string
-	{
-	 	return LinkType::class;
-	}
+        ]);
+    }
+    
+    public function getParent(): ?string
+    {
+         return LinkType::class;
+    }
 }
 ```
 
@@ -107,11 +107,11 @@ class ProductType extends AbstractType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-		$builder
-			// ...
-			->addColumn('category', CategoryLinkType::class)
-		;
-	}
+        $builder
+            // ...
+            ->addColumn('category', CategoryLinkType::class)
+        ;
+    }
 }
 ```
 
@@ -130,7 +130,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType;
 
 class QuantityType extends AbstractType
 {
-	// ...
+    // ...
 } 
 ```
 
@@ -173,28 +173,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class QuantityType extends AbstractType
 {
-	public function configureOptions(OptionsResolver $resolver): void
-	{
-		// this defines the available options and their default values when
-		// they are not configured explicitly when using the column type
-		$resolver->setDefaults([
-			'decimals' => 0,
-			'decimal_separator' => '.',
-			'thousands_separator' => ',',
-		]);
-		
-		// this defines the available options that are required to be configured explicitly
-		$resolver->setRequired([
-			'unit_from',
-			'unit_to',
-		]);
-		
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        // this defines the available options and their default values when
+        // they are not configured explicitly when using the column type
+        $resolver->setDefaults([
+            'decimals' => 0,
+            'decimal_separator' => '.',
+            'thousands_separator' => ',',
+        ]);
+        
+        // this defines the available options that are required to be configured explicitly
+        $resolver->setRequired([
+            'unit_from',
+            'unit_to',
+        ]);
+        
         // optionally you can also restrict the options type or types (to get
         // automatic type validation and useful error messages for end users)
-		$resolver->setAllowedTypes('decimals', ['int']);
-		$resolver->setAllowedTypes('decimal_separator', ['null', 'string']);
-		$resolver->setAllowedTypes('thousands_separator', ['null', 'string']);
-	}
+        $resolver->setAllowedTypes('decimals', ['int']);
+        $resolver->setAllowedTypes('decimal_separator', ['null', 'string']);
+        $resolver->setAllowedTypes('thousands_separator', ['null', 'string']);
+    }
 } 
 ```
 
@@ -212,16 +212,16 @@ class ProductType extends AbstractType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-		$builder
-			// ...
-			->addColumn('quantity', QuantityType::class, [
-				'unit_from' => 'g',
-				'unit_to' => 't',
-				// decimals, decimal_separator and thousands_separator options are not configured explicitly,
-				// so their default value will be used
-			])
-		;
-	}
+        $builder
+            // ...
+            ->addColumn('quantity', QuantityType::class, [
+                'unit_from' => 'g',
+                'unit_to' => 't',
+                // decimals, decimal_separator and thousands_separator options are not configured explicitly,
+                // so their default value will be used
+            ])
+        ;
+    }
 }
 ```
 
@@ -243,9 +243,9 @@ Then, update the [themes option]() to add this new template at the beginning of 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-	themes: 
-		- 'data_table/custom_theme.html.twig' 
-		- '...' 
+    themes: 
+        - 'data_table/custom_theme.html.twig' 
+        - '...' 
 ```
 
 The last step is to create the actual Twig template that will render the type.
@@ -254,7 +254,7 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
 ```twig
 {# templates/data_table/custom_theme.html.twig #}
 {% block data_table_quantity %}
-	{# ... #}
+    {# ... #}
 {% endblock %}
 ```
 
@@ -276,29 +276,29 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class QuantityType extends AbstractType
 {
-	public function __construct(private UnitConverterInterface $unitConverter)
-	{
-	}
-	
-	public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
-	{	
-		// pass the custom options directly to the template
-		$view->vars['decimals'] = $options['decimals'];
-		$view->vars['decimal_separator'] = $options['decimal_separator'];
-		$view->vars['thousands_separator'] = $options['thousands_separator'];
-		
-		// create an additional variable named "converted_value" that will hold the value after the conversion
-		$view->vars['converted_value'] = $view->vars['value'] ?? null;
-		
-		if (null !== $view->vars['converted_value']) {
-			// use some implementation of unit converter to do the heavy work
-			$view->vars['converted_value'] = $this->unitConverter
-				->convert($value)
-				->from($options['unit_from'])
-				->to($options['unit_to'])
-			;
-		}
-	}
+    public function __construct(private UnitConverterInterface $unitConverter)
+    {
+    }
+    
+    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    {    
+        // pass the custom options directly to the template
+        $view->vars['decimals'] = $options['decimals'];
+        $view->vars['decimal_separator'] = $options['decimal_separator'];
+        $view->vars['thousands_separator'] = $options['thousands_separator'];
+        
+        // create an additional variable named "converted_value" that will hold the value after the conversion
+        $view->vars['converted_value'] = $view->vars['value'] ?? null;
+        
+        if (null !== $view->vars['converted_value']) {
+            // use some implementation of unit converter to do the heavy work
+            $view->vars['converted_value'] = $this->unitConverter
+                ->convert($value)
+                ->from($options['unit_from'])
+                ->to($options['unit_to'])
+            ;
+        }
+    }
 }
 ```
 
@@ -307,8 +307,8 @@ The variables added in `buildView()` are available in the column type template a
 ```twig
 {# templates/data_table/custom_theme.html.twig #}
 {% block data_table_quantity %}
-	{% if value is not null %}
-		{{- value|number_format(decimals, decimal_separator, thousands_separator) -}}
-	{% endif %}
+    {% if value is not null %}
+        {{- value|number_format(decimals, decimal_separator, thousands_separator) -}}
+    {% endif %}
 {% endblock %}
 ```

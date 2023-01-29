@@ -3,7 +3,7 @@
 [//]: # ([![Latest Stable Version]&#40;http://poser.pugx.org/kreyu/data-table-bundle/v&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
 [//]: # ([![PHP Version Require]&#40;http://poser.pugx.org/kreyu/data-table-bundle/require/php&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
 
-Streamlines creation process of the data tables in Symfony applications.  
+Streamlines creation process of the data tables in Symfony applications.
 
 > ### ️ℹ️ Note
 > This bundle structure was heavily inspired by the [Symfony Form](https://github.com/symfony/form) component.
@@ -22,34 +22,34 @@ Streamlines creation process of the data tables in Symfony applications.
 * [Installation](#installation)
 * [Usage](#usage)
 * [Building data tables](#building-data-tables)
-	* [Creating data tables in controllers](#creating-data-tables-in-controllers)
-	* [Creating data table classes](#creating-data-table-classes)
+    * [Creating data tables in controllers](#creating-data-tables-in-controllers)
+    * [Creating data table classes](#creating-data-table-classes)
 * [Rendering data tables](#rendering-data-tables)
 * [Processing data tables](#processing-data-tables)
 * [Other common data table features](#other-common-data-table-features)
-	* [Passing options to data tables](#passing-options-to-data-tables)
+    * [Passing options to data tables](#passing-options-to-data-tables)
 * [Columns](#columns)
-	* [Available column types](#available-column-types)
-	* [Creating custom column type](#creating-custom-column-type)
+    * [Available column types](#available-column-types)
+    * [Creating custom column type](#creating-custom-column-type)
 * [Filtration](#filtration)
-	* [Filtration criteria persistence](#filtration-criteria-persistence)
-		* [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
-		* [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
-	* [Available filters](#available-filters)
-	* [Creating custom filter](#creating-custom-filter)
-		* [Doctrine ORM](#doctrine-orm)
-	* [Filter operators](#filter-operators)
-	* [Available filters](#available-filters-1)
-	* [Creating custom filter](#creating-custom-filter-1)
-		* [Doctrine ORM](#doctrine-orm-1)
-	* [Filter operators](#filter-operators-1)
+    * [Filtration criteria persistence](#filtration-criteria-persistence)
+        * [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
+        * [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
+    * [Available filters](#available-filters)
+    * [Creating custom filter](#creating-custom-filter)
+        * [Doctrine ORM](#doctrine-orm)
+    * [Filter operators](#filter-operators)
+    * [Available filters](#available-filters-1)
+    * [Creating custom filter](#creating-custom-filter-1)
+        * [Doctrine ORM](#doctrine-orm-1)
+    * [Filter operators](#filter-operators-1)
 * [Persistence](#persistence-1)
-	* [Persistence adapters](#persistence-adapters)
-		* [Using built-in cache adapter](#using-built-in-cache-adapter)
-		* [Creating custom adapters](#creating-custom-adapters)
-	* [Persistence subjects](#persistence-subjects)
-	* [Persistence subject providers](#persistence-subject-providers)
-		* [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
+    * [Persistence adapters](#persistence-adapters)
+        * [Using built-in cache adapter](#using-built-in-cache-adapter)
+        * [Creating custom adapters](#creating-custom-adapters)
+    * [Persistence subjects](#persistence-subjects)
+    * [Persistence subject providers](#persistence-subject-providers)
+        * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
 
 ## Installation
 
@@ -127,7 +127,7 @@ You've also assigned each a [column type]() (e.g. `NumberType` and `TextType`), 
 > ### 💡 Important note
 > Notice the use of the `ProxyQuery` class, which wraps the query builder.
 > Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
-> Although only the [Doctrine ORM proxy query class]() is provided out-of-the-box, [creating custom proxy query classes]() is easy. 
+> Although only the [Doctrine ORM proxy query class]() is provided out-of-the-box, [creating custom proxy query classes]() is easy.
 
 ### Creating data table classes
 
@@ -163,7 +163,7 @@ class ProductType extends AbstractType
 > Install the [MakerBundle](https://symfony.com/bundles/SymfonyMakerBundle/current/index.html) in your project to generate data table classes using the `make:data-table` command.
 
 The data table class contains all the directions needed to create the product data table.
-In controllers using the [DataTableControllerTrait](src/DataTableControllerTrait.php), use the `createDataTable()` helper 
+In controllers using the [DataTableControllerTrait](src/DataTableControllerTrait.php), use the `createDataTable()` helper
 (otherwise, use the `create()` method of the `kreyu_data_table.factory` service):
 
 ```php
@@ -240,22 +240,22 @@ Then, use some [data table helper functions](#using-twig-helper-functions) to re
 That's it! The [data_table() function]() renders all the columns.
 
 > ### 💡 Important note
-> 
+>
 > The data table system is smart enough to access the value of the private `id` and `name` properties from each product returned by the query via the `getId()` and `getName()` methods on the `Product` class.
 > Unless a property is public, it _must_ have a "getter" method so that [Symfony Property Accessor Component]() can read its value.
 > For a boolean property, you can use an "isser" or "hasser" method (e.g. `isPublished()` or `hasReminder()`) instead of a getter (e.g. `getPublished` or `getReminder()`).
 
-As short as this rendering is, it's not very flexible. 
-Usually, you'll need more control about how the entire data table or some of its parts look. 
+As short as this rendering is, it's not very flexible.
+Usually, you'll need more control about how the entire data table or some of its parts look.
 For example, thanks to the [Bootstrap 5 integration with data tables]() you can set this option to generate data tables compatible with the Bootstrap 5 CSS framework:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-	themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig']
+  themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig']
 ```
 
-In addition to the data table themes, this bundle allows you to customize the way any part of the table is rendered 
+In addition to the data table themes, this bundle allows you to customize the way any part of the table is rendered
 with multiple functions to render each part separately (column values, headers, pagination, filtration form, etc.)
 
 ## Processing data tables
@@ -301,7 +301,7 @@ class ProductController extends AbstractController
 
 This controller follows a common pattern for handling data tables and has two possible paths:
 
-1. When initially loading the page in a browser, the data table hasn't been submitted yet. 
+1. When initially loading the page in a browser, the data table hasn't been submitted yet.
    So the data table is created and rendered;
 2. When the user submits the data table (e.g. changes current page), [handleRequest()]() recognizes this and immediately
    writes the submitted data into the data table. This works the same, as if you've manually extracted the submitted data
@@ -309,14 +309,14 @@ This controller follows a common pattern for handling data tables and has two po
 
 > ### 💡 Important note
 > If you need more control over exactly when and how your data table is modified, you can use each feature dedicated method to handle the submissions:
-> 
+>
 > - [paginate()]() to handle pagination - with current page and limit of items per page;
 > - [sort()]() to handle sorting - with fields and directions to sort the list. Supports sorting by multiple fields;
 > - [filter()]() to handle filtration - with filters and their values and operators;
 > - [personalize()]() to handle personalization - with columns visibility status and their order;
-> 
-> The [handleRequest()]() method handles all of them manually. 
-> First argument of the method - the request object - is not tied to specific request implementation, 
+>
+> The [handleRequest()]() method handles all of them manually.
+> First argument of the method - the request object - is not tied to specific request implementation,
 > although only the [HttpFoundation request handler]() is provided out-of-the-box, [creating custom data table request handler]() is easy.
 
 ## Other common data table features
@@ -359,7 +359,7 @@ class ProductController extends AbstractController
 }
 ```
 
-If you try to use the data table now, you'll see an error message: _The option "display_identifier_column" does not exist._ 
+If you try to use the data table now, you'll see an error message: _The option "display_identifier_column" does not exist._
 That's because forms must declare all the options they accept using the `configureOptions()` method:
 
 ```php
@@ -421,16 +421,16 @@ class ProductType extends AbstractType
 The following column types are natively available in the bundle:
 
 - Text types
-	- [TextType](docs/column/types/text.md)
-	- [NumberType](docs/column/types/number.md)
-	- [BooleanType](docs/column/types/boolean.md)
-	- [LinkType](docs/column/types/link.md)
+    - [TextType](docs/column/types/text.md)
+    - [NumberType](docs/column/types/number.md)
+    - [BooleanType](docs/column/types/boolean.md)
+    - [LinkType](docs/column/types/link.md)
 - Special docs/column/types
-	- [CollectionType](docs/column/types/collection.md)
-	- [TemplateType](docs/column/types/template.md)
-	- [ActionsType](docs/column/types/actions.md)
+    - [CollectionType](docs/column/types/collection.md)
+    - [TemplateType](docs/column/types/template.md)
+    - [ActionsType](docs/column/types/actions.md)
 - Other
-	- [ColumnType](docs/column/types/column.md)
+    - [ColumnType](docs/column/types/column.md)
 
 ### Creating custom column type
 
@@ -652,12 +652,12 @@ class ProjectType extends AbstractType
 The following filters are natively available in the bundle:
 
 - Doctrine ORM
-	- [StringFilter](docs/filter/doctrine/orm/string.md)
-	- [NumericFilter](docs/filter/doctrine/orm/numeric.md)
-	- [EntityFilter](docs/filter/doctrine/orm/entity.md)
-	- [CallbackFilter](docs/filter/doctrine/orm/callback.md)
+    - [StringFilter](docs/filter/doctrine/orm/string.md)
+    - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
+    - [EntityFilter](docs/filter/doctrine/orm/entity.md)
+    - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
 - Other
-	- [AbstractFilter](docs/filter/other/abstract.md)
+    - [AbstractFilter](docs/filter/other/abstract.md)
 
 ### Creating custom filter
 
@@ -725,12 +725,12 @@ Options passed as `operator_options` are used in that type.
 The following filters are natively available in the bundle:
 
 - Doctrine ORM
-	- [StringFilter](docs/filter/doctrine/orm/string.md)
-	- [NumericFilter](docs/filter/doctrine/orm/numeric.md)
-	- [EntityFilter](docs/filter/doctrine/orm/entity.md)
-	- [CallbackFilter](docs/filter/doctrine/orm/callback.md)
+    - [StringFilter](docs/filter/doctrine/orm/string.md)
+    - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
+    - [EntityFilter](docs/filter/doctrine/orm/entity.md)
+    - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
 - Other
-	- [AbstractFilter](docs/filter/other/abstract.md)
+    - [AbstractFilter](docs/filter/other/abstract.md)
 
 ### Creating custom filter
 

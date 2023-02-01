@@ -101,17 +101,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-	use DataTableControllerTrait;
+    use DataTableControllerTrait;
 	
-	public function index(Request $request, ProductRepository $repository): Response
+    public function index(Request $request, ProductRepository $repository): Response
 	{
-	    $products = $repository->createQueryBuilder('product');
-	    
-	    $dataTable = $this->createDataTableBuilder(new ProxyQuery($products))
-	    	->addColumn('id', NumberType::class)
-	    	->addColumn('name', TextType::class)
-	    	->getDataTable();
-	    	
+        $products = $repository->createQueryBuilder('product');
+
+        $dataTable = $this->createDataTableBuilder(new ProxyQuery($products))
+        	->addColumn('id', NumberType::class)
+        	->addColumn('name', TextType::class)
+        	->getDataTable();
+        	
         // ...
 	}
 }
@@ -148,8 +148,8 @@ class ProductType extends AbstractType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
     	$builder
-    		->addColumn('id', NumberType::class)
-    		->addColumn('name', TextType::class)
+            ->addColumn('id', NumberType::class)
+            ->addColumn('name', TextType::class)
         ;
     }
 }
@@ -182,11 +182,11 @@ class ProductController extends AbstractController
 	
 	public function index(Request $request, ProductRepository $repository): Response
 	{
-		$products = $repository->createQueryBuilder('product');
-	    
-		$dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
-	    	
-		// ...
+        $products = $repository->createQueryBuilder('product');
+        
+        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        	
+        // ...
 	}
 }
 ```
@@ -215,13 +215,13 @@ class ProductController extends AbstractController
 	
 	public function index(Request $request, ProductRepository $repository): Response
 	{
-	    $products = $repository->createQueryBuilder('product');
-	    
-	    $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
-	    	
+        $products = $repository->createQueryBuilder('product');
+        
+        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        	
         return $this->render('product/index.html.twig', [
-			'data_table' => $dataTable->createView(),        
-		]);
+        	'data_table' => $dataTable->createView(),        
+        ]);
 	}
 }
 ```
@@ -280,14 +280,14 @@ class ProductController extends AbstractController
 	
 	public function index(Request $request, ProductRepository $repository): Response
 	{
-		$products = $repository->createQueryBuilder('product');
+        $products = $repository->createQueryBuilder('product');
 
-		$dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
-		$dataTable->handleRequest($request);
+        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        $dataTable->handleRequest($request);
 
-		return $this->render('product/index.html.twig', [
-			'data_table' => $dataTable->createView(),        
-		]);
+        return $this->render('product/index.html.twig', [
+        	'data_table' => $dataTable->createView(),        
+        ]);
 	}
 }
 ```
@@ -338,16 +338,16 @@ class ProductController extends AbstractController
 	
 	public function index(Request $request, ProductRepository $repository): Response
 	{
-		$products = $repository->createQueryBuilder('product');
+        $products = $repository->createQueryBuilder('product');
 
-		// use some PHP logic to decide if this column is displayed or not
-		$displayIdentifierColumn = ...;
+        // use some PHP logic to decide if this column is displayed or not
+        $displayIdentifierColumn = ...;
 
-		$dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products), [
-			'display_identifier_column' => $displayIdentifierColumn,
-		]);
+        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products), [
+        	'display_identifier_column' => $displayIdentifierColumn,
+        ]);
 
-		// ...
+        // ...
 	}
 }
 ```
@@ -397,7 +397,7 @@ class ProductType extends AbstractType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
     	if ($options['display_identifier_column']) {
-    		$builder->addColumn('id', NumberType::class);
+            $builder->addColumn('id', NumberType::class);
     	}
     	
     	$builder->addColumn('name', TextType::class);

@@ -35,11 +35,11 @@ class Filter implements FilterInterface
     public function getFormOptions(): array
     {
         return [
-            'field_type' => $this->options['field_type'],
-            'field_options' => $this->options['field_options'],
-            'operator_type' => $this->options['operator_type'],
-            'operator_options' => $this->options['operator_options'],
-            'label' => $this->options['label'],
+            'field_type' => $this->getOption('field_type'),
+            'field_options' => $this->getOption('field_options'),
+            'operator_type' => $this->getOption('operator_type'),
+            'operator_options' => $this->getOption('operator_options'),
+            'label' => $this->getOption('label'),
         ];
     }
 
@@ -56,6 +56,11 @@ class Filter implements FilterInterface
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getOption(string $name): mixed
+    {
+        return $this->options[$name];
     }
 
     public function createView(DataTableView $parent = null): FilterView

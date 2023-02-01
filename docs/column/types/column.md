@@ -1,6 +1,6 @@
-# AbstractType
+# ColumnType
 
-Every column type should extend from [AbstractType](#), to inherit necessary options.
+The [ColumnType](#) represents a base column, used as a parent for every other type in the bundle.
 
 ## Options
 
@@ -53,20 +53,19 @@ By default, if column type class name is `TextType`, the block name option will 
 Allows you to add a custom block prefix and override the block name used to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of all of them without the need to create a new column type.
 
-### `value`
+### `formatter`
 
-**type**: `mixed` **default**: `null` - the value retrieved by the property accessor is used
+**type**: `callable` **default**: `null`
 
-Sets the column value of each row.  
-Callable can be used to provide an option value based on an actual row value, which is passed as a first argument.
+Formats the value retrieved by the property accessor to string:
 
 ```php
-$columns
-    ->add('ean', TextType::class, [
-        'value' => fn (string $value) => trim($value),
+$builder
+    ->addColumn('ean', TextType::class, [
+        'formatter' => fn (string $value) => trim($value),
     ])
-    ->add('quantity', TextType::class, [
-        'value' => fn (float $value) => number_format($value, 2) . 'kg',
+    ->addColumn('quantity', TextType::class, [
+        'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
     ])
 ;
 ```
@@ -74,10 +73,10 @@ $columns
 If you disabled property accessor by setting the `property_path` option to `false`, this is a way to retrieve a value manually:
 
 ```php
-$columns
-    ->add('fullName', TextType::class, [
+$builder
+    ->addColumn('fullName', TextType::class, [
         'property_path' => false,
-        'value' => fn (User $value) => implode(' ', [$user->name, $user->surname]),    
+        'formatter' => fn (User $value) => implode(' ', [$user->name, $user->surname]),    
     ])
 ;
 ```

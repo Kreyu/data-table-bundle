@@ -2,8 +2,6 @@
 
 The [CollectionType](../../../src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
 
-**Note**: this type implements `ColumnFactoryAwareInterface`, which gives ability to use the column factory.
-
 ## Options
 
 ### `entry_type`
@@ -46,12 +44,6 @@ $columns
 
 Sets the value displayed between every item in the collection.
 
-### `prototype`
-
-**type**: `null` or `ColumnInterface` **default**: column created from `entry_` options, or `null` if column factory does not exist in the type
-
-This option holds a column created using the `entry_type` and `entry_options` options.  
-
 ## Inherited options
 
-See [abstract column type documentation](abstract.md).
+See [base column type documentation](column.md).

@@ -15,4 +15,4 @@ This filter has no additional options.
 
 ## Inherited options
 
-See [abstract column type documentation](../../other/abstract.md).
+See [base filter type documentation](../../filter.md).

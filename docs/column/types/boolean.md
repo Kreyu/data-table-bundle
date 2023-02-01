@@ -18,4 +18,4 @@ Sets the value that will be displayed if row value is false.
 
 ## Inherited options
 
-See [abstract column type documentation](abstract.md).
+See [base column type documentation](column.md).

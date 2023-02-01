@@ -19,5 +19,7 @@ interface FilterInterface
 
     public function getOptions(): array;
 
+    public function getOption(string $name): mixed;
+
     public function createView(DataTableView $parent = null): FilterView;
 }

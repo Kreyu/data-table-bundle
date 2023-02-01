@@ -1,6 +1,6 @@
-# AbstractFilter
+# FilterType
 
-Every filter should extend from [AbstractFilter](../../../src/Bridge/Doctrine/Orm/Filter/AbstractFilter.php), to inherit necessary options.
+The [FilterType](#) represents a base filter, used as a parent for every other type in the bundle.
 
 ## Options
 
@@ -23,13 +23,11 @@ Sets the parameters used when translating the `label` option.
 Sets the translation domain used when translating the filter translatable values.  
 Setting the option to `false` disables translation for the filter.
 
-### `field_name`
+### `query_path`
 
-**type**: `string` **default**: the field name is "guessed" from the filter name
+**type**: `string` **default**: the query path name is "guessed" from the filter name
 
-Sets the field name used in the DQL. For example, if you have a query aliased as `product`, and you want to filter by `name`, then `field_name` should equal `product.name`.
-
-[//]: # (TODO: Change it to something like alias or anything more obvious, because this sounds like a **form field** name)
+Sets the field name used in the DQL. For example, if you have a query aliased as `product`, and you want to filter by `name`, then `query_path` should equal `product.name`.
 
 ### `field_type`
 
@@ -46,16 +44,18 @@ For example, if you used the `EntityType` as your `field_type` option (to let us
 then you'd want to (at least) pass the `class` option to the underlying type, as it is required:
 
 ```php
-$filters
-    ->add('author', EntityFilter::class, [
-        'field_type' => EntityType::class, // default for EntityFilter
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType as EntityFormType; 
+
+$builder
+    ->addFilter('author', EntityType::class, [
+        'field_type' => EntityFormType::class, // default for entity filter type
         'field_options' => [
             'class' => User::class,
         ],    
     ])
 ;
 ```
-
 
 ### `operator_type`
 
@@ -72,8 +72,11 @@ For example, if you used the [OperatorType](../../../src/Filter/Form/Type/Operat
 then you'd want to pass the `visible` and `choices` options to the underlying type:
 
 ```php
-$filters
-    ->add('name', StringFilter::class, [
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\StringFilter;
+use Kreyu\Bundle\DataTableBundle\Filter\Operator;
+
+$builder
+    ->addFilter('name', StringFilter::class, [
         'operator_options' => [
             'visible' => true,
             'choices' => [

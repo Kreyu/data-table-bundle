@@ -8,4 +8,4 @@ This column type has no additional options.
 
 ## Inherited options
 
-See [abstract column type documentation](abstract.md).
+See [base column type documentation](column.md).

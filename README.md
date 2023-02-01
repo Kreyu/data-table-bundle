@@ -12,6 +12,7 @@ Streamlines creation process of the data tables in Symfony applications.
 
 - class-based definition of data tables to reduce repeated codebase;
 - source data pagination, filtration and sorting;
+- filters supporting multiple operators (e.g. user can select if string filter contains or equals given value);
 - per-user persistence with [cache component](https://symfony.com/doc/current/components/cache.html) by default;
 - extension system used to modify data tables across the entire application;
 - personalization, where user is able to show/hide or even change order of the columns;
@@ -31,25 +32,22 @@ Streamlines creation process of the data tables in Symfony applications.
 * [Columns](#columns)
     * [Available column types](#available-column-types)
     * [Creating custom column type](#creating-custom-column-type)
-* [Filtration](#filtration)
-    * [Filtration criteria persistence](#filtration-criteria-persistence)
-        * [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
-        * [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
-    * [Available filters](#available-filters)
-    * [Creating custom filter](#creating-custom-filter)
-        * [Doctrine ORM](#doctrine-orm)
+    * [Creating column type extension](#creating-column-type-extension)
+* [Filters](#filters)
+    * [Available filter types](#available-filter-types)
+    * [Creating custom filter type](#creating-custom-filter-type)
+    * [Creating filter type extension](#creating-filter-type-extension)
     * [Filter operators](#filter-operators)
-    * [Available filters](#available-filters-1)
-    * [Creating custom filter](#creating-custom-filter-1)
-        * [Doctrine ORM](#doctrine-orm-1)
-    * [Filter operators](#filter-operators-1)
-* [Persistence](#persistence-1)
+* [Persistence](#persistence)
     * [Persistence adapters](#persistence-adapters)
         * [Using built-in cache adapter](#using-built-in-cache-adapter)
         * [Creating custom adapters](#creating-custom-adapters)
     * [Persistence subjects](#persistence-subjects)
     * [Persistence subject providers](#persistence-subject-providers)
         * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
+    * [Filtration criteria persistence](#filtration-criteria-persistence)
+        * [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
+        * [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
 
 ## Installation
 
@@ -416,6 +414,8 @@ class ProductType extends AbstractType
 
 ## Columns
 
+A data table is composed of _columns_, each of which are built with the help of a column _type_ (e.g. `NumberType`, `TextType`, etc).
+
 ### Available column types
 
 The following column types are natively available in the bundle:
@@ -425,25 +425,89 @@ The following column types are natively available in the bundle:
     - [NumberType](docs/column/types/number.md)
     - [BooleanType](docs/column/types/boolean.md)
     - [LinkType](docs/column/types/link.md)
-- Special docs/column/types
+- Special types
     - [CollectionType](docs/column/types/collection.md)
     - [TemplateType](docs/column/types/template.md)
     - [ActionsType](docs/column/types/actions.md)
-- Other
+- Base types
     - [ColumnType](docs/column/types/column.md)
 
 ### Creating custom column type
 
-To create a custom column type, create a class that extends `Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType`.
+See [How to Create a Custom Column Type](docs/column/create_custom_column_type.md).
 
-When using default container configuration, that type should be ready to use.  
-If not, remember to tag this class as `kreyu_data_table.column_type`:
+### Creating column type extension
 
-```yaml
-App\DataTable\Column\Type\MyCustomType:
-  tags:
-    - { name: 'kreyu_data_table.column_type' }
+See [How to Create a Column Type Extension](docs/column/create_column_type_extension.md).
+
+## Filters
+
+A data table can be filtered with a set of _filters_, each of which are built with the help of a filter _type_ (e.g. `StringType`, `EntityType`, etc),
+
+### Available filter types
+
+The following filter types are natively available in the bundle:
+
+- Doctrine ORM
+    - [StringType](docs/filter/types/doctrine/orm/string.md)
+    - [NumericType](docs/filter/types/doctrine/orm/numeric.md)
+    - [EntityType](docs/filter/types/doctrine/orm/entity.md)
+    - [CallbackType](docs/filter/types/doctrine/orm/callback.md)
+- Other
+    - [FilterType](docs/filter/types/filter.md) 
+
+### Creating custom filter type
+
+See [How to Create a Custom Filter Type](docs/create_custom_filter_type.md).
+
+### Creating filter type extension
+
+See [How to Create a Filter Type Extension](docs/create_filter_type_extension.md).
+
+### Filter operators
+
+Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
+
+Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
+
+By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
+
+```php
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+{
+    $builder
+        // StringFilter uses Operator::EQUAL by default
+        ->addFilter('name', StringType::class, [
+            'field_name' => 'product.name',
+            'operator_options' => [
+                'choices' => [
+                    Operator::CONTAINS,
+                ],
+            ],
+        ])
+    ;
+}
 ```
+
+If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
+
+```php
+public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+{
+    $filters
+        ->add('quantity', NumericFilter::class, [
+            'field_name' => 'product.quantity',
+            'operator_options' => [
+                'visible' => true,
+            ],
+        ])
+    ;
+}
+```
+
+If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
+Options passed as `operator_options` are used in that type.
+
 
 ## Persistence
 
@@ -497,7 +561,7 @@ class DatabasePersistenceAdapter implements PersistenceAdapterInterface
 }
 ```
 
-... and register it in the container as an abstract service:
+...and register it in the container as an abstract service:
 
 ```yaml
 services:
@@ -507,8 +571,6 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
 ```
-
-
 
 ### Persistence subjects
 
@@ -575,36 +637,66 @@ services:
       - { name: kreyu_data_table.persistence.subject_provider }
 ```
 
-## Filtration
-
-Source data can be filtered by the criteria given by the user.
-
-This feature can be disabled by overriding the `isFiltrationEnabled()` method of the data table type class:
-
-```php
-// src/DataTable/Type/ProjectType.php
-class ProjectType extends AbstractType
-{
-    public function isFiltrationEnabled(): bool
-    {
-        return false;
-    }
-}
-```
-
 ### Filtration criteria persistence
 
 By default, filtration criteria applied by the user is saved to the cache for later use.
 
-This feature can be disabled by overriding the `isFiltrationPersistenceEnabled()` method of the data table type class:
+This feature can be disabled by either:
+
+a) setting the `filtration_persistence_enabled` option default value as `false` in the data table type class:
 
 ```php
-// src/DataTable/Type/ProjectType.php
-class ProjectType extends AbstractType
+// src/DataTable/Type/ProductType.php
+namespace App\DataTable\Type;
+
+use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductType extends AbstractType
 {
-    public function isFiltrationPersistenceEnabled(): bool
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return false;
+        $resolver->setDefault('filtration_persistence_enabled', false);
+    }
+    
+    // ...
+}
+```
+
+b) passing the `filtration_persistence_enabled` option as `false` to the data table type class:
+
+```php
+// src/Controller/ProductController.php
+namespace App\Controller;
+
+use App\Repository\ProductRepository;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ProductController extends AbstractController
+{
+    use DataTableControllerTrait;
+	
+    public function index(Request $request, ProductRepository $repository): Response
+    {
+        // ...
+
+        // If using "createDataTable" method:
+        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products), [
+            'filtration_persistence_enabled' => false,
+        ]);
+	    
+        // If using "createDataTableBuilder" method:
+        $dataTableBuilder = $this->createDataTableBuilder($query, [
+            'filtration_persistence_enabled' => false,	    
+        ]);
+	
+        // ...
     }
 }
 ```
@@ -619,182 +711,10 @@ For filtration, by default, there's a cache adapter service already pre-configur
 bin/console debug:container kreyu_data_table.filtration.persistence.adapter.cache
 ```
 
-Recommended way to change the filtration persistence adapter used by the data table type class, is to use setter injection:
-
-```yaml
-# config/services.yaml
-services:
-  App\DataTable\Type\ProjectType:
-    calls:
-      - setFiltrationPersistenceAdapter: ['@kreyu_data_table.filtration.persistence.adapter.cache']
-```
+_TODO: How to change filtration persistence adapter of the data table type._
 
 #### Passing the persistence subject directly
 
 In some cases, it may be more handy to provide a persistence subject directly, instead of using a provider.
-To do so, override the `getFiltrationPersistenceSubject()` method of the data table type class:
 
-```php
-// src/DataTable/Type/ProjectType.php
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
-
-class ProjectType extends AbstractType
-{
-    public function getFiltrationPersistenceSubject(): PersistenceSubjectInterface
-    {
-        // return the subject directly
-    }
-}
-```
-
-### Available filters
-
-The following filters are natively available in the bundle:
-
-- Doctrine ORM
-    - [StringFilter](docs/filter/doctrine/orm/string.md)
-    - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
-    - [EntityFilter](docs/filter/doctrine/orm/entity.md)
-    - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
-- Other
-    - [AbstractFilter](docs/filter/other/abstract.md)
-
-### Creating custom filter
-
-#### Doctrine ORM
-
-To create a custom filter, create a class that extends `Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\AbstractFilter`.
-
-When using default container configuration, that filter should be ready to use.  
-If not, remember to tag this class as `kreyu_data_table.filter`:
-
-```yaml
-# config/services.yaml
-services:
-  App\DataTable\Filter\MyCustomFilter:
-    tags:
-      - { name: 'kreyu_data_table.filter' }
-```
-
-### Filter operators
-
-Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
-
-Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
-
-By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
-
-```php
-public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-{
-    $builder
-        // StringFilter uses Operator::EQUAL by default
-        ->addFilter('name', StringType::class, [
-            'field_name' => 'product.name',
-            'operator_options' => [
-                'choices' => [
-                    Operator::CONTAINS,
-                ],
-            ],
-        ])
-    ;
-}
-```
-
-If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
-
-```php
-public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-{
-    $filters
-        ->add('quantity', NumericFilter::class, [
-            'field_name' => 'product.quantity',
-            'operator_options' => [
-                'visible' => true,
-            ],
-        ])
-    ;
-}
-```
-
-If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
-Options passed as `operator_options` are used in that type.
-
-### Available filters
-
-The following filters are natively available in the bundle:
-
-- Doctrine ORM
-    - [StringFilter](docs/filter/doctrine/orm/string.md)
-    - [NumericFilter](docs/filter/doctrine/orm/numeric.md)
-    - [EntityFilter](docs/filter/doctrine/orm/entity.md)
-    - [CallbackFilter](docs/filter/doctrine/orm/callback.md)
-- Other
-    - [AbstractFilter](docs/filter/other/abstract.md)
-
-### Creating custom filter
-
-#### Doctrine ORM
-
-To create a custom filter, create a class that extends `Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\AbstractFilter`.
-
-When using default container configuration, that filter should be ready to use.  
-If not, remember to tag this class as `kreyu_data_table.filter`:
-
-```yaml
-App\DataTable\Filter\MyCustomFilter:
-  tags:
-    - { name: 'kreyu_data_table.filter' }
-```
-
-### Filter operators
-
-Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
-
-Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
-
-By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
-
-```php
-public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-{
-    $filters
-        // StringFilter uses Operator::EQUAL by default
-        ->add('name', StringFilter::class, [
-            'field_name' => 'product.name',
-            'operator_options' => [
-                'choices' => [
-                    Operator::CONTAINS,
-                ],
-            ],
-        ])
-    ;
-}
-```
-
-If you just want to display operator selector, pass the `operator_options.visible` option to the filter:
-
-```php
-public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-{
-    $builder
-        ->addFilter('quantity', NumericFilter::class, [
-            'field_name' => 'product.quantity',
-            'operator_options' => [
-                'visible' => true,
-            ],
-        ])
-    ;
-}
-```
-
-If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
-Options passed as `operator_options` are used in that type.
-
-## Learn more
-
-There's a lot more to learn and a lot of _powerful_ tricks in the data tables:
-
-Advanced Features:
-
-- [How to Create a Custom Column Type](docs/create_custom_column_type.md)
+_TODO: How to directly change filtration persistence subject of the data table type._

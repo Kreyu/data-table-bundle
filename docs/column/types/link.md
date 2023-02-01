@@ -36,4 +36,4 @@ Callable can be used to provide an option value based on a row value, which is p
 
 ## Inherited options
 
-See [abstract column type documentation](abstract.md).
+See [base column type documentation](column.md).

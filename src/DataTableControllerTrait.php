@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -34,6 +35,15 @@ trait DataTableControllerTrait
         }
 
         return $this->dataTableFactory->createNamed($name, $type, $query, $options);
+    }
+
+    protected function createDataTableBuilder(?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
+    {
+        if (null === $this->dataTableFactory) {
+            throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+        }
+
+        return $this->dataTableFactory->createBuilder(DataTableType::class, $query, $options);
     }
 
     #[Required]

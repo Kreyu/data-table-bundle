@@ -20,8 +20,8 @@ The following action templates are natively available in the bundle:
 Example usage:
 
 ```php
-$columns
-    ->add('actions', ActionsType::class, [
+$builder
+    ->addColumn('actions', ActionsType::class, [
         'actions' => [
             'show' => [
                 'template_path' => '@KreyuDataTable\Action\action_link_button.html.twig',
@@ -41,7 +41,7 @@ $columns
 
 ## Inherited options
 
-See [abstract column type documentation](abstract.md).
+See [base column type documentation](column.md).
 
 ## Overridden options
 

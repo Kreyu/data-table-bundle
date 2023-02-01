@@ -243,16 +243,13 @@ That's it! The [data_table() function]() renders all the columns.
 
 As short as this rendering is, it's not very flexible.
 Usually, you'll need more control about how the entire data table or some of its parts look.
-For example, thanks to the [Bootstrap 5 integration with data tables]() you can set this option to generate data tables compatible with the Bootstrap 5 CSS framework:
+For example, thanks to the [Bootstrap 5 integration with data tables](), generated data tables are compatible with the Bootstrap 5 CSS framework:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-  themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig']
+    theme: '@KreyuDataTable/themes/bootstrap_5.html.twig' # default value
 ```
-
-In addition to the data table themes, this bundle allows you to customize the way any part of the table is rendered
-with multiple functions to render each part separately (column values, headers, pagination, filtration form, etc.)
 
 ## Processing data tables
 

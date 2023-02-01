@@ -233,32 +233,37 @@ However, for some types you may prefer to create a custom template in order to c
 First, create a new Twig template anywhere in the application to store the fragments used to render the types:
 
 ```twig
-{# templates/data_table/custom_theme.html.twig #}
+{# templates/data_table/theme.html.twig #}
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
 {# ... here you will add the Twig code ... #}
 ```
 
-Then, update the [themes option]() to add this new template at the beginning of the list (the first one overrides the rest of the files):
+> ### 💡 Important note
+> Notice the use of the `extends` on built-in bundle theme.
+> By doing it this way, you can overwrite only specific parts of the theme.
+
+Then, update the [theme configuration option]() to use this new template:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-    themes: 
-        - 'data_table/custom_theme.html.twig' 
-        - '...' 
+    theme: 'data_table/theme.html.twig' 
 ```
 
 The last step is to create the actual Twig template that will render the type.
 The template contents depend on which HTML, CSS and JavaScript frameworks and libraries are used in your application:
 
 ```twig
-{# templates/data_table/custom_theme.html.twig #}
-{% block data_table_quantity %}
+{# templates/data_table/theme.html.twig #}
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
+
+{% block kreyu_data_table_quantity %}
     {# ... #}
 {% endblock %}
 ```
 
-Every block is prefixed with `data_table_` by default.
+Every block is prefixed with `kreyu_data_table_` by default.
 Last part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityType` -> `quantity`).
 This can be controlled by overriding the `getBlockPrefix()` method in `QuantityType`.
 
@@ -309,7 +314,9 @@ class QuantityType extends AbstractType
 The variables added in `buildView()` are available in the column type template as any other regular Twig variable:
 
 ```twig
-{# templates/data_table/custom_theme.html.twig #}
+{# templates/data_table/theme.html.twig #}
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
+
 {% block data_table_quantity %}
     {% if value is not null %}
         {{- value|number_format(decimals, decimal_separator, thousands_separator) -}}

@@ -27,7 +27,6 @@ final class ColumnType implements ColumnTypeInterface
                 'property_path' => $column->getName(),
                 'block_prefix' => $column->getType()->getBlockPrefix(),
                 'block_name' => 'kreyu_data_table_column_' . $column->getType()->getBlockPrefix(),
-                'sorting_enabled' => $view->parent->vars['sorting_enabled'],
             ])
         ;
 

@@ -80,7 +80,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_header %}
-    {% if sorting_enabled and sort_field %}
+    {% if data_table.vars.sorting_enabled and sort_field %}
         {% set query_parameters = app.request.query.all() %}
 
         {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
@@ -104,7 +104,7 @@
         {{ block('kreyu_data_table_column_label', _self, _context) }}
     {% endif %}
 
-    {% if display_personalization_button %}
+    {% if data_table.vars.personalization_enabled and display_personalization_button %}
         <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">🔧</a>
     {% endif %}
 {% endblock %}

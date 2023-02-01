@@ -1,0 +1,363 @@
+{% trans_default_domain 'KreyuDataTable' %}
+
+{% block kreyu_data_table %}
+    {% block filters %}
+        {% if filtration_enabled %}
+            {{ data_table_filters_form(filtration_form) }}
+        {% endif %}
+    {% endblock %}
+
+    {% block table %}
+        <table class="table table-vcenter">
+            {% block table_head %}
+                <thead>
+                    <tr>
+                        {{ data_table_headers(headers) }}
+                    </tr>
+                </thead>
+            {% endblock %}
+            {% block table_body %}
+                <tbody>
+                    <tr>
+                        {% for row in rows %}
+                            {{ data_table_row(row) }}
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            {% endblock %}
+        </table>
+    {% endblock %}
+
+    {% block pagination %}
+        {{ data_table_pagination(pagination) }}
+    {% endblock %}
+
+    {% block personalization_modal %}
+        <div class="modal modal-blur" id="{{ personalization_form.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
+            {% block personalization_modal_dialog %}
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    {% block personalization_modal_content %}
+                        <div class="modal-content">
+                            {% block personalization_modal_header %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        {% block personalization_modal_title %}
+                                            {{ 'Personalization'|trans({}, 'KreyuDataTable') }}
+                                        {% endblock %}
+                                    </h5>
+                                    {% block personalization_modal_header_close_button %}
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    {% endblock %}
+                                </div>
+                            {% endblock %}
+                            {% block personalization_modal_body %}
+                                <div class="modal-body">
+                                    {{ data_table_personalization_form(personalization_form) }}
+                                </div>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+{% endblock %}
+
+{% block kreyu_data_table_header_row %}
+    <tr>
+        {% for column in columns %}
+            <td>{{ data_table_column_header(column) }}</td>
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block kreyu_data_table_value_row %}
+    <tr>
+        {% for column in columns %}
+            <td>{{ data_table_column_value(column) }}</td>
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block kreyu_data_table_column_header %}
+    {% if sorting_enabled and sort_field %}
+        {% set query_parameters = app.request.query.all() %}
+
+        {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
+
+        {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
+        {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
+
+        {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
+
+        <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
+            (sort_parameter_name ~ '[field]'): sort_field,
+            (sort_parameter_name ~ '[direction]'): opposite_sort_direction
+        })) }}">
+            {{ block('kreyu_data_table_column_label', _self, _context) }}
+
+            {% if sort_field == current_sort_field %}
+                {% if current_sort_direction == 'asc' %}˄{% else %}˅{% endif %}
+            {% endif %}
+        </a>
+    {% else %}
+        {{ block('kreyu_data_table_column_label', _self, _context) }}
+    {% endif %}
+
+    {% if display_personalization_button %}
+        <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">🔧</a>
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_column_value %}
+    {% if block(block_name, _self) is defined %}
+        {{- block(block_name, _self) -}}
+    {% else %}
+        {{- value -}}
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_column_label %}
+    {% if translation_domain is not same as false %}
+        {{- label|trans(label_translation_parameters, translation_domain) -}}
+    {% else %}
+        {{- label -}}
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_pagination %}
+    {% if page_count > 1 %}
+        {% set current_page = app.request.query.get(page_parameter_name) %}
+
+        <div>
+            <ul class="pagination m-0 ms-auto">
+                <li class="page-item {% if not has_previous_page %}disabled{% endif %}">
+                    <a class="page-link"
+                       href="{{ has_previous_page ? path(
+                           app.request.get('_route'),
+                           app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })
+                       ) : '#' }}">
+                        ‹
+                    </a>
+                </li>
+
+                {% for page_number in 1..page_count %}
+                    <li class="page-item {% if current_page_number == page_number %}active{% endif %}">
+                        <a class="page-link"
+                           href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) }}">
+                            {{ page_number }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item {% if not has_next_page %}disabled{% endif %}">
+                    <a class="page-link"
+                       href="{{ has_next_page ? path(
+                           app.request.get('_route'),
+                           app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })
+                       ) : '#' }}">
+                        ›
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_filters_form %}
+    {% if form.count > 0 %}
+        <div class="mb-4">
+            {{ form_start(form) }}
+            <div class="row">
+                {% for child in form.children %}
+                    <div class="col-12 col-lg-3 col-md-6">
+                        {{ form_row(child) }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-end">
+                <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_personalization_form %}
+    <div class="personalization-form">
+        {{ form_start(form) }}
+        {{ form_row(form._token) }}
+
+        {% block personalization_form_help %}
+            <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
+        {% endblock %}
+
+        {% block personalization_form_content %}
+            <div class="row my-3">
+                {% set children = form.children.columns %}
+
+                {% block personalization_form_visible_columns %}
+                    <div class="col-6">
+                        <div class="list-group list-group-flush card">
+                            <div class="card-header">
+                                {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
+                            </div>
+
+                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
+                                {% for child in children|filter(child => child.vars.value.visible) %}
+                                    {{ form_row(child) }}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endblock %}
+
+                {% block personalization_form_hidden_columns %}
+                    <div class="col-6">
+                        <div class="list-group list-group-flush card">
+                            <div class="card-header">
+                                {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
+                            </div>
+
+                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
+                                {% for child in children|filter(child => not child.vars.value.visible) %}
+                                    {{ form_row(child) }}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endblock %}
+            </div>
+
+            {% block personalization_form_submit %}
+                <div class="text-end">
+                    <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
+                </div>
+            {% endblock %}
+        {% endblock %}
+        {{ form_end(form, { render_rest: false }) }}
+
+        <script>
+            class PersonalizationForm {
+                #visibleColumnsSelector;
+                #hiddenColumnsSelector;
+                #connectionSelector;
+
+                constructor(visibleColumnsSelector, hiddenColumnsSelector, connectionSelector) {
+                    this.#visibleColumnsSelector = visibleColumnsSelector;
+                    this.#hiddenColumnsSelector = hiddenColumnsSelector;
+                    this.#connectionSelector = connectionSelector;
+                }
+
+                initialize() {
+                    this.#attachEventHandlers();
+                }
+
+                #attachEventHandlers() {
+                    $(this.#getSortableElementSelector()).sortable(this.#getSortableConfiguration());
+                }
+
+                #getSortableElementSelector() {
+                    return `${this.#visibleColumnsSelector}, ${this.#hiddenColumnsSelector}`;
+                }
+
+                #getSortableConfiguration() {
+                    return {
+                        connectWith: this.#connectionSelector,
+                        update: function (event) {
+                            $(event.target).find('.ui-sortable-handle').each(function () {
+                                $(this).find('[name$="[order]"]').val($(this).index());
+                            });
+                        },
+                        receive: function (event, ui) {
+                            $(ui.item).find('[name$="[visible]"]').val(parseInt($(event.target).data('visible')));
+                        }
+                    };
+                }
+            }
+
+            if (window.jQuery && typeof PersonalizationForm === 'function') {
+                $(function () {
+                    const form = new PersonalizationForm(
+                        '#{{ form.vars.id }}_visible',
+                        '#{{ form.vars.id }}_hidden',
+                        '.personalization-columns',
+                    );
+
+                    form.initialize();
+                });
+            }
+        </script>
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_column_text %}
+    <span>{{- value -}}</span>
+{% endblock %}
+
+{% block kreyu_data_table_column_number %}
+    <div class="text-end">
+        <span>{{- value -}}</span>
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_column_boolean %}
+    {% if value %}
+        <span class="badge bg-green">{{ label_true|trans({}, translation_domain) }}</span>
+    {% else %}
+        <span class="badge bg-red">{{ label_false|trans({}, translation_domain) }}</span>
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_column_link %}
+    <a href="{{- href -}}" target="{{- target -}}">
+        <span>{{- value -}}</span>
+    </a>
+{% endblock %}
+
+{% block kreyu_data_table_column_collection %}
+    {% for child in children %}
+        {{- data_table_column_value(child) -}}
+        <span>{% if not loop.last %}{{ separator }}{% endif %}</span>
+    {% endfor %}
+{% endblock %}
+
+{% block kreyu_data_table_column_template %}
+    {{ include(template_path, template_vars) }}
+{% endblock %}
+
+{% block kreyu_data_table_column_actions %}
+    {% for action in actions %}
+        {{ include(action.template_path, action.template_vars) }}
+    {% endfor %}
+{% endblock %}
+
+{% block kreyu_data_table_filter_row %}
+    <div class="row">
+        {{ form_label(form) }}
+
+        {% if form.operator.vars.visible %}
+            <div class="col-12 col-md-8">
+                {{ form_row(form.value) }}
+            </div>
+            <div class="col-12 col-md-4">
+                {{ form_row(form.operator) }}
+            </div>
+        {% else %}
+            <div class="col-12">
+                {{ form_row(form.value) }}
+                <div style="display: none;">
+                    {{ form_row(form.operator) }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_personalization_column_row %}
+    <li class="list-group-item" data-column-name="{{ form.vars.data.name }}">
+        {{ form.vars.data.name }}
+        {{ form_widget(form.order) }}
+        {{ form_widget(form.visible) }}
+    </li>
+{% endblock %}

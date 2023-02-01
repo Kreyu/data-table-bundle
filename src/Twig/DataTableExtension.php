@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\HeadersView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\RowView;
 use Symfony\Component\Form\FormInterface;
+use Throwable;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
 use Twig\Extension\AbstractExtension;
@@ -19,6 +20,11 @@ use Twig\TwigFunction;
 
 class DataTableExtension extends AbstractExtension
 {
+    public function __construct(
+        private string $themeTemplate
+    ) {
+    }
+
     public function getFunctions(): array
     {
         return [
@@ -70,66 +76,90 @@ class DataTableExtension extends AbstractExtension
         ];
     }
 
-    public function renderHeaders(Environment $environment, HeadersView $view): string
+    /**
+     * @throws TwigException|Throwable
+     */
+    private function renderBlock(Environment $environment, string $blockName, array $context = []): string
     {
-        return $environment->render('@KreyuDataTable/headers.html.twig', $view->vars);
+        return $environment
+            ->load($this->themeTemplate)
+            ->renderBlock($blockName, $context)
+        ;
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
+     */
+    public function renderHeaders(Environment $environment, HeadersView $view): string
+    {
+        return $this->renderBlock($environment, 'kreyu_data_table_header_row', $view->vars);
+    }
+
+    /**
+     * @throws TwigException|Throwable
      */
     public function renderColumnHeader(Environment $environment, ColumnView $view): string
     {
-        return $environment->render('@KreyuDataTable/column_header.html.twig', $view->vars);
-    }
-
-
-    public function renderRow(Environment $environment, RowView $view): string
-    {
-        return $environment->render('@KreyuDataTable/row.html.twig', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_column_header', $view->vars);
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
+     */
+    public function renderRow(Environment $environment, RowView $view): string
+    {
+        return $this->renderBlock($environment, 'kreyu_data_table_value_row', $view->vars);
+    }
+
+    /**
+     * @throws TwigException|Throwable
+     */
+    public function renderColumnLabel(Environment $environment, ColumnView $view): string
+    {
+        return $this->renderBlock($environment, 'kreyu_data_table_column_label', $view->vars);
+    }
+
+    /**
+     * @throws TwigException|Throwable
      */
     public function renderColumnValue(Environment $environment, ColumnView $view): string
     {
-        return $environment->render('@KreyuDataTable/column_value.html.twig', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_column_value', $view->vars);
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
      */
     public function renderDataTable(Environment $environment, DataTableView $view): string
     {
-        return $environment->render('@KreyuDataTable/data_table.html.twig', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table', $view->vars);
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
      */
     public function renderFiltersForm(Environment $environment, FormInterface $form): string
     {
-        return $environment->render('@KreyuDataTable/filters_form.html.twig', [
+        return $this->renderBlock($environment, 'kreyu_data_table_filters_form', [
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
      */
     public function renderPersonalizationForm(Environment $environment, FormInterface $form): string
     {
-        return $environment->render('@KreyuDataTable/personalization_form.html.twig', [
+        return $this->renderBlock($environment, 'kreyu_data_table_personalization_form', [
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @throws TwigException
+     * @throws TwigException|Throwable
      */
     public function renderPagination(Environment $environment, PaginationView $view): string
     {
-        return $environment->render('@KreyuDataTable/pagination.html.twig', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_pagination', $view->vars);
     }
 }

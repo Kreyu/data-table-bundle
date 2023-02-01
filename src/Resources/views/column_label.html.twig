@@ -1,7 +1,0 @@
-{% trans_default_domain 'KreyuDataTable' %}
-
-{% if translation_domain is not same as false %}
-    {{- label|trans(label_translation_parameters, translation_domain) -}}
-{% else %}
-    {{- label -}}
-{% endif %}

@@ -49,10 +49,19 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             ->registerForAutoconfiguration(PersistenceAdapterInterface::class)
             ->addTag('kreyu_data_table.persistence.adapter')
         ;
+
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        $container->setParameter('kreyu_data_table.theme', $config['theme']);
     }
 
     public function prepend(ContainerBuilder $container): void
     {
+        $config = $this->processConfiguration(
+            new Configuration(),
+            $container->getExtensionConfig($this->getAlias()),
+        );
+
         $container->prependExtensionConfig('framework', [
             'cache' => [
                 'pools' => [
@@ -60,6 +69,12 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
                         'adapter' => 'cache.adapter.filesystem',
                     ],
                 ],
+            ],
+        ]);
+
+        $container->prependExtensionConfig('twig', [
+            'form_themes' => [
+                $config['theme'],
             ],
         ]);
     }

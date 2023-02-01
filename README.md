@@ -17,6 +17,7 @@ Streamlines creation process of the data tables in Symfony applications.
 - extension system used to modify data tables across the entire application;
 - personalization, where user is able to show/hide or even change order of the columns;
 - support for [Doctrine ORM](https://github.com/doctrine/orm) by default, but open to custom implementation;
+- easy theming of every part of the bundle;
 
 ## Table of contents
 
@@ -45,9 +46,6 @@ Streamlines creation process of the data tables in Symfony applications.
     * [Persistence subjects](#persistence-subjects)
     * [Persistence subject providers](#persistence-subject-providers)
         * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
-    * [Filtration criteria persistence](#filtration-criteria-persistence)
-        * [Configuring the filtration persistence adapter](#configuring-the-filtration-persistence-adapter)
-        * [Passing the persistence subject directly](#passing-the-persistence-subject-directly)
 
 ## Installation
 
@@ -228,7 +226,7 @@ class ProductController extends AbstractController
 }
 ```
 
-Then, use some [data table helper functions](#using-twig-helper-functions) to render the data table contents:
+Then, use some [data table helper functions]() to render the data table contents:
 
 ```html
 {# templates/product/index.html.twig #}
@@ -458,19 +456,18 @@ The following filter types are natively available in the bundle:
 
 ### Creating custom filter type
 
-See [How to Create a Custom Filter Type](docs/create_custom_filter_type.md).
+See [How to Create a Custom Filter Type]().
 
 ### Creating filter type extension
 
-See [How to Create a Filter Type Extension](docs/create_filter_type_extension.md).
+See [How to Create a Filter Type Extension]().
 
 ### Filter operators
 
 Because every filter can work differently, e.g. string filter can match exact string or just contain it, each filter supports a set of operators.
 
-Supported operators are defined in the protected `getSupportedOperators()` method of the filter class.
-
-By default, operator selector is not visible to the user. Because of that, first operator choice is always used. If you wish to override that, you can pass selector choices manually:
+By default, operator selector is not visible to the user. Because of that, first operator choice is always used. 
+If you wish to override that, you can pass selector choices manually:
 
 ```php
 public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
@@ -494,9 +491,9 @@ If you just want to display operator selector, pass the `operator_options.visibl
 ```php
 public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
 {
-    $filters
-        ->add('quantity', NumericFilter::class, [
-            'field_name' => 'product.quantity',
+    $builder
+        ->addFilter('name', StringType::class, [
+            'field_name' => 'product.name',
             'operator_options' => [
                 'visible' => true,
             ],
@@ -507,7 +504,6 @@ public function buildDataTable(DataTableBuilderInterface $builder, array $option
 
 If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
 Options passed as `operator_options` are used in that type.
-
 
 ## Persistence
 
@@ -593,7 +589,7 @@ class User implements PersistenceSubjectInterface
 }
 ```
 
-The value returned in the `getDataTablePersistenceIdentifier()` is used in [persistence adapters](#adapters)
+The value returned in the `getDataTablePersistenceIdentifier()` is used in [persistence adapters](#persistence-adapters)
 to associate persistent data with the subject.
 
 ### Persistence subject providers
@@ -636,85 +632,3 @@ services:
     tags:
       - { name: kreyu_data_table.persistence.subject_provider }
 ```
-
-### Filtration criteria persistence
-
-By default, filtration criteria applied by the user is saved to the cache for later use.
-
-This feature can be disabled by either:
-
-a) setting the `filtration_persistence_enabled` option default value as `false` in the data table type class:
-
-```php
-// src/DataTable/Type/ProductType.php
-namespace App\DataTable\Type;
-
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-class ProductType extends AbstractType
-{
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefault('filtration_persistence_enabled', false);
-    }
-    
-    // ...
-}
-```
-
-b) passing the `filtration_persistence_enabled` option as `false` to the data table type class:
-
-```php
-// src/Controller/ProductController.php
-namespace App\Controller;
-
-use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
-class ProductController extends AbstractController
-{
-    use DataTableControllerTrait;
-	
-    public function index(Request $request, ProductRepository $repository): Response
-    {
-        // ...
-
-        // If using "createDataTable" method:
-        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products), [
-            'filtration_persistence_enabled' => false,
-        ]);
-	    
-        // If using "createDataTableBuilder" method:
-        $dataTableBuilder = $this->createDataTableBuilder($query, [
-            'filtration_persistence_enabled' => false,	    
-        ]);
-	
-        // ...
-    }
-}
-```
-
-#### Configuring the filtration persistence adapter
-
-To read about the persistence adapters, see [persistence adapters](#persistence-adapters) section.
-
-For filtration, by default, there's a cache adapter service already pre-configured:
-
-```shell
-bin/console debug:container kreyu_data_table.filtration.persistence.adapter.cache
-```
-
-_TODO: How to change filtration persistence adapter of the data table type._
-
-#### Passing the persistence subject directly
-
-In some cases, it may be more handy to provide a persistence subject directly, instead of using a provider.
-
-_TODO: How to directly change filtration persistence subject of the data table type._

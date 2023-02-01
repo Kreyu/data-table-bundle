@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Maker;
 
-use Kreyu\Bundle\DataTableBundle\Column\Mapper\ColumnMapperInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Mapper\FilterMapperInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -49,9 +47,7 @@ class MakeDataTable extends AbstractMaker
 
         $useStatements = new UseStatementGenerator([
             AbstractType::class,
-            ColumnMapperInterface::class,
-            FilterMapperInterface::class,
-            ProxyQueryInterface::class,
+            DataTableBuilderInterface::class,
         ]);
 
         $generator->generateClass(

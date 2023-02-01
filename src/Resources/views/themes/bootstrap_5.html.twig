@@ -19,9 +19,15 @@
             {% block table_body %}
                 <tbody>
                     <tr>
-                        {% for row in rows %}
-                            {{ data_table_row(row) }}
-                        {% endfor %}
+                        {% if rows|length > 0 %}
+                            {% for row in rows %}
+                                {{ data_table_row(row) }}
+                            {% endfor %}
+                        {% else %}
+                            <td class="align-middle text-muted py-4 text-center" colspan="{{ columns|length }}">
+                                {{ 'No results'|trans({}, 'KreyuDataTable') }}
+                            </td>
+                        {% endif %}
                     </tr>
                 </tbody>
             {% endblock %}
@@ -66,7 +72,7 @@
 {% block kreyu_data_table_header_row %}
     <tr>
         {% for column in columns %}
-            <td>{{ data_table_column_header(column) }}</td>
+            <td class="align-middle">{{ data_table_column_header(column) }}</td>
         {% endfor %}
     </tr>
 {% endblock %}
@@ -74,7 +80,7 @@
 {% block kreyu_data_table_value_row %}
     <tr>
         {% for column in columns %}
-            <td>{{ data_table_column_value(column) }}</td>
+            <td class="align-middle">{{ data_table_column_value(column) }}</td>
         {% endfor %}
     </tr>
 {% endblock %}
@@ -90,14 +96,22 @@
 
         {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
 
-        <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
+        <a class="text-decoration-none" href="{{ path(app.request.get('_route'), app.request.query.all|merge({
             (sort_parameter_name ~ '[field]'): sort_field,
             (sort_parameter_name ~ '[direction]'): opposite_sort_direction
         })) }}">
             {{ block('kreyu_data_table_column_label', _self, _context) }}
 
             {% if sort_field == current_sort_field %}
-                {% if current_sort_direction == 'asc' %}˄{% else %}˅{% endif %}
+                {% if current_sort_direction == 'asc' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                    </svg>
+                {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+                    </svg>
+                {% endif %}
             {% endif %}
         </a>
     {% else %}
@@ -105,7 +119,12 @@
     {% endif %}
 
     {% if data_table.vars.personalization_enabled and display_personalization_button %}
-        <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">🔧</a>
+        <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+            </svg>
+        </a>
     {% endif %}
 {% endblock %}
 
@@ -119,9 +138,9 @@
 
 {% block kreyu_data_table_column_label %}
     {% if translation_domain is not same as false %}
-        {{- label|trans(label_translation_parameters, translation_domain) -}}
+        <span>{{- label|trans(label_translation_parameters, translation_domain) -}}</span>
     {% else %}
-        {{- label -}}
+        <span>{{- label -}}</span>
     {% endif %}
 {% endblock %}
 
@@ -166,19 +185,30 @@
 
 {% block kreyu_data_table_filters_form %}
     {% if form.count > 0 %}
-        <div class="mb-4">
-            {{ form_start(form) }}
-            <div class="row">
-                {% for child in form.children %}
-                    <div class="col-12 col-lg-3 col-md-6">
-                        {{ form_row(child) }}
+        <div class="w-100 text-end">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ form.vars.id ~ '__collapse' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
+                    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
+            <div class="mb-4">
+                {{ form_start(form) }}
+                    <div class="row">
+                        {% for child in form.children %}
+                            <div class="col-12 col-md-6 col-lg-3">
+                                {{ form_row(child) }}
+                            </div>
+                        {% endfor %}
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="col-form-label">&nbsp;</div>
+                            <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
+                        </div>
                     </div>
-                {% endfor %}
+                {{ form_end(form) }}
             </div>
-            <div class="text-end">
-                <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
-            </div>
-            {{ form_end(form) }}
         </div>
     {% endif %}
 {% endblock %}
@@ -186,55 +216,55 @@
 {% block kreyu_data_table_personalization_form %}
     <div class="personalization-form">
         {{ form_start(form) }}
-        {{ form_row(form._token) }}
+            {{ form_row(form._token) }}
 
-        {% block personalization_form_help %}
-            <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
-        {% endblock %}
-
-        {% block personalization_form_content %}
-            <div class="row my-3">
-                {% set children = form.children.columns %}
-
-                {% block personalization_form_visible_columns %}
-                    <div class="col-6">
-                        <div class="list-group list-group-flush card">
-                            <div class="card-header">
-                                {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
-                            </div>
-
-                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
-                                {% for child in children|filter(child => child.vars.value.visible) %}
-                                    {{ form_row(child) }}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                {% endblock %}
-
-                {% block personalization_form_hidden_columns %}
-                    <div class="col-6">
-                        <div class="list-group list-group-flush card">
-                            <div class="card-header">
-                                {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
-                            </div>
-
-                            <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
-                                {% for child in children|filter(child => not child.vars.value.visible) %}
-                                    {{ form_row(child) }}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                {% endblock %}
-            </div>
-
-            {% block personalization_form_submit %}
-                <div class="text-end">
-                    <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
-                </div>
+            {% block personalization_form_help %}
+                <span class="mx-1">ⓘ</span> {{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.
             {% endblock %}
-        {% endblock %}
+
+            {% block personalization_form_content %}
+                <div class="row my-3">
+                    {% set children = form.children.columns %}
+
+                    {% block personalization_form_visible_columns %}
+                        <div class="col-6">
+                            <div class="list-group list-group-flush card">
+                                <div class="card-header">
+                                    {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
+                                </div>
+
+                                <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
+                                    {% for child in children|filter(child => child.vars.value.visible) %}
+                                        {{ form_row(child) }}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endblock %}
+
+                    {% block personalization_form_hidden_columns %}
+                        <div class="col-6">
+                            <div class="list-group list-group-flush card">
+                                <div class="card-header">
+                                    {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
+                                </div>
+
+                                <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
+                                    {% for child in children|filter(child => not child.vars.value.visible) %}
+                                        {{ form_row(child) }}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endblock %}
+                </div>
+
+                {% block personalization_form_submit %}
+                    <div class="text-end">
+                        <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
+                    </div>
+                {% endblock %}
+            {% endblock %}
         {{ form_end(form, { render_rest: false }) }}
 
         <script>
@@ -310,7 +340,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_link %}
-    <a href="{{- href -}}" target="{{- target -}}">
+    <a href="{{- href -}}" target="{{- target -}}" class="text-decoration-none">
         <span>{{- value -}}</span>
     </a>
 {% endblock %}
@@ -337,11 +367,9 @@
         {{ form_label(form) }}
 
         {% if form.operator.vars.visible %}
-            <div class="col-12 col-md-8">
-                {{ form_row(form.value) }}
-            </div>
-            <div class="col-12 col-md-4">
-                {{ form_row(form.operator) }}
+            <div class="input-group">
+                {{ form_widget(form.value) }}
+                {{ form_widget(form.operator) }}
             </div>
         {% else %}
             <div class="col-12">

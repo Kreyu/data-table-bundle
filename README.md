@@ -1,7 +1,7 @@
 # DataTableBundle
 
-[//]: # ([![Latest Stable Version]&#40;http://poser.pugx.org/kreyu/data-table-bundle/v&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
-[//]: # ([![PHP Version Require]&#40;http://poser.pugx.org/kreyu/data-table-bundle/require/php&#41;]&#40;https://packagist.org/packages/kreyu/data-table-bundle&#41;)
+[![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
+[![PHP Version Require](http://poser.pugx.org/kreyu/data-table-bundle/require/php)](https://packagist.org/packages/kreyu/data-table-bundle)
 
 Streamlines creation process of the data tables in Symfony applications.
 
@@ -33,7 +33,7 @@ Streamlines creation process of the data tables in Symfony applications.
   * [Available column types](#available-column-types)
   * [Creating custom column type](#creating-custom-column-type)
   * [Creating column type extension](#creating-column-type-extension)
-* [Filters](#filters)
+* [Filtration](#filtration)
   * [Configuring the filtration feature](#configuring-the-filtration-feature)
   * [Available filter types](#available-filter-types)
   * [Creating custom filter type](#creating-custom-filter-type)
@@ -440,7 +440,7 @@ See [How to Create a Custom Column Type](docs/column/create_custom_column_type.m
 
 See [How to Create a Column Type Extension](docs/column/create_column_type_extension.md).
 
-## Filters
+## Filtration
 
 A data table can be filtered with a set of _filters_, each of which are built with the help of a filter _type_ (e.g. `StringType`, `EntityType`, etc),
 

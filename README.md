@@ -23,29 +23,36 @@ Streamlines creation process of the data tables in Symfony applications.
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [Building data tables](#building-data-tables)
-    * [Creating data tables in controllers](#creating-data-tables-in-controllers)
-    * [Creating data table classes](#creating-data-table-classes)
-* [Rendering data tables](#rendering-data-tables)
-* [Processing data tables](#processing-data-tables)
-* [Other common data table features](#other-common-data-table-features)
-    * [Passing options to data tables](#passing-options-to-data-tables)
+  * [Building data tables](#building-data-tables)
+  * [Creating data tables in controllers](#creating-data-tables-in-controllers)
+  * [Creating data table classes](#creating-data-table-classes)
+  * [Rendering data tables](#rendering-data-tables)
+  * [Processing data tables](#processing-data-tables)
+  * [Passing options to data tables](#passing-options-to-data-tables)
 * [Columns](#columns)
-    * [Available column types](#available-column-types)
-    * [Creating custom column type](#creating-custom-column-type)
-    * [Creating column type extension](#creating-column-type-extension)
+  * [Available column types](#available-column-types)
+  * [Creating custom column type](#creating-custom-column-type)
+  * [Creating column type extension](#creating-column-type-extension)
 * [Filters](#filters)
-    * [Available filter types](#available-filter-types)
-    * [Creating custom filter type](#creating-custom-filter-type)
-    * [Creating filter type extension](#creating-filter-type-extension)
-    * [Filter operators](#filter-operators)
+  * [Configuring the filtration feature](#configuring-the-filtration-feature)
+  * [Available filter types](#available-filter-types)
+  * [Creating custom filter type](#creating-custom-filter-type)
+  * [Creating filter type extension](#creating-filter-type-extension)
+  * [Filter operators](#filter-operators)
+* [Sorting](#sorting)
+  * [Configuring the sorting feature](#configuring-the-sorting-feature)
+* [Pagination](#pagination)
+  * [Configuring the pagination feature](#configuring-the-pagination-feature)
+* [Personalization](#personalization)
+  * [Configuring the personalization feature](#configuring-the-personalization-feature)
 * [Persistence](#persistence)
-    * [Persistence adapters](#persistence-adapters)
-        * [Using built-in cache adapter](#using-built-in-cache-adapter)
-        * [Creating custom adapters](#creating-custom-adapters)
-    * [Persistence subjects](#persistence-subjects)
-    * [Persistence subject providers](#persistence-subject-providers)
-        * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
+  * [Persistence adapters](#persistence-adapters)
+    * [Using built-in cache adapter](#using-built-in-cache-adapter)
+    * [Creating custom adapters](#creating-custom-adapters)
+  * [Persistence subjects](#persistence-subjects)
+  * [Persistence subject providers](#persistence-subject-providers)
+    * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
+
 
 ## Installation
 
@@ -77,7 +84,7 @@ class Product
 }
 ```
 
-## Building data tables
+### Building data tables
 
 This bundle provides a "data table builder" object which allows you to describe the data table using a fluent interface.
 Later, the builder created the actual data table object used to render and process contents.
@@ -191,7 +198,7 @@ class ProductController extends AbstractController
 }
 ```
 
-## Rendering data tables
+### Rendering data tables
 
 Now that the data table has been created, the next step is to render it:
 
@@ -251,7 +258,7 @@ kreyu_data_table:
     theme: '@KreyuDataTable/themes/bootstrap_5.html.twig' # default value
 ```
 
-## Processing data tables
+### Processing data tables
 
 The recommended way of processing data tables is to use a single action for both rendering the data table and handling
 its pagination, filtration and other features. You can use separate actions, but using one action simplifies everything
@@ -311,8 +318,6 @@ This controller follows a common pattern for handling data tables and has two po
 > The [handleRequest()]() method handles all of them manually.
 > First argument of the method - the request object - is not tied to specific request implementation,
 > although only the [HttpFoundation request handler]() is provided out-of-the-box, [creating custom data table request handler]() is easy.
-
-## Other common data table features
 
 ### Passing options to data tables
 
@@ -439,6 +444,19 @@ See [How to Create a Column Type Extension](docs/column/create_column_type_exten
 
 A data table can be filtered with a set of _filters_, each of which are built with the help of a filter _type_ (e.g. `StringType`, `EntityType`, etc),
 
+### Configuring the filtration feature
+
+By default, the filtration is enabled for every data table type.
+
+Every part of the feature can be configured using the [data table options](#passing-options-to-data-tables):
+
+- `filtration_enabled` - to enable/disable feature completely;
+- `filtration_persistence_enabled` - to enable/disable feature persistence;
+- `filtration_persistence_adapter` - to change the persistence adapter;
+- `filtration_persistence_subject` - to change the persistence subject directly;
+
+By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
+
 ### Available filter types
 
 The following filter types are natively available in the bundle:
@@ -501,6 +519,60 @@ public function buildDataTable(DataTableBuilderInterface $builder, array $option
 
 If you wish to override the operator selector completely, create custom form type and pass it as `operator_type` option.
 Options passed as `operator_options` are used in that type.
+
+
+## Sorting
+
+This bundle provides sorting feature, what gives users the ability to sort the data table by its columns.
+
+### Configuring the sorting feature
+
+By default, the sorting is enabled for every data table type.
+
+Every part of the feature can be configured using the [data table options](#passing-options-to-data-tables):
+
+- `sorting_enabled` - to enable/disable feature completely;
+- `sorting_persistence_enabled` - to enable/disable feature persistence;
+- `sorting_persistence_adapter` - to change the persistence adapter;
+- `sorting_persistence_subject` - to change the persistence subject directly;
+
+By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
+
+
+## Pagination
+
+This bundle provides pagination feature, what gives users the ability to display data in chunks, which saves memory on huge data sources.
+
+### Configuring the pagination feature
+
+By default, the pagination is enabled for every data table type.
+
+Every part of the feature can be configured using the [data table options](#passing-options-to-data-tables):
+
+- `pagination_enabled` - to enable/disable feature completely;
+- `pagination_persistence_enabled` - to enable/disable feature persistence;
+- `pagination_persistence_adapter` - to change the persistence adapter;
+- `pagination_persistence_subject` - to change the persistence subject directly;
+
+By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
+
+
+## Personalization
+
+This bundle provides personalization feature, what gives users the ability to freely show/hide specific columns and even set their order per data-table basis.
+
+### Configuring the personalization feature
+
+By default, the personalization is enabled for every data table type.
+
+Every part of the feature can be configured using the [data table options](#passing-options-to-data-tables):
+
+- `personalization_enabled` - to enable/disable feature completely;
+- `personalization_persistence_enabled` - to enable/disable feature persistence;
+- `personalization_persistence_adapter` - to change the persistence adapter;
+- `personalization_persistence_subject` - to change the persistence subject directly;
+
+By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
 
 ## Persistence
 

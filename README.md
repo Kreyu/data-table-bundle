@@ -71,7 +71,7 @@ The recommended workflow when working with this bundle is the following:
 
 Each of these steps is explained in detail in the next sections. To make examples easier to follow, all of them assume that you're building an application that displays a list of "products".
 
-Users list projects using data table. Each project is an instance of the following `Product` class:
+Users list products using data table. Each product is an instance of the following `Product` class:
 
 ```php
 // src/Entity/Product.php

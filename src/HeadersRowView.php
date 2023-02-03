@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-class HeadersView
+class HeadersRowView
 {
     public array $vars = [];
 

@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 
-class RowView
+class ValuesRowView
 {
     public array $vars = [];
 

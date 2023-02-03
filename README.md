@@ -19,6 +19,7 @@ Streamlines creation process of the data tables in Symfony applications.
 - support for [Doctrine ORM](https://github.com/doctrine/orm) by default, but open to custom implementation;
 - easy theming of every part of the bundle;
 
+
 ## Table of contents
 
 * [Installation](#installation)
@@ -29,6 +30,7 @@ Streamlines creation process of the data tables in Symfony applications.
   * [Rendering data tables](#rendering-data-tables)
   * [Processing data tables](#processing-data-tables)
   * [Passing options to data tables](#passing-options-to-data-tables)
+  * [Creating data table type extension](#creating-data-table-type-extension)
 * [Columns](#columns)
   * [Available column types](#available-column-types)
   * [Creating custom column type](#creating-custom-column-type)
@@ -52,7 +54,7 @@ Streamlines creation process of the data tables in Symfony applications.
   * [Persistence subjects](#persistence-subjects)
   * [Persistence subject providers](#persistence-subject-providers)
     * [Creating custom persistence subject providers](#creating-custom-persistence-subject-providers)
-
+* [Learn more](#learn-more)
 
 ## Installation
 
@@ -125,12 +127,12 @@ class ProductController extends AbstractController
 ```
 
 In this example, you've added two columns to your data table - `id` and `name` - corresponding to the `id` and `name` properties of the `Product` class.
-You've also assigned each a [column type]() (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
+You've also assigned each a [column type](#available-column-types) (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
 
 > ### 💡 Important note
 > Notice the use of the `ProxyQuery` class, which wraps the query builder.
 > Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
-> Although only the [Doctrine ORM proxy query class]() is provided out-of-the-box, [creating custom proxy query classes]() is easy.
+> Although only the [Doctrine ORM proxy query class](src/Bridge/Doctrine/Orm/Query/ProxyQuery.php) is provided out-of-the-box, [creating custom proxy query classes](docs/create_custom_proxy_query_classes.md) is easy.
 
 ### Creating data table classes
 
@@ -233,24 +235,24 @@ class ProductController extends AbstractController
 }
 ```
 
-Then, use some [data table helper functions]() to render the data table contents:
+Then, use some [data table helper functions](docs/twig_reference.md#functions) to render the data table contents:
 
 ```html
 {# templates/product/index.html.twig #}
 {{ data_table(data_table) }}
 ```
 
-That's it! The [data_table() function]() renders all the columns.
+That's it! The [data_table() function](docs/twig_reference.md#datatabledatatableview-variables) renders a complete data table.
 
 > ### 💡 Important note
 >
 > The data table system is smart enough to access the value of the private `id` and `name` properties from each product returned by the query via the `getId()` and `getName()` methods on the `Product` class.
-> Unless a property is public, it _must_ have a "getter" method so that [Symfony Property Accessor Component]() can read its value.
+> Unless a property is public, it _must_ have a "getter" method so that [Symfony Property Accessor Component](https://symfony.com/doc/current/components/property_access.html) can read its value.
 > For a boolean property, you can use an "isser" or "hasser" method (e.g. `isPublished()` or `hasReminder()`) instead of a getter (e.g. `getPublished` or `getReminder()`).
 
 As short as this rendering is, it's not very flexible.
 Usually, you'll need more control about how the entire data table or some of its parts look.
-For example, thanks to the [Bootstrap 5 integration with data tables](), generated data tables are compatible with the Bootstrap 5 CSS framework:
+For example, thanks to the [Bootstrap 5 integration with data tables](src/Resources/views/themes/bootstrap_5.html.twig), generated data tables are compatible with the Bootstrap 5 CSS framework:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
@@ -303,21 +305,21 @@ This controller follows a common pattern for handling data tables and has two po
 
 1. When initially loading the page in a browser, the data table hasn't been submitted yet.
    So the data table is created and rendered;
-2. When the user submits the data table (e.g. changes current page), [handleRequest()]() recognizes this and immediately
+2. When the user submits the data table (e.g. changes current page), `handleRequest()` recognizes this and immediately
    writes the submitted data into the data table. This works the same, as if you've manually extracted the submitted data
    and used the data table's `sort`, `paginate`, `filter` and `personalize` methods.
 
 > ### 💡 Important note
 > If you need more control over exactly when and how your data table is modified, you can use each feature dedicated method to handle the submissions:
 >
-> - [paginate()]() to handle pagination - with current page and limit of items per page;
-> - [sort()]() to handle sorting - with fields and directions to sort the list. Supports sorting by multiple fields;
-> - [filter()]() to handle filtration - with filters and their values and operators;
-> - [personalize()]() to handle personalization - with columns visibility status and their order;
+> - `paginate()` to handle pagination - with current page and limit of items per page;
+> - `sort()` to handle sorting - with fields and directions to sort the list. Supports sorting by multiple fields;
+> - `filter()` to handle filtration - with filters and their values and operators;
+> - `personalize()` to handle personalization - with columns visibility status and their order;
 >
-> The [handleRequest()]() method handles all of them manually.
+> The `handleRequest()` method handles all of them manually.
 > First argument of the method - the request object - is not tied to specific request implementation,
-> although only the [HttpFoundation request handler]() is provided out-of-the-box, [creating custom data table request handler]() is easy.
+> although only the [HttpFoundation request handler](src/Request/HttpFoundationRequestHandler.php) is provided out-of-the-box, [creating custom data table request handler](docs/create_custom_request_handler.md) is easy.
 
 ### Passing options to data tables
 
@@ -411,6 +413,10 @@ class ProductType extends AbstractType
     // ...
 }
 ```
+
+### Creating data table type extension
+
+See [How to Create a Data Table Type Extension]().
 
 ## Columns
 
@@ -701,3 +707,9 @@ services:
     tags:
       - { name: kreyu_data_table.persistence.subject_provider }
 ```
+
+## Learn more
+
+- [Create Custom Request Handler](docs/create_custom_request_handler.md)
+- [Create Custom Proxy Query Classes](docs/create_custom_proxy_query_classes.md)
+- [Twig reference](docs/twig_reference.md)

@@ -21,6 +21,7 @@ final class FilterType implements FilterTypeInterface
 
     public function buildView(FilterView $view, FilterInterface $filter, array $options): void
     {
+        $view->vars = $options;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -8,10 +8,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\HeadersView;
+use Kreyu\Bundle\DataTableBundle\HeadersRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
-use Kreyu\Bundle\DataTableBundle\RowView;
+use Kreyu\Bundle\DataTableBundle\ValuesRowView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
@@ -34,13 +35,13 @@ class DataTableExtension extends AbstractExtension
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
-                'data_table_headers',
-                [$this, 'renderHeaders'],
+                'data_table_headers_row',
+                [$this, 'renderHeadersRow'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
-                'data_table_row',
-                [$this, 'renderRow'],
+                'data_table_values_row',
+                [$this, 'renderValuesRow'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
@@ -90,76 +91,84 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|Throwable
      */
-    public function renderHeaders(Environment $environment, HeadersView $view): string
+    public function renderHeadersRow(Environment $environment, HeadersRowView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_header_row', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_headers_row', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderColumnHeader(Environment $environment, ColumnView $view): string
+    public function renderValuesRow(Environment $environment, ValuesRowView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_column_header', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_values_row', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderRow(Environment $environment, RowView $view): string
+    public function renderColumnHeader(Environment $environment, ColumnView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_value_row', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_column_header', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderColumnLabel(Environment $environment, ColumnView $view): string
+    public function renderColumnLabel(Environment $environment, ColumnView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_column_label', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_column_label', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderColumnValue(Environment $environment, ColumnView $view): string
+    public function renderColumnValue(Environment $environment, ColumnView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_column_value', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_column_value', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderDataTable(Environment $environment, DataTableView $view): string
+    public function renderDataTable(Environment $environment, DataTableView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table', array_merge($view->vars, $variables));
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderFiltersForm(Environment $environment, FormInterface $form): string
+    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form): string
     {
+        if ($form instanceof FormInterface) {
+            $form = $form->createView();
+        }
+
         return $this->renderBlock($environment, 'kreyu_data_table_filters_form', [
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderPersonalizationForm(Environment $environment, FormInterface $form): string
+    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form): string
     {
+        if ($form instanceof FormInterface) {
+            $form = $form->createView();
+        }
+
         return $this->renderBlock($environment, 'kreyu_data_table_personalization_form', [
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
     }
 
     /**
      * @throws TwigException|Throwable
      */
-    public function renderPagination(Environment $environment, PaginationView $view): string
+    public function renderPagination(Environment $environment, PaginationView $view, array $variables = []): string
     {
-        return $this->renderBlock($environment, 'kreyu_data_table_pagination', $view->vars);
+        return $this->renderBlock($environment, 'kreyu_data_table_pagination', array_merge($view->vars, $variables));
     }
 }

@@ -8,10 +8,12 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\HeadersRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\ValuesRowView;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class DataTableType implements DataTableTypeInterface
@@ -52,6 +54,9 @@ final class DataTableType implements DataTableTypeInterface
             $columns = $personalizationData->compute($columns);
         }
 
+        $personalizationForm = $dataTable->getPersonalizationForm()->createView();
+        $personalizationForm->vars['data_table'] = $view;
+
         $view->vars += [
             'columns' => $columns,
             'filters' => $dataTable->getConfig()->getFilters(),
@@ -64,10 +69,16 @@ final class DataTableType implements DataTableTypeInterface
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
-            'filtration_form' => $dataTable->getFiltrationForm(),
-            'personalization_form' => $dataTable->getPersonalizationForm(),
+            'filtration_form' => $dataTable->getFiltrationForm()->createView(),
+            'personalization_form' => $personalizationForm,
             'values_rows' => [],
         ];
+
+        $view->vars['has_active_filters'] = !empty(array_filter($view->vars['filtration_form']->children, function (FormView $child) {
+            $data = $child->vars['data'];
+
+            return $data instanceof FilterData && $data->hasValue();
+        }));
 
         foreach ($dataTable->getPagination()->getItems() as $item) {
             $view->vars['values_rows'][] = new ValuesRowView($view, $item);

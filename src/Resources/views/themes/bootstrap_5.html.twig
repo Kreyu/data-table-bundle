@@ -1,6 +1,87 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
 {% block kreyu_data_table %}
+    {% block action_bar %}
+        <div class="mb-4">
+            {% block action_bar_left %}
+                <div class="d-inline-block">
+                    {% if has_active_filters %}
+                        {% block filter_clear_all_button %}
+                            <a class="btn btn-sm btn-outline-danger"
+                                href="{{ path(
+                                    app.request.get('_route'),
+                                    app.request.query.all|filter((value, key) => key != filtration_parameter_name)
+                                ) }}"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                            </a>
+                        {% endblock %}
+                    {% endif %}
+
+                    {% for filter in filters %}
+                        {% set field = filtration_form.children[filter.name] %}
+
+                        {% if field.vars.data and field.vars.data.value != null %}
+                            {% block filter_clear_button %}
+                                <a class="btn btn-sm btn-outline-dark my-1"
+                                    href="{{ path(
+                                        app.request.get('_route'),
+                                        app.request.query.all|merge({
+                                            (filtration_parameter_name): app.request.query.all(filtration_parameter_name)|filter(
+                                                (value, key) => key != filter.name
+                                            )
+                                        })
+                                    ) }}"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom"
+                                    title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
+                                >
+                                    <small>
+                                        {{ field.vars.label }}
+
+                                        {% if filter.options.operator_options.visible %}
+                                            ({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})
+                                        {% endif %}
+                                    </small>
+
+                                    {{ field.vars.data.value }}
+
+                                    <span class="mx-1" aria-hidden="true">&times;</span>
+                                </a>
+                            {% endblock %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endblock %}
+            {% block action_bar_right %}
+                <div class="d-inline-block float-end">
+                    {% if filtration_enabled %}
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
+                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+                            </svg>
+                        </button>
+                    {% endif %}
+
+                    {% if personalization_enabled %}
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                            </svg>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endblock %}
+        </div>
+    {% endblock %}
+
     {% block filters %}
         {% if filtration_enabled %}
             {{ data_table_filters_form(filtration_form) }}
@@ -39,7 +120,7 @@
     {% endblock %}
 
     {% block personalization_modal %}
-        <div class="modal modal-blur" id="{{ personalization_form.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal modal-blur fade" id="{{ personalization_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
             {% block personalization_modal_dialog %}
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     {% block personalization_modal_content %}
@@ -104,27 +185,18 @@
 
             {% if sort_field == current_sort_field %}
                 {% if current_sort_direction == 'asc' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
                     </svg>
                 {% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
                     </svg>
                 {% endif %}
             {% endif %}
         </a>
     {% else %}
         {{ block('kreyu_data_table_column_label', _self, _context) }}
-    {% endif %}
-
-    {% if data_table.vars.personalization_enabled and display_personalization_button %}
-        <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#{{ data_table.vars.personalization_form.name }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-            </svg>
-        </a>
     {% endif %}
 {% endblock %}
 
@@ -185,14 +257,6 @@
 
 {% block kreyu_data_table_filters_form %}
     {% if form.count > 0 %}
-        <div class="w-100 text-end">
-            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ form.vars.id ~ '__collapse' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
-                    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
-                </svg>
-            </button>
-        </div>
-
         <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
             <div class="mb-4">
                 {{ form_start(form) }}
@@ -308,6 +372,12 @@
 {% block kreyu_data_table_column_link %}
     <a href="{{- href -}}" target="{{- target -}}" class="text-decoration-none">
         <span>{{- value -}}</span>
+        {% if display_icon %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+            </svg>
+        {% endif %}
     </a>
 {% endblock %}
 
@@ -349,8 +419,8 @@
 {% endblock %}
 
 {% block kreyu_data_table_personalization_column_row %}
-    <li class="list-group-item" data-column-name="{{ form.vars.data.name }}">
-        {{ form.vars.data.name }}
+    <li class="list-group-item">
+        {{ data_table_column_label(form.vars.column) }}
         {{ form_widget(form.order) }}
         {{ form_widget(form.visible) }}
     </li>

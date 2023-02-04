@@ -27,6 +27,9 @@ class PersonalizationDataType extends AbstractType
     {
         $builder->add('columns', CollectionType::class, [
             'entry_type' => PersonalizationColumnDataType::class,
+            'entry_options' => [
+                'data_table' => $options['data_table'],
+            ],
         ]);
     }
 
@@ -36,6 +39,8 @@ class PersonalizationDataType extends AbstractType
             'data_class' => PersonalizationData::class,
             'translation_domain' => 'KreyuDataTable',
         ]);
+
+        $resolver->setRequired('data_table');
     }
 
     public function getBlockPrefix(): string

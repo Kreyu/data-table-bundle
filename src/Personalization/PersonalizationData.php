@@ -88,8 +88,8 @@ class PersonalizationData implements \ArrayAccess
             fn (ColumnInterface $column) => $this->isColumnVisible($column),
         );
         
-        usort($columns, fn (ColumnInterface $a, ColumnInterface $b) => $this->getColumnOrder($a) <=> $this->getColumnOrder($b));
-        
+        uasort($columns, fn (ColumnInterface $a, ColumnInterface $b) => $this->getColumnOrder($a) <=> $this->getColumnOrder($b));
+
         return $columns;
     }
 

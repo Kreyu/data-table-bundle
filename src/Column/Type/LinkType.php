@@ -14,9 +14,11 @@ class LinkType extends AbstractType
             ->setDefaults([
                 'href' => '#',
                 'target' => '_self',
+                'display_icon' => true,
             ])
             ->setAllowedTypes('href', ['string', 'callable'])
             ->setAllowedTypes('target', ['string', 'callable'])
+            ->setAllowedTypes('display_icon', ['boolean'])
         ;
     }
 }

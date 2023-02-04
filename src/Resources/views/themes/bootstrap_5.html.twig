@@ -214,7 +214,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_personalization_form %}
-    <div {{ stimulus_controller('@kreyu/ux-data-table/personalization') }}>
+    <div data-controller="kreyu--data-table-bundle--personalization">
         {{ form_start(form) }}
             {{ form_row(form._token) }}
 
@@ -245,7 +245,7 @@
                                     class="p-2 mb-0"
                                     role="button"
                                     data-visible="1"
-                                    {{ stimulus_target('@kreyu/ux-data-table/personalization', 'visibleColumns') }}
+                                    data-kreyu--data-table-bundle--personalization-target="visibleColumns"
                                 >
                                     {% for child in children|filter(child => child.vars.value.visible) %}
                                         {{ form_row(child) }}
@@ -266,7 +266,7 @@
                                     class="p-2 mb-0"
                                     role="button"
                                     data-visible="0"
-                                    {{ stimulus_target('@kreyu/ux-data-table/personalization', 'hiddenColumns') }}
+                                    data-kreyu--data-table-bundle--personalization-target="hiddenColumns"
                                 >
                                     {% for child in children|filter(child => not child.vars.value.visible) %}
                                         {{ form_row(child) }}

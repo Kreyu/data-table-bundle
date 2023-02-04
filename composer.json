@@ -2,6 +2,9 @@
     "name": "kreyu/data-table-bundle",
     "description": "Streamlines creation process of the data tables",
     "type": "symfony-bundle",
+    "keywords": [
+        "symfony-ux"
+    ],
     "authors": [
         {
             "name": "Sebastian Wróblewski",

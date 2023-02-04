@@ -1,0 +1,23 @@
+{
+    "name": "@kreyu/ux-data-table",
+    "description": "Streamlines creation process of the data tables",
+    "license": "MIT",
+    "version": "1.0.0",
+    "symfony": {
+        "controllers": {
+            "personalization": {
+                "main": "controllers/personalization.js",
+                "fetch": "eager",
+                "enabled": true
+            }
+        }
+    },
+    "peerDependencies": {
+        "@hotwired/stimulus": "^3.0.0",
+        "sortablejs": "^1.15.0"
+    },
+    "devDependencies": {
+        "@hotwired/stimulus": "^3.0.0",
+        "sortablejs": "^1.15.0"
+    }
+}

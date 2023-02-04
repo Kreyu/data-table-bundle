@@ -214,20 +214,16 @@
 {% endblock %}
 
 {% block kreyu_data_table_personalization_form %}
-    <div class="personalization-form">
+    <div {{ stimulus_controller('@kreyu/ux-data-table/personalization') }}>
         {{ form_start(form) }}
             {{ form_row(form._token) }}
 
             {% block personalization_form_help %}
                 <div class="alert d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                        <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                        </symbol>
-                    </svg>
-
                     <div class="p-2">
-                        <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+                        <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Info:">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                        </svg>
                     </div>
 
                     <span>{{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.</span>
@@ -245,7 +241,12 @@
                                     {{ 'Visible columns'|trans({}, 'KreyuDataTable') }}
                                 </div>
 
-                                <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="1" style="cursor: pointer">
+                                <ul
+                                    class="p-2 mb-0"
+                                    role="button"
+                                    data-visible="1"
+                                    {{ stimulus_target('@kreyu/ux-data-table/personalization', 'visibleColumns') }}
+                                >
                                     {% for child in children|filter(child => child.vars.value.visible) %}
                                         {{ form_row(child) }}
                                     {% endfor %}
@@ -261,7 +262,12 @@
                                     {{ 'Hidden columns'|trans({}, 'KreyuDataTable') }}
                                 </div>
 
-                                <ul id="{{ form.vars.id }}_visible" class="personalization-columns p-2 mb-0" data-visible="0" style="cursor: pointer">
+                                <ul
+                                    class="p-2 mb-0"
+                                    role="button"
+                                    data-visible="0"
+                                    {{ stimulus_target('@kreyu/ux-data-table/personalization', 'hiddenColumns') }}
+                                >
                                     {% for child in children|filter(child => not child.vars.value.visible) %}
                                         {{ form_row(child) }}
                                     {% endfor %}
@@ -278,58 +284,6 @@
                 {% endblock %}
             {% endblock %}
         {{ form_end(form, { render_rest: false }) }}
-
-        <script>
-            class PersonalizationForm {
-                #visibleColumnsSelector;
-                #hiddenColumnsSelector;
-                #connectionSelector;
-
-                constructor(visibleColumnsSelector, hiddenColumnsSelector, connectionSelector) {
-                    this.#visibleColumnsSelector = visibleColumnsSelector;
-                    this.#hiddenColumnsSelector = hiddenColumnsSelector;
-                    this.#connectionSelector = connectionSelector;
-                }
-
-                initialize() {
-                    this.#attachEventHandlers();
-                }
-
-                #attachEventHandlers() {
-                    $(this.#getSortableElementSelector()).sortable(this.#getSortableConfiguration());
-                }
-
-                #getSortableElementSelector() {
-                    return `${this.#visibleColumnsSelector}, ${this.#hiddenColumnsSelector}`;
-                }
-
-                #getSortableConfiguration() {
-                    return {
-                        connectWith: this.#connectionSelector,
-                        update: function (event) {
-                            $(event.target).find('.ui-sortable-handle').each(function () {
-                                $(this).find('[name$="[order]"]').val($(this).index());
-                            });
-                        },
-                        receive: function (event, ui) {
-                            $(ui.item).find('[name$="[visible]"]').val(parseInt($(event.target).data('visible')));
-                        }
-                    };
-                }
-            }
-
-            if (window.jQuery && typeof PersonalizationForm === 'function') {
-                $(function () {
-                    const form = new PersonalizationForm(
-                        '#{{ form.vars.id }}_visible',
-                        '#{{ form.vars.id }}_hidden',
-                        '.personalization-columns',
-                    );
-
-                    form.initialize();
-                });
-            }
-        </script>
     </div>
 {% endblock %}
 

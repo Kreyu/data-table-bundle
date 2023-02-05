@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 
-class PersonalizationData implements \ArrayAccess
+class PersonalizationData
 {
     private array $columns;
 
@@ -30,23 +30,7 @@ class PersonalizationData implements \ArrayAccess
         }
     }
 
-    public function toFormData(): array
-    {
-        $data = [
-            'columns' => [],
-        ];
-
-        foreach ($this->getColumns() as $personalizationColumn) {
-            $data['columns'][$personalizationColumn->getName()] = [
-                'order' => $personalizationColumn->getOrder(),
-                'visible' => $personalizationColumn->isVisible(),
-            ];
-        }
-
-        return $data;
-    }
-
-    public function fromFormData(array $data): void
+    public function fromArray(array $data): void
     {
         foreach ($this->getColumns() as $personalizationColumn) {
             $columnData = $data['columns'][$personalizationColumn->getName()];
@@ -59,6 +43,15 @@ class PersonalizationData implements \ArrayAccess
     public function getColumns(): array
     {
         return $this->columns;
+    }
+
+    public function getPersonalizationColumnData(ColumnInterface|string $column): ?PersonalizationColumnData
+    {
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return $this->columns[$column] ?? null;
     }
 
     /**
@@ -95,48 +88,24 @@ class PersonalizationData implements \ArrayAccess
 
     public function getColumnOrder(string|ColumnInterface $column): int
     {
-        if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
-        }
-
-        return $this->columns[$column]->getOrder();
+        return $this->getPersonalizationColumnData($column)?->getOrder() ?? 0;
     }
 
     public function setColumnOrder(string|ColumnInterface $column, int $order): self
     {
-        if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
-        }
-
-        if (!array_key_exists($column, $this->columns)) {
-            throw new \InvalidArgumentException("Column \"$column\" does not exist in the personalization context");
-        }
-
-        $this->columns[$column]->setOrder($order);
+        $this->getPersonalizationColumnData($column)?->setOrder($order);
 
         return $this;
     }
 
     public function getColumnVisibility(string|ColumnInterface $column): bool
     {
-        if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
-        }
-
-        return $this->columns[$column]->isVisible();
+        return $this->getPersonalizationColumnData($column)?->isVisible() ?? true;
     }
 
     public function setColumnVisibility(string|ColumnInterface $column, bool $visible): self
     {
-        if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
-        }
-
-        if (!array_key_exists($column, $this->columns)) {
-            throw new \InvalidArgumentException("Column \"$column\" does not exist in the personalization context");
-        }
-
-        $this->columns[$column]->setVisible($visible);
+        $this->getPersonalizationColumnData($column)?->setVisible($visible);
 
         return $this;
     }
@@ -159,25 +128,5 @@ class PersonalizationData implements \ArrayAccess
     public function setColumnHidden(string|ColumnInterface $column): self
     {
         return $this->setColumnVisibility($column, false);
-    }
-
-    public function offsetExists(mixed $offset): bool
-    {
-        return array_key_exists($offset, $this->columns);
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        dd($offset);
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-
     }
 }

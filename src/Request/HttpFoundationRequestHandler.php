@@ -110,7 +110,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             columns: $dataTable->getConfig()->getColumns(),
         );
 
-        $personalizationData->fromFormData($formData);
+        $personalizationData->fromArray($formData);
 
         $dataTable->personalize($personalizationData);
     }

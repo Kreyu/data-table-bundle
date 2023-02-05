@@ -27,6 +27,8 @@ interface DataTableInterface
 
     public function export(): File;
 
+    public function isExporting(): bool;
+
     public function handleRequest(mixed $request): void;
 
     public function getPagination(): PaginationInterface;

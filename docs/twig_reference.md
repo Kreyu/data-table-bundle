@@ -81,8 +81,9 @@ The following variables are common to every data table type.
 | `sort_parameter_name`            | Name of the parameter that holds the sorting data array (e.g. `[{sort_parameter_name}][field]`, `[{sort_parameter_name}][direction]`). |
 | `filtration_parameter_name`      | Name of the parameter that holds the filtration form data.                                                                             |
 | `personalization_parameter_name` | Name of the parameter that holds the personalization form data.                                                                        |
-| `filtration_form`                | Holds an instance of the filtration form.                                                                                              |
-| `personalization_form`           | Holds an instance of the personalization form.                                                                                         |
+| `filtration_form`                | Holds an instance of the filtration form view.                                                                                         |
+| `personalization_form`           | Holds an instance of the personalization form view.                                                                                    |
+| `export_form`                    | Holds an instance of the export form view.                                                                                             |
 | `headers_row`                    | Holds an instance of the headers row view.                                                                                             |
 | `values_rows`                    | List of value rows views.                                                                                                              |
 | `pagination`                     | Holds an instance of the pagination view.                                                                                              |

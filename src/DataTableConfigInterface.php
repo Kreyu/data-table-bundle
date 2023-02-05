@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
@@ -29,6 +30,15 @@ interface DataTableConfigInterface
      * @return array<FilterInterface>
      */
     public function getFilters(): array;
+
+    /**
+     * @return array<ExporterInterface>
+     */
+    public function getExporters(): array;
+
+    public function isExportingEnabled(): bool;
+
+    public function getExportFormFactory(): ?FormFactoryInterface;
 
     public function isPersonalizationEnabled(): bool;
 
@@ -77,4 +87,6 @@ interface DataTableConfigInterface
     public function getFiltrationParameterName(): string;
 
     public function getPersonalizationParameterName(): string;
+
+    public function getExportParameterName(): string;
 }

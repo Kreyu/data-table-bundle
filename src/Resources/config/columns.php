@@ -25,7 +25,7 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.resolved_type_factory', ResolvedColumnTypeFactory::class)
-        ->alias(ResolvedColumnTypeFactoryInterface::class, 'kreyu_data_table.resolved_type_factory')
+        ->alias(ResolvedColumnTypeFactoryInterface::class, 'kreyu_data_table.column.resolved_type_factory')
     ;
 
     $services

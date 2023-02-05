@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -22,6 +24,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public const SORT_PARAMETER = 'sort';
     public const FILTRATION_PARAMETER = 'filter';
     public const PERSONALIZATION_PARAMETER = 'personalization';
+    public const EXPORT_PARAMETER = 'export';
 
     /**
      * Name of the data table, used to differentiate multiple data tables on the same page.
@@ -49,12 +52,20 @@ class DataTableBuilder implements DataTableBuilderInterface
      * @var array<ColumnInterface>
      */
     private array $columns = [];
+
     /**
      * Stores an array of filters, used to build and handle the filtering feature.
      *
      * @var array<FilterInterface>
      */
     private array $filters = [];
+
+    /**
+     * Stores an array of exporters, used to output data to various file types.
+     *
+     * @var array<ExporterInterface>
+     */
+    private array $exporters = [];
 
     /**
      * Factory used to create proper column models.
@@ -65,6 +76,21 @@ class DataTableBuilder implements DataTableBuilderInterface
      * Factory used to create proper filter models.
      */
     private FilterFactoryInterface $filterFactory;
+
+    /**
+     * Factory used to create proper exporter models.
+     */
+    private ExporterFactoryInterface $exporterFactory;
+
+    /**
+     * Determines whether the data table exporting feature is enabled.
+     */
+    private bool $exportingEnabled = true;
+
+    /**
+     * Form factory used to create an export form.
+     */
+    private null|FormFactoryInterface $exportFormFactory = null;
 
     /**
      * Determines whether the data table personalization feature is enabled.
@@ -246,6 +272,18 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function getColumnFactory(): ColumnFactoryInterface
+    {
+        return $this->columnFactory;
+    }
+
+    public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
+    {
+        $this->columnFactory = $columnFactory;
+
+        return $this;
+    }
+
     public function getFilters(): array
     {
         return $this->filters;
@@ -273,18 +311,6 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return $this->columnFactory;
-    }
-
-    public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
-    {
-        $this->columnFactory = $columnFactory;
-
-        return $this;
-    }
-
     public function getFilterFactory(): FilterFactoryInterface
     {
         return $this->filterFactory;
@@ -293,6 +319,69 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static
     {
         $this->filterFactory = $filterFactory;
+
+        return $this;
+    }
+
+    public function getExporters(): array
+    {
+        return $this->exporters;
+    }
+
+    public function addExporter(string $name, string $type, array $options = []): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        $this->exporters[$name] = $this->getExporterFactory()->create($name, $type, $options);
+
+        return $this;
+    }
+
+    public function removeExporter(string $name): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        unset($this->exporters[$name]);
+
+        return $this;
+    }
+
+    public function getExporterFactory(): ExporterFactoryInterface
+    {
+        return $this->exporterFactory;
+    }
+
+    public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static
+    {
+        $this->exporterFactory = $exporterFactory;
+
+        return $this;
+    }
+
+    public function isExportingEnabled(): bool
+    {
+        return $this->exportingEnabled;
+    }
+
+    public function setExportingEnabled(bool $exportingEnabled): static
+    {
+        $this->exportingEnabled = $exportingEnabled;
+
+        return $this;
+    }
+
+    public function getExportFormFactory(): ?FormFactoryInterface
+    {
+        return $this->exportFormFactory;
+    }
+
+    public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static
+    {
+        $this->exportFormFactory = $exportFormFactory;
 
         return $this;
     }
@@ -616,6 +705,11 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function getPersonalizationParameterName(): string
     {
         return $this->getParameterName(static::PERSONALIZATION_PARAMETER);
+    }
+
+    public function getExportParameterName(): string
+    {
+        return $this->getParameterName(static::EXPORT_PARAMETER);
     }
 
     public function getDataTable(): DataTableInterface

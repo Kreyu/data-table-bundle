@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -43,6 +45,21 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function getFilterFactory(): FilterFactoryInterface;
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static;
+
+    /**
+     * @param class-string<ExporterTypeInterface> $type
+     */
+    public function addExporter(string $name, string $type, array $options = []): static;
+
+    public function removeExporter(string $name): static;
+
+    public function getExporterFactory(): ExporterFactoryInterface;
+
+    public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static;
+
+    public function setExportingEnabled(bool $exportingEnabled): static;
+
+    public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static;
 
     public function setPersonalizationEnabled(bool $personalizationEnabled): static;
 

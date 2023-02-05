@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
+use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
@@ -15,9 +18,13 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use RuntimeException;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 class DataTable implements DataTableInterface
 {
+    public const DEFAULT_PAGE = 1;
+    public const DEFAULT_PER_PAGE = 25;
+
     /**
      * Lazy-loaded form used to apply filtration criteria to the data table.
      */
@@ -27,6 +34,11 @@ class DataTable implements DataTableInterface
      * Lazy-loaded form used to apply personalization criteria to the data table.
      */
     private null|FormInterface $personalizationForm = null;
+
+    /**
+     * Lazy-loaded form used to apply export criteria to the export feature.
+     */
+    private null|FormInterface $exportForm = null;
 
     public function __construct(
         private ProxyQueryInterface $query,
@@ -135,6 +147,33 @@ class DataTable implements DataTableInterface
         }
     }
 
+    public function isExporting(): bool
+    {
+        return $this->getExportForm()->isSubmitted();
+    }
+
+    public function export(): File
+    {
+        if (!$this->config->isExportingEnabled()) {
+            throw new RuntimeException('The data table requested to export has exporting feature disabled.');
+        }
+
+        /** @var ExportData $exportData */
+        $exportData = $this->getExportForm()->getData();
+
+        $dataTable = clone $this;
+
+        if ($exportData->strategy === ExportStrategy::INCLUDE_ALL) {
+            $dataTable->paginate(new PaginationData(1));
+        }
+
+        if (!$exportData->includePersonalization) {
+            $dataTable->personalize(new PersonalizationData($dataTable->getConfig()->getColumns()));
+        }
+
+        return $exportData->exporter->export($dataTable->createView());
+    }
+
     public function handleRequest(mixed $request): void
     {
         if (null === $requestHandler = $this->config->getRequestHandler()) {
@@ -157,6 +196,11 @@ class DataTable implements DataTableInterface
     public function getPersonalizationForm(): FormInterface
     {
         return $this->personalizationForm ??= $this->buildPersonalizationForm();
+    }
+
+    public function getExportForm(): FormInterface
+    {
+        return $this->exportForm ??= $this->buildExportForm();
     }
 
     public function createView(): DataTableView
@@ -188,9 +232,7 @@ class DataTable implements DataTableInterface
                 $filter->getFormName(),
                 FilterDataType::class,
                 $filter->getFormOptions() + [
-                    'getter' => function (FiltrationData $data, FormInterface $form) use ($filter) {
-                        return $data->getFilterData($filter);
-                    }
+                    'getter' => fn (FiltrationData $data) => $data->getFilterData($filter),
                 ],
             );
         }
@@ -212,13 +254,27 @@ class DataTable implements DataTableInterface
         return $formBuilder->getForm();
     }
 
+    private function buildExportForm(): FormInterface
+    {
+        $formBuilder = $this->config->getPersonalizationFormFactory()->createNamedBuilder(
+            name: $this->config->getExportParameterName(),
+            type: ExportDataType::class,
+            options: [
+                'method' => 'POST',
+                'exporters' => $this->config->getExporters(),
+            ],
+        );
+
+        return $formBuilder->getForm();
+    }
+
     private function initializePagination(): void
     {
         if (!$this->config->isPaginationEnabled()) {
             return;
         }
 
-        $paginationData = new PaginationData(1, 25);
+        $paginationData = new PaginationData(static::DEFAULT_PAGE, static::DEFAULT_PER_PAGE);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {

@@ -70,6 +70,11 @@ class DataTableExtension extends AbstractExtension
                 ['needs_environment' => true, 'is_safe' => ['html']],
             ),
             new TwigFunction(
+                'data_table_export_form',
+                [$this, 'renderExportForm'],
+                ['needs_environment' => true, 'is_safe' => ['html']],
+            ),
+            new TwigFunction(
                 'data_table_pagination',
                 [$this, 'renderPagination'],
                 ['needs_environment' => true, 'is_safe' => ['html']],
@@ -160,6 +165,20 @@ class DataTableExtension extends AbstractExtension
         }
 
         return $this->renderBlock($environment, 'kreyu_data_table_personalization_form', [
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * @throws TwigException|Throwable
+     */
+    public function renderExportForm(Environment $environment, FormInterface|FormView $form): string
+    {
+        if ($form instanceof FormInterface) {
+            $form = $form->createView();
+        }
+
+        return $this->renderBlock($environment, 'kreyu_data_table_export_form', [
             'form' => $form,
         ]);
     }

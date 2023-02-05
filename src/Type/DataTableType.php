@@ -39,6 +39,7 @@ final class DataTableType implements DataTableTypeInterface
             ->setPaginationPersistenceEnabled($options['pagination_persistence_enabled'])
             ->setPaginationPersistenceAdapter($options['pagination_persistence_adapter'])
             ->setPaginationPersistenceSubject($options['pagination_persistence_subject'])
+            ->setExportingEnabled($options['exporting_enabled'])
             ->setRequestHandler($options['request_handler'])
         ;
     }
@@ -60,17 +61,21 @@ final class DataTableType implements DataTableTypeInterface
         $view->vars += [
             'columns' => $columns,
             'filters' => $dataTable->getConfig()->getFilters(),
+            'exporters' => $dataTable->getConfig()->getExporters(),
             'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
+            'exporting_enabled' => $dataTable->getConfig()->isExportingEnabled(),
             'page_parameter_name' => $dataTable->getConfig()->getPageParameterName(),
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
+            'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
             'filtration_form' => $dataTable->getFiltrationForm()->createView(),
             'personalization_form' => $personalizationForm,
+            'export_form' => $dataTable->getExportForm()->createView(),
             'values_rows' => [],
         ];
 
@@ -92,23 +97,24 @@ final class DataTableType implements DataTableTypeInterface
     {
         $resolver->setDefaults([
             'personalization_enabled' => true,
-            'personalization_persistence_enabled' => false,
+            'personalization_persistence_enabled' => true,
             'personalization_persistence_adapter' => null,
             'personalization_persistence_subject' => null,
             'personalization_form_factory' => null,
             'filtration_enabled' => true,
-            'filtration_persistence_enabled' => false,
+            'filtration_persistence_enabled' => true,
             'filtration_persistence_adapter' => null,
             'filtration_persistence_subject' => null,
             'filtration_form_factory' => null,
             'sorting_enabled' => true,
-            'sorting_persistence_enabled' => false,
+            'sorting_persistence_enabled' => true,
             'sorting_persistence_adapter' => null,
             'sorting_persistence_subject' => null,
             'pagination_enabled' => true,
-            'pagination_persistence_enabled' => false,
+            'pagination_persistence_enabled' => true,
             'pagination_persistence_adapter' => null,
             'pagination_persistence_subject' => null,
+            'exporting_enabled' => true,
             'request_handler' => null,
         ]);
     }

@@ -47,7 +47,13 @@ If given value is instance of `FormInterface`, the `createView()` method will be
 
 ### `data_table_personalization_form(form)`
 
-Renders the personalization form.
+Renders the personalization form. Accepts both the `FormInterface` and `FormView`.
+If given value is instance of `FormInterface`, the `createView()` method will be called.
+
+### `data_table_export_form(form)`
+
+Renders the export form. Accepts both the `FormInterface` and `FormView`.
+If given value is instance of `FormInterface`, the `createView()` method will be called.
 
 ### `data_table_pagination(pagination_view, variables)`
 

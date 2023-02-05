@@ -8,7 +8,7 @@ class PaginationData
 {
     public function __construct(
         private int $page,
-        private int $perPage,
+        private ?int $perPage = null,
     ) {
     }
 
@@ -22,12 +22,12 @@ class PaginationData
         $this->page = $page;
     }
 
-    public function getPerPage(): int
+    public function getPerPage(): ?int
     {
         return $this->perPage;
     }
 
-    public function setPerPage(int $perPage): void
+    public function setPerPage(?int $perPage): void
     {
         $this->perPage = $perPage;
     }

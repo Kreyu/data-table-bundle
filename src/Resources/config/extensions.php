@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Extension\Core\ColumnFactoryExtension;
+use Kreyu\Bundle\DataTableBundle\Extension\Core\ExporterExtension;
 use Kreyu\Bundle\DataTableBundle\Extension\Core\FilterFactoryExtension;
 use Kreyu\Bundle\DataTableBundle\Extension\Core\FiltrationExtension;
 use Kreyu\Bundle\DataTableBundle\Extension\Core\HttpFoundationExtension;
@@ -18,6 +19,15 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.type_extension.column_factory', ColumnFactoryExtension::class)
         ->args([service('kreyu_data_table.column.factory')])
+        ->tag('kreyu_data_table.type_extension')
+    ;
+
+    $services
+        ->set('kreyu_data_table.type_extension.exporter', ExporterExtension::class)
+        ->args([
+            service('kreyu_data_table.exporter.factory'),
+            service('form.factory'),
+        ])
         ->tag('kreyu_data_table.type_extension')
     ;
 

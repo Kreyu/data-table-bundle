@@ -25,6 +25,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('columns.php');
         $loader->load('core.php');
+        $loader->load('exporter.php');
         $loader->load('extensions.php');
         $loader->load('filtration.php');
         $loader->load('personalization.php');

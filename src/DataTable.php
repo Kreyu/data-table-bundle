@@ -256,7 +256,7 @@ class DataTable implements DataTableInterface
 
     private function buildExportForm(): FormInterface
     {
-        $formBuilder = $this->config->getPersonalizationFormFactory()->createNamedBuilder(
+        $formBuilder = $this->config->getExportFormFactory()->createNamedBuilder(
             name: $this->config->getExportParameterName(),
             type: ExportDataType::class,
             options: [

@@ -23,6 +23,8 @@ Streamlines creation process of the data tables in Symfony applications.
 ## Table of contents
 
 * [Installation](#installation)
+  * [Integration with PhpSpreadsheet](#integration-with-phpspreadsheet)
+  * [Front-end dependencies](#front-end-dependencies)
 * [Usage](#usage)
   * [Building data tables](#building-data-tables)
   * [Creating data tables in controllers](#creating-data-tables-in-controllers)
@@ -63,6 +65,67 @@ Run this command to install the bundle:
 ```shell
 composer require kreyu/data-table-bundle
 ```
+
+### Integration with PhpSpreadsheet
+
+This bundle provides exporting feature, handled using the [PhpSpreadsheet](https://phpspreadsheet.readthedocs.io/) by default.
+
+If you wish to use it, make sure to have it installed:
+
+```shell
+composer require phpoffice/phpspreadsheet
+```
+
+If not, you can easily [create your own exporter types](#).
+
+### Front-end dependencies
+
+This bundle provides front-end scripts created using the [Stimulus JavaScript framework](https://stimulus.hotwired.dev/).
+To begin with, make sure your application uses the [Symfony Stimulus Bridge](https://github.com/symfony/stimulus-bridge).
+
+Because the bundle is tagged as the `symfony-ux`, the [Symfony Flex](https://github.com/symfony/flex) 
+should automatically configure the front-end controllers for you.
+
+To confirm that, first check your `package.json`, that should contain a `@kreyu/data-table-bundle` dependency:
+
+```json5
+{
+    "devDependencies": {
+        // ...
+        "@kreyu/data-table-bundle": "file:vendor/kreyu/data-table-bundle/assets",
+    }
+}
+```
+
+Then, check your [assets/controllers.json](https://github.com/symfony/stimulus-bridge#the-controllersjson-file) file, which should contain following configuration:
+
+```json5
+{
+    "controllers": {
+        // ...
+        "@kreyu/data-table-bundle": {
+            "personalization": {
+                "enabled": true,
+                "fetch": "eager"
+            }
+        }
+    },
+    // ...
+}
+```
+
+Last but not least, remember to run install & build front-end dependencies:
+
+```shell
+# if using npm
+npm install
+npm run watch
+
+# if using yarn
+yarn
+yarn watch
+```
+
 
 ## Usage
 
@@ -579,6 +642,38 @@ Every part of the feature can be configured using the [data table options](#pass
 - `personalization_persistence_subject` - to change the persistence subject directly;
 
 By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
+
+
+## Exporting
+
+A data table can be exporter to various formats, using _exporters_, each of which are built with the help of a exporter _type_ (e.g. `CsvType`, `XlsxType`, etc),
+
+### Configuring the exporting feature
+
+By default, the exporting is enabled for every data table type.
+
+Every part of the exporting feature can be configured using the [data table options](#passing-options-to-data-tables):
+
+- `exporting_enabled` - to enable/disable feature completely;
+
+### Available exporter types
+
+The following exporter types are natively available in the bundle:
+
+- PhpSpreadsheet
+  - [CsvType](docs/exporter/types/phpspreadsheet/csv.md)
+  - [XlsxType](docs/exporter/types/phpspreadsheet/xls.md)
+  - [XlsxType](docs/exporter/types/phpspreadsheet/xlsx.md)
+- Other
+  - [ExporterType](docs/exporter/types/exporter.md)
+
+### Creating custom exporter type
+
+See [How to Create a Custom Exporter Type]().
+
+### Creating exporter type extension
+
+See [How to Create an Exporter Type Extension]().
 
 ## Persistence
 

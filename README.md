@@ -41,8 +41,6 @@ Streamlines creation process of the data tables in Symfony applications.
 * [Filtration](#filtration)
   * [Configuring the filtration feature](#configuring-the-filtration-feature)
   * [Available filter types](#available-filter-types)
-  * [Creating custom filter type](#creating-custom-filter-type)
-  * [Creating filter type extension](#creating-filter-type-extension)
   * [Filter operators](#filter-operators)
 * [Sorting](#sorting)
   * [Configuring the sorting feature](#configuring-the-sorting-feature)
@@ -52,6 +50,8 @@ Streamlines creation process of the data tables in Symfony applications.
   * [Configuring the personalization feature](#configuring-the-personalization-feature)
 * [Exporting](#exporting)
   * [Configuring the exporting feature](#configuring-the-exporting-feature)
+  * [Available exporter types](#available-exporter-types)
+  * [Creating custom exporter type](#creating-custom-exporter-type)
 * [Persistence](#persistence)
   * [Persistence adapters](#persistence-adapters)
     * [Using built-in cache adapter](#using-built-in-cache-adapter)
@@ -541,13 +541,6 @@ The following filter types are natively available in the bundle:
 - Other
     - [FilterType](docs/filter/types/filter.md) 
 
-### Creating custom filter type
-
-See [How to Create a Custom Filter Type]().
-
-### Creating filter type extension
-
-See [How to Create a Filter Type Extension]().
 
 ### Filter operators
 
@@ -674,9 +667,6 @@ The following exporter types are natively available in the bundle:
 
 See [How to Create a Custom Exporter Type]().
 
-### Creating exporter type extension
-
-See [How to Create an Exporter Type Extension]().
 
 ## Persistence
 

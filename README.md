@@ -16,6 +16,7 @@ Streamlines creation process of the data tables in Symfony applications.
 - per-user persistence with [cache component](https://symfony.com/doc/current/components/cache.html) by default;
 - extension system used to modify data tables across the entire application;
 - personalization, where user is able to show/hide or even change order of the columns;
+- exporting, where user is able to export data tables to various file formats;
 - support for [Doctrine ORM](https://github.com/doctrine/orm) by default, but open to custom implementation;
 - easy theming of every part of the bundle;
 
@@ -49,6 +50,8 @@ Streamlines creation process of the data tables in Symfony applications.
   * [Configuring the pagination feature](#configuring-the-pagination-feature)
 * [Personalization](#personalization)
   * [Configuring the personalization feature](#configuring-the-personalization-feature)
+* [Exporting](#exporting)
+  * [Configuring the exporting feature](#configuring-the-exporting-feature)
 * [Persistence](#persistence)
   * [Persistence adapters](#persistence-adapters)
     * [Using built-in cache adapter](#using-built-in-cache-adapter)

@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {
@@ -30,6 +31,8 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader->load('filtration.php');
         $loader->load('personalization.php');
         $loader->load('twig.php');
+
+        $config = $this->resolveConfiguration($configs, $container);
 
         $container
             ->registerForAutoconfiguration(DataTableTypeInterface::class)
@@ -51,9 +54,15 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             ->addTag('kreyu_data_table.persistence.adapter')
         ;
 
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container
+            ->getDefinition('kreyu_data_table.twig.data_table_extension')
+            ->setArgument('$themes', $config['themes'])
+        ;
 
-        $container->setParameter('kreyu_data_table.theme', $config['theme']);
+        $container
+            ->getDefinition('kreyu_data_table.type_extension.default_configuration')
+            ->setArgument('$defaults', $config['defaults'])
+        ;
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -74,9 +83,30 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         ]);
 
         $container->prependExtensionConfig('twig', [
-            'form_themes' => [
-                $config['theme'],
-            ],
+            'form_themes' => $config['themes'],
         ]);
+    }
+
+    private function resolveConfiguration(array $configs, ContainerBuilder $container): array
+    {
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        $serviceReferenceNodes = [
+            'persistence_adapter',
+            'persistence_subject_provider',
+            'form_factory',
+            'column_factory',
+            'filter_factory',
+            'exporter_factory',
+            'request_handler',
+        ];
+
+        array_walk_recursive($config, function (&$item, $key) use ($container, $serviceReferenceNodes) {
+            if (in_array($key, $serviceReferenceNodes) && is_string($item)) {
+                $item = new Reference($item);
+            }
+        });
+
+        return $config;
     }
 }

@@ -51,13 +51,12 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.persistence.token_storage_subject_provider', TokenStoragePersistenceSubjectProvider::class)
+        ->set('kreyu_data_table.persistence.subject_provider.token_storage', TokenStoragePersistenceSubjectProvider::class)
         ->args([service('security.token_storage')])
     ;
 
     $services
-        ->set('kreyu_data_table.persistence.static_subject_provider', StaticPersistenceSubjectProvider::class)
-        ->args([service('security.token_storage')])
+        ->set('kreyu_data_table.persistence.subject_provider.static', StaticPersistenceSubjectProvider::class)
     ;
 
     $services

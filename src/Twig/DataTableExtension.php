@@ -16,13 +16,17 @@ use Symfony\Component\Form\FormView;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
+use Twig\Error\RuntimeError;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class DataTableExtension extends AbstractExtension
 {
+    /**
+     * @param array<string> $themes
+     */
     public function __construct(
-        private string $themeTemplate
+        private array $themes,
     ) {
     }
 
@@ -87,10 +91,15 @@ class DataTableExtension extends AbstractExtension
      */
     private function renderBlock(Environment $environment, string $blockName, array $context = []): string
     {
-        return $environment
-            ->load($this->themeTemplate)
-            ->renderBlock($blockName, $context)
-        ;
+        foreach ($this->themes as $theme) {
+            $wrapper = $environment->load($theme);
+
+            if ($wrapper->hasBlock($blockName, $context)) {
+                return $wrapper->renderBlock($blockName, $context);
+            }
+        }
+
+        throw new RuntimeError(sprintf('Block "%s" does not exist on any of the configured data table themes', $blockName));
     }
 
     /**

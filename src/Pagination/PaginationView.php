@@ -11,7 +11,7 @@ class PaginationView
     public array $vars = [];
 
     public function __construct(
-        private DataTableView $parent,
+        public DataTableView $parent,
         PaginationInterface $pagination,
     ) {
         $this->vars = [

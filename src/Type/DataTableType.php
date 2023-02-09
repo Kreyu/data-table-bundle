@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\HeadersRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\ValuesRowView;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -55,9 +54,6 @@ final class DataTableType implements DataTableTypeInterface
             $columns = $personalizationData->compute($columns);
         }
 
-        $personalizationForm = $dataTable->getPersonalizationForm()->createView();
-        $personalizationForm->vars['data_table'] = $view;
-
         $view->vars += [
             'columns' => $columns,
             'filters' => $dataTable->getConfig()->getFilters(),
@@ -73,17 +69,12 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
-            'filtration_form' => $dataTable->getFiltrationForm()->createView(),
-            'personalization_form' => $personalizationForm,
-            'export_form' => $dataTable->getExportForm()->createView(),
+            'filtration_form' => $this->getFormView($dataTable->getFiltrationForm(), $view),
+            'personalization_form' => $this->getFormView($dataTable->getPersonalizationForm(), $view),
+            'export_form' => $this->getFormView($dataTable->getExportForm(), $view),
+            'has_active_filters' => $dataTable->hasActiveFilters(),
             'values_rows' => [],
         ];
-
-        $view->vars['has_active_filters'] = !empty(array_filter($view->vars['filtration_form']->children, function (FormView $child) {
-            $data = $child->vars['data'];
-
-            return $data instanceof FilterData && $data->hasValue();
-        }));
 
         foreach ($dataTable->getPagination()->getItems() as $item) {
             $view->vars['values_rows'][] = new ValuesRowView($view, $item);
@@ -116,6 +107,7 @@ final class DataTableType implements DataTableTypeInterface
             'pagination_persistence_subject' => null,
             'exporting_enabled' => false,
             'request_handler' => null,
+            'themes' => [],
         ]);
     }
 
@@ -127,5 +119,13 @@ final class DataTableType implements DataTableTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function getFormView(FormInterface $form, DataTableView $dataTableView): FormView
+    {
+        $view = $form->createView();
+        $view->vars['data_table'] = $dataTableView;
+
+        return $view;
     }
 }

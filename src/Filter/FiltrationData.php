@@ -20,8 +20,10 @@ class FiltrationData
                 $resolver
                     ->setPrototype(true)
                     ->setRequired([
-                        'operator',
                         'value',
+                    ])
+                    ->setDefaults([
+                        'operator' => null,
                     ])
                 ;
             })
@@ -38,6 +40,11 @@ class FiltrationData
     public function isEmpty(): bool
     {
         return empty($this->filters);
+    }
+
+    public function hasActiveFilters(): bool
+    {
+        return !empty(array_filter($this->filters, fn (array $filter) => !empty($filter['value'])));
     }
 
     public function hasFilter(FilterInterface $filter): bool

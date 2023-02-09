@@ -72,19 +72,23 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             $container->getExtensionConfig($this->getAlias()),
         );
 
-        $container->prependExtensionConfig('framework', [
-            'cache' => [
-                'pools' => [
-                    'kreyu_data_table.persistence.cache.default' => [
-                        'adapter' => 'cache.adapter.filesystem',
+        if ($container->hasExtension('framework')) {
+            $container->prependExtensionConfig('framework', [
+                'cache' => [
+                    'pools' => [
+                        'kreyu_data_table.persistence.cache.default' => [
+                            'adapter' => 'cache.adapter.filesystem',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
+        }
 
-        $container->prependExtensionConfig('twig', [
-            'form_themes' => $config['themes'],
-        ]);
+        if ($container->hasExtension('twig')) {
+            $container->prependExtensionConfig('twig', [
+                'form_themes' => $config['themes'],
+            ]);
+        }
     }
 
     private function resolveConfiguration(array $configs, ContainerBuilder $container): array

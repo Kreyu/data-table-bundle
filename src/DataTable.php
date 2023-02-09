@@ -174,6 +174,11 @@ class DataTable implements DataTableInterface
         return $exportData->exporter->export($dataTable->createView());
     }
 
+    public function hasActiveFilters(): bool
+    {
+        return $this->getFiltrationForm()->getData()->hasActiveFilters();
+    }
+
     public function handleRequest(mixed $request): void
     {
         if (null === $requestHandler = $this->config->getRequestHandler()) {

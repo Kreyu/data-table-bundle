@@ -7,10 +7,22 @@
                 <div class="d-inline-block">
                     {% if has_active_filters %}
                         {% block filter_clear_all_button %}
+                            {% set query_parameters = app.request.query.all(filtration_parameter_name) %}
+
+                            {% for filter in filters %}
+                                {% set query_parameters = query_parameters|merge({
+                                    (filter.name): {
+                                        value: ''
+                                    }
+                                }) %}
+                            {% endfor %}
+
                             <a class="btn btn-sm btn-outline-danger"
                                 href="{{ path(
                                     app.request.get('_route'),
-                                    app.request.query.all|filter((value, key) => key != filtration_parameter_name)
+                                    app.request.query.all|merge({
+                                        (filtration_parameter_name): query_parameters
+                                    })
                                 ) }}"
                                 data-toggle="tooltip"
                                 data-placement="bottom"
@@ -29,13 +41,17 @@
 
                         {% if field.vars.data and field.vars.data.value != null %}
                             {% block filter_clear_button %}
+                                {% set query_parameters = app.request.query.all(filtration_parameter_name)|merge({
+                                    (filter.name): {
+                                        value: ''
+                                    }
+                                }) %}
+
                                 <a class="btn btn-sm btn-outline-dark my-1"
                                     href="{{ path(
                                         app.request.get('_route'),
                                         app.request.query.all|merge({
-                                            (filtration_parameter_name): app.request.query.all(filtration_parameter_name)|filter(
-                                                (value, key) => key != filter.name
-                                            )
+                                            (filtration_parameter_name): query_parameters
                                         })
                                     ) }}"
                                     data-toggle="tooltip"

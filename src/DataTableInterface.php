@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
@@ -29,6 +28,8 @@ interface DataTableInterface
 
     public function isExporting(): bool;
 
+    public function hasActiveFilters(): bool;
+
     public function handleRequest(mixed $request): void;
 
     public function getPagination(): PaginationInterface;
@@ -36,6 +37,8 @@ interface DataTableInterface
     public function getFiltrationForm(): FormInterface;
 
     public function getPersonalizationForm(): FormInterface;
+
+    public function getExportForm(): FormInterface;
 
     public function createView(): DataTableView;
 }

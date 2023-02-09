@@ -16,7 +16,6 @@ use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataTy
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
-use RuntimeException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -65,11 +64,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getPaginationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
             }
 
             $persistenceAdapter->write($this, $persistenceSubject, $paginationData);
@@ -86,11 +85,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isSortingPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getSortingPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
             }
 
             $persistenceAdapter->write($this, $persistenceSubject, $sortingData);
@@ -115,11 +114,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getFiltrationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
             }
 
             $persistenceAdapter->write($this, $persistenceSubject, $filtrationData);
@@ -136,11 +135,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getPersonalizationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
             }
 
             $persistenceAdapter->write($this, $persistenceSubject, $personalizationData);
@@ -155,7 +154,7 @@ class DataTable implements DataTableInterface
     public function export(): File
     {
         if (!$this->config->isExportingEnabled()) {
-            throw new RuntimeException('The data table requested to export has exporting feature disabled.');
+            throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
         /** @var ExportData $exportData */
@@ -163,7 +162,7 @@ class DataTable implements DataTableInterface
 
         $dataTable = clone $this;
 
-        if ($exportData->strategy === ExportStrategy::INCLUDE_ALL) {
+        if (ExportStrategy::INCLUDE_ALL === $exportData->strategy) {
             $dataTable->paginate(new PaginationData(1));
         }
 
@@ -182,7 +181,7 @@ class DataTable implements DataTableInterface
     public function handleRequest(mixed $request): void
     {
         if (null === $requestHandler = $this->config->getRequestHandler()) {
-            throw new RuntimeException(sprintf('%s cannot be used on data tables without configured request handler.', __METHOD__));
+            throw new \RuntimeException(sprintf('%s cannot be used on data tables without configured request handler.', __METHOD__));
         }
 
         $requestHandler->handle($this, $request);
@@ -283,11 +282,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getPaginationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
             }
 
             $paginationData = $persistenceAdapter->read($this, $persistenceSubject, $paginationData);
@@ -306,11 +305,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isSortingPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getSortingPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
             }
 
             $sortingData = $persistenceAdapter->read($this, $persistenceSubject, $sortingData);
@@ -333,11 +332,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getFiltrationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
             }
 
             $filtrationData = $persistenceAdapter->read($this, $persistenceSubject, $filtrationData);
@@ -356,11 +355,11 @@ class DataTable implements DataTableInterface
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
-                throw new RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
+                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
             }
 
             if (null === $persistenceSubject = $this->config->getPersonalizationPersistenceSubject()) {
-                throw new RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
+                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
             }
 
             $personalizationData = $persistenceAdapter->read($this, $persistenceSubject, $personalizationData);

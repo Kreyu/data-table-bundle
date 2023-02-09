@@ -11,7 +11,6 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\ValuesRowView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Throwable;
 use Twig\Environment;
 use Twig\Error\Error as TwigException;
 use Twig\Error\RuntimeError;
@@ -53,7 +52,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderDataTable(Environment $environment, DataTableView $view, array $variables = []): string
     {
@@ -65,7 +64,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderHeadersRow(Environment $environment, HeadersRowView $view, array $variables = []): string
     {
@@ -77,7 +76,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderValuesRow(Environment $environment, ValuesRowView $view, array $variables = []): string
     {
@@ -89,7 +88,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderColumnLabel(Environment $environment, ColumnView $view, array $variables = []): string
     {
@@ -101,7 +100,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderColumnHeader(Environment $environment, ColumnView $view, array $variables = []): string
     {
@@ -113,7 +112,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderColumnValue(Environment $environment, ColumnView $view, array $variables = []): string
     {
@@ -125,7 +124,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderPagination(Environment $environment, PaginationView $view, array $variables = []): string
     {
@@ -137,7 +136,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderFiltersForm(Environment $environment, FormInterface|FormView $form): string
     {
@@ -155,7 +154,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form): string
     {
@@ -173,7 +172,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     public function renderExportForm(Environment $environment, FormInterface|FormView $form): string
     {
@@ -191,7 +190,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @throws TwigException|Throwable
+     * @throws TwigException|\Throwable
      */
     private function renderBlock(Environment $environment, string $blockName, array $context = []): string
     {

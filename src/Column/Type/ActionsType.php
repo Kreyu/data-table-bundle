@@ -26,7 +26,7 @@ class ActionsType extends AbstractType
                         ->setAllowedTypes('template_path', ['string', 'callable'])
                         ->setAllowedTypes('template_vars', ['array', 'callable'])
                     ;
-                }
+                },
             ])
         ;
     }

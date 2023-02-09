@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Symfony\Component\Translation\TranslatableMessage;
 
 class BooleanType extends AbstractType

@@ -6,9 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -26,7 +24,7 @@ final class ColumnType implements ColumnTypeInterface
                 'value' => $column->getData(),
                 'property_path' => $column->getName(),
                 'block_prefix' => $column->getType()->getBlockPrefix(),
-                'block_name' => 'kreyu_data_table_column_' . $column->getType()->getBlockPrefix(),
+                'block_name' => 'kreyu_data_table_column_'.$column->getType()->getBlockPrefix(),
             ])
         ;
 

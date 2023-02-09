@@ -19,7 +19,7 @@ class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
 
         foreach ($view->vars['value'] ?? [] as $index => $data) {
             $child = $this->columnFactory->create(
-                $column->getName() . '__' . ($index + 1),
+                $column->getName().'__'.($index + 1),
                 $options['entry_type'],
                 $options['entry_options'],
             );

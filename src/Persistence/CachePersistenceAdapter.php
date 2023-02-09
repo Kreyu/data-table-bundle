@@ -6,8 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle\Persistence;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Contracts\Cache\CacheInterface;
+
 use function Symfony\Component\String\u;
+
+use Symfony\Contracts\Cache\CacheInterface;
 
 class CachePersistenceAdapter implements PersistenceAdapterInterface
 {

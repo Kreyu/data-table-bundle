@@ -20,6 +20,16 @@ Drag items between columns to show/hide relevant data in the list or change thei
 Visible columns: Visible columns
 Hidden columns: Hidden columns
 
+# Export
+Export: Export
+Exporter: Exporter
+Strategy: Strategy
+Include personalization: Include personalization
+
+# Export strategy
+INCLUDE_CURRENT_PAGE: Include current page
+INCLUDE_ALL: From all pages
+
 # Misc
 Filter: Filter
 Apply: Apply

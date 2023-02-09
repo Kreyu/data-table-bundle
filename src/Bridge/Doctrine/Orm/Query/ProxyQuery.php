@@ -6,13 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
-use RuntimeException;
-use function count;
 
 class ProxyQuery implements ProxyQueryInterface
 {
@@ -59,14 +56,14 @@ class ProxyQuery implements ProxyQueryInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getPagination(): PaginationInterface
     {
         $rootEntity = current($this->queryBuilder->getRootEntities());
 
         if (false === $rootEntity) {
-            throw new RuntimeException('There are not root entities defined in the query.');
+            throw new \RuntimeException('There are not root entities defined in the query.');
         }
 
         $identifierFieldNames = $this->queryBuilder
@@ -74,8 +71,8 @@ class ProxyQuery implements ProxyQueryInterface
             ->getClassMetadata($rootEntity)
             ->getIdentifierFieldNames();
 
-        $hasSingleIdentifierName = 1 === count($identifierFieldNames);
-        $hasJoins = count($this->queryBuilder->getDQLPart('join')) > 0;
+        $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
+        $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
 
         $paginator = new Paginator($this->queryBuilder->getQuery(), $hasSingleIdentifierName && $hasJoins);
 

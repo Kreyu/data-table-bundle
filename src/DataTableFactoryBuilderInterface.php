@@ -6,5 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 interface DataTableFactoryBuilderInterface
 {
-
 }

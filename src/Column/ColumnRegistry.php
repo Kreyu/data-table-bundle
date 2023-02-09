@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
-use InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
-use LogicException;
 
 class ColumnRegistry implements ColumnRegistryInterface
 {
@@ -34,8 +32,8 @@ class ColumnRegistry implements ColumnRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @var array<ColumnTypeInterface> $types
-     * @var array<ColumnTypeExtensionInterface> $typeExtensions
+     * @var array<ColumnTypeInterface>
+     * @var array<ColumnTypeExtensionInterface>
      */
     public function __construct(
         iterable $types,
@@ -44,7 +42,7 @@ class ColumnRegistry implements ColumnRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof ColumnTypeInterface) {
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
             }
 
             $this->types[$type::class] = $type;
@@ -52,7 +50,7 @@ class ColumnRegistry implements ColumnRegistryInterface
 
         foreach ($typeExtensions as $typeExtension) {
             if (!$typeExtension instanceof ColumnTypeExtensionInterface) {
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
             }
 
             $this->typeExtensions[$typeExtension::class] = $typeExtension;
@@ -63,7 +61,7 @@ class ColumnRegistry implements ColumnRegistryInterface
     {
         if (!isset($this->resolvedTypes[$name])) {
             if (!isset($this->types[$name])) {
-                throw new InvalidArgumentException(sprintf('Could not load type "%s".', $name));
+                throw new \InvalidArgumentException(sprintf('Could not load type "%s".', $name));
             }
 
             $this->resolvedTypes[$name] = $this->resolveType($this->types[$name]);
@@ -78,7 +76,7 @@ class ColumnRegistry implements ColumnRegistryInterface
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for column type "%s" (%s).', $fqcn, $types));
+            throw new \LogicException(sprintf('Circular reference detected for column type "%s" (%s).', $fqcn, $types));
         }
 
         $this->checkedTypes[$fqcn] = true;
@@ -94,7 +92,7 @@ class ColumnRegistry implements ColumnRegistryInterface
             return $this->resolvedColumnTypeFactory->createResolvedType(
                 $type,
                 $typeExtensions,
-                $parentType ? $this->getType($parentType) : null
+                $parentType ? $this->getType($parentType) : null,
             );
         } finally {
             unset($this->checkedTypes[$fqcn]);

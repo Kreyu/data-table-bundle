@@ -20,7 +20,7 @@ interface DataTableTypeInterface
     public function getName(): string;
 
     /**
-     * @return null|class-string<DataTableTypeInterface>
+     * @return class-string<DataTableTypeInterface>|null
      */
     public function getParent(): ?string;
 }

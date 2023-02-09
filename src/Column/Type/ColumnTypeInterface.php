@@ -17,7 +17,7 @@ interface ColumnTypeInterface
     public function getBlockPrefix(): string;
 
     /**
-     * @return null|class-string<ColumnTypeInterface>
+     * @return class-string<ColumnTypeInterface>|null
      */
     public function getParent(): ?string;
 }

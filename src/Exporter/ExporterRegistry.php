@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
-use InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
-use LogicException;
 
 class ExporterRegistry implements ExporterRegistryInterface
 {
@@ -33,7 +31,7 @@ class ExporterRegistry implements ExporterRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof ExporterTypeInterface) {
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
             }
 
             $this->types[$type::class] = $type;
@@ -44,7 +42,7 @@ class ExporterRegistry implements ExporterRegistryInterface
     {
         if (!isset($this->resolvedTypes[$name])) {
             if (!isset($this->types[$name])) {
-                throw new InvalidArgumentException(sprintf('Could not load type "%s".', $name));
+                throw new \InvalidArgumentException(sprintf('Could not load type "%s".', $name));
             }
 
             $this->resolvedTypes[$name] = $this->resolveType($this->types[$name]);
@@ -59,7 +57,7 @@ class ExporterRegistry implements ExporterRegistryInterface
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for filter type "%s" (%s).', $fqcn, $types));
+            throw new \LogicException(sprintf('Circular reference detected for filter type "%s" (%s).', $fqcn, $types));
         }
 
         $this->checkedTypes[$fqcn] = true;
@@ -69,7 +67,7 @@ class ExporterRegistry implements ExporterRegistryInterface
         try {
             return $this->resolvedExporterTypeFactory->createResolvedType(
                 $type,
-                $parentType ? $this->getType($parentType) : null
+                $parentType ? $this->getType($parentType) : null,
             );
         } finally {
             unset($this->checkedTypes[$fqcn]);

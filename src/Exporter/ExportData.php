@@ -10,7 +10,6 @@ class ExportData
     public ExportStrategy $strategy;
     public bool $includePersonalization;
 
-
     public function getExporter(): ExporterInterface
     {
         return $this->exporter;

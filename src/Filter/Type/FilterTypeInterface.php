@@ -19,7 +19,7 @@ interface FilterTypeInterface
     public function configureOptions(OptionsResolver $resolver): void;
 
     /**
-     * @return null|class-string<FilterTypeInterface>
+     * @return class-string<FilterTypeInterface>|null
      */
     public function getParent(): ?string;
 }

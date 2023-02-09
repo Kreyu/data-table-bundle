@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
-use Exception;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -105,7 +104,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'request_handler',
         ];
 
-        array_walk_recursive($config, function (&$item, $key) use ($container, $serviceReferenceNodes) {
+        array_walk_recursive($config, function (&$item, $key) use ($serviceReferenceNodes) {
             if (in_array($key, $serviceReferenceNodes) && is_string($item)) {
                 $item = new Reference($item);
             }

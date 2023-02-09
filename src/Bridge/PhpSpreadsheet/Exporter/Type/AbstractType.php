@@ -40,7 +40,7 @@ abstract class AbstractType extends BaseAbstractType
                 $worksheet,
                 array_map(function (ColumnView $column) {
                     return $column->vars['label'];
-                }, $headersRow->vars['columns'])
+                }, $headersRow->vars['columns']),
             );
         }
 
@@ -49,7 +49,7 @@ abstract class AbstractType extends BaseAbstractType
                 $worksheet,
                 array_map(function (ColumnView $column) {
                     return $column->vars['value'];
-                }, $valuesRow->vars['columns'])
+                }, $valuesRow->vars['columns']),
             );
         }
 

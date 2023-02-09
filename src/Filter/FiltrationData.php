@@ -15,7 +15,7 @@ class FiltrationData
 
     public static function fromArray(array $data): self
     {
-        ($resolver = new OptionsResolver)
+        ($resolver = new OptionsResolver())
             ->setDefault('filters', function (OptionsResolver $resolver) {
                 $resolver
                     ->setPrototype(true)

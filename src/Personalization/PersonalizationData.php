@@ -71,7 +71,8 @@ class PersonalizationData
     }
 
     /**
-     * @param  array<ColumnInterface> $columns
+     * @param array<ColumnInterface> $columns
+     *
      * @return array<ColumnInterface>
      */
     public function compute(array $columns): array
@@ -80,7 +81,7 @@ class PersonalizationData
             $columns,
             fn (ColumnInterface $column) => $this->isColumnVisible($column),
         );
-        
+
         uasort($columns, fn (ColumnInterface $a, ColumnInterface $b) => $this->getColumnOrder($a) <=> $this->getColumnOrder($b));
 
         return $columns;
@@ -112,7 +113,7 @@ class PersonalizationData
 
     public function isColumnVisible(string|ColumnInterface $column): bool
     {
-        return $this->getColumnVisibility($column) === true;
+        return true === $this->getColumnVisibility($column);
     }
 
     public function setColumnVisible(string|ColumnInterface $column): self
@@ -122,7 +123,7 @@ class PersonalizationData
 
     public function isColumnHidden(string|ColumnInterface $column): bool
     {
-        return $this->getColumnVisibility($column) === false;
+        return false === $this->getColumnVisibility($column);
     }
 
     public function setColumnHidden(string|ColumnInterface $column): self

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
-use LogicException;
 
 class DataTableRegistry implements DataTableRegistryInterface
 {
@@ -34,8 +32,8 @@ class DataTableRegistry implements DataTableRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @var array<DataTableTypeInterface> $types
-     * @var array<DataTableTypeExtensionInterface> $typeExtensions
+     * @param array<DataTableTypeInterface>          $types
+     * @param array<DataTableTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -44,7 +42,7 @@ class DataTableRegistry implements DataTableRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof DataTableTypeInterface) {
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
             }
 
             $this->types[$type::class] = $type;
@@ -52,7 +50,7 @@ class DataTableRegistry implements DataTableRegistryInterface
 
         foreach ($typeExtensions as $typeExtension) {
             if (!$typeExtension instanceof DataTableTypeExtensionInterface) {
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
             }
 
             $this->typeExtensions[$typeExtension::class] = $typeExtension;
@@ -63,7 +61,7 @@ class DataTableRegistry implements DataTableRegistryInterface
     {
         if (!isset($this->resolvedTypes[$name])) {
             if (!isset($this->types[$name])) {
-                throw new InvalidArgumentException(sprintf('Could not load type "%s".', $name));
+                throw new \InvalidArgumentException(sprintf('Could not load type "%s".', $name));
             }
 
             $this->resolvedTypes[$name] = $this->resolveType($this->types[$name]);
@@ -78,7 +76,7 @@ class DataTableRegistry implements DataTableRegistryInterface
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for data table type "%s" (%s).', $fqcn, $types));
+            throw new \LogicException(sprintf('Circular reference detected for data table type "%s" (%s).', $fqcn, $types));
         }
 
         $this->checkedTypes[$fqcn] = true;
@@ -94,7 +92,7 @@ class DataTableRegistry implements DataTableRegistryInterface
             return $this->resolvedDataTableTypeFactory->createResolvedType(
                 $type,
                 $typeExtensions,
-                $parentType ? $this->getType($parentType) : null
+                $parentType ? $this->getType($parentType) : null,
             );
         } finally {
             unset($this->checkedTypes[$fqcn]);

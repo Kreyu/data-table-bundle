@@ -20,6 +20,6 @@ abstract class AbstractType implements ExporterTypeInterface
 
     protected function getTempnam(array $options): string
     {
-        return (new Filesystem)->tempnam($options['tempnam_dir'], $options['tempnam_prefix']);
+        return (new Filesystem())->tempnam($options['tempnam_dir'], $options['tempnam_prefix']);
     }
 }

@@ -15,7 +15,7 @@ interface ExporterTypeInterface
     public function configureOptions(OptionsResolver $resolver): void;
 
     /**
-     * @return null|class-string<ExporterTypeInterface>
+     * @return class-string<ExporterTypeInterface>|null
      */
     public function getParent(): ?string;
 }

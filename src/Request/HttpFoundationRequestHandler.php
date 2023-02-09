@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -40,17 +38,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
         $this->export($dataTable, $request);
-    }
-
-    private function export(DataTableInterface $dataTable, Request $request): void
-    {
-        $formData = $request->request->all($dataTable->getConfig()->getExportParameterName());
-
-        if (empty($formData)) {
-            return;
-        }
-
-        $dataTable->getExportForm()->submit($formData);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
@@ -113,6 +100,17 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $personalizationData->fromArray($formData);
 
         $dataTable->personalize($personalizationData);
+    }
+
+    private function export(DataTableInterface $dataTable, Request $request): void
+    {
+        $formData = $request->request->all($dataTable->getConfig()->getExportParameterName());
+
+        if (empty($formData)) {
+            return;
+        }
+
+        $dataTable->getExportForm()->submit($formData);
     }
 
     private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed

@@ -107,7 +107,6 @@ final class DataTableType implements DataTableTypeInterface
             'pagination_persistence_subject' => null,
             'exporting_enabled' => false,
             'request_handler' => null,
-            'themes' => [],
         ]);
     }
 

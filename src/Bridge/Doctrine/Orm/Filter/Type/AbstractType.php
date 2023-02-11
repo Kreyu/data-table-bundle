@@ -20,8 +20,6 @@ abstract class AbstractType extends BaseAbstractType
             throw new \InvalidArgumentException();
         }
 
-        // If operator is given, check if it's supported by the filter.
-
         $this->filter($query, $data, $filter);
     }
 

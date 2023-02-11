@@ -16,13 +16,13 @@ interface DataTableInterface
 {
     public function getConfig(): DataTableConfigInterface;
 
-    public function sort(SortingData $sortingData): void;
+    public function sort(SortingData $data): void;
 
-    public function filter(FiltrationData $filtrationData): void;
+    public function filter(FiltrationData $data): void;
 
-    public function paginate(PaginationData $paginationData): void;
+    public function paginate(PaginationData $data): void;
 
-    public function personalize(PersonalizationData $personalizationData): void;
+    public function personalize(PersonalizationData $data): void;
 
     public function export(): File;
 

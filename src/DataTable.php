@@ -44,7 +44,6 @@ class DataTable implements DataTableInterface
         private DataTableConfigInterface $config,
     ) {
         $this->initializeSorting();
-        $this->initializeFiltration();
         $this->initializePagination();
         $this->initializePersonalization();
     }
@@ -54,13 +53,13 @@ class DataTable implements DataTableInterface
         return $this->config;
     }
 
-    public function paginate(PaginationData $paginationData): void
+    public function paginate(PaginationData $data): void
     {
         if (!$this->config->isPaginationEnabled()) {
             return;
         }
 
-        $this->query->paginate($paginationData);
+        $this->query->paginate($data);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
@@ -71,17 +70,17 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
             }
 
-            $persistenceAdapter->write($this, $persistenceSubject, $paginationData);
+            $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
     }
 
-    public function sort(SortingData $sortingData): void
+    public function sort(SortingData $data): void
     {
         if (!$this->config->isSortingEnabled()) {
             return;
         }
 
-        $this->query->sort($sortingData);
+        $this->query->sort($data);
 
         if ($this->config->isSortingPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
@@ -92,25 +91,25 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
             }
 
-            $persistenceAdapter->write($this, $persistenceSubject, $sortingData);
+            $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
     }
 
-    public function filter(FiltrationData $filtrationData): void
+    public function filter(FiltrationData $data): void
     {
         if (!$this->config->isFiltrationEnabled()) {
             return;
         }
 
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $filtrationData->getFilterData($filter);
+            $filterData = $data->getFilterData($filter);
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
             }
         }
 
-        $this->getFiltrationForm()->setData($filtrationData);
+        $this->getFiltrationForm()->setData($data);
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
@@ -121,17 +120,17 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
             }
 
-            $persistenceAdapter->write($this, $persistenceSubject, $filtrationData);
+            $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
     }
 
-    public function personalize(PersonalizationData $personalizationData): void
+    public function personalize(PersonalizationData $data): void
     {
         if (!$this->config->isPersonalizationEnabled()) {
             return;
         }
 
-        $this->getPersonalizationForm()->setData($personalizationData);
+        $this->getPersonalizationForm()->setData($data);
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
@@ -142,7 +141,7 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
             }
 
-            $persistenceAdapter->write($this, $persistenceSubject, $personalizationData);
+            $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
     }
 
@@ -209,6 +208,10 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
+        if (null === $this->getFiltrationForm()->getData()) {
+            $this->initializeFiltration();
+        }
+
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 

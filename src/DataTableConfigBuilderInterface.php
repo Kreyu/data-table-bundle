@@ -9,10 +9,14 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -71,6 +75,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static;
 
+    public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static;
+
     public function setFiltrationEnabled(bool $filtrationEnabled): static;
 
     public function setFiltrationPersistenceEnabled(bool $filtrationPersistenceEnabled): static;
@@ -81,6 +87,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
 
+    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static;
+
     public function setSortingEnabled(bool $sortingEnabled): static;
 
     public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static;
@@ -89,6 +97,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static;
 
+    public function setDefaultSortingData(?SortingData $defaultSortingData): static;
+
     public function setPaginationEnabled(bool $paginationEnabled): static;
 
     public function setPaginationPersistenceEnabled(bool $paginationPersistenceEnabled): static;
@@ -96,6 +106,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static;
 
     public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static;
+
+    public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static;
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
 

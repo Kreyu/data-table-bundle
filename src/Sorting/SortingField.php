@@ -8,7 +8,7 @@ class SortingField
 {
     public function __construct(
         private string $name,
-        private string $direction = 'desc',
+        private string $direction = 'asc',
     ) {
     }
 

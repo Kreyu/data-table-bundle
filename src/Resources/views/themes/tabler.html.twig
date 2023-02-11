@@ -1,0 +1,74 @@
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
+
+{% block action_filter %}
+    <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
+        </svg>
+    </button>
+{% endblock %}
+
+{% block action_export %}
+    <button class="btn btn-primary btn-icon" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+            <path d="M8 11h8v7h-8z"></path>
+            <path d="M8 15h8"></path>
+            <path d="M11 11v7"></path>
+        </svg>
+    </button>
+{% endblock %}
+
+{% block action_personalize %}
+    <button class="btn btn-primary btn-icon" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
+            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+        </svg>
+    </button>
+{% endblock %}
+
+{% block filter_clear_all_button %}
+    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
+
+    <a class="btn btn-icon btn-outline-danger"
+       href="{{ filter_clear_all_url(filtration_parameter_name, filters) }}"
+       data-toggle="tooltip"
+       data-placement="bottom"
+       title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block filter_clear_button %}
+    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
+
+    <a class="btn btn-outline-dark px-2"
+       href="{{ filter_clear_url(filtration_parameter_name, filter) }}"
+       data-toggle="tooltip"
+       data-placement="bottom"
+       title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
+    >
+        <div class="d-flex flex-column">
+            <span class="mx-1">
+                {{ field.vars.label }}
+
+                {% if filter.options.operator_options.visible %}
+                    <span class="text-muted">({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <span class="">{{ field.vars.data.value }}</span>
+
+        <span class="mx-2" aria-hidden="true">&times;</span>
+    </a>
+{% endblock %}

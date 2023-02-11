@@ -73,6 +73,7 @@ final class ColumnType implements ColumnTypeInterface
                 'display_personalization_button' => false,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'formatter' => null,
+                'exportable' => true,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
@@ -83,6 +84,8 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('display_personalization_button', ['bool'])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
+            ->setAllowedTypes('formatter', ['null', 'callable'])
+            ->setAllowedTypes('exportable', ['bool'])
         ;
     }
 

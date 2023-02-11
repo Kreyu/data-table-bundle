@@ -76,12 +76,21 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
-        $page = $this->extractQueryParameter($request, "[$pageParameterName]", 1);
-        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", 25);
+        $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
+
+        $defaultPage = $defaultPaginationData?->getPage() ?? 1;
+        $defaultPerPage = $defaultPaginationData?->getPerPage() ?? 25;
+
+        $page = $this->extractQueryParameter($request, "[$pageParameterName]", $defaultPage);
+        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", $defaultPerPage);
+
+        if (null === $page && null === $perPage) {
+            return;
+        }
 
         $dataTable->paginate(new PaginationData(
-            page: (int) $page,
-            perPage: (int) $perPage,
+            page: $page ? (int) $page : null,
+            perPage: $perPage ? (int) $perPage : null,
         ));
     }
 

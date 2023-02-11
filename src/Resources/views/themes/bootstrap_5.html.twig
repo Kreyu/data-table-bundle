@@ -2,28 +2,15 @@
 
 {% block kreyu_data_table %}
     {% block action_bar %}
-        <div class="mb-4">
+        <div class="mb-2">
             {% block action_bar_left %}
-                <div class="d-inline-block">
+                <div class="d-inline-block my-2">
                     {% if has_active_filters %}
                         {% block filter_clear_all_button %}
-                            {% set query_parameters = app.request.query.all(filtration_parameter_name) %}
-
-                            {% for filter in filters %}
-                                {% set query_parameters = query_parameters|merge({
-                                    (filter.name): {
-                                        value: ''
-                                    }
-                                }) %}
-                            {% endfor %}
+                            {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
                             <a class="btn btn-sm btn-outline-danger"
-                                href="{{ path(
-                                    app.request.get('_route'),
-                                    app.request.query.all|merge({
-                                        (filtration_parameter_name): query_parameters
-                                    })
-                                ) }}"
+                                href="{{ filter_clear_all_url(filtration_parameter_name, filters) }}"
                                 data-toggle="tooltip"
                                 data-placement="bottom"
                                 title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
@@ -41,19 +28,10 @@
 
                         {% if field.vars.data and field.vars.data.value != null %}
                             {% block filter_clear_button %}
-                                {% set query_parameters = app.request.query.all(filtration_parameter_name)|merge({
-                                    (filter.name): {
-                                        value: ''
-                                    }
-                                }) %}
+                                {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
                                 <a class="btn btn-sm btn-outline-dark my-1"
-                                    href="{{ path(
-                                        app.request.get('_route'),
-                                        app.request.query.all|merge({
-                                            (filtration_parameter_name): query_parameters
-                                        })
-                                    ) }}"
+                                    href="{{ filter_clear_url(filtration_parameter_name, filter) }}"
                                     data-toggle="tooltip"
                                     data-placement="bottom"
                                     title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
@@ -77,30 +55,36 @@
             {% endblock %}
 
             {% block action_bar_right %}
-                <div class="d-inline-block float-end">
+                <div class="d-inline-block float-end my-2">
                     {% if filtration_enabled %}
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
-                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
-                            </svg>
-                        </button>
+                        {% block action_filter %}
+                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
+                                    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+                                </svg>
+                            </button>
+                        {% endblock %}
                     {% endif %}
 
                     {% if exporting_enabled %}
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
-                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
-                            </svg>
-                        </button>
+                        {% block action_export %}
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+                                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
+                                </svg>
+                            </button>
+                        {% endblock %}
                     {% endif %}
 
                     {% if personalization_enabled %}
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                            </svg>
-                        </button>
+                        {% block action_personalize %}
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                </svg>
+                            </button>
+                        {% endblock %}
                     {% endif %}
                 </div>
             {% endblock %}
@@ -216,7 +200,7 @@
 {% block kreyu_data_table_values_row %}
     <tr>
         {% for column in columns %}
-            <td class="align-middle">{{ data_table_column_value(column) }}</td>
+            <td class="align-middle text-break">{{ data_table_column_value(column) }}</td>
         {% endfor %}
     </tr>
 {% endblock %}

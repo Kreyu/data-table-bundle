@@ -166,7 +166,7 @@ class DataTable implements DataTableInterface
         }
 
         if (!$exportData->includePersonalization) {
-            $dataTable->personalize(new PersonalizationData($dataTable->getConfig()->getColumns()));
+            $dataTable->personalize(new PersonalizationData($dataTable->config->getColumns()));
         }
 
         return $exportData->exporter->export($dataTable->createView());
@@ -281,7 +281,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $paginationData = new PaginationData(static::DEFAULT_PAGE, static::DEFAULT_PER_PAGE);
+        $data = $this->config->getDefaultPaginationData() ?? new PaginationData(static::DEFAULT_PAGE, static::DEFAULT_PER_PAGE);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
@@ -292,10 +292,10 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
             }
 
-            $paginationData = $persistenceAdapter->read($this, $persistenceSubject, $paginationData);
+            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
         }
 
-        $this->paginate($paginationData);
+        $this->paginate($data);
     }
 
     private function initializeSorting(): void
@@ -304,7 +304,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $sortingData = new SortingData();
+        $data = $this->config->getDefaultSortingData() ?? new SortingData();
 
         if ($this->config->isSortingPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
@@ -315,14 +315,10 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
             }
 
-            $sortingData = $persistenceAdapter->read($this, $persistenceSubject, $sortingData);
+            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
         }
 
-        if (null === $sortingData) {
-            return;
-        }
-
-        $this->sort($sortingData);
+        $this->sort($data);
     }
 
     private function initializeFiltration(): void
@@ -331,7 +327,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $filtrationData = new FiltrationData();
+        $data = $this->config->getDefaultFiltrationData() ?? new FiltrationData();
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
@@ -342,10 +338,10 @@ class DataTable implements DataTableInterface
                 throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
             }
 
-            $filtrationData = $persistenceAdapter->read($this, $persistenceSubject, $filtrationData);
+            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
         }
 
-        $this->filter($filtrationData);
+        $this->filter($data);
     }
 
     private function initializePersonalization(): void
@@ -354,7 +350,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $personalizationData = new PersonalizationData($this->getConfig()->getColumns());
+        $personalizationData = $this->config->getDefaultPersonalizationData() ?? new PersonalizationData($this->config->getColumns());
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {

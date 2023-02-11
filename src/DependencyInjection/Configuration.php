@@ -90,7 +90,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->booleanNode('enabled')
-                                    ->defaultTrue()
+                                    ->defaultFalse()
                                 ->end()
                                 ->booleanNode('persistence_enabled')
                                     ->defaultFalse()

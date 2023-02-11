@@ -36,6 +36,10 @@ class Pagination implements PaginationInterface
 
     public function getPageCount(): int
     {
+        if ($this->itemNumberPerPage < 1) {
+            return 1;
+        }
+
         return (int) ceil($this->totalItemCount / $this->itemNumberPerPage);
     }
 

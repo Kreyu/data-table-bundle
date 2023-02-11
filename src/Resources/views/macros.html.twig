@@ -1,0 +1,31 @@
+{% macro filter_clear_url(filtration_parameter_name, filter) %}
+    {{ path(
+        app.request.get('_route'),
+        app.request.query.all|merge({
+            (filtration_parameter_name): app.request.query.all(filtration_parameter_name)|merge({
+                (filter.name): {
+                    value: ''
+                }
+            })
+        })
+    ) }}
+{% endmacro %}
+
+{% macro filter_clear_all_url(filtration_parameter_name, filters) %}
+    {% set query = app.request.query.all(filtration_parameter_name) %}
+
+    {% for filter in filters %}
+        {% set query = query|merge({
+            (filter.name): {
+                value: ''
+            }
+        }) %}
+    {% endfor %}
+
+    {{ path(
+        app.request.get('_route'),
+        app.request.query.all|merge({
+            (filtration_parameter_name): query
+        })
+    ) }}
+{% endmacro %}

@@ -10,10 +10,14 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -118,6 +122,11 @@ class DataTableBuilder implements DataTableBuilderInterface
     private null|FormFactoryInterface $personalizationFormFactory = null;
 
     /**
+     * Default personalization data, which is applied to the data table if no data is given by the user.
+     */
+    private null|PersonalizationData $defaultPersonalizationData = null;
+
+    /**
      * Determines whether the data table filtration feature is enabled.
      */
     private bool $filtrationEnabled = true;
@@ -143,6 +152,11 @@ class DataTableBuilder implements DataTableBuilderInterface
     private null|FormFactoryInterface $filtrationFormFactory = null;
 
     /**
+     * Default filtration data, which is applied to the data table if no data is given by the user.
+     */
+    private null|FiltrationData $defaultFiltrationData = null;
+
+    /**
      * Determines whether the data table sorting feature is enabled.
      */
     private bool $sortingEnabled = true;
@@ -163,6 +177,11 @@ class DataTableBuilder implements DataTableBuilderInterface
     private null|PersistenceSubjectInterface $sortingPersistenceSubject = null;
 
     /**
+     * Default sorting data, which is applied to the data table if no data is given by the user.
+     */
+    private null|SortingData $defaultSortingData = null;
+
+    /**
      * Determines whether the data table pagination feature is enabled.
      */
     private bool $paginationEnabled = true;
@@ -181,6 +200,11 @@ class DataTableBuilder implements DataTableBuilderInterface
      * Subject (e.g. logged-in user) used to associate with the pagination persistence feature data.
      */
     private null|PersistenceSubjectInterface $paginationPersistenceSubject = null;
+
+    /**
+     * Default pagination data, which is applied to the data table if no data is given by the user.
+     */
+    private null|PaginationData $defaultPaginationData = null;
 
     /**
      * Request handler class used to automatically apply data from request to the data table.
@@ -462,6 +486,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function getDefaultPersonalizationData(): ?PersonalizationData
+    {
+        return $this->defaultPersonalizationData;
+    }
+
+    public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        $this->defaultPersonalizationData = $defaultPersonalizationData;
+
+        return $this;
+    }
+
     public function isFiltrationEnabled(): bool
     {
         return $this->filtrationEnabled;
@@ -538,6 +578,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function getDefaultFiltrationData(): ?FiltrationData
+    {
+        return $this->defaultFiltrationData;
+    }
+
+    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        $this->defaultFiltrationData = $defaultFiltrationData;
+
+        return $this;
+    }
+
     public function isSortingEnabled(): bool
     {
         return $this->sortingEnabled;
@@ -598,6 +654,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->sortingPersistenceSubject = $sortingPersistenceSubject;
+
+        return $this;
+    }
+
+    public function getDefaultSortingData(): ?SortingData
+    {
+        return $this->defaultSortingData;
+    }
+
+    public function setDefaultSortingData(?SortingData $defaultSortingData): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        $this->defaultSortingData = $defaultSortingData;
 
         return $this;
     }
@@ -666,6 +738,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function getDefaultPaginationData(): ?PaginationData
+    {
+        return $this->defaultPaginationData;
+    }
+
+    public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static
+    {
+        if ($this->locked) {
+            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        }
+
+        $this->defaultPaginationData = $defaultPaginationData;
+
+        return $this;
+    }
+
     public function getRequestHandler(): ?RequestHandlerInterface
     {
         return $this->requestHandler;
@@ -715,7 +803,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function getDataTable(): DataTableInterface
     {
         return new DataTable(
-            query: $this->query,
+            query: clone $this->query,
             config: $this->getDataTableConfig(),
         );
     }

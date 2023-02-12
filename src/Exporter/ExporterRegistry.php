@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
@@ -25,13 +26,16 @@ class ExporterRegistry implements ExporterRegistryInterface
      */
     private array $checkedTypes = [];
 
+    /**
+     * @param array<ExporterTypeInterface> $types
+     */
     public function __construct(
         iterable $types,
         private ResolvedExporterTypeFactoryInterface $resolvedExporterTypeFactory,
     ) {
         foreach ($types as $type) {
             if (!$type instanceof ExporterTypeInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($type, ExporterTypeInterface::class);
             }
 
             $this->types[$type::class] = $type;

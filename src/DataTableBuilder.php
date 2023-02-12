@@ -23,13 +23,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DataTableBuilder implements DataTableBuilderInterface
 {
-    public const PAGE_PARAMETER = 'page';
-    public const PER_PAGE_PARAMETER = 'limit';
-    public const SORT_PARAMETER = 'sort';
-    public const FILTRATION_PARAMETER = 'filter';
-    public const PERSONALIZATION_PARAMETER = 'personalization';
-    public const EXPORT_PARAMETER = 'export';
-
     /**
      * Name of the data table, used to differentiate multiple data tables on the same page.
      */
@@ -230,6 +223,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setName(string $name): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->name = $name;
 
         return $this;
@@ -242,6 +239,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setType(ResolvedDataTableTypeInterface $type): void
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->type = $type;
     }
 
@@ -252,6 +253,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setQuery(?ProxyQueryInterface $query): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->query = $query;
 
         return $this;
@@ -264,6 +269,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setOptions(array $options): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->options = $options;
 
         return $this;
@@ -274,10 +283,15 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this->columns;
     }
 
+    public function getColumn(string $name): ColumnInterface
+    {
+        return $this->columns[$name] ?? throw new \InvalidArgumentException("Column \"$name\" does not exist");
+    }
+
     public function addColumn(string $name, string $type, array $options = []): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
@@ -288,10 +302,74 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function removeColumn(string $name): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         unset($this->columns[$name]);
+
+        return $this;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getFilter(string $name): FilterInterface
+    {
+        return $this->filters[$name] ?? throw new \InvalidArgumentException("Filter \"$name\" does not exist");
+    }
+
+    public function addFilter(string $name, string $type, array $options = []): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->filters[$name] = $this->getFilterFactory()->create($name, $type, $options);
+
+        return $this;
+    }
+
+    public function removeFilter(string $name): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->filters[$name]);
+
+        return $this;
+    }
+
+    public function getExporters(): array
+    {
+        return $this->exporters;
+    }
+
+    public function getExporter(string $name): ExporterInterface
+    {
+        return $this->exporters[$name] ?? throw new \InvalidArgumentException("Exporter \"$name\" does not exist");
+    }
+
+    public function addExporter(string $name, string $type, array $options = []): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->exporters[$name] = $this->getExporterFactory()->create($name, $type, $options);
+
+        return $this;
+    }
+
+    public function removeExporter(string $name): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->exporters[$name]);
 
         return $this;
     }
@@ -303,34 +381,11 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->columnFactory = $columnFactory;
-
-        return $this;
-    }
-
-    public function getFilters(): array
-    {
-        return $this->filters;
-    }
-
-    public function addFilter(string $name, string $type, array $options = []): static
-    {
-        if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
-        }
-
-        $this->filters[$name] = $this->getFilterFactory()->create($name, $type, $options);
-
-        return $this;
-    }
-
-    public function removeFilter(string $name): static
-    {
-        if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
-        }
-
-        unset($this->filters[$name]);
 
         return $this;
     }
@@ -342,34 +397,11 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->filterFactory = $filterFactory;
-
-        return $this;
-    }
-
-    public function getExporters(): array
-    {
-        return $this->exporters;
-    }
-
-    public function addExporter(string $name, string $type, array $options = []): static
-    {
-        if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
-        }
-
-        $this->exporters[$name] = $this->getExporterFactory()->create($name, $type, $options);
-
-        return $this;
-    }
-
-    public function removeExporter(string $name): static
-    {
-        if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
-        }
-
-        unset($this->exporters[$name]);
 
         return $this;
     }
@@ -381,7 +413,27 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->exporterFactory = $exporterFactory;
+
+        return $this;
+    }
+
+    public function getBatchActionFactory(): BatchActionFactoryInterface
+    {
+        return $this->batchActionFactory;
+    }
+
+    public function setBatchActionFactory(BatchActionFactoryInterface $batchActionFactory): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->batchActionFactory = $batchActionFactory;
 
         return $this;
     }
@@ -393,6 +445,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExportingEnabled(bool $exportingEnabled): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->exportingEnabled = $exportingEnabled;
 
         return $this;
@@ -405,6 +461,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->exportFormFactory = $exportFormFactory;
 
         return $this;
@@ -418,7 +478,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPersonalizationEnabled(bool $personalizationEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->personalizationEnabled = $personalizationEnabled;
@@ -434,7 +494,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPersonalizationPersistenceEnabled(bool $personalizationPersistenceEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->personalizationPersistenceEnabled = $personalizationPersistenceEnabled;
@@ -450,7 +510,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->personalizationPersistenceAdapter = $personalizationPersistenceAdapter;
@@ -466,7 +526,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPersonalizationPersistenceSubject(?PersistenceSubjectInterface $personalizationPersistenceSubject): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->personalizationPersistenceSubject = $personalizationPersistenceSubject;
@@ -481,6 +541,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->personalizationFormFactory = $personalizationFormFactory;
 
         return $this;
@@ -494,7 +558,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->defaultPersonalizationData = $defaultPersonalizationData;
@@ -510,7 +574,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setFiltrationEnabled(bool $filtrationEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->filtrationEnabled = $filtrationEnabled;
@@ -526,7 +590,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setFiltrationPersistenceEnabled(bool $filtrationPersistenceEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->filtrationPersistenceEnabled = $filtrationPersistenceEnabled;
@@ -542,7 +606,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->filtrationPersistenceAdapter = $filtrationPersistenceAdapter;
@@ -558,7 +622,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setFiltrationPersistenceSubject(?PersistenceSubjectInterface $filtrationPersistenceSubject): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->filtrationPersistenceSubject = $filtrationPersistenceSubject;
@@ -573,6 +637,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->filtrationFormFactory = $filtrationFormFactory;
 
         return $this;
@@ -586,7 +654,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->defaultFiltrationData = $defaultFiltrationData;
@@ -602,7 +670,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setSortingEnabled(bool $sortingEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->sortingEnabled = $sortingEnabled;
@@ -618,7 +686,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->sortingPersistenceEnabled = $sortingPersistenceEnabled;
@@ -634,7 +702,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->sortingPersistenceAdapter = $sortingPersistenceAdapter;
@@ -650,7 +718,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->sortingPersistenceSubject = $sortingPersistenceSubject;
@@ -666,7 +734,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setDefaultSortingData(?SortingData $defaultSortingData): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->defaultSortingData = $defaultSortingData;
@@ -682,7 +750,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPaginationEnabled(bool $paginationEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->paginationEnabled = $paginationEnabled;
@@ -698,7 +766,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPaginationPersistenceEnabled(bool $paginationPersistenceEnabled): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->paginationPersistenceEnabled = $paginationPersistenceEnabled;
@@ -714,7 +782,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->paginationPersistenceAdapter = $paginationPersistenceAdapter;
@@ -730,7 +798,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->paginationPersistenceSubject = $paginationPersistenceSubject;
@@ -746,7 +814,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->defaultPaginationData = $defaultPaginationData;
@@ -762,7 +830,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static
     {
         if ($this->locked) {
-            throw new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+            throw $this->createBuilderLockedException();
         }
 
         $this->requestHandler = $requestHandler;
@@ -819,5 +887,10 @@ class DataTableBuilder implements DataTableBuilderInterface
     private function getParameterName(string $prefix): string
     {
         return implode('_', array_filter([$prefix, $this->name]));
+    }
+
+    private function createBuilderLockedException(): \BadMethodCallException
+    {
+        return new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
     }
 }

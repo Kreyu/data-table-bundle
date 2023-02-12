@@ -166,7 +166,7 @@ class DataTable implements DataTableInterface
         }
 
         if (!$exportData->includePersonalization) {
-            $dataTable->personalize(new PersonalizationData($dataTable->config->getColumns()));
+            $dataTable->personalize(PersonalizationData::fromDataTable($this));
         }
 
         return $exportData->exporter->export($dataTable->createView());
@@ -350,7 +350,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $personalizationData = $this->config->getDefaultPersonalizationData() ?? new PersonalizationData($this->config->getColumns());
+        $personalizationData = $this->config->getDefaultPersonalizationData() ?? PersonalizationData::fromDataTable($this);
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {

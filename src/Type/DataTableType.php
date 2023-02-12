@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
-use Kreyu\Bundle\DataTableBundle\Batch\BatchActionInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
@@ -49,10 +48,11 @@ final class DataTableType implements DataTableTypeInterface
         $columns = $dataTable->getConfig()->getColumns();
 
         if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            /** @var PersonalizationData $personalizationData */
             $personalizationData = $dataTable->getPersonalizationForm()->getData();
 
-            $columns = $personalizationData->compute($columns);
+            if ($personalizationData instanceof PersonalizationData) {
+                $columns = $personalizationData->compute($columns);
+            }
         }
 
         $view->vars += [

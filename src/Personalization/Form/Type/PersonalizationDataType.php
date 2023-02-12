@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -16,10 +17,8 @@ class PersonalizationDataType extends AbstractType
 {
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['attr']['id'] = $form->getName();
-
-        usort($view['columns']->children, function (FormView $a, FormView $b) {
-            return $a->vars['data']->getOrder() <=> $b->vars['data']->getOrder();
+        usort($view['columns']->children, function (FormView $columnA, FormView $columnB) {
+            return $columnA->vars['data']->getOrder() <=> $columnB->vars['data']->getOrder();
         });
     }
 
@@ -41,10 +40,11 @@ class PersonalizationDataType extends AbstractType
         ]);
 
         $resolver->setRequired('data_table');
+        $resolver->setAllowedTypes('data_table', DataTableInterface::class);
     }
 
     public function getBlockPrefix(): string
     {
-        return 'kreyu_data_table_personalization';
+        return 'kreyu_data_table_personalization_data';
     }
 }

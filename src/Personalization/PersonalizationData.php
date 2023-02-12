@@ -5,108 +5,102 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
 {
-    private array $columns;
-
     /**
-     * @param array<ColumnInterface> $columns
+     * @param array<PersonalizationColumnData> $columns
      */
-    public function __construct(array $columns)
-    {
-        $index = 0;
-
-        foreach ($columns as $column) {
-            if (!$column instanceof ColumnInterface) {
-                continue;
-            }
-
-            $this->columns[$column->getName()] = new PersonalizationColumnData(
-                name: $column->getName(),
-                order: $index++,
-                visible: true,
-            );
-        }
+    private function __construct(
+        private array $columns,
+    ) {
     }
 
-    public function fromArray(array $data): void
+    public static function fromArray(array $data): static
     {
-        foreach ($this->getColumns() as $personalizationColumn) {
-            $columnData = $data['columns'][$personalizationColumn->getName()];
+        ($resolver = new OptionsResolver())
+            ->setDefault('columns', [])
+            ->setAllowedTypes('columns', 'array[]')
+        ;
 
-            $personalizationColumn->setOrder(filter_var($columnData['order'], FILTER_VALIDATE_INT));
-            $personalizationColumn->setVisible(filter_var($columnData['visible'], FILTER_VALIDATE_BOOLEAN));
-        }
+        $data = $resolver->resolve($data);
+
+        $columns = array_map(
+            fn (array $column) => PersonalizationColumnData::fromArray($column),
+            $data['columns'],
+        );
+
+        return new static($columns);
     }
 
-    public function getColumns(): array
+    public static function fromDataTable(DataTableInterface $dataTable): static
     {
-        return $this->columns;
-    }
+        $columns = [];
 
-    public function getPersonalizationColumnData(ColumnInterface|string $column): ?PersonalizationColumnData
-    {
-        if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
+        foreach (array_values($dataTable->getConfig()->getColumns()) as $index => $column) {
+            $columns[$column->getName()] = PersonalizationColumnData::fromColumn($column, $index);
         }
 
-        return $this->columns[$column] ?? null;
+        return new static($columns);
     }
 
     /**
-     * @return array<ColumnInterface>
-     */
-    public function getComputedColumns(): array
-    {
-        $columns = $this->columns;
-
-        $columns = array_filter($columns, fn (PersonalizationColumnData $column) => $column->isVisible());
-
-        usort($columns, function (PersonalizationColumnData $a, PersonalizationColumnData $b) {
-            return $a->getOrder() <=> $b->getOrder();
-        });
-
-        return array_map(fn (PersonalizationColumnData $column) => $column->getColumn(), $columns);
-    }
-
-    /**
+     * Computes given set of {@see ColumnInterface}, ordering it and excluding hidden ones.
+     *
      * @param array<ColumnInterface> $columns
      *
      * @return array<ColumnInterface>
      */
     public function compute(array $columns): array
     {
-        $columns = array_filter(
-            $columns,
-            fn (ColumnInterface $column) => $this->isColumnVisible($column),
-        );
+        foreach ($columns as $column) {
+            if (!$column instanceof ColumnInterface) {
+                throw new UnexpectedTypeException($column, ColumnInterface::class);
+            }
+        }
 
-        uasort($columns, fn (ColumnInterface $a, ColumnInterface $b) => $this->getColumnOrder($a) <=> $this->getColumnOrder($b));
+        $columns = array_filter($columns, function (ColumnInterface $column) {
+            return $this->isColumnVisible($column);
+        });
+
+        uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB) {
+            return $this->getColumnOrder($columnA) <=> $this->getColumnOrder($columnB);
+        });
 
         return $columns;
     }
 
+    /**
+     * @return array<PersonalizationColumnData>
+     */
+    public function getColumns(): array
+    {
+        return $this->columns;
+    }
+
     public function getColumnOrder(string|ColumnInterface $column): int
     {
-        return $this->getPersonalizationColumnData($column)?->getOrder() ?? 0;
+        return $this->getColumn($column)?->getOrder() ?? 0;
     }
 
     public function setColumnOrder(string|ColumnInterface $column, int $order): self
     {
-        $this->getPersonalizationColumnData($column)?->setOrder($order);
+        $this->getColumn($column)?->setOrder($order);
 
         return $this;
     }
 
     public function getColumnVisibility(string|ColumnInterface $column): bool
     {
-        return $this->getPersonalizationColumnData($column)?->isVisible() ?? true;
+        return $this->getColumn($column)?->isVisible() ?? true;
     }
 
     public function setColumnVisibility(string|ColumnInterface $column, bool $visible): self
     {
-        $this->getPersonalizationColumnData($column)?->setVisible($visible);
+        $this->getColumn($column)?->setVisible($visible);
 
         return $this;
     }
@@ -129,5 +123,14 @@ class PersonalizationData
     public function setColumnHidden(string|ColumnInterface $column): self
     {
         return $this->setColumnVisibility($column, false);
+    }
+
+    private function getColumn(string|ColumnInterface $column): ?PersonalizationColumnData
+    {
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return $this->columns[$column] ?? null;
     }
 }

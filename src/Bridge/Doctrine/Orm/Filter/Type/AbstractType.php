@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface as DoctrineOrmProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractType as BaseAbstractType;
@@ -17,7 +18,7 @@ abstract class AbstractType extends BaseAbstractType
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
     {
         if (!is_a($query, DoctrineOrmProxyQueryInterface::class)) {
-            throw new \InvalidArgumentException();
+            throw new UnexpectedTypeException($query, DoctrineOrmProxyQueryInterface::class);
         }
 
         $this->filter($query, $data, $filter);

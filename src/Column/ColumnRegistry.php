@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class ColumnRegistry implements ColumnRegistryInterface
 {
@@ -32,8 +33,8 @@ class ColumnRegistry implements ColumnRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @var array<ColumnTypeInterface>
-     * @var array<ColumnTypeExtensionInterface>
+     * @param iterable<ColumnTypeInterface>          $types
+     * @param iterable<ColumnTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -42,7 +43,7 @@ class ColumnRegistry implements ColumnRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof ColumnTypeInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($type, ColumnTypeInterface::class);
             }
 
             $this->types[$type::class] = $type;
@@ -50,7 +51,7 @@ class ColumnRegistry implements ColumnRegistryInterface
 
         foreach ($typeExtensions as $typeExtension) {
             if (!$typeExtension instanceof ColumnTypeExtensionInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($typeExtension, ColumnTypeExtensionInterface::class);
             }
 
             $this->typeExtensions[$typeExtension::class] = $typeExtension;

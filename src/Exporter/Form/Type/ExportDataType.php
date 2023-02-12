@@ -43,5 +43,7 @@ class ExportDataType extends AbstractType
             'translation_domain' => 'KreyuDataTable',
             'exporters' => [],
         ]);
+
+        $resolver->setAllowedTypes('exporters', ExporterInterface::class.'[]');
     }
 }

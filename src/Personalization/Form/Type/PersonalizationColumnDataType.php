@@ -17,30 +17,31 @@ class PersonalizationColumnDataType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $columns = $options['data_table']->getConfig()->getColumns();
-        $columnName = $view->vars['name'];
+        /**
+         * @var DataTableInterface $dataTable
+         */
+        $dataTable = $options['data_table'];
 
-        if (!array_key_exists($columnName, $columns)) {
-            throw new \InvalidArgumentException("Column $columnName does not exist in the data table");
-        }
+        $column = $dataTable->getConfig()->getColumn($form->getName());
 
-        $view->vars['column'] = $columns[$columnName]->createView();
+        $view->vars['column'] = $column->createView();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('name', HiddenType::class)
             ->add('order', HiddenType::class)
-            ->add('visible', HiddenType::class, [
-                'getter' => fn (PersonalizationColumnData $column) => (int) $column->isVisible(),
-                'setter' => fn (PersonalizationColumnData $column, mixed $value) => $column->setVisible((bool) $value),
-            ])
+            ->add('visible', HiddenType::class)
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', PersonalizationColumnData::class);
+        $resolver->setDefaults([
+            'data_class' => PersonalizationColumnData::class,
+            'translation_domain' => 'KreyuDataTable',
+        ]);
 
         $resolver->setRequired('data_table');
         $resolver->setAllowedTypes('data_table', DataTableInterface::class);
@@ -48,6 +49,6 @@ class PersonalizationColumnDataType extends AbstractType
 
     public function getBlockPrefix(): string
     {
-        return 'kreyu_data_table_personalization_column';
+        return 'kreyu_data_table_personalization_column_data';
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -30,7 +31,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         if (!$request instanceof Request) {
-            throw new \InvalidArgumentException();
+            throw new UnexpectedTypeException($request, Request::class);
         }
 
         $this->filter($dataTable, $request);
@@ -96,30 +97,26 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $formData = $request->request->all($dataTable->getConfig()->getPersonalizationParameterName());
+        $data = $request->request->all($dataTable->getConfig()->getPersonalizationParameterName());
 
-        if (empty($formData)) {
+        if (empty($data)) {
             return;
         }
 
-        $personalizationData = new PersonalizationData(
-            columns: $dataTable->getConfig()->getColumns(),
-        );
+        $data = array_intersect_key($data, ['columns' => true]);
 
-        $personalizationData->fromArray($formData);
-
-        $dataTable->personalize($personalizationData);
+        $dataTable->personalize(PersonalizationData::fromArray($data));
     }
 
     private function export(DataTableInterface $dataTable, Request $request): void
     {
-        $formData = $request->request->all($dataTable->getConfig()->getExportParameterName());
+        $data = $request->request->all($dataTable->getConfig()->getExportParameterName());
 
-        if (empty($formData)) {
+        if (empty($data)) {
             return;
         }
 
-        $dataTable->getExportForm()->submit($formData);
+        $dataTable->getExportForm()->submit($data);
     }
 
     private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed

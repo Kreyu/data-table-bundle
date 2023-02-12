@@ -14,15 +14,19 @@ class ValuesRowView
         public DataTableView $parent,
         public mixed $data = null,
     ) {
-        $columns = (clone $this->parent)->vars['columns'];
+        /**
+         * @var array<ColumnInterface> $columns
+         */
+        $columns = (clone $parent)->vars['columns'];
 
         $this->vars['columns'] = [];
 
-        /** @var ColumnInterface $column */
         foreach ($columns as $column) {
             $column->setData($this->data);
 
-            $this->vars['columns'][$column->getName()] = $column->createView($this->parent);
+            $view = $column->createView($parent);
+
+            $this->vars['columns'][$column->getName()] = $view;
         }
     }
 }

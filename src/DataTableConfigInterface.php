@@ -19,6 +19,13 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 interface DataTableConfigInterface
 {
+    public const PAGE_PARAMETER = 'page';
+    public const PER_PAGE_PARAMETER = 'limit';
+    public const SORT_PARAMETER = 'sort';
+    public const FILTRATION_PARAMETER = 'filter';
+    public const PERSONALIZATION_PARAMETER = 'personalization';
+    public const EXPORT_PARAMETER = 'export';
+
     public function getName(): string;
 
     public function getType(): ResolvedDataTableTypeInterface;
@@ -31,14 +38,29 @@ interface DataTableConfigInterface
     public function getColumns(): array;
 
     /**
+     * @throws \InvalidArgumentException if column of given name does not exist
+     */
+    public function getColumn(string $name): ColumnInterface;
+
+    /**
      * @return array<FilterInterface>
      */
     public function getFilters(): array;
 
     /**
+     * @throws \InvalidArgumentException if filter of given name does not exist
+     */
+    public function getFilter(string $name): FilterInterface;
+
+    /**
      * @return array<ExporterInterface>
      */
     public function getExporters(): array;
+
+    /**
+     * @throws \InvalidArgumentException if exporter of given name does not exist
+     */
+    public function getExporter(string $name): ExporterInterface;
 
     public function isExportingEnabled(): bool;
 

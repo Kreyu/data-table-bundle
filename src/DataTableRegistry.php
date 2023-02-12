@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
@@ -32,8 +33,8 @@ class DataTableRegistry implements DataTableRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @param array<DataTableTypeInterface>          $types
-     * @param array<DataTableTypeExtensionInterface> $typeExtensions
+     * @param iterable<DataTableTypeInterface>          $types
+     * @param iterable<DataTableTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -42,7 +43,7 @@ class DataTableRegistry implements DataTableRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof DataTableTypeInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($type, DataTableTypeInterface::class);
             }
 
             $this->types[$type::class] = $type;
@@ -50,7 +51,7 @@ class DataTableRegistry implements DataTableRegistryInterface
 
         foreach ($typeExtensions as $typeExtension) {
             if (!$typeExtension instanceof DataTableTypeExtensionInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($typeExtension, DataTableTypeExtensionInterface::class);
             }
 
             $this->typeExtensions[$typeExtension::class] = $typeExtension;

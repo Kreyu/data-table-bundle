@@ -160,7 +160,7 @@
         {% endblock %}
 
         {% block export_modal %}
-            <div class="modal modal-blur fade" id="{{ export_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal modal-blur fade" id="{{ export_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true" data-turbo="false">
                 {% block export_modal_dialog %}
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         {% block export_modal_content %}
@@ -478,9 +478,10 @@
     </div>
 {% endblock %}
 
-{% block kreyu_data_table_personalization_column_row %}
+{% block kreyu_data_table_personalization_column_data_row %}
     <li class="list-group-item">
         {{ data_table_column_label(form.vars.column) }}
+        {{ form_widget(form.name) }}
         {{ form_widget(form.order) }}
         {{ form_widget(form.visible) }}
     </li>

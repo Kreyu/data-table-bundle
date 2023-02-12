@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactoryInterface;
@@ -32,8 +33,8 @@ class FilterRegistry implements FilterRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @var array<FilterTypeInterface>
-     * @var array<FilterTypeExtensionInterface>
+     * @param iterable<FilterTypeInterface>          $types
+     * @param iterable<FilterTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -42,7 +43,7 @@ class FilterRegistry implements FilterRegistryInterface
     ) {
         foreach ($types as $type) {
             if (!$type instanceof FilterTypeInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($type, FilterTypeInterface::class);
             }
 
             $this->types[$type::class] = $type;
@@ -50,7 +51,7 @@ class FilterRegistry implements FilterRegistryInterface
 
         foreach ($typeExtensions as $typeExtension) {
             if (!$typeExtension instanceof FilterTypeExtensionInterface) {
-                throw new \InvalidArgumentException();
+                throw new UnexpectedTypeException($typeExtension, FilterTypeExtensionInterface::class);
             }
 
             $this->typeExtensions[$typeExtension::class] = $typeExtension;

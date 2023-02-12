@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
+use Kreyu\Bundle\DataTableBundle\Batch\BatchActionInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
@@ -55,6 +56,7 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         $view->vars += [
+            'name' => $dataTable->getConfig()->getName(),
             'columns' => $columns,
             'filters' => $dataTable->getConfig()->getFilters(),
             'exporters' => $dataTable->getConfig()->getExporters(),

@@ -1,192 +1,194 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
 {% block kreyu_data_table %}
-    {% block action_bar %}
-        <div class="mb-2">
-            {% block action_bar_left %}
-                <div class="d-inline-block my-2">
-                    {% if has_active_filters %}
-                        {% block filter_clear_all_button %}
-                            {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
+    <turbo-frame id="kreyu_data_table_{{ name }}">
+        {% block action_bar %}
+            <div class="mb-2">
+                {% block action_bar_left %}
+                    <div class="d-inline-block my-2">
+                        {% if has_active_filters %}
+                            {% block filter_clear_all_button %}
+                                {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
-                            <a class="btn btn-sm btn-outline-danger"
-                                href="{{ filter_clear_all_url(filtration_parameter_name, filters) }}"
-                                data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                </svg>
-                            </a>
-                        {% endblock %}
-                    {% endif %}
-
-                    {% for filter in filters %}
-                        {% set field = filtration_form.children[filter.name] %}
-
-                        {% if field.vars.data and field.vars.data.value != null %}
-                            {% block filter_clear_button %}
-                                {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
-
-                                <a class="btn btn-sm btn-outline-dark my-1"
-                                    href="{{ filter_clear_url(filtration_parameter_name, filter) }}"
+                                <a class="btn btn-sm btn-outline-danger"
+                                    href="{{ filter_clear_all_url(filtration_parameter_name, filters) }}"
                                     data-toggle="tooltip"
                                     data-placement="bottom"
-                                    title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
+                                    title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
                                 >
-                                    <small>
-                                        {{ field.vars.label }}
-
-                                        {% if filter.options.operator_options.visible %}
-                                            ({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})
-                                        {% endif %}
-                                    </small>
-
-                                    {{ field.vars.data.value }}
-
-                                    <span class="mx-1" aria-hidden="true">&times;</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
                                 </a>
                             {% endblock %}
                         {% endif %}
-                    {% endfor %}
-                </div>
-            {% endblock %}
 
-            {% block action_bar_right %}
-                <div class="d-inline-block float-end my-2">
-                    {% if filtration_enabled %}
-                        {% block action_filter %}
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
-                                    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
-                                </svg>
-                            </button>
-                        {% endblock %}
-                    {% endif %}
+                        {% for filter in filters %}
+                            {% set field = filtration_form.children[filter.name] %}
 
-                    {% if exporting_enabled %}
-                        {% block action_export %}
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
-                                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
-                                </svg>
-                            </button>
-                        {% endblock %}
-                    {% endif %}
+                            {% if field.vars.data and field.vars.data.value != null %}
+                                {% block filter_clear_button %}
+                                    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
-                    {% if personalization_enabled %}
-                        {% block action_personalize %}
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                                </svg>
-                            </button>
-                        {% endblock %}
-                    {% endif %}
-                </div>
-            {% endblock %}
-        </div>
-    {% endblock %}
+                                    <a class="btn btn-sm btn-outline-dark my-1"
+                                        href="{{ filter_clear_url(filtration_parameter_name, filter) }}"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
+                                    >
+                                        <small>
+                                            {{ field.vars.label }}
 
-    {% block filters %}
-        {% if filtration_enabled %}
-            {{ data_table_filters_form(filtration_form) }}
-        {% endif %}
-    {% endblock %}
+                                            {% if filter.options.operator_options.visible %}
+                                                ({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})
+                                            {% endif %}
+                                        </small>
 
-    {% block table %}
-        <table class="table table-vcenter">
-            {% block table_head %}
-                <thead>
-                    <tr>
-                        {{ data_table_headers_row(headers_row) }}
-                    </tr>
-                </thead>
-            {% endblock %}
-            {% block table_body %}
-                <tbody>
-                    <tr>
-                        {% if values_rows|length > 0 %}
-                            {% for values_row in values_rows %}
-                                {{ data_table_values_row(values_row) }}
-                            {% endfor %}
-                        {% else %}
-                            <td class="align-middle text-muted py-4 text-center" colspan="{{ columns|length }}">
-                                {{ 'No results'|trans({}, 'KreyuDataTable') }}
-                            </td>
+                                        {{ field.vars.data.value }}
+
+                                        <span class="mx-1" aria-hidden="true">&times;</span>
+                                    </a>
+                                {% endblock %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endblock %}
+
+                {% block action_bar_right %}
+                    <div class="d-inline-block float-end my-2">
+                        {% if filtration_enabled %}
+                            {% block action_filter %}
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
+                                        <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+                                    </svg>
+                                </button>
+                            {% endblock %}
                         {% endif %}
-                    </tr>
-                </tbody>
-            {% endblock %}
-        </table>
-    {% endblock %}
 
-    {% block pagination %}
-        {{ data_table_pagination(pagination) }}
-    {% endblock %}
+                        {% if exporting_enabled %}
+                            {% block action_export %}
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
+                                    </svg>
+                                </button>
+                            {% endblock %}
+                        {% endif %}
 
-    {% block personalization_modal %}
-        <div class="modal modal-blur fade" id="{{ personalization_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
-            {% block personalization_modal_dialog %}
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    {% block personalization_modal_content %}
-                        <div class="modal-content">
-                            {% block personalization_modal_header %}
-                                <div class="modal-header">
-                                    <h5 class="modal-title">
-                                        {% block personalization_modal_title %}
-                                            {{ 'Personalization'|trans({}, 'KreyuDataTable') }}
+                        {% if personalization_enabled %}
+                            {% block action_personalize %}
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                    </svg>
+                                </button>
+                            {% endblock %}
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endblock %}
+
+        {% block filters %}
+            {% if filtration_enabled %}
+                {{ data_table_filters_form(filtration_form) }}
+            {% endif %}
+        {% endblock %}
+
+        {% block table %}
+            <table class="table table-vcenter">
+                {% block table_head %}
+                    <thead>
+                        <tr>
+                            {{ data_table_headers_row(headers_row) }}
+                        </tr>
+                    </thead>
+                {% endblock %}
+                {% block table_body %}
+                    <tbody>
+                        <tr>
+                            {% if values_rows|length > 0 %}
+                                {% for values_row in values_rows %}
+                                    {{ data_table_values_row(values_row) }}
+                                {% endfor %}
+                            {% else %}
+                                <td class="align-middle text-muted py-4 text-center" colspan="{{ columns|length }}">
+                                    {{ 'No results'|trans({}, 'KreyuDataTable') }}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                {% endblock %}
+            </table>
+        {% endblock %}
+
+        {% block pagination %}
+            {{ data_table_pagination(pagination) }}
+        {% endblock %}
+
+        {% block personalization_modal %}
+            <div class="modal modal-blur fade" id="{{ personalization_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
+                {% block personalization_modal_dialog %}
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        {% block personalization_modal_content %}
+                            <div class="modal-content">
+                                {% block personalization_modal_header %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            {% block personalization_modal_title %}
+                                                {{ 'Personalization'|trans({}, 'KreyuDataTable') }}
+                                            {% endblock %}
+                                        </h5>
+                                        {% block personalization_modal_header_close_button %}
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         {% endblock %}
-                                    </h5>
-                                    {% block personalization_modal_header_close_button %}
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    {% endblock %}
-                                </div>
-                            {% endblock %}
-                            {% block personalization_modal_body %}
-                                <div class="modal-body">
-                                    {{ data_table_personalization_form(personalization_form) }}
-                                </div>
-                            {% endblock %}
-                        </div>
-                    {% endblock %}
-                </div>
-            {% endblock %}
-        </div>
-    {% endblock %}
+                                    </div>
+                                {% endblock %}
+                                {% block personalization_modal_body %}
+                                    <div class="modal-body">
+                                        {{ data_table_personalization_form(personalization_form) }}
+                                    </div>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endblock %}
 
-    {% block export_modal %}
-        <div class="modal modal-blur fade" id="{{ export_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
-            {% block export_modal_dialog %}
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    {% block export_modal_content %}
-                        <div class="modal-content">
-                            {% block export_modal_header %}
-                                <div class="modal-header">
-                                    <h5 class="modal-title">
-                                        {% block export_modal_title %}
-                                            {{ 'Export'|trans({}, 'KreyuDataTable') }}
+        {% block export_modal %}
+            <div class="modal modal-blur fade" id="{{ export_form.vars.name }}" tabindex="-1" style="display: none;" aria-hidden="true">
+                {% block export_modal_dialog %}
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        {% block export_modal_content %}
+                            <div class="modal-content">
+                                {% block export_modal_header %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            {% block export_modal_title %}
+                                                {{ 'Export'|trans({}, 'KreyuDataTable') }}
+                                            {% endblock %}
+                                        </h5>
+                                        {% block export_modal_header_close_button %}
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         {% endblock %}
-                                    </h5>
-                                    {% block export_modal_header_close_button %}
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    {% endblock %}
-                                </div>
-                            {% endblock %}
-                            {% block export_modal_body %}
-                                <div class="modal-body">
-                                    {{ data_table_export_form(export_form) }}
-                                </div>
-                            {% endblock %}
-                        </div>
-                    {% endblock %}
-                </div>
-            {% endblock %}
-        </div>
-    {% endblock %}
+                                    </div>
+                                {% endblock %}
+                                {% block export_modal_body %}
+                                    <div class="modal-body">
+                                        {{ data_table_export_form(export_form) }}
+                                    </div>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endblock %}
+    </turbo-frame>
 {% endblock %}
 
 {% block kreyu_data_table_headers_row %}

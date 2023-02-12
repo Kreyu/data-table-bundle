@@ -41,7 +41,7 @@ Streamlines creation process of the data tables in Symfony applications.
 * [Filtration](#filtration)
   * [Configuring the filtration feature](#configuring-the-filtration-feature)
   * [Available filter types](#available-filter-types)
-  * [Filter operators](#filter-operators)
+  * [Using filter operators](#using-filter-operators)
 * [Sorting](#sorting)
   * [Configuring the sorting feature](#configuring-the-sorting-feature)
 * [Pagination](#pagination)

@@ -15,7 +15,7 @@ interface PaginationInterface
 
     public function getTotalItemCount(): int;
 
-    public function getItemNumberPerPage(): int;
+    public function getItemNumberPerPage(): ?int;
 
     public function getPageCount(): int;
 

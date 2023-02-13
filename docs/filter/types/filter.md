@@ -1,6 +1,6 @@
 # FilterType
 
-The [FilterType](#) represents a base filter, used as a parent for every other type in the bundle.
+The [FilterType](../../../src/Filter/Type/FilterType.php) represents a base filter, used as a parent for every other type in the bundle.
 
 ## Options
 
@@ -40,7 +40,7 @@ Sets the form field type used to render the filter control.
 **type**: `array` **default**: `[]`
 
 This is the array that's passed to the operator form type specified in the `field_type` option.
-For example, if you used the `EntityType` as your `field_type` option (to let user select a specific entity, default for [EntityFilter](../doctrine/orm/entity.md)),
+For example, if you used the `EntityType` as your `field_type` option (to let user select a specific entity, default for [EntityFilter](doctrine/orm/entity.md)),
 then you'd want to (at least) pass the `class` option to the underlying type, as it is required:
 
 ```php

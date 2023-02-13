@@ -40,6 +40,33 @@ class CustomType extends AbstractType
 > is an instance of [Doctrine ORM's ProxyQueryInterface](../../src/Bridge/Doctrine/Orm/Query/ProxyQueryInterface.php), which has access to all the [QueryBuilder](https://www.doctrine-project.org/projects/doctrine-orm/en/2.14/reference/query-builder.html) methods, 
 > and some additional helper methods, such as `generateUniqueParameterId()`.
 
-## Creating Filter Types From Scratch
+## Creating Filter Types For Custom Proxy Query
 
-TODO
+If your application is not using Doctrine ORM, you can [create custom proxy query class](../create_custom_proxy_query_classes.md).
+Then, you can create an abstract filter type class, that every other filter will extend.
+You can use the same approach as the [Doctrine ORM ProxyQuery class](../../src/Bridge/Doctrine/Orm/Query/ProxyQueryInterface.php),
+and add an abstract `filter()` method, and use the `apply()` to make sure a valid type is given.  
+
+```php
+<?php
+
+namespace App\DataTable\Filter\Type;
+
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
+use App\DataTable\Query\CustomProxyQuery;
+
+class CustomType extends AbstractType
+{
+    abstract protected function filter(CustomProxyQuery $query, FilterData $data, FilterInterface $filter): void;
+
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
+    {
+        if (!is_a($query, CustomProxyQuery::class)) {
+            throw new UnexpectedTypeException($query, CustomProxyQuery::class);
+        }
+
+        $this->filter($query, $data, $filter);
+    }
+}
+```

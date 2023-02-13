@@ -7,10 +7,10 @@ namespace Kreyu\Bundle\DataTableBundle\Pagination;
 class Pagination implements PaginationInterface
 {
     public function __construct(
-        private readonly iterable $items,
-        private readonly int $currentPageNumber,
-        private readonly int $totalItemCount,
-        private readonly int $itemNumberPerPage,
+        private iterable $items,
+        private int $currentPageNumber,
+        private int $totalItemCount,
+        private ?int $itemNumberPerPage = null,
     ) {
     }
 
@@ -29,7 +29,7 @@ class Pagination implements PaginationInterface
         return $this->totalItemCount;
     }
 
-    public function getItemNumberPerPage(): int
+    public function getItemNumberPerPage(): ?int
     {
         return $this->itemNumberPerPage;
     }

@@ -1,6 +1,6 @@
 # ColumnType
 
-The [ColumnType](#) represents a base column, used as a parent for every other type in the bundle.
+The [ColumnType](../../../src/Column/Type/ColumnType.php) represents a base column, used as a parent for every other type in the bundle.
 
 ## Options
 
@@ -83,8 +83,8 @@ $builder
 
 Because property accessor is not called, the value passed as the first argument is a "raw" row value (and for most cases it will be an entity).
 
-### `display_personalization_button`
+### `exportable`
 
-**type**: `bool` **default**: `false`
+**type**: `bool` **default**: `true`
 
-If this value is true, a button will be visible next to the column header. Clicking it opens the personalization modal.
+If this value is true, the column will be included in the export results.

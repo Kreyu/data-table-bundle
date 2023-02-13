@@ -18,6 +18,7 @@ Streamlines creation process of the data tables in Symfony applications.
 - exporting, where user is able to export data tables to various file formats;
 - logic decoupled from the source of the data;
 - easy theming of every part of the bundle;
+- out-of-the-box support for [Symfony UX](https://symfony.com/blog/new-in-symfony-the-ux-initiative-a-new-javascript-ecosystem-for-symfony), including [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html);
 
 
 ## Table of contents

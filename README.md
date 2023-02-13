@@ -829,3 +829,7 @@ services:
 - [Create Custom Request Handler](docs/create_custom_request_handler.md)
 - [Create Custom Proxy Query Classes](docs/create_custom_proxy_query_classes.md)
 - [Twig reference](docs/twig_reference.md)
+
+## License
+
+The MIT License (MIT). Please see [license file](LICENSE) for more information.

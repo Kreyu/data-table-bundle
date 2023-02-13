@@ -67,13 +67,13 @@ Run this command to install the bundle:
 composer require kreyu/data-table-bundle
 ```
 
-If you wish to use the [Doctrine ORM](https://github.com/doctrine/orm):
+If you wish to use the [Doctrine ORM](https://github.com/doctrine/orm), install the [DataTableDoctrineOrmBundle](https://github.com/Kreyu/data-table-doctrine-orm-bundle):
 
 ```shell
 composer require kreyu/data-table-doctrine-orm-bundle
 ```
 
-If you wish to use the exporting feature with [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet):
+If you wish to use the exporting feature with [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet), install the [DataTablePhpSpreadsheetBundle](https://github.com/Kreyu/data-table-phpspreadsheet-bundle):
 
 ```shell
 composer require kreyu/data-table-phpspreadsheet-bundle

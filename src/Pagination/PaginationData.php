@@ -4,12 +4,39 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Pagination;
 
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class PaginationData
 {
     public function __construct(
-        private int $page,
-        private ?int $perPage = null,
+        private int $page = PaginationInterface::DEFAULT_PAGE,
+        private ?int $perPage = PaginationInterface::DEFAULT_PER_PAGE,
     ) {
+    }
+
+    public static function fromArray(array $data): static
+    {
+        ($resolver = new OptionsResolver())
+            ->setDefault('page', null)
+            ->setDefault('perPage', null)
+            ->setNormalizer('page', function (Options $options, mixed $value) {
+                return null !== $value ? (int) $value : null;
+            })
+            ->setNormalizer('perPage', function (Options $options, mixed $value) {
+                return null !== $value ? (int) $value : null;
+            })
+            ->setAllowedValues('page', function (int $value): bool {
+                return $value > 0;
+            })
+            ->setAllowedValues('perPage', function (?int $value): bool {
+                return null === $value || $value > 0;
+            })
+        ;
+
+        $data = $resolver->resolve($data);
+
+        return new self($data['page'], $data['perPage']);
     }
 
     public function getPage(): int

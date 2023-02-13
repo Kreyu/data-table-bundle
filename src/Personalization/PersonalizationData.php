@@ -14,9 +14,14 @@ class PersonalizationData
     /**
      * @param array<PersonalizationColumnData> $columns
      */
-    private function __construct(
-        private array $columns,
+    public function __construct(
+        private array $columns = [],
     ) {
+        foreach ($columns as $column) {
+            if (!$column instanceof PersonalizationColumnData) {
+                throw new UnexpectedTypeException($column, PersonalizationColumnData::class);
+            }
+        }
     }
 
     public static function fromArray(array $data): static

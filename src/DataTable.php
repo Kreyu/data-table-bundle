@@ -21,9 +21,6 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class DataTable implements DataTableInterface
 {
-    public const DEFAULT_PAGE = 1;
-    public const DEFAULT_PER_PAGE = 25;
-
     /**
      * Lazy-loaded form used to apply filtration criteria to the data table.
      */
@@ -102,7 +99,7 @@ class DataTable implements DataTableInterface
         }
 
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $data->getFilterData($filter);
+            $filterData = $data->getFilter($filter);
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
@@ -162,7 +159,7 @@ class DataTable implements DataTableInterface
         $dataTable = clone $this;
 
         if (ExportStrategy::INCLUDE_ALL === $exportData->strategy) {
-            $dataTable->paginate(new PaginationData(1));
+            $dataTable->paginate(new PaginationData(perPage: null));
         }
 
         if (!$exportData->includePersonalization) {
@@ -239,7 +236,7 @@ class DataTable implements DataTableInterface
                 $filter->getFormName(),
                 FilterDataType::class,
                 $filter->getFormOptions() + [
-                    'getter' => fn (FiltrationData $data) => $data->getFilterData($filter),
+                    'getter' => fn (FiltrationData $data) => $data->getFilter($filter),
                 ],
             );
         }
@@ -281,7 +278,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $data = $this->config->getDefaultPaginationData() ?? new PaginationData(static::DEFAULT_PAGE, static::DEFAULT_PER_PAGE);
+        $data = $this->config->getDefaultPaginationData() ?? new PaginationData(PaginationInterface::DEFAULT_PAGE, PaginationInterface::DEFAULT_PER_PAGE);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {

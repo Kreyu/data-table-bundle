@@ -24,7 +24,7 @@ class FiltrationDataType extends AbstractType
 
             foreach ($filters as $filter) {
                 $form->add($filter->getName(), FilterDataType::class, $filter->getFormOptions() + [
-                    'getter' => fn (FiltrationData $data) => $data->getFilterData($filter),
+                    'getter' => fn (FiltrationData $data) => $data->getFilter($filter),
                 ]);
             }
         });

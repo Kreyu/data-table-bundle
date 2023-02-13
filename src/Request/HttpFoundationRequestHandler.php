@@ -10,7 +10,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
-use Kreyu\Bundle\DataTableBundle\Sorting\SortingField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -38,7 +37,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
-        $this->export($dataTable, $request);
+
+        $dataTable->getExportForm()->handleRequest($request);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
@@ -60,16 +60,17 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     {
         $sortParameterName = $dataTable->getConfig()->getSortParameterName();
 
-        $sortingData = new SortingData();
-
         $sortField = $this->extractQueryParameter($request, "[$sortParameterName][field]");
-        $sortDirection = $this->extractQueryParameter($request, "[$sortParameterName][direction]", 'DESC');
+        $sortDirection = $this->extractQueryParameter($request, "[$sortParameterName][direction]");
 
-        if (null !== $sortField) {
-            $sortingData->addField(new SortingField($sortField, $sortDirection));
+        if (null === $sortField) {
+            return;
         }
 
-        $dataTable->sort($sortingData);
+        $dataTable->sort(SortingData::fromArray([
+            'field' => $sortField,
+            'direction' => $sortDirection,
+        ]));
     }
 
     private function paginate(DataTableInterface $dataTable, Request $request): void
@@ -79,44 +80,30 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
         $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
 
-        $defaultPage = $defaultPaginationData?->getPage() ?? 1;
-        $defaultPerPage = $defaultPaginationData?->getPerPage() ?? 25;
+        $defaultPage = $defaultPaginationData?->getPage();
+        $defaultPerPage = $defaultPaginationData?->getPerPage();
 
         $page = $this->extractQueryParameter($request, "[$pageParameterName]", $defaultPage);
         $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", $defaultPerPage);
 
-        if (null === $page && null === $perPage) {
-            return;
-        }
-
-        $dataTable->paginate(new PaginationData(
-            page: $page ? (int) $page : null,
-            perPage: $perPage ? (int) $perPage : null,
-        ));
+        $dataTable->paginate(PaginationData::fromArray([
+            'page' => $page,
+            'perPage' => $perPage,
+        ]));
     }
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $data = $request->request->all($dataTable->getConfig()->getPersonalizationParameterName());
+        $data = array_intersect_key(
+            $request->request->all($dataTable->getConfig()->getPersonalizationParameterName()),
+            ['columns' => true],
+        );
 
         if (empty($data)) {
             return;
         }
-
-        $data = array_intersect_key($data, ['columns' => true]);
 
         $dataTable->personalize(PersonalizationData::fromArray($data));
-    }
-
-    private function export(DataTableInterface $dataTable, Request $request): void
-    {
-        $data = $request->request->all($dataTable->getConfig()->getExportParameterName());
-
-        if (empty($data)) {
-            return;
-        }
-
-        $dataTable->getExportForm()->submit($data);
     }
 
     private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed

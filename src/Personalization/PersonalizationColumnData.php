@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnData
 {
-    private function __construct(
+    public function __construct(
         private string $name,
         private int $order,
         private bool $visible,

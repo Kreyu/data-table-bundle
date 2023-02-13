@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FiltrationData
@@ -11,9 +12,14 @@ class FiltrationData
     public function __construct(
         private array $filters = [],
     ) {
+        foreach ($filters as $filter) {
+            if (!$filter instanceof FilterData) {
+                throw new UnexpectedTypeException($filter, FilterData::class);
+            }
+        }
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         ($resolver = new OptionsResolver())
             ->setDefault('filters', function (OptionsResolver $resolver) {
@@ -27,14 +33,31 @@ class FiltrationData
                     ])
                 ;
             })
-            ->setAllowedTypes('filters', ['array'])
+            ->setAllowedTypes('filters', 'array[]')
         ;
 
         $data = $resolver->resolve($data);
 
-        return new self(
-            filters: $data['filters'],
+        $filters = array_map(
+            fn (array $filter) => FilterData::fromArray($filter),
+            $data['filters'],
         );
+
+        return new static($filters);
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getFilter(string|FilterInterface $filter): ?FilterData
+    {
+        if ($filter instanceof FilterInterface) {
+            $filter = $filter->getFormName();
+        }
+
+        return $this->filters[$filter] ?? null;
     }
 
     public function isEmpty(): bool
@@ -44,20 +67,6 @@ class FiltrationData
 
     public function hasActiveFilters(): bool
     {
-        return !empty(array_filter($this->filters, fn (array $filter) => !empty($filter['value'])));
-    }
-
-    public function hasFilter(FilterInterface $filter): bool
-    {
-        return array_key_exists($filter->getFormName(), $this->filters);
-    }
-
-    public function getFilterData(FilterInterface $filter): ?FilterData
-    {
-        if (!$this->hasFilter($filter)) {
-            return null;
-        }
-
-        return FilterData::fromArray($this->filters[$filter->getFormName()]);
+        return !empty(array_filter($this->filters, fn (FilterData $filter) => $filter->hasValue()));
     }
 }

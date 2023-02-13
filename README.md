@@ -16,15 +16,14 @@ Streamlines creation process of the data tables in Symfony applications.
 - extension system used to modify data tables across the entire application;
 - personalization, where user is able to show/hide or even change order of the columns;
 - exporting, where user is able to export data tables to various file formats;
-- support for [Doctrine ORM](https://github.com/doctrine/orm) by default, but open to custom implementation;
+- logic decoupled from the source of the data;
 - easy theming of every part of the bundle;
 
 
 ## Table of contents
 
 * [Installation](#installation)
-  * [Integration with PhpSpreadsheet](#integration-with-phpspreadsheet)
-  * [Front-end dependencies](#front-end-dependencies)
+  * [Integration with Symfony UX](#integration-with-symfony-ux)
 * [Usage](#usage)
   * [Building data tables](#building-data-tables)
   * [Creating data tables in controllers](#creating-data-tables-in-controllers)
@@ -68,19 +67,19 @@ Run this command to install the bundle:
 composer require kreyu/data-table-bundle
 ```
 
-### Integration with PhpSpreadsheet
-
-This bundle provides exporting feature, handled using the [PhpSpreadsheet](https://phpspreadsheet.readthedocs.io/) by default.
-
-If you wish to use it, make sure to have it installed:
+If you wish to use the [Doctrine ORM](https://github.com/doctrine/orm):
 
 ```shell
-composer require phpoffice/phpspreadsheet
+composer require kreyu/data-table-doctrine-orm-bundle
 ```
 
-If not, you can easily [create your own exporter types](#).
+If you wish to use the exporting feature with [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet):
 
-### Front-end dependencies
+```shell
+composer require kreyu/data-table-phpspreadsheet-bundle
+```
+
+### Integration with Symfony UX
 
 This bundle provides front-end scripts created using the [Stimulus JavaScript framework](https://stimulus.hotwired.dev/).
 To begin with, make sure your application uses the [Symfony Stimulus Bridge](https://github.com/symfony/stimulus-bridge).
@@ -165,7 +164,7 @@ If your controller uses the [DataTableControllerTrait](src/DataTableControllerTr
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -197,7 +196,10 @@ You've also assigned each a [column type](#available-column-types) (e.g. `Number
 > ### 💡 Important note
 > Notice the use of the `ProxyQuery` class, which wraps the query builder.
 > Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
-> Although only the [Doctrine ORM proxy query class](src/Bridge/Doctrine/Orm/Query/ProxyQuery.php) is provided out-of-the-box, [creating custom proxy query classes](docs/create_custom_proxy_query_classes.md) is easy.
+> 
+> In this example, the [Doctrine ORM](https://github.com/doctrine/orm) is used, and the proxy class comes from the `kreyu/data-table-doctrine-orm-bundle` package.
+> 
+> For custom implementation, see [creating custom proxy query classes](docs/create_custom_proxy_query_classes.md).
 
 ### Creating data table classes
 
@@ -242,7 +244,7 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -275,7 +277,7 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -322,7 +324,8 @@ For example, thanks to the [Bootstrap 5 integration with data tables](src/Resour
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-    theme: '@KreyuDataTable/themes/bootstrap_5.html.twig' # default value
+    themes: 
+      - '@KreyuDataTable/themes/bootstrap_5.html.twig' # default value
 ```
 
 ### Processing data tables
@@ -340,7 +343,7 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -396,7 +399,7 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQuery;
+use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -530,15 +533,11 @@ By default, if the feature is enabled, the [persistence adapter](#persistence-ad
 
 ### Available filter types
 
-The following filter types are natively available in the bundle:
+Filter application methods differ between various data providers.
+Therefore, only the [base filter type](docs/filter/types/filter.md) is available natively in the bundle.
 
-- Doctrine ORM
-    - [StringType](docs/filter/types/doctrine/orm/string.md)
-    - [NumericType](docs/filter/types/doctrine/orm/numeric.md)
-    - [EntityType](docs/filter/types/doctrine/orm/entity.md)
-    - [CallbackType](docs/filter/types/doctrine/orm/callback.md)
-- Other
-    - [FilterType](docs/filter/types/filter.md) 
+If your application uses the [Doctrine ORM](https://github.com/doctrine/orm), you can use the [kreyu/data-table-doctrine-orm-bundle](https://github.com/Kreyu/data-table-doctrine-orm-bundle), 
+which provides several Doctrine ORM oriented [filter types](https://github.com/Kreyu/data-table-doctrine-orm-bundle#available-filter-types).
 
 ### Using filter operators
 
@@ -686,14 +685,11 @@ Every part of the exporting feature can be configured using the [data table opti
 
 ### Available exporter types
 
-The following exporter types are natively available in the bundle:
+Exporters in general depend on external libraries.
+This bundle does not force the usage of any specific implementation, therefore, only the [base exporter type](docs/exporter/types/exporter.md) is available natively in the bundle.
 
-- PhpSpreadsheet
-  - [CsvType](docs/exporter/types/phpspreadsheet/csv.md)
-  - [XlsxType](docs/exporter/types/phpspreadsheet/xls.md)
-  - [XlsxType](docs/exporter/types/phpspreadsheet/xlsx.md)
-- Other
-  - [ExporterType](docs/exporter/types/exporter.md)
+If your application uses the [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet), you can use the [kreyu/data-table-phpspreadsheet-bundle](https://github.com/Kreyu/data-table-phpspreadsheet-bundle),
+which provides several PhpSpreadsheet oriented [exporter types](https://github.com/Kreyu/data-table-phpspreadsheet-bundle#available-exporter-types).
 
 ### Creating custom exporter type
 

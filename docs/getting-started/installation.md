@@ -12,8 +12,9 @@ composer require kreyu/data-table-bundle
 
 ## Enable the Bundle
 
-> ℹ️ **Note**  
-> If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), you can skip this step. 
+!!! Note
+
+    If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), you can skip this step. 
 
 Enable the bundle by adding it to the `bundles.php`:
 
@@ -30,9 +31,10 @@ return [
 This bundle provides front-end scripts created using the [Stimulus JavaScript framework](https://stimulus.hotwired.dev/).
 To begin with, make sure your application uses the [Symfony Stimulus Bridge](https://github.com/symfony/stimulus-bridge).
 
-> ℹ️ **Note**  
-> If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), 
-> you can ignore following steps and simply install dependencies and build the front-end.
+!!! Note
+
+    If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), 
+    you can ignore following steps and simply install dependencies and build the front-end.
 
 ### Add dependency to package.json
 

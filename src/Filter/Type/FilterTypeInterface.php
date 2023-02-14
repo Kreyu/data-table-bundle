@@ -10,11 +10,20 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @template T of ProxyQueryInterface
+ */
 interface FilterTypeInterface
 {
+    /**
+     * @param T $query
+     */
     public function supports(ProxyQueryInterface $query): bool;
 
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void;
+    /**
+     * @param T $query
+     */
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 
     public function buildView(FilterView $view, FilterInterface $filter, array $options): void;
 

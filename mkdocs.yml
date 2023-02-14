@@ -1,6 +1,7 @@
 site_name: DataTableBundle
 
 theme:
+  name: readthedocs
   hljs_languages:
     - php
     - yaml

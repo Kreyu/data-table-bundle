@@ -10,7 +10,7 @@ Use [Composer](https://getcomposer.org/) to install the bundle:
 composer require kreyu/data-table-bundle
 ```
 
-## Enable the Bundle
+## Enable the bundle
 
 !!! Note
 
@@ -26,7 +26,7 @@ return [
 ];
 ```
 
-## Enable the Symfony UX Integration
+## Enable the Symfony UX integration
 
 This bundle provides front-end scripts created using the [Stimulus JavaScript framework](https://stimulus.hotwired.dev/).
 To begin with, make sure your application uses the [Symfony Stimulus Bridge](https://github.com/symfony/stimulus-bridge).
@@ -77,7 +77,7 @@ yarn
 yarn build
 ```
 
-## Enable the Translator Service
+## Enable the translator service
 
 The translator service is required by the bundle to display all labels properly.
 For more information, see [Symfony translation documentation](https://symfony.com/doc/current/translation.html#configuration).

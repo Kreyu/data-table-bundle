@@ -33,8 +33,5 @@ markdown_extensions:
   - pymdownx.superfences
 
 plugins:
-  - git-revision-date-localized:
-      type: datetime
-      locale: en
   - search
   - include-markdown

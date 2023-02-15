@@ -70,5 +70,5 @@ kreyu_data_table:
 
 !!! Note
 
-    The cache subject providers are provided only, if the [symfony/security-bundle](https://symfony.com/doc/current/security.html) component is installed.
+    The persistence subject providers are provided only, if the [symfony/security-bundle](https://symfony.com/doc/current/security.html) component is installed.
     If the component is not installed, then default value equals null, meaning you'll have to specify a subject provider manually if you wish to use the persistence.

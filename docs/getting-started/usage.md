@@ -68,8 +68,8 @@ You've also assigned each a [column type](#available-column-types) (e.g. `Number
     Notice the use of the `ProxyQuery` class, which wraps the query builder.
     Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
 
-    In this example, the [Doctrine ORM](https://github.com/doctrine/orm) is used, and the proxy class comes from the `kreyu/data-table-doctrine-orm-bundle` package.
-    For custom implementation, see [creating custom proxy query classes](docs/create_custom_proxy_query_classes.md).
+    Altrough only the [Doctrine ORM](https://github.com/doctrine/orm) is supported out-of-the-box,
+    [creating custom proxy query classes](../advanced/creating-custom-proxy-query.md) is easy.
 
 ## Creating data table classes
 

@@ -7,7 +7,7 @@ This bundle can be installed at any moment during a project’s lifecycle.
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
 ```bash
-composer require kreyu/data-table-bundle
+composer require kreyu/data-table-bundle:dev-main
 ```
 
 ## Enable the bundle

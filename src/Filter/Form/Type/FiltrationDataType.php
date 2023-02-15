@@ -35,6 +35,7 @@ class FiltrationDataType extends AbstractType
         $resolver
             ->setDefaults([
                 'data_class' => FiltrationData::class,
+                'csrf_protection' => false,
                 'filters' => [],
             ])
         ;

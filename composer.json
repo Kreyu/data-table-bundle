@@ -16,7 +16,6 @@
         "symfony/framework-bundle": "^6.0",
         "symfony/translation": "^6.0",
         "symfony/form": "^6.0",
-        "symfony/security-bundle": "^6.0",
         "symfony/mime": "^6.0",
         "symfony/twig-bundle": "^6.0"
     },

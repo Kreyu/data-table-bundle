@@ -226,7 +226,6 @@ class DataTable implements DataTableInterface
             type: FiltrationDataType::class,
             options: [
                 'method' => 'GET',
-                'csrf_protection' => false,
                 'filters' => $this->config->getFilters(),
             ],
         );

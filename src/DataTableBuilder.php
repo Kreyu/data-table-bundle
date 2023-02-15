@@ -870,6 +870,8 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getDataTable(): DataTableInterface
     {
+        $this->validate();
+
         return new DataTable(
             query: clone $this->query,
             config: $this->getDataTableConfig(),
@@ -882,6 +884,27 @@ class DataTableBuilder implements DataTableBuilderInterface
         $config->locked = true;
 
         return $config;
+    }
+
+    private function validate(): void
+    {
+        $persistenceContexts = [
+            'sorting',
+        ];
+
+        foreach ($persistenceContexts as $context) {
+            if (!$this->{$context . 'Enabled'} || !$this->{$context . 'PersistenceEnabled'}) {
+                continue;
+            }
+
+            if (null === $this->{$context . 'PersistenceAdapter'}) {
+                throw new \LogicException("The data table is configured to use $context persistence, but does not have an adapter.");
+            }
+
+            if (null === $this->{$context . 'PersistenceSubject'}) {
+                throw new \LogicException("The data table is configured to use $context persistence, but does not have a subject.");
+            }
+        }
     }
 
     private function getParameterName(string $prefix): string

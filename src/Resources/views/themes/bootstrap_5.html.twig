@@ -340,7 +340,9 @@
 {% block kreyu_data_table_personalization_form %}
     <div data-controller="kreyu--data-table-bundle--personalization">
         {{ form_start(form) }}
-            {{ form_row(form._token) }}
+            {% if form._token is defined %}
+                {{ form_row(form._token) }}
+            {% endif %}
 
             {% block personalization_form_help %}
                 <div class="alert d-flex align-items-center">

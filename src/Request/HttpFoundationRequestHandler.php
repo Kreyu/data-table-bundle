@@ -69,8 +69,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $dataTable->sort(SortingData::fromArray([
-            'field' => $sortField,
-            'direction' => $sortDirection,
+            'fields' => [
+                [
+                    'name' => $sortField,
+                    'direction' => $sortDirection,
+                ],
+            ],
         ]));
     }
 

@@ -50,6 +50,6 @@ class FilterDataType extends AbstractType
 
     public function getBlockPrefix(): string
     {
-        return 'kreyu_data_table_filter';
+        return 'kreyu_data_table_filter_data';
     }
 }

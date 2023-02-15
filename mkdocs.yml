@@ -21,6 +21,7 @@ nav:
     - 'Personalization': 'reference/personalization.md'
     - 'Exporting': 'reference/exporting.md'
     - 'Persistence': 'reference/persistence.md'
+    - 'Configuration': 'reference/configuration.md'
     - 'Twig': 'reference/twig.md'
   - 'Advanced':
       - 'Creating custom proxy query': 'advanced/creating-custom-proxy-query.md'

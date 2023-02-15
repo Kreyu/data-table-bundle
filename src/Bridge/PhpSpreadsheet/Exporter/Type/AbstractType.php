@@ -96,6 +96,6 @@ abstract class AbstractType extends BaseAbstractType
 
     public function getParent(): ?string
     {
-        return ExporterType::class;
+        return PhpSpreadsheetType::class;
     }
 }

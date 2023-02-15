@@ -33,7 +33,7 @@ class CsvType extends AbstractType
             ->setAllowedTypes('enclosure_required', 'bool')
             ->setAllowedTypes('line_ending', 'string')
             ->setAllowedTypes('sheet_index', 'int')
-            ->setAllowedTypes('use_bom', 'string')
+            ->setAllowedTypes('use_bom', 'bool')
             ->setAllowedTypes('include_separator_line', 'bool')
             ->setAllowedTypes('excel_compatibility', 'bool')
             ->setAllowedTypes('output_encoding', 'string')

@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class ExporterType implements ExporterTypeInterface
+final class PhpSpreadsheetType implements ExporterTypeInterface
 {
     public function export(DataTableView $view, array $options = []): File
     {

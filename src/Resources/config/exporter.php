@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\PhpSpreadsheetType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsxType;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactory;
@@ -42,6 +43,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.exporter.type.exporter', ExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.exporter.type.phpspreadsheet', PhpSpreadsheetType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 

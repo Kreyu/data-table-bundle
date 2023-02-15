@@ -20,7 +20,7 @@ final class FilterType implements FilterTypeInterface
         return true;
     }
 
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
     }
 

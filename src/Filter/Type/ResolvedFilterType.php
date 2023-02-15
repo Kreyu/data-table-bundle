@@ -55,14 +55,14 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
         }
     }
 
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
-        $this->parent?->apply($query, $data, $filter);
+        $this->parent?->apply($query, $data, $filter, $options);
 
-        $this->innerType->apply($query, $data, $filter);
+        $this->innerType->apply($query, $data, $filter, $options);
 
         foreach ($this->typeExtensions as $extension) {
-            $extension->apply($query, $data, $filter);
+            $extension->apply($query, $data, $filter, $options);
         }
     }
 

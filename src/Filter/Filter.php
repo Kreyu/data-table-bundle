@@ -19,7 +19,7 @@ class Filter implements FilterInterface
 
     public function apply(ProxyQueryInterface $query, FilterData $data): void
     {
-        $this->type->apply($query, $data, $this);
+        $this->type->apply($query, $data, $this, $this->options);
     }
 
     public function getName(): string

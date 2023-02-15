@@ -888,6 +888,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     private function validate(): void
     {
+        if (empty($this->columns)) {
+            throw new \LogicException('The data table has no configured columns.');
+        }
+
         $persistenceContexts = [
             'sorting',
         ];

@@ -205,6 +205,10 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
+        if (empty($this->config->getColumns())) {
+            throw new \LogicException('The data table has no configured columns.');
+        }
+
         if (null === $this->getFiltrationForm()->getData()) {
             $this->initializeFiltration();
         }

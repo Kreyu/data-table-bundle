@@ -28,7 +28,7 @@ class EntityType extends AbstractType
             return;
         }
 
-        $parameterName = $query->getUniqueParameterId();
+        $parameterName = $this->getUniqueParameterName($query, $filter);
 
         $expression = $query->expr()->{$expressionBuilderMethodName}($filter->getQueryPath(), ":$parameterName");
 

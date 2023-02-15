@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,8 +81,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
         $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
 
-        $defaultPage = $defaultPaginationData?->getPage();
-        $defaultPerPage = $defaultPaginationData?->getPerPage();
+        $defaultPage = $defaultPaginationData?->getPage() ?? PaginationInterface::DEFAULT_PAGE;
+        $defaultPerPage = $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
 
         $page = $this->extractQueryParameter($request, "[$pageParameterName]", $defaultPage);
         $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", $defaultPerPage);

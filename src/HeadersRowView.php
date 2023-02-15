@@ -13,6 +13,8 @@ class HeadersRowView
     ) {
         $columns = (clone $parent)->vars['columns'];
 
+        $this->vars['columns'] = [];
+
         foreach ($columns as $column) {
             $this->vars['columns'][$column->getName()] = $column->createView($parent);
         }

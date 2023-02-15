@@ -3,6 +3,15 @@
 A data table can be exported to various formats, using _exporters_, each of which are built 
 with the help of an exporter _type_ (e.g. `CsvType`, `XlsxType`, etc).
 
+## Prerequisites
+
+If you plan to use the built-in [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) exporter types,
+make sure you have the PhpSpreadsheet installed:
+
+```bash
+composer require phpoffice/phpspreadsheet
+```
+
 ## Configuring the exporting feature
 
 By default, the exporting is enabled for every data table type.

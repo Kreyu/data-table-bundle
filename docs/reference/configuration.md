@@ -26,6 +26,8 @@ either by passing it as a data table option, or by using the data table builder 
     The default configuration is loaded by the [DefaultConfigurationExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Core/DefaultConfigurationExtension.php),
     that extends every data table type class with [DataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableType.php) specified as a parent.
 
+The given values represent the default ones, unless specifically stated otherwise:
+
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
@@ -50,7 +52,7 @@ kreyu_data_table:
       form_factory: form.factory
       filter_factory: kreyu_data_table.filter.factory
     personalization:
-      enabled: true
+      enabled: false
       persistence_enabled: false
       persistence_adapter: kreyu_data_table.personalization.persistence.adapter.cache  # if symfony/cache is installed, null otherwise
       persistence_subject_provider: kreyu_data_table.persistence.subject_provider.token_storage # if symfony/security-bundle is installed, null otherwise

@@ -111,7 +111,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->booleanNode('enabled')
-                                    ->defaultValue(true)
+                                    ->defaultTrue()
                                 ->end()
                                 ->scalarNode('exporter_factory')
                                     ->defaultValue('kreyu_data_table.exporter.factory')

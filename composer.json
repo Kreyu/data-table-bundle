@@ -21,5 +21,10 @@
         "friendsofphp/php-cs-fixer": "^3.13",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.11",
         "symfony/maker-bundle": "^1.48"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kreyu\\Bundle\\DataTableBundle\\": "src"
+        }
     }
 }

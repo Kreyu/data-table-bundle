@@ -14,10 +14,10 @@ This bundle provides integration that works out-of-the-box.
 
 To begin with, make sure your application uses the [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html#usage).
 
-The next step is... voilà! ✨ You don't have to configure anything extra, now your data tables work asynchronously!
+The next step is... voilà! ✨ You don't have to configure anything extra, your data tables automatically work asynchronously!
 
 The magic comes from the [@KreyuDataTable/themes/base.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) 
-template, which wraps the whole bundle in the `<turbo-frame>` tag:
+template, which wraps the whole table in the `<turbo-frame>` tag:
 
 ```twig
 {% block kreyu_data_table %}

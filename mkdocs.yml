@@ -25,9 +25,10 @@ nav:
     - 'Configuration': 'reference/configuration.md'
     - 'Twig': 'reference/twig.md'
   - 'Advanced':
-      - 'Creating custom proxy query': 'advanced/creating-custom-proxy-query.md'
-      - 'Creating custom request handler': 'advanced/creating-custom-request-handler.md'
-      - 'Creating data table type extension': 'advanced/creating-data-table-type-extension.md'
+    - 'Integration with Symfony UX Turbo': 'advanced/integration-with-symfony-ux-turbo.md'
+    - 'Creating custom proxy query': 'advanced/creating-custom-proxy-query.md'
+    - 'Creating custom request handler': 'advanced/creating-custom-request-handler.md'
+    - 'Creating data table type extension': 'advanced/creating-data-table-type-extension.md'
 
 markdown_extensions:
   - markdown.extensions.admonition

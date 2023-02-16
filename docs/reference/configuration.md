@@ -5,14 +5,16 @@ This bundle can be configured using the `config/packages/kreyu_data_table.yaml` 
 ## Themes
 
 You can define which Twig theme to use with the data tables using the `themes` node.
-By default, the Bootstrap 5 theme is used. Because themes are built using [Twig blocks](https://twig.symfony.com/doc/3.x/tags/block.html),
+By default, the base theme is used. Because themes are built using [Twig blocks](https://twig.symfony.com/doc/3.x/tags/block.html),
 the bundle iterates through given themes, until it find the desired block, using the first one it finds.
+
+For more information about theming, see [theming reference](theming.md).
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
   themes:
-    - '@KreyuDataTable/themes/bootstrap_5.html.twig'
+    - '@KreyuDataTable/themes/base.html.twig'
 ```
 
 ## Data table builder defaults

@@ -21,6 +21,7 @@ nav:
     - 'Personalization': 'reference/personalization.md'
     - 'Exporting': 'reference/exporting.md'
     - 'Persistence': 'reference/persistence.md'
+    - 'Theming': 'reference/theming.md'
     - 'Configuration': 'reference/configuration.md'
     - 'Twig': 'reference/twig.md'
   - 'Advanced':

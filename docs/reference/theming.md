@@ -45,7 +45,7 @@ you can provide your own theme with only a fraction of Twig blocks,
 using the built-in themes as a fallback, for example:
 
 ```twig
-# templates/data_table/theme.html.twig
+{# templates/data_table/theme.html.twig #}
 {% block kreyu_data_table_column_boolean %}
     {# ... #}
 {% endblock %}

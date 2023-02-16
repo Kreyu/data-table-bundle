@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('themes')
                     ->scalarPrototype()->end()
-                    ->defaultValue(['@KreyuDataTable/themes/bootstrap_5.html.twig'])
+                    ->defaultValue(['@KreyuDataTable/themes/base.html.twig'])
                 ->end()
                 ->arrayNode('defaults')
                     ->addDefaultsIfNotSet()

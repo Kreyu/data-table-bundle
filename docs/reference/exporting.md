@@ -35,7 +35,7 @@ The following exporter types are natively available in the bundle:
 - Base types
     - [ExporterType](#exportertype)
 
-{% include-markdown "exporter/creating_custom_exporter_type.md" heading-offset=1 %}
+{% include-markdown "exporters/creating_custom_exporter_type.md" heading-offset=1 %}
 
 ## Built-in types reference
 

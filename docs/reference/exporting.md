@@ -22,8 +22,7 @@ Every part of the exporting feature can be configured using the [data table opti
 
 ## Downloading the file
 
-To download an export file, use the `export()` method on the data table, which returns
-an instance of HttpFoundation File object.
+To download an export file, use the `export()` method on the data table.
 
 If you're using data tables in controllers, use it in combination with `isExporting()` method:
 

@@ -20,6 +20,44 @@ Every part of the exporting feature can be configured using the [data table opti
 
 - `exporting_enabled` - to enable/disable feature completely;
 
+## Downloading the file
+
+To download an export file, use the `export()` method on the data table, which returns
+an instance of HttpFoundation File object.
+
+If you're using data tables in controllers, use it in combination with `isExporting()` method:
+
+```php
+// src/Controller/ProductController.php
+namespace App\Controller;
+
+use App\DataTable\Type\ProductType;
+use App\Repository\ProductRepository;
+use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ProductController extends AbstractController
+{
+    use DataTableControllerTrait;
+    
+    public function index(Request $request, ProductRepository $repository): Response
+    {
+        // ...
+
+        $dataTable = $this->createDataTable(ProductType::class, $query);
+        $dataTable->handleRequest($request);
+        
+        if ($dataTable->isExporting()) {
+            return $this->file($dataTable->export());
+        }
+        
+        // ...
+    }
+}
+```
+
 ## Built-in exporter types
 
 The following exporter types are natively available in the bundle:

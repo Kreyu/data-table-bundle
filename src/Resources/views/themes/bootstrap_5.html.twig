@@ -171,10 +171,10 @@
                             </div>
 
                             <ul
-                                    class="p-2 mb-0"
-                                    role="button"
-                                    data-visible="1"
-                                    data-kreyu--data-table-bundle--personalization-target="visibleColumns"
+                                class="p-2 mb-0"
+                                role="button"
+                                data-visible="1"
+                                data-kreyu--data-table-bundle--personalization-target="visibleColumns"
                             >
                                 {% for child in children|filter(child => child.vars.value.visible) %}
                                     {{ form_row(child) }}
@@ -219,18 +219,21 @@
 {% block kreyu_data_table_export_form %}
     <div>
         {{ form_start(form) }}
-        <div class="mb-3">
-            {{ form_row(form.exporter) }}
-        </div>
-        <div class="mb-3">
-            {{ form_row(form.strategy) }}
-        </div>
-        <div class="mb-3">
-            {{ form_row(form.includePersonalization) }}
-        </div>
-        <div class="text-end">
-            <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
-        </div>
+            <div class="mb-3">
+                {{ form_row(form.filename) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(form.exporter) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(form.strategy) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(form.includePersonalization) }}
+            </div>
+            <div class="text-end">
+                <button class="btn btn-primary">{{ 'Apply'|trans({}, 'KreyuDataTable') }}</button>
+            </div>
         {{ form_end(form) }}
     </div>
 {% endblock %}

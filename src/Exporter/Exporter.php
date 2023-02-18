@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
-use Symfony\Component\HttpFoundation\File\File;
 
 class Exporter implements ExporterInterface
 {
@@ -22,8 +21,8 @@ class Exporter implements ExporterInterface
         return $this->name;
     }
 
-    public function export(DataTableView $view): File
+    public function export(DataTableView $view, string $filename): ExportFile
     {
-        return $this->type->getInnerType()->export($view, $this->options);
+        return $this->type->getInnerType()->export($view, $filename, $this->options);
     }
 }

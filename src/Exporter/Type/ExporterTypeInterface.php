@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Symfony\Component\HttpFoundation\File\File;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface ExporterTypeInterface
 {
-    public function export(DataTableView $view, array $options = []): File;
+    public function export(DataTableView $view, string $filename, array $options = []): ExportFile;
 
     public function configureOptions(OptionsResolver $resolver): void;
 

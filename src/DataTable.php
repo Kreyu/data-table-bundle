@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
@@ -17,7 +18,6 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\File\File;
 
 class DataTable implements DataTableInterface
 {
@@ -147,14 +147,14 @@ class DataTable implements DataTableInterface
         return $this->getExportForm()->isSubmitted();
     }
 
-    public function export(): File
+    public function export(ExportData $exportData = null): ExportFile
     {
         if (!$this->config->isExportingEnabled()) {
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
         /** @var ExportData $exportData */
-        $exportData = $this->getExportForm()->getData();
+        $exportData ??= $this->getExportForm()->getData();
 
         $dataTable = clone $this;
 
@@ -166,7 +166,9 @@ class DataTable implements DataTableInterface
             $dataTable->personalize(PersonalizationData::fromDataTable($this));
         }
 
-        return $exportData->exporter->export($dataTable->createView());
+        $filename = $exportData->filename ?? $this->getConfig()->getName();
+
+        return $exportData->exporter->export($dataTable->createView(), $filename);
     }
 
     public function hasActiveFilters(): bool
@@ -269,6 +271,7 @@ class DataTable implements DataTableInterface
             options: [
                 'method' => 'POST',
                 'exporters' => $this->config->getExporters(),
+                'default_filename' => $this->getConfig()->getName(),
             ],
         );
 

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType as BaseExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class PhpSpreadsheetType implements ExporterTypeInterface
 {
-    public function export(DataTableView $view, array $options = []): File
+    public function export(DataTableView $view, string $filename, array $options = []): ExportFile
     {
         throw new \LogicException('Base exporter type cannot be called directly');
     }

@@ -888,12 +888,19 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     private function validate(): void
     {
+        if (null === $this->query) {
+            throw new \LogicException('The data table has no proxy query. You must provide it using either the data table factory or the builder "setQuery()" method.');
+        }
+
         if (empty($this->columns)) {
-            throw new \LogicException('The data table has no configured columns.');
+            throw new \LogicException('The data table has no configured columns. You must provide them using the builder "addColumn()" method.');
         }
 
         $persistenceContexts = [
             'sorting',
+            'pagination',
+            'filtration',
+            'personalization',
         ];
 
         foreach ($persistenceContexts as $context) {

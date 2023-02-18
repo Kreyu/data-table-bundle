@@ -52,21 +52,21 @@
         {% block table_body %}
             <tbody>
                 {% block table_body_row %}
-                    <tr>
-                        {% if values_rows|length > 0 %}
-                            {% block table_body_row_value %}
-                                {% for values_row in values_rows %}
-                                    {{ data_table_values_row(values_row) }}
-                                {% endfor %}
-                            {% endblock %}
-                        {% else %}
-                            {% block table_body_row_no_results %}
-                                <td {% with { attr: table_body_row_no_results_attr } %}{{ block('attributes') }}{% endwith %} colspan="{{ columns|length }}">
+                    {% if values_rows|length > 0 %}
+                        {% block table_body_row_value %}
+                            {% for values_row in values_rows %}
+                                <tr>{{ data_table_values_row(values_row) }}</tr>
+                            {% endfor %}
+                        {% endblock %}
+                    {% else %}
+                        {% block table_body_row_no_results %}
+                            <tr>
+                                <td {% with { attr: table_body_row_no_results_attr|default({}) } %}{{ block('attributes') }}{% endwith %} colspan="{{ columns|length }}">
                                     {{ 'No results'|trans({}, 'KreyuDataTable') }}
                                 </td>
-                            {% endblock %}
-                        {% endif %}
-                    </tr>
+                            </tr>
+                        {% endblock %}
+                    {% endif %}
                 {% endblock %}
             </tbody>
         {% endblock %}

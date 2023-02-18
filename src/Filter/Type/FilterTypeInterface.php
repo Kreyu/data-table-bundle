@@ -18,11 +18,6 @@ interface FilterTypeInterface
     /**
      * @param T $query
      */
-    public function supports(ProxyQueryInterface $query): bool;
-
-    /**
-     * @param T $query
-     */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 
     public function buildView(FilterView $view, FilterInterface $filter, array $options): void;

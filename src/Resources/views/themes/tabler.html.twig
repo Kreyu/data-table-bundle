@@ -75,3 +75,9 @@
         <span class="mx-2" aria-hidden="true">&times;</span>
     </a>
 {% endblock %}
+
+{% block table_body_row_no_results %}
+    {% with { table_body_row_no_results_attr: { class: 'text-muted text-center' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}

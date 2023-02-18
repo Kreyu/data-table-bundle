@@ -1,10 +1,10 @@
 # Operators
-EQUAL: equals
+EQUALS: equals
 CONTAINS: contains
 NOT_CONTAINS: not contains
-NOT_EQUAL: not equals
-GREATER_EQUAL: greater or equal
-LESS_EQUAL: lesser or equal
+NOT_EQUALS: not equals
+GREATER_EQUALS: greater or equal
+LESS_EQUALS: lesser or equal
 GREATER_THAN: greater than
 LESS_THAN: lesser than
 STARTS_WITH: starts with

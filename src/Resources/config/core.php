@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
@@ -9,6 +10,8 @@ use Kreyu\Bundle\DataTableBundle\DataTableRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Maker\MakeDataTable;
 use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
+use Kreyu\Bundle\DataTableBundle\Query\ChainProxyQueryFactory;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
@@ -46,6 +49,7 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.factory', DataTableFactory::class)
         ->args([
             service('kreyu_data_table.registry'),
+            service('kreyu_data_table.proxy_query.factory.chain'),
         ])
         ->alias(DataTableFactoryInterface::class, 'kreyu_data_table.factory')
     ;
@@ -62,6 +66,20 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.request_handler.http_foundation', HttpFoundationRequestHandler::class)
         ->alias(RequestHandlerInterface::class, 'kreyu_data_table.request_handler.http_foundation')
+    ;
+
+    $services
+        ->set('kreyu_data_table.proxy_query.factory.chain', ChainProxyQueryFactory::class)
+        ->args([
+            tagged_iterator('kreyu_data_table.proxy_query.factory'),
+        ])
+        ->alias(ProxyQueryFactoryInterface::class, 'kreyu_data_table.query.proxy_query_factory.chain')
+    ;
+
+
+    $services
+        ->set('kreyu_data_table.proxy_query.factory.doctrine_orm', DoctrineOrmProxyQueryFactory::class)
+        ->tag('kreyu_data_table.proxy_query.factory')
     ;
 
     $services

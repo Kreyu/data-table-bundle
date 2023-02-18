@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface as BaseProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumericType extends AbstractType
 {
     /**
-     * @param ProxyQueryInterface $query
+     * @param DoctrineOrmProxyQuery $query
      */
-    public function apply(BaseProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
+    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
         $operator = $data->getOperator() ?? Operator::EQUALS;
         $value = $data->getValue();

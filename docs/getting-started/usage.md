@@ -34,7 +34,6 @@ If your controller uses the [DataTableControllerTrait](src/DataTableControllerTr
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -48,9 +47,9 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $repository): Response
     {
-        $products = $repository->createQueryBuilder('product');
+        $query = $repository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTableBuilder(new ProxyQuery($products))
+        $dataTable = $this->createDataTableBuilder($query)
             ->addColumn('id', NumberType::class)
             ->addColumn('name', TextType::class)
             ->getDataTable();
@@ -62,14 +61,6 @@ class ProductController extends AbstractController
 
 In this example, you've added two columns to your data table - `id` and `name` - corresponding to the `id` and `name` properties of the `Product` class.
 You've also assigned each a [column type](#available-column-types) (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
-
-!!! note
-
-    Notice the use of the `ProxyQuery` class, which wraps the query builder.
-    Classes implementing the `ProxyQueryInterface` are used to modify the underlying query by the data tables.
-
-    Altrough only the [Doctrine ORM](https://github.com/doctrine/orm) is supported out-of-the-box,
-    [creating custom proxy query classes](../advanced/creating-custom-proxy-query.md) is easy.
 
 ## Creating data table classes
 
@@ -115,7 +106,6 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -129,9 +119,9 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $repository): Response
     {
-        $products = $repository->createQueryBuilder('product');
+        $query = $repository->createQueryBuilder('product');
         
-        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        $dataTable = $this->createDataTable(ProductType::class, $query);
             
         // ...
     }
@@ -148,7 +138,6 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -162,9 +151,9 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $repository): Response
     {
-        $products = $repository->createQueryBuilder('product');
+        $query = $repository->createQueryBuilder('product');
         
-        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        $dataTable = $this->createDataTable(ProductType::class, $query);
             
         return $this->render('product/index.html.twig', [
             'data_table' => $dataTable->createView(),        
@@ -214,7 +203,6 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -228,9 +216,9 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $repository): Response
     {
-        $products = $repository->createQueryBuilder('product');
+        $query = $repository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products));
+        $dataTable = $this->createDataTable(ProductType::class, $query);
         $dataTable->handleRequest($request);
 
         return $this->render('product/index.html.twig', [
@@ -273,7 +261,6 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableDoctrineOrmBundle\Query\ProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -287,12 +274,12 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $repository): Response
     {
-        $products = $repository->createQueryBuilder('product');
+        $query = $repository->createQueryBuilder('product');
 
         // use some PHP logic to decide if this column is displayed or not
         $displayIdentifierColumn = ...;
 
-        $dataTable = $this->createDataTable(ProductType::class, new ProxyQuery($products), [
+        $dataTable = $this->createDataTable(ProductType::class, $query, [
             'display_identifier_column' => $displayIdentifierColumn,
         ]);
 

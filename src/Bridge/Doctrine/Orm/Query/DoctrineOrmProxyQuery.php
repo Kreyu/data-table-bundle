@@ -9,9 +9,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
-class ProxyQuery implements ProxyQueryInterface
+/**
+ * @mixin QueryBuilder
+ */
+class DoctrineOrmProxyQuery implements ProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
 

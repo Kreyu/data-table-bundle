@@ -1,6 +1,6 @@
 # TextType
 
-The [TextType](../../../src/Column/Type/TextType.php) represents a column with value displayed as a text.
+The [TextType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TextType.php) represents a column with value displayed as a text.
 
 ## Options
 

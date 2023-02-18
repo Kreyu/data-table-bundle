@@ -1,6 +1,6 @@
 # XlsxType
 
-The [XlsxType](../../src/Exporter/Type/XlsxType.php) represents an exporter that uses a [PhpSpreadsheet XLSX writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Xlsx.php).
+The [XlsxType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/XlsxType.php) represents an exporter that uses a [PhpSpreadsheet XLSX writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Xlsx.php).
 
 ## Options
 

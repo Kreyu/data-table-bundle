@@ -1,6 +1,6 @@
 # BooleanType
 
-The [BooleanType](../../../src/Column/Type/BooleanType.php) column represents a column with value displayed as a "yes" or "no" badge.
+The [BooleanType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/BooleanType.php) column represents a column with value displayed as a "yes" or "no" badge.
 
 ## Options
 

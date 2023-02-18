@@ -9,8 +9,8 @@ They have 2 main use-cases:
 
 ## Defining the data table type extension
 
-First, create the data table type extension class extending from [AbstractTypeExtension](../src/Extension/AbstractTypeExtension.php) 
-(you can implement [DataTableTypeExtensionInterface](../src/Extension/DataTableTypeExtensionInterface.php) instead if you prefer):
+First, create the data table type extension class extending from [AbstractTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/srcsrc/Extension/AbstractTypeExtension.php) 
+(you can implement [DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/srcsrc/Extension/DataTableTypeExtensionInterface.php) instead if you prefer):
 
 ```php
 // src/DataTable/Extension/LoggedUserExtension.php

@@ -1,6 +1,6 @@
 # ColumnType
 
-The [ColumnType](../../../src/Column/Type/ColumnType.php) represents a base column, used as a parent for every other type in the bundle.
+The [ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php) represents a base column, used as a parent for every other type in the bundle.
 
 ## Options
 

@@ -1,6 +1,6 @@
 # PhpSpreadsheetType
 
-The [PhpSpreadsheetType](../../src/Exporter/Type/PhpSpreadsheetType.php) represents a base exporter, 
+The [PhpSpreadsheetType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/PhpSpreadsheetType.php) represents a base exporter, 
 used as a parent for every other PhpSpreadsheet-oriented type in the bundle.
 
 ## Options

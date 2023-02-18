@@ -1,6 +1,6 @@
 # ActionsType
 
-The [ActionsType](../../../src/Column/Type/ActionsType.php) represents a column with value displayed as a list of actions.
+The [ActionsType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ActionsType.php) represents a column with value displayed as a list of actions.
 
 ## Options
 

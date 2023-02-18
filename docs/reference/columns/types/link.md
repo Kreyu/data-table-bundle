@@ -1,6 +1,6 @@
 # LinkType
 
-The [LinkType](../../../src/Column/Type/LinkType.php) represents a column with value displayed as a link.
+The [LinkType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/LinkType.php) represents a column with value displayed as a link.
 
 ## Options
 

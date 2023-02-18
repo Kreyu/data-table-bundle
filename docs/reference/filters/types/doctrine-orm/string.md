@@ -1,6 +1,6 @@
 # StringType
 
-The [StringType](../../src/Filter/Type/StringType.php) represents a filter that operates on string values.
+The [StringType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/StringType.php) represents a filter that operates on string values.
 
 ## Supported operators
 

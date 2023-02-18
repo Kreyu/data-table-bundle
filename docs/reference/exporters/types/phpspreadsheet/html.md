@@ -1,6 +1,6 @@
 # HtmlType
 
-The [HtmlType](../../src/Exporter/Type/HtmlType.php) represents an exporter that uses a [PhpSpreadsheet HTML writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Html.php).
+The [HtmlType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/HtmlType.php) represents an exporter that uses a [PhpSpreadsheet HTML writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Html.php).
 
 !!! Note
 

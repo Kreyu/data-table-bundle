@@ -1,9 +1,9 @@
 # Creating custom request handler
 
-This bundle comes with [HttpFoundation request handler](../src/Request/HttpFoundationRequestHandler.php) built-in.
+This bundle comes with [HttpFoundation request handler](https://github.com/Kreyu/data-table-bundle/blob/main/srcsrc/Request/HttpFoundationRequestHandler.php) built-in.
 However, it's common to create custom request handlers to solve specific purposes in your projects.
 
-To create a custom request handler, create a class that implements [RequestHandlerInterface](../src/Request/RequestHandlerInterface.php):
+To create a custom request handler, create a class that implements [RequestHandlerInterface](https://github.com/Kreyu/data-table-bundle/blob/main/srcsrc/Request/RequestHandlerInterface.php):
 
 ```php
 // src/DataTable/Request/ExcelRequestHandler.php

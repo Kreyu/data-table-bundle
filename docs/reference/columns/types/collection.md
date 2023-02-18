@@ -1,6 +1,6 @@
 # CollectionType
 
-The [CollectionType](../../../src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
+The [CollectionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
 
 ## Options
 

@@ -132,6 +132,6 @@ so the chain proxy query factory will know to skip that factory and check other 
 
 ## Registering the proxy query factory as a service
 
-Proxy query factories must be registered as services and tagged with the `kreyu_data_table.column.proxy_query.factory` tag.
+Proxy query factories must be registered as services and tagged with the `kreyu_data_table.proxy_query.factory` tag.
 If you're using the [default services.yaml configuration](https://symfony.com/doc/current/service_container.html#service-container-services-load-example),
 this is already done for you, thanks to [autoconfiguration](https://symfony.com/doc/current/service_container.html#services-autoconfigure).

@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -51,6 +52,11 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $container
             ->registerForAutoconfiguration(PersistenceAdapterInterface::class)
             ->addTag('kreyu_data_table.persistence.adapter')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(ProxyQueryFactoryInterface::class)
+            ->addTag('kreyu_data_table.proxy_query.factory')
         ;
 
         $container

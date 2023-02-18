@@ -1,37 +1,69 @@
-# Creating custom proxy query
+# Proxy queries
 
-This bundle comes with [DoctrineOrmProxyQuery](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQuery.php) built-in.
+Proxy queries are classes that implements [ProxyQueryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ProxyQueryInterface.php).
+
+They work as an "adapter" for the data source you're using in the application.
+For example, if you want to display a list of products from the database, and your application uses Doctrine ORM,
+then you'd want to use the built-in [DoctrineOrmProxyQuery](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQuery.php).
+If your data comes from another source (from an array, from CSV, etc.), then you can create a custom proxy query class.
+
+## Creating custom proxy query
 
 To create a custom request handler, create a class that implements [ProxyQueryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ProxyQueryInterface.php):
 
 ```php
-// src/DataTable/Query/CustomProxyQuery.php
+// src/DataTable/Query/ArrayProxyQuery.php
 namespace App\DataTable\Query;
 
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
-class CustomProxyQuery implements ProxyQueryInterface
+class ArrayProxyQuery implements ProxyQueryInterface
 {
+    private int $page = 1;
+    private int $perPage = 25;
+    private int $offset = 0;
+
+    public function __construct(
+        private array $data,
+    ) {
+    }
+    
     public function sort(SortingData $sortingData): void
     {
-        // ...
+        foreach ($sortingData->getFields() as $sortingField) {
+            uksort($this->data, function (array $a, array $b) use ($sortingField) {
+                if ($sortingField->getDirection() === 'ASC') {
+                    return $a[$sortingField->getName()] <=> $b[$sortingField->getName()];
+                }
+                
+                return $b[$sortingField->getName()] <=> $a[$sortingField->getName()];
+            });
+        }
     }
 
     public function paginate(PaginationData $paginationData): void
     {
-        // ...
+        $this->page = $paginationData->getPage();
+        $this->perPage = $paginationData->getPerPage();
+        $this->offset = $paginationData->getOffset();
     }
 
     public function getPagination(): PaginationInterface
     {
-        // ...
+        return new Pagination(
+            items: new \LimitIterator(
+                new \ArrayIterator($this->data), 
+                $this->offset, 
+                $this->perPage
+            ),
+            currentPageNumber: $this->page,
+            totalItemCount: count($this->data),
+            itemNumberPerPage: $this->perPage,
+        );
     }
 }
 ```
-
-The current page results should be container within the pagination class. 
-Take look at the built-in [DoctrineOrmProxyQuery](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQuery.php) class.
 
 ## Creating the proxy query factory
 
@@ -75,21 +107,22 @@ on every proxy query factory registered in the container, and returns the first 
 To create a custom request handler, create a class that implements [ProxyQueryFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ProxyQueryFactoryInterface.php):
 
 ```php
-// src/DataTable/Query/CustomProxyQueryFactory.php
+// src/DataTable/Query/ArrayProxyQueryFactory.php
 namespace App\DataTable\Query;
 
+use App\DataTable\Query\ArrayProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
-class CustomProxyQueryFactory implements ProxyQueryFactoryInterface
+class ArrayProxyQueryFactory implements ProxyQueryFactoryInterface
 {
     public function create(mixed $data): ProxyQueryInterface
     {
-        if ($data instanceof CustomDataSourceObject) {
-            return new CustomProxyQuery($data);        
+        if (is_array($data)) {
+            return new ArrayProxyQuery($data);        
         }
 
-        throw new UnexpectedTypeException($data, CustomProxyQuery::class);
+        throw new UnexpectedTypeException($data, ArrayProxyQuery::class);
     }
 }
 ```

@@ -1,6 +1,6 @@
 # Creating column type extension
 
-Column type extensions are incredibly powerful: they allow you to modify any existing form field types across the entire system.
+Column type extensions are incredibly powerful: they allow you to modify any existing column types across the entire system.
 
 They have 2 main use-cases:
 

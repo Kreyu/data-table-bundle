@@ -5,9 +5,9 @@ However, it's common to create custom column types to solve specific purposes in
 
 ## Creating types based on built-in types
 
-The easiest way to create a column type is to base it on one of the [existing column types]().
+The easiest way to create a column type is to base it on one of the [existing column types](#built-in-column-types).
 Imagine, that your project displays a column with link to the related entity `show` view.
-This can be implemented with a [LinkType](), where the `href` option is set to the url to the `show` view:
+This can be implemented with a [LinkType](#linktype), where the `href` option is set to the url to the `show` view:
 
 ```php
 // src/DataTable/Type/ProductType.php
@@ -48,7 +48,8 @@ However, if you use the same column type in several data tables, repeating the g
 In this example, a better solutions is to create a custom column type based on `LinkType`.
 The custom type looks and behaves like a `LinkType`, but the `href` and `formatter` options are already populated, so you don't need to define them.
 
-Column types are PHP classes that implement [ColumnTypeInterface](), but you should instead extend from [AbstractType](),
+Column types are PHP classes that implement [ColumnTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnTypeInterface.php), 
+but you should instead extend from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractType.php),
 which already implements that interface and provides some utilities.
 By convention, they are stored in the `src/DataTable/Column/Type/` directory:
 
@@ -120,7 +121,7 @@ class ProductType extends AbstractType
 Some column types are so specific to your projects that they cannot be based on any existing form types because they are too different.
 Consider an application, that wants to display a tonnage in many units.
 
-As explained above, column types are PHP classes that implement [ColumnTypeInterface](), although it's more convenient to extend instead from [AbstractType]():
+As explained above, column types are PHP classes that implement [ColumnTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnTypeInterface.php), although it's more convenient to extend instead from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractType.php):
 
 ```php
 // src/DataTable/Column/Type/QuantityType.php
@@ -152,7 +153,7 @@ If your custom type is based on another type (i.e. they share some functionality
 
 Otherwise, if your custom type is build from scratch, you can omit `getParent()`.
 
-By default, the `AbstractType` class returns the generic [ColumnType]() type, which is the root parent for all column types.
+By default, the `AbstractType` class returns the generic [ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php) type, which is the root parent for all column types.
 
 ## Adding configuration for the type
 
@@ -227,7 +228,7 @@ class ProductType extends AbstractType
 
 ## Creating the type template
 
-By default, custom column types will be rendered using the [data table themes]() configured in the application.
+By default, custom column types will be rendered using the [data table themes](../../reference/theming.md) configured in the application.
 However, for some types you may prefer to create a custom template in order to customize how they look or their HTML structure.
 
 First, create a new Twig template anywhere in the application to store the fragments used to render the types:
@@ -244,7 +245,7 @@ First, create a new Twig template anywhere in the application to store the fragm
     Notice the use of the `extends` with the built-in Bootstrap 5 theme.  
     By doing it this way, you can overwrite only specific parts of the theme.
 
-Then, update the [theme configuration option]() to use this new template:
+Then, update the [theme configuration option](../../reference/configuration.md#themes) to use this new template:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
@@ -321,8 +322,8 @@ The variables added in `buildView()` are available in the column type template a
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
 {% block data_table_quantity %}
-    {% if value is not null %}
-        {{- value|number_format(decimals, decimal_separator, thousands_separator) -}}
+    {% if converted_value is not null %}
+        {{- converted_value|number_format(decimals, decimal_separator, thousands_separator) -}}
     {% endif %}
 {% endblock %}
 ```

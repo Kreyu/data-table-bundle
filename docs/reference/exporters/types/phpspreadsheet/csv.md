@@ -1,6 +1,8 @@
 # CsvType
 
-The [CsvType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/CsvType.php) represents an exporter that uses a [PhpSpreadsheet CSV writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Csv.php).
+S|Requires PhpSpreadsheet||
+
+The [CsvType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/CsvType.php) represents an exporter that uses a [PhpSpreadsheet CSV writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Csv.php).
 
 !!! Note
 

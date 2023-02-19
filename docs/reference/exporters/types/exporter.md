@@ -1,6 +1,7 @@
 # ExporterType
 
-The [ExporterType](#) represents a base exporter, used as a parent for every other type in the bundle.
+The [ExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterType.php) represents a base exporter, 
+used as a parent for every other type in the bundle.
 
 ## Options
 

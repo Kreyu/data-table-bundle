@@ -9,7 +9,7 @@ They have 2 main use-cases:
 
 ## Defining the column type extension
 
-First, create the column type extension class extending from [AbstractTypeExtension]() (you can implement [ColumnTypeExtensionInterface]() instead if you prefer):
+First, create the column type extension class extending from [AbstractTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/AbstractTypeExtension.php) (you can implement [ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/ColumnTypeExtensionInterface.php) instead if you prefer):
 
 ```php
 // src/DataTable/Column/Extension/TextTypeExtension.php
@@ -27,14 +27,8 @@ class TextTypeExtension extends AbstractTypeExtension
     }
 }
 ```
+
 The only method you must implement is `getExtendedTypes()`, which is used to configure which field types you want to modify.
-
-Depending on your use case, you may need to override some of the following methods:
-
-- `buildView()`
-- `configureOptions()`
-
-For more information on what those methods do, see the [custom column field type]() article.
 
 ## Registering the extension as a service
 
@@ -46,7 +40,7 @@ Once the extension is registered, any method that you've overridden (e.g. `build
 
 ## Generic column type extensions
 
-You can modify several column types at once by specifying their common parent ([Column Types Reference]()).
+You can modify several column types at once by specifying their common parent.
 For example, several column types inherit from the TextType column type (such as `EmailType`, `LinkType`, etc.).
 A column type extension applying to `TextType` (i.e. whose `getExtendedType()` method returns `TextType::class`) would apply to all of these column types.
 

@@ -22,12 +22,12 @@ and [subject provider](#persistence-subject-providers) are autoconfigured.
 The following filter types are natively available in the bundle:
 
 - Doctrine ORM
-    - [StringType]()
-    - [NumericType]()
-    - [EntityType]()
-    - [CallbackType]()
+    - [StringType](#stringtype)
+    - [NumericType](#numerictype)
+    - [EntityType](#entitytype)
+    - [CallbackType](#callbacktype)
 - Base types
-    - [FilterType]()
+    - [FilterType](#filtertype)
 
 {% include-markdown "filters/creating_custom_filter_type.md" heading-offset=1 %}
 {% include-markdown "filters/creating_filter_type_extension.md" heading-offset=1 %}
@@ -112,3 +112,11 @@ class ProductType extends AbstractType
 
 If you wish to override the operator selector completely, create custom form type 
 and pass it as the `operator_type` option. Options passed as `operator_options` are used in that type.
+
+## Built-in types reference
+
+{% include-markdown "filters/types/doctrine-orm/string.md" heading-offset=2 %}
+{% include-markdown "filters/types/doctrine-orm/numeric.md" heading-offset=2 %}
+{% include-markdown "filters/types/doctrine-orm/entity.md" heading-offset=2 %}
+{% include-markdown "filters/types/doctrine-orm/callback.md" heading-offset=2 %}
+{% include-markdown "filters/types/filter.md" heading-offset=2 %}

@@ -1,5 +1,7 @@
 # NumericType
 
+S|Requires Doctrine ORM||
+
 The [NumericType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/NumericType.php) represents a filter that operates on numeric values.
 
 ## Supported operators

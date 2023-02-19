@@ -104,7 +104,7 @@ class ProductController extends AbstractController
 This is thanks to the proxy query factories. In the background, a [ChainProxyQueryFactory](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ChainProxyQueryFactory.php) is used, which iterates
 on every proxy query factory registered in the container, and returns the first successfully created proxy query.
 
-To create a custom request handler, create a class that implements [ProxyQueryFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ProxyQueryFactoryInterface.php):
+To create a custom proxy query factory, create a class that implements [ProxyQueryFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Query/ProxyQueryFactoryInterface.php):
 
 ```php
 // src/DataTable/Query/ArrayProxyQueryFactory.php

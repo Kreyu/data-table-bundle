@@ -38,11 +38,9 @@ Depending on your use case, you may need to override some of the following metho
 - `buildView()`
 - `configureOptions()`
 
-For more information on what those methods do, see the [custom data table type]() article.
-
 ## Registering the extension as a service
 
-Column type extensions must be registered as services and tagged with the `kreyu_data_table.type_extension` tag. 
+Data table type extensions must be registered as services and tagged with the `kreyu_data_table.type_extension` tag. 
 If you're using the [default services.yaml configuration](https://symfony.com/doc/current/service_container.html#service-container-services-load-example), 
 this is already done for you, thanks to [autoconfiguration](https://symfony.com/doc/current/service_container.html#services-autoconfigure).
 

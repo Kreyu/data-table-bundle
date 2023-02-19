@@ -1,4 +1,5 @@
 site_name: DataTableBundle
+repo_url: https://github.com/kreyu/data-table-bundle
 
 theme:
   name: readthedocs
@@ -38,4 +39,5 @@ markdown_extensions:
 
 plugins:
   - search
+  - badges
   - include-markdown

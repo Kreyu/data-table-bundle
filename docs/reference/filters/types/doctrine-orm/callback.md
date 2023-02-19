@@ -1,5 +1,7 @@
 # CallbackType
 
+S|Requires Doctrine ORM||
+
 The [CallbackType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CallbackType.php) represents a filter 
 that allows manual application of complex conditions to the query. 
 

@@ -27,7 +27,7 @@ Later, the builder created the actual data table object used to render and proce
 
 ## Creating data tables in controllers
 
-If your controller uses the [DataTableControllerTrait](src/DataTableControllerTrait.php), use the `createDataTableBuilder()` helper:
+If your controller uses the [DataTableControllerTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableControllerTrait.php), use the `createDataTableBuilder()` helper:
 
 ```php
 // src/Controller/ProductController.php
@@ -60,7 +60,7 @@ class ProductController extends AbstractController
 ```
 
 In this example, you've added two columns to your data table - `id` and `name` - corresponding to the `id` and `name` properties of the `Product` class.
-You've also assigned each a [column type](#available-column-types) (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
+You've also assigned each a [column type](../reference/columns.md#built-in-column-types) (e.g. `NumberType` and `TextType`), represented by its fully qualified class name.
 
 ## Creating data table classes
 
@@ -68,8 +68,8 @@ It is always recommended to put as little logic in controllers as possible.
 That's why it's better to move complex data tables to dedicated classes instead of defining them in controller actions.
 Besides, data tables defined in classes can be reused in multiple actions and services.
 
-Data table classes are the data table types that implement [DataTableTypeInterface](src/DataTableInterface.php).
-However, it's better to extend from [AbstractType](src/Type/AbstractType.php), which already implements the interface and provides some utilities:
+Data table classes are the data table types that implement [DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php).
+However, it's better to extend from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractType.php), which already implements the interface and provides some utilities:
 
 ```php
 // src/DataTable/Type/ProductType.php
@@ -97,7 +97,7 @@ class ProductType extends AbstractType
     Install the [MakerBundle](https://symfony.com/bundles/SymfonyMakerBundle/current/index.html) in your project to generate data table classes using the `make:data-table` command.
 
 The data table class contains all the directions needed to create the product data table.
-In controllers using the [DataTableControllerTrait](src/DataTableControllerTrait.php), use the `createDataTable()` helper
+In controllers using the [DataTableControllerTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableControllerTrait.php), use the `createDataTable()` helper
 (otherwise, use the `create()` method of the `kreyu_data_table.factory` service):
 
 ```php
@@ -106,8 +106,6 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -162,14 +160,14 @@ class ProductController extends AbstractController
 }
 ```
 
-Then, use some [data table helper functions](docs/twig_reference.md#functions) to render the data table contents:
+Then, use some [data table helper functions](../reference/twig.md#functions) to render the data table contents:
 
 ```html
 {# templates/product/index.html.twig #}
 {{ data_table(data_table) }}
 ```
 
-That's it! The [data_table() function](docs/twig_reference.md#datatabledatatableview-variables) renders a complete data table.
+That's it! The [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) renders a complete data table.
 
 !!! Note
 
@@ -179,14 +177,16 @@ That's it! The [data_table() function](docs/twig_reference.md#datatabledatatable
 
 As short as this rendering is, it's not very flexible.
 Usually, you'll need more control about how the entire data table or some of its parts look.
-For example, thanks to the [Bootstrap 5 integration with data tables](src/Resources/views/themes/bootstrap_5.html.twig), generated data tables are compatible with the Bootstrap 5 CSS framework:
+For example, thanks to the [Bootstrap 5 integration with data tables](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/bootstrap_5.html.twig), 
+generated data tables are compatible with the Bootstrap 5 CSS framework:
 
 ```yaml
 # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-    themes: 
-      - '@KreyuDataTable/themes/bootstrap_5.html.twig' # default value
+    themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig']
 ```
+
+The [built-in themes](../reference/theming.md#built-in-themes) include Bootstrap 5 and Tabler. You can also create your own theme. 
 
 ## Processing data tables
 
@@ -248,8 +248,8 @@ This controller follows a common pattern for handling data tables and has two po
     
     The `handleRequest()` method handles all of them manually.
     First argument of the method - the request object - is not tied to specific request implementation,
-    although only the [HttpFoundation request handler](src/Request/HttpFoundationRequestHandler.php) is provided out-of-the-box, 
-    [creating custom data table request handler](docs/create_custom_request_handler.md) is easy.
+    although only the [HttpFoundation request handler](https://github.com/Kreyu/data-table-bundle/blob/main/src/Request/HttpFoundationRequestHandler.php) is provided out-of-the-box, 
+    [creating custom data table request handler](../advanced/creating-custom-request-handler.md) is easy.
 
 ## Passing options to data tables
 

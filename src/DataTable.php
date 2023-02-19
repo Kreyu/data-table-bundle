@@ -156,6 +156,10 @@ class DataTable implements DataTableInterface
         /** @var ExportData $exportData */
         $exportData ??= $this->getExportForm()->getData();
 
+        if (null === $exportData) {
+            throw new \RuntimeException('Unable to export the data table without an export data. Explicitly pass the export data as the first argument of the "export()" method.');
+        }
+
         $dataTable = clone $this;
 
         if (ExportStrategy::INCLUDE_ALL === $exportData->strategy) {

@@ -1,7 +1,5 @@
 # PdfType
 
-S|Requires PhpSpreadsheet||
-
 The [PdfType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/PdfType.php) represents an exporter that uses a [PhpSpreadsheet PDF writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Pdf.php).
 
 !!! Note

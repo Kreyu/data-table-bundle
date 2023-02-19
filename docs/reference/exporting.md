@@ -76,11 +76,16 @@ The following exporter types are natively available in the bundle:
 
 ## Built-in types reference
 
-{% include-markdown "exporters/types/phpspreadsheet/csv.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/html.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/ods.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/pdf.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/xls.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/xlsx.md" heading-offset=2 %}
-{% include-markdown "exporters/types/phpspreadsheet/phpspreadsheet.md" heading-offset=2 %}
-{% include-markdown "exporters/types/exporter.md" heading-offset=2 %}
+### PhpSpreadsheet
+
+{% include-markdown "exporters/types/phpspreadsheet/csv.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/html.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/ods.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/pdf.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/xls.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/xlsx.md" heading-offset=3 %}
+{% include-markdown "exporters/types/phpspreadsheet/phpspreadsheet.md" heading-offset=3 %}
+
+### Base types
+
+{% include-markdown "exporters/types/exporter.md" heading-offset=3 %}

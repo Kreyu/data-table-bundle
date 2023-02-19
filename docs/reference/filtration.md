@@ -115,8 +115,13 @@ and pass it as the `operator_type` option. Options passed as `operator_options` 
 
 ## Built-in types reference
 
-{% include-markdown "filters/types/doctrine-orm/string.md" heading-offset=2 %}
-{% include-markdown "filters/types/doctrine-orm/numeric.md" heading-offset=2 %}
-{% include-markdown "filters/types/doctrine-orm/entity.md" heading-offset=2 %}
-{% include-markdown "filters/types/doctrine-orm/callback.md" heading-offset=2 %}
-{% include-markdown "filters/types/filter.md" heading-offset=2 %}
+### Doctrine ORM
+
+{% include-markdown "filters/types/doctrine-orm/string.md" heading-offset=3 %}
+{% include-markdown "filters/types/doctrine-orm/numeric.md" heading-offset=3 %}
+{% include-markdown "filters/types/doctrine-orm/entity.md" heading-offset=3 %}
+{% include-markdown "filters/types/doctrine-orm/callback.md" heading-offset=3 %}
+
+### Base types
+
+{% include-markdown "filters/types/filter.md" heading-offset=3 %}

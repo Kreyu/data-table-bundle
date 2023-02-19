@@ -39,5 +39,4 @@ markdown_extensions:
 
 plugins:
   - search
-  - badges
   - include-markdown

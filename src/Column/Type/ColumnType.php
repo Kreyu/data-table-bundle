@@ -20,6 +20,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $resolver
             ->setDefaults([
+                'label' => ucfirst($column->getName()),
                 'data' => $column->getData(),
                 'value' => $column->getData(),
                 'property_path' => $column->getName(),

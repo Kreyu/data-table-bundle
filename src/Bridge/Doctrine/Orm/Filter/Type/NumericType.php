@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumericType extends AbstractType
@@ -39,7 +39,7 @@ class NumericType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('field_type', NumberType::class);
+        $resolver->setDefault('field_type', TextType::class);
     }
 
     private function getExpressionBuilderMethodName(Operator $operator): string

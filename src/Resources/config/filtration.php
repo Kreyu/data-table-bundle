@@ -73,7 +73,7 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_numeric', EntityType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_entity', EntityType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 

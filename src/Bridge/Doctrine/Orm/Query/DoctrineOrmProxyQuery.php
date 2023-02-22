@@ -75,9 +75,11 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
 
         $paginator = new Paginator($this->queryBuilder->getQuery(), $hasSingleIdentifierName && $hasJoins);
 
+        $currentPageNumber = (int) ($this->queryBuilder->getFirstResult() / $this->queryBuilder->getMaxResults()) + 1;
+
         return new Pagination(
             items: $paginator->getIterator(),
-            currentPageNumber: $this->queryBuilder->getFirstResult() + 1,
+            currentPageNumber: $currentPageNumber,
             totalItemCount: $paginator->count(),
             itemNumberPerPage: $this->queryBuilder->getMaxResults(),
         );

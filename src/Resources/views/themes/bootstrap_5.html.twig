@@ -74,7 +74,7 @@
                 {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
                 <a class="btn btn-sm btn-outline-danger"
-                    href="{{ filter_clear_all_url(filtration_parameter_name, filters) }}"
+                    href="{{- filter_clear_all_url(filtration_parameter_name, filters)|trim -}}"
                     data-toggle="tooltip"
                     data-placement="bottom"
                     title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
@@ -95,7 +95,7 @@
                     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
                     <a class="btn btn-sm btn-outline-dark my-1"
-                        href="{{ filter_clear_url(filtration_parameter_name, filter) }}"
+                        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim -}}"
                         data-toggle="tooltip"
                         data-placement="bottom"
                         title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"

@@ -30,7 +30,7 @@ class EntityType extends AbstractType
 
         $parameterName = $this->getUniqueParameterName($query, $filter);
 
-        $expression = $query->expr()->{$expressionBuilderMethodName}($filter->getQueryPath(), ":$parameterName");
+        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFilterQueryPath($query, $filter), ":$parameterName");
 
         $query
             ->andWhere($expression)

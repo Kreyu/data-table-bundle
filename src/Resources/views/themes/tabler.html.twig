@@ -62,9 +62,9 @@
     >
         <div class="d-flex flex-column">
             <span class="mx-1">
-                {{ field.vars.label }}
+                {{ filter.vars.label }}
 
-                {% if filter.options.operator_options.visible %}
+                {% if filter.vars.operator_options.visible %}
                     <span class="text-muted">({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})</span>
                 {% endif %}
             </span>

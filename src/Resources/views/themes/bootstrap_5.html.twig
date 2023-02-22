@@ -88,7 +88,7 @@
         {% endif %}
 
         {% for filter in filters %}
-            {% set field = filtration_form.children[filter.name] %}
+            {% set field = filtration_form.children[filter.vars.name] %}
 
             {% if field.vars.data and field.vars.data.value != null %}
                 {% block filter_clear_button %}
@@ -101,9 +101,9 @@
                         title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
                     >
                         <small>
-                            {{ field.vars.label }}
+                            {{ filter.vars.label }}
 
-                            {% if filter.options.operator_options.visible %}
+                            {% if filter.vars.operator_options.visible %}
                                 ({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})
                             {% endif %}
                         </small>

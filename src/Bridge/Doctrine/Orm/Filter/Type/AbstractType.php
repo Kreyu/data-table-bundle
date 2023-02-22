@@ -18,4 +18,20 @@ abstract class AbstractType extends BaseAbstractType
     {
         return $filter->getFormName() . '_' . $query->getUniqueParameterId();
     }
+
+    /**
+     * @param DoctrineOrmProxyQuery $query
+     */
+    protected function getFilterQueryPath(ProxyQueryInterface $query, FilterInterface $filter): string
+    {
+        $rootAlias = current($query->getRootAliases());
+
+        $queryPath = $filter->getQueryPath();
+
+        if ($rootAlias && !str_contains($queryPath, '.')) {
+            $queryPath = $rootAlias . '.' . $queryPath;
+        }
+
+        return $queryPath;
+    }
 }

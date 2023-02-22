@@ -3,7 +3,7 @@
         app.request.get('_route'),
         app.request.query.all|merge({
             (filtration_parameter_name): app.request.query.all(filtration_parameter_name)|merge({
-                (filter.name): {
+                (filter.vars.name): {
                     value: ''
                 }
             })
@@ -16,7 +16,7 @@
 
     {% for filter in filters %}
         {% set query = query|merge({
-            (filter.name): {
+            (filter.vars.name): {
                 value: ''
             }
         }) %}

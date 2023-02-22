@@ -25,7 +25,9 @@ final class FilterType implements FilterTypeInterface
 
         $resolver
             ->setDefaults([
+                'name' => $filter->getName(),
                 'label' => ucfirst($filter->getName()),
+                'query_path' => $filter->getName(),
             ])
         ;
 
@@ -51,7 +53,7 @@ final class FilterType implements FilterTypeInterface
                 ],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('query_path', ['string'])
+            ->setAllowedTypes('query_path', ['null', 'string'])
             ->setAllowedTypes('field_type', ['string'])
             ->setAllowedTypes('field_options', ['array'])
             ->setAllowedTypes('operator_type', ['string'])

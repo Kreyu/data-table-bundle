@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Type;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\HeadersRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -58,7 +59,10 @@ final class DataTableType implements DataTableTypeInterface
         $view->vars += [
             'name' => $dataTable->getConfig()->getName(),
             'columns' => $columns,
-            'filters' => $dataTable->getConfig()->getFilters(),
+            'filters' => array_map(
+                fn (FilterInterface $filter) => $filter->createView($view),
+                $dataTable->getConfig()->getFilters(),
+            ),
             'exporters' => $dataTable->getConfig()->getExporters(),
             'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),

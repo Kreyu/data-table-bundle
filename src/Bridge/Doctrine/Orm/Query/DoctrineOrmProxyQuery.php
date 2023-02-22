@@ -41,8 +41,16 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
 
     public function sort(SortingData $sortingData): void
     {
+        $rootAlias = current($this->queryBuilder->getRootAliases());
+
         foreach ($sortingData->getFields() as $field) {
-            $this->queryBuilder->orderBy($field->getName(), $field->getDirection());
+            $fieldName = $field->getName();
+
+            if ($rootAlias && !str_contains($fieldName, '.')) {
+                $fieldName = $rootAlias . '.' . $fieldName;
+            }
+
+            $this->queryBuilder->orderBy($fieldName, $field->getDirection());
         }
     }
 

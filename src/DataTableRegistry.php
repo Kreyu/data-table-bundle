@@ -84,7 +84,7 @@ class DataTableRegistry implements DataTableRegistryInterface
 
         $typeExtensions = array_filter(
             $this->typeExtensions,
-            fn (DataTableTypeExtensionInterface $extension) => in_array($fqcn, $extension::getExtendedTypes()),
+            fn (DataTableTypeExtensionInterface $extension) => $this->isFqcnExtensionEligible($fqcn, $extension),
         );
 
         $parentType = $type->getParent();
@@ -98,5 +98,16 @@ class DataTableRegistry implements DataTableRegistryInterface
         } finally {
             unset($this->checkedTypes[$fqcn]);
         }
+    }
+
+    private function isFqcnExtensionEligible(string $fqcn, DataTableTypeExtensionInterface $extension): bool
+    {
+        $extendedTypes = $extension::getExtendedTypes();
+
+        if ($extendedTypes instanceof \Traversable) {
+            $extendedTypes = iterator_to_array($extendedTypes);
+        }
+
+        return in_array($fqcn, $extendedTypes);
     }
 }

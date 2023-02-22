@@ -84,7 +84,7 @@ class ColumnRegistry implements ColumnRegistryInterface
 
         $typeExtensions = array_filter(
             $this->typeExtensions,
-            fn (ColumnTypeExtensionInterface $extension) => in_array($fqcn, $extension::getExtendedTypes()),
+            fn (ColumnTypeExtensionInterface $extension) => $this->isFqcnExtensionEligible($fqcn, $extension),
         );
 
         $parentType = $type->getParent();
@@ -98,5 +98,16 @@ class ColumnRegistry implements ColumnRegistryInterface
         } finally {
             unset($this->checkedTypes[$fqcn]);
         }
+    }
+
+    private function isFqcnExtensionEligible(string $fqcn, ColumnTypeExtensionInterface $extension): bool
+    {
+        $extendedTypes = $extension::getExtendedTypes();
+
+        if ($extendedTypes instanceof \Traversable) {
+            $extendedTypes = iterator_to_array($extendedTypes);
+        }
+
+        return in_array($fqcn, $extendedTypes);
     }
 }

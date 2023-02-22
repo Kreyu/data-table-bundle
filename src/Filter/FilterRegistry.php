@@ -84,7 +84,7 @@ class FilterRegistry implements FilterRegistryInterface
 
         $typeExtensions = array_filter(
             $this->typeExtensions,
-            fn (FilterTypeExtensionInterface $extension) => in_array($fqcn, $extension::getExtendedTypes()),
+            fn (FilterTypeExtensionInterface $extension) => $this->isFqcnExtensionEligible($fqcn, $extension),
         );
 
         $parentType = $type->getParent();
@@ -98,5 +98,16 @@ class FilterRegistry implements FilterRegistryInterface
         } finally {
             unset($this->checkedTypes[$fqcn]);
         }
+    }
+
+    private function isFqcnExtensionEligible(string $fqcn, FilterTypeExtensionInterface $extension): bool
+    {
+        $extendedTypes = $extension::getExtendedTypes();
+
+        if ($extendedTypes instanceof \Traversable) {
+            $extendedTypes = iterator_to_array($extendedTypes);
+        }
+
+        return in_array($fqcn, $extendedTypes);
     }
 }

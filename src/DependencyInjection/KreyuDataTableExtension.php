@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
+use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
@@ -41,12 +44,27 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
 
         $container
             ->registerForAutoconfiguration(ColumnTypeInterface::class)
-            ->addTag('kreyu_data_table.column_type')
+            ->addTag('kreyu_data_table.column.type')
         ;
 
         $container
-            ->registerForAutoconfiguration(FilterInterface::class)
-            ->addTag('kreyu_data_table.filter')
+            ->registerForAutoconfiguration(ColumnTypeExtensionInterface::class)
+            ->addTag('kreyu_data_table.column.type_extension')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(FilterTypeInterface::class)
+            ->addTag('kreyu_data_table.filter.type')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(FilterTypeExtensionInterface::class)
+            ->addTag('kreyu_data_table.filter.type_extension')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(ExporterTypeInterface::class)
+            ->addTag('kreyu_data_table.exporter.type')
         ;
 
         $container

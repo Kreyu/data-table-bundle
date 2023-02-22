@@ -104,7 +104,7 @@
             (sort_parameter_name ~ '[field]'): sort_field,
             (sort_parameter_name ~ '[direction]'): opposite_sort_direction
         })) }}">
-            {{ block('kreyu_data_table_column_label', _self, _context) }}
+            {{ block('kreyu_data_table_column_label', theme, _context) }}
 
             {% if sort_field == current_sort_field %}
                 {% if current_sort_direction == 'asc' %}
@@ -115,13 +115,13 @@
             {% endif %}
         </a>
     {% else %}
-        {{ block('kreyu_data_table_column_label', _self, _context) }}
+        {{ block('kreyu_data_table_column_label', theme, _context) }}
     {% endif %}
 {% endblock %}
 
 {% block kreyu_data_table_column_value %}
-    {% if block(block_name, _self) is defined %}
-        {{- block(block_name, _self) -}}
+    {% if block(block_name, theme) is defined %}
+        {{- block(block_name, theme) -}}
     {% else %}
         {{- value -}}
     {% endif %}

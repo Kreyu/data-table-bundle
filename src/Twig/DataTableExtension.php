@@ -198,6 +198,8 @@ class DataTableExtension extends AbstractExtension
             $wrapper = $environment->load($theme);
 
             if ($wrapper->hasBlock($blockName, $context)) {
+                $context['theme'] = $theme;
+
                 return $wrapper->renderBlock($blockName, $context);
             }
         }

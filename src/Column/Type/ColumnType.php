@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -29,7 +30,20 @@ final class ColumnType implements ColumnTypeInterface
             ])
         ;
 
+        $resolver
+            ->setNormalizer('sort', function (Options $options, mixed $value) use ($column) {
+                if (true === $value) {
+                    return $column->getName();
+                }
+
+                return $value;
+            })
+        ;
+
         $options = $resolver->resolve(array_filter($options));
+        $options['sort_field'] = $options['sort'];
+
+        unset($options['sort']);
 
         $value = $options['value'];
         $formatter = $options['formatter'];
@@ -67,7 +81,7 @@ final class ColumnType implements ColumnTypeInterface
                 'label_translation_parameters' => [],
                 'translation_domain' => 'KreyuDataTable',
                 'property_path' => null,
-                'sort_field' => false,
+                'sort' => false,
                 'block_name' => null,
                 'block_prefix' => null,
                 'value' => null,
@@ -80,7 +94,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('translation_domain', ['bool', 'string'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
-            ->setAllowedTypes('sort_field', ['bool', 'string'])
+            ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('display_personalization_button', ['bool'])

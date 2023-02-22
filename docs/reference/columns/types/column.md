@@ -30,11 +30,12 @@ Setting the option to `false` disables translation for the column.
 Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.  
 Setting the option to `false` disables property accessor (for situations, where you want to manually retrieve the value).
 
-### `sort_field`
+### `sort`
 
-**type**: `false` or `string` **default**: `false` - the sortable behavior is disabled
+**type**: `bool` or `string` **default**: `false` - the sortable behavior is disabled
 
 Sets the sort field used by the sortable behavior.   
+Setting the option to `true` enables column sorting and uses the column name as a sort field name.  
 Setting the option to `false` disables column sorting.
 
 ### `block_name`

@@ -21,6 +21,16 @@ final class FilterType implements FilterTypeInterface
 
     public function buildView(FilterView $view, FilterInterface $filter, array $options): void
     {
+        $resolver = clone $filter->getType()->getOptionsResolver();
+
+        $resolver
+            ->setDefaults([
+                'label' => ucfirst($filter->getName()),
+            ])
+        ;
+
+        $options = $resolver->resolve(array_filter($options));
+
         $view->vars = $options;
     }
 
@@ -40,7 +50,7 @@ final class FilterType implements FilterTypeInterface
                     'choices' => [],
                 ],
             ])
-            ->setAllowedTypes('label', ['string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('query_path', ['string'])
             ->setAllowedTypes('field_type', ['string'])
             ->setAllowedTypes('field_options', ['array'])

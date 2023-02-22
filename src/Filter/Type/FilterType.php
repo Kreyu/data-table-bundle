@@ -15,11 +15,6 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 final class FilterType implements FilterTypeInterface
 {
-    public function supports(ProxyQueryInterface $query): bool
-    {
-        return true;
-    }
-
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
     }

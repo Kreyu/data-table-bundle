@@ -235,15 +235,9 @@ First, create a new Twig template anywhere in the application to store the fragm
 
 ```twig
 {# templates/data_table/theme.html.twig #}
-{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
 {# ... here you will add the Twig code ... #}
 ```
-
-!!! Note
-
-    Notice the use of the `extends` with the built-in Bootstrap 5 theme.  
-    By doing it this way, you can overwrite only specific parts of the theme.
 
 Then, update the [theme configuration option](../../reference/configuration.md#themes) to use this new template:
 
@@ -252,6 +246,7 @@ Then, update the [theme configuration option](../../reference/configuration.md#t
 kreyu_data_table:
     themes: 
         - 'data_table/theme.html.twig'
+        - '@KreyuDataTable/themes/bootstrap_5.html.twig'
         # ...
 ```
 

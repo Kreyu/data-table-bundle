@@ -3,8 +3,8 @@ EQUALS: równa się
 CONTAINS: zawiera
 NOT_CONTAINS: nie zawiera
 NOT_EQUALS: różne od
-GREATER_EQUALS: większe lub równe
-LESS_EQUALS: mniejsze lub równe
+GREATER_THAN_EQUALS: większe lub równe
+LESS_THAN_EQUALS: mniejsze lub równe
 GREATER_THAN: większe od
 LESS_THAN: mniejsze od
 STARTS_WITH: zaczyna się od

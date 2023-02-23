@@ -68,7 +68,7 @@ abstract class AbstractType extends BaseAbstractType
             $this->appendRow(
                 $worksheet,
                 array_map(function (ColumnView $column) {
-                    return $column->vars['value'];
+                    return $column->vars['exportable_value'];
                 }, $columns),
             );
         }

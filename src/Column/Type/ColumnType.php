@@ -25,6 +25,7 @@ final class ColumnType implements ColumnTypeInterface
                 'translation_domain' => $view->parent->vars['label_translation_domain'],
                 'data' => $column->getData(),
                 'value' => $column->getData(),
+                'exportable_value' => $column->getData(),
                 'property_path' => $column->getName(),
                 'block_prefix' => $column->getType()->getBlockPrefix(),
                 'block_name' => 'kreyu_data_table_column_'.$column->getType()->getBlockPrefix(),
@@ -45,6 +46,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $value = $options['value'];
         $formatter = $options['formatter'];
+        $exportableFormatter = $options['exportable_formatter'];
         $propertyPath = $options['property_path'];
         $propertyAccessor = $options['property_accessor'];
 
@@ -56,9 +58,14 @@ final class ColumnType implements ColumnTypeInterface
 
         if (null !== $column->getData()) {
             $options['value'] = $value;
+            $options['exportable_value'] = $value;
 
             if (is_callable($formatter)) {
                 $options['value'] = $formatter($value);
+            }
+
+            if (is_callable($exportableFormatter)) {
+                $options['exportable_value'] = $exportableFormatter($value);
             }
 
             $options = array_merge($options, $this->normalizeOptions(
@@ -88,8 +95,10 @@ final class ColumnType implements ColumnTypeInterface
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'formatter' => null,
                 'exportable' => true,
+                'exportable_formatter' => null,
                 'non_normalizable_options' => [
                     'exportable',
+                    'exportable_formatter',
                 ],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
@@ -103,6 +112,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('formatter', ['null', 'callable'])
             ->setAllowedTypes('exportable', ['bool'])
+            ->setAllowedTypes('exportable_formatter', ['null', 'callable'])
             ->setAllowedTypes('non_normalizable_options', ['string[]'])
         ;
     }

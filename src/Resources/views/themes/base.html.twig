@@ -205,6 +205,10 @@
     {{- block('kreyu_data_table_column_text') -}}
 {% endblock %}
 
+{% block kreyu_data_table_column_date_time %}
+    <span {{ block('attributes') }}>{{- value|date(format) -}}</span>
+{% endblock %}
+
 {% block kreyu_data_table_column_boolean %}
     <span {{ block('attributes') }}>{{- (value ? label_true : label_false)|trans({}, translation_domain) -}}</span>
 {% endblock %}

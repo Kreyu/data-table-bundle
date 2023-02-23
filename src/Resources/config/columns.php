@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
@@ -78,6 +79,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.template', TemplateType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.datetime', DateTimeType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

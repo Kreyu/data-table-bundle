@@ -26,6 +26,7 @@ The following column types are natively available in the bundle:
 {% include-markdown "columns/types/text.md" heading-offset=2 %}
 {% include-markdown "columns/types/number.md" heading-offset=2 %}
 {% include-markdown "columns/types/boolean.md" heading-offset=2 %}
+{% include-markdown "columns/types/datetime.md" heading-offset=2 %}
 {% include-markdown "columns/types/link.md" heading-offset=2 %}
 {% include-markdown "columns/types/collection.md" heading-offset=2 %}
 {% include-markdown "columns/types/template.md" heading-offset=2 %}

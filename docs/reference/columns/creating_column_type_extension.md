@@ -49,24 +49,4 @@ a column type extension applying to `ColumnType` would apply to all of these.
 Also keep in mind that if you created (or are using) a custom column type, it's possible that it does not extend `ColumnType`,
 and so your column type extension may not be applied to it.
 
-Another option is to return multiple column types in the `getExtendedTypes()` method to extend all of them:
-
-```php
-// src/DataTable/Column/Extension/DateTimeTypeExtension.php
-namespace App\Form\Extension;
-
-use Kreyu\Bundle\DataTableBundle\Column\Extension\AbstractTypeExtension;
-use Kreyu\Bundle\DataTableBundle\Column\Type\DateType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TimeType;
-
-class DateTimeTypeExtension extends AbstractTypeExtension
-{
-    // ...
-
-    public static function getExtendedTypes(): iterable
-    {
-        return [DateTimeType::class, DateType::class, TimeType::class];
-    }
-}
-```
+Another option is to return multiple column types in the `getExtendedTypes()` method to extend all of them.

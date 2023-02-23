@@ -63,7 +63,8 @@
     {% endif %}
 
     {% if filtration_enabled %}
-        {{ data_table_filters_form(filtration_form) }}
+        <div class="clearfix"></div>
+        <div class="px-2">{{ data_table_filters_form(filtration_form) }}</div>
     {% endif %}
 {% endblock %}
 

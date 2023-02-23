@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -40,6 +41,11 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $container
             ->registerForAutoconfiguration(DataTableTypeInterface::class)
             ->addTag('kreyu_data_table.type')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(DataTableTypeExtensionInterface::class)
+            ->addTag('kreyu_data_table.type_extension')
         ;
 
         $container

@@ -55,15 +55,16 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         if (null !== $column->getData()) {
+            $options['value'] = $value;
+
             if (is_callable($formatter)) {
                 $options['value'] = $formatter($value);
-            } else {
-                $options['value'] = $value;
             }
 
-            $normalizableOptions = array_diff_key($options, ['formatter' => true]);
-
-            $options = $this->normalizeOptions($normalizableOptions, $value);
+            $options = $this->normalizeOptions(
+                array_diff_key($options, ['formatter' => true]),
+                $value,
+            );
         }
 
         $options['data_table'] = $view->parent;
@@ -91,7 +92,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
+            ->setAllowedTypes('property_path', ['null', 'false', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])

@@ -904,15 +904,15 @@ class DataTableBuilder implements DataTableBuilderInterface
         ];
 
         foreach ($persistenceContexts as $context) {
-            if (!$this->{$context . 'Enabled'} || !$this->{$context . 'PersistenceEnabled'}) {
+            if (!$this->{$context.'Enabled'} || !$this->{$context.'PersistenceEnabled'}) {
                 continue;
             }
 
-            if (null === $this->{$context . 'PersistenceAdapter'}) {
+            if (null === $this->{$context.'PersistenceAdapter'}) {
                 throw new \LogicException("The data table is configured to use $context persistence, but does not have an adapter.");
             }
 
-            if (null === $this->{$context . 'PersistenceSubject'}) {
+            if (null === $this->{$context.'PersistenceSubject'}) {
                 throw new \LogicException("The data table is configured to use $context persistence, but does not have a subject.");
             }
         }

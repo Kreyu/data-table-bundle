@@ -8,8 +8,10 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class ExportFile extends File
 {
-    public function __construct(string $path, private string $filename)
-    {
+    public function __construct(
+        string $path,
+        private string $filename,
+    ) {
         parent::__construct($path);
     }
 

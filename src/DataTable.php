@@ -153,7 +153,7 @@ class DataTable implements DataTableInterface
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
-        /** @var ExportData $exportData */
+        /* @var ExportData $exportData */
         $exportData ??= $this->getExportForm()->getData();
 
         if (null === $exportData) {

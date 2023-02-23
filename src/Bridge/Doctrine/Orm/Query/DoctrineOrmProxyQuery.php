@@ -47,7 +47,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
             $fieldName = $field->getName();
 
             if ($rootAlias && !str_contains($fieldName, '.')) {
-                $fieldName = $rootAlias . '.' . $fieldName;
+                $fieldName = $rootAlias.'.'.$fieldName;
             }
 
             $this->queryBuilder->orderBy($fieldName, $field->getDirection());

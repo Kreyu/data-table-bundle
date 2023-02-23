@@ -21,7 +21,8 @@ class ChainProxyQueryFactory implements ProxyQueryFactoryInterface
         foreach ($this->factories as $factory) {
             try {
                 return $factory->create($data);
-            } catch (UnexpectedTypeException) {}
+            } catch (UnexpectedTypeException) {
+            }
         }
 
         throw new \InvalidArgumentException('Unable to create ProxyQuery class for given data');

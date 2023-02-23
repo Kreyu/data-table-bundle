@@ -16,7 +16,7 @@ abstract class AbstractType extends BaseAbstractType
      */
     public function getUniqueParameterName(ProxyQueryInterface $query, FilterInterface $filter): string
     {
-        return $filter->getFormName() . '_' . $query->getUniqueParameterId();
+        return $filter->getFormName().'_'.$query->getUniqueParameterId();
     }
 
     /**
@@ -29,7 +29,7 @@ abstract class AbstractType extends BaseAbstractType
         $queryPath = $filter->getQueryPath();
 
         if ($rootAlias && !str_contains($queryPath, '.')) {
-            $queryPath = $rootAlias . '.' . $queryPath;
+            $queryPath = $rootAlias.'.'.$queryPath;
         }
 
         return $queryPath;

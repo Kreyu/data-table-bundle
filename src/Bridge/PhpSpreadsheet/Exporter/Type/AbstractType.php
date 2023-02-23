@@ -13,7 +13,6 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
-use Symfony\Component\HttpFoundation\File\File;
 
 abstract class AbstractType extends BaseAbstractType
 {

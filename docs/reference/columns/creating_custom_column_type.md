@@ -262,12 +262,12 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
-{% block kreyu_data_table_quantity %}
+{% block kreyu_data_table_column_quantity %}
     {# ... #}
 {% endblock %}
 ```
 
-Every block is prefixed with `kreyu_data_table_` by default.
+Every block is prefixed with `kreyu_data_table_column_` by default.
 Last part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityType` -> `quantity`).
 This can be controlled by overriding the `getBlockPrefix()` method in `QuantityType`.
 

@@ -40,16 +40,16 @@ Setting the option to `false` disables column sorting.
 
 ### `block_name`
 
-**type**: `string` **default**: `data_table_`  + column type block prefix (see [Knowing which block to customize](#))
+**type**: `string` **default**: `kreyu_data_table_column_`  + column type block prefix
 
 Allows you to add a custom block name to the ones used by default to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of the columns individually.
 
-By default, if column type class name is `TextType`, the block name option will equal `data_table_text`.
+By default, if column type class name is `TextType`, the block name option will equal `kreyu_data_table_column_text`.
 
 ### `block_prefix`
 
-**type**: `string` **default**: column type block prefix (see [Knowing which block to customize](#))
+**type**: `string` **default**: column type block prefix
 
 Allows you to add a custom block prefix and override the block name used to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of all of them without the need to create a new column type.

@@ -38,7 +38,7 @@ final class ColumnType implements ColumnTypeInterface
             })
         ;
 
-        $options = $resolver->resolve(array_filter($options));
+        $options = $resolver->resolve(array_filter($options, fn ($option) => null !== $option));
         $options['sort_field'] = $options['sort'];
 
         unset($options['sort']);

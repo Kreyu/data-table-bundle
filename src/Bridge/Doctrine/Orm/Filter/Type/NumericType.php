@@ -40,6 +40,19 @@ class NumericType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('field_type', TextType::class);
+        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
+            $resolver->setDefaults([
+                'visible' => false,
+                'choices' => [
+                    Operator::EQUALS,
+                    Operator::NOT_EQUALS,
+                    Operator::GREATER_THAN_EQUALS,
+                    Operator::GREATER_THAN,
+                    Operator::LESS_THAN_EQUALS,
+                    Operator::LESS_THAN,
+                ],
+            ]);
+        });
     }
 
     private function getExpressionBuilderMethodName(Operator $operator): string

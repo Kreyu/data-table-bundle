@@ -38,17 +38,19 @@ class StringType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('operator_options', [
-            'visible' => false,
-            'choices' => [
-                Operator::EQUALS,
-                Operator::NOT_EQUALS,
-                Operator::CONTAINS,
-                Operator::NOT_CONTAINS,
-                Operator::STARTS_WITH,
-                Operator::ENDS_WITH,
-            ],
-        ]);
+        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
+            $resolver->setDefaults([
+                'visible' => false,
+                'choices' => [
+                    Operator::EQUALS,
+                    Operator::NOT_EQUALS,
+                    Operator::CONTAINS,
+                    Operator::NOT_CONTAINS,
+                    Operator::STARTS_WITH,
+                    Operator::ENDS_WITH,
+                ],
+            ]);
+        });
     }
 
     private function getExpressionBuilderMethodName(Operator $operator): string

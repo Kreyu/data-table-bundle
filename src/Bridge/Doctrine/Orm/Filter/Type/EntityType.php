@@ -39,9 +39,9 @@ class EntityType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'field_type' => EntityFormType::class,
-            'operator_options' => [
+        $resolver->setDefault('field_type', EntityFormType::class);
+        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
+            $resolver->setDefaults([
                 'visible' => false,
                 'choices' => [
                     Operator::EQUALS,
@@ -49,8 +49,8 @@ class EntityType extends AbstractType
                     Operator::CONTAINS,
                     Operator::NOT_CONTAINS,
                 ],
-            ],
-        ]);
+            ]);
+        });
     }
 
     private function getExpressionBuilderMethodName(Operator $operator): string

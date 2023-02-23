@@ -12,15 +12,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PersonalizationData
 {
     /**
+     * @var array<PersonalizationColumnData>
+     */
+    private array $columns;
+
+    /**
      * @param array<PersonalizationColumnData> $columns
      */
     public function __construct(
-        private array $columns = [],
+        array $columns = [],
     ) {
         foreach ($columns as $column) {
             if (!$column instanceof PersonalizationColumnData) {
                 throw new UnexpectedTypeException($column, PersonalizationColumnData::class);
             }
+
+            $this->columns[str_replace('.', '__', $column->getName())] = $column;
         }
     }
 
@@ -46,7 +53,7 @@ class PersonalizationData
         $columns = [];
 
         foreach (array_values($dataTable->getConfig()->getColumns()) as $index => $column) {
-            $columns[$column->getName()] = PersonalizationColumnData::fromColumn($column, $index);
+            $columns[] = PersonalizationColumnData::fromColumn($column, $index);
         }
 
         return new static($columns);
@@ -133,7 +140,7 @@ class PersonalizationData
     private function getColumn(string|ColumnInterface $column): ?PersonalizationColumnData
     {
         if ($column instanceof ColumnInterface) {
-            $column = $column->getName();
+            $column = str_replace('.', '__', $column->getName());
         }
 
         return $this->columns[$column] ?? null;

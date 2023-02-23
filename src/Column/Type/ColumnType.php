@@ -22,15 +22,13 @@ final class ColumnType implements ColumnTypeInterface
         $resolver
             ->setDefaults([
                 'label' => ucfirst($column->getName()),
+                'translation_domain' => $view->parent->vars['label_translation_domain'],
                 'data' => $column->getData(),
                 'value' => $column->getData(),
                 'property_path' => $column->getName(),
                 'block_prefix' => $column->getType()->getBlockPrefix(),
                 'block_name' => 'kreyu_data_table_column_'.$column->getType()->getBlockPrefix(),
             ])
-        ;
-
-        $resolver
             ->setNormalizer('sort', function (Options $options, mixed $value) use ($column) {
                 if (true === $value) {
                     return $column->getName();
@@ -79,7 +77,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setDefaults([
                 'label' => null,
                 'label_translation_parameters' => [],
-                'translation_domain' => 'KreyuDataTable',
+                'translation_domain' => null,
                 'property_path' => null,
                 'sort' => false,
                 'block_name' => null,
@@ -92,7 +90,7 @@ final class ColumnType implements ColumnTypeInterface
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
-            ->setAllowedTypes('translation_domain', ['bool', 'string'])
+            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])

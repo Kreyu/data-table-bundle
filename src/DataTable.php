@@ -260,7 +260,6 @@ class DataTable implements DataTableInterface
             type: PersonalizationDataType::class,
             options: [
                 'method' => 'POST',
-                'data_table' => $this,
             ],
         );
 

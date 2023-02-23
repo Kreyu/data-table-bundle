@@ -10,9 +10,9 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\HeadersRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\ValuesRowView;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -46,19 +46,9 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $columns = $dataTable->getConfig()->getColumns();
-
-        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            $personalizationData = $dataTable->getPersonalizationForm()->getData();
-
-            if ($personalizationData instanceof PersonalizationData) {
-                $columns = $personalizationData->compute($columns);
-            }
-        }
-
         $view->vars += [
             'name' => $dataTable->getConfig()->getName(),
-            'columns' => $columns,
+            'columns' => $this->getVisibleColumns($dataTable),
             'filters' => array_map(
                 fn (FilterInterface $filter) => $filter->createView($view),
                 $dataTable->getConfig()->getFilters(),
@@ -75,12 +65,14 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
-            'filtration_form' => $this->getFormView($dataTable->getFiltrationForm(), $view),
-            'personalization_form' => $this->getFormView($dataTable->getPersonalizationForm(), $view),
-            'export_form' => $this->getFormView($dataTable->getExportForm(), $view),
+            'filtration_form' => $dataTable->getFiltrationForm()->createView(),
+            'export_form' => $dataTable->getExportForm()->createView(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
+            'label_translation_domain' => $options['label_translation_domain'] ?? $dataTable->getConfig()->getName(),
             'values_rows' => [],
         ];
+
+        $view->vars['personalization_form'] = $this->getPersonalizationFormView($view, $dataTable);
 
         foreach ($dataTable->getPagination()->getItems() as $item) {
             $view->vars['values_rows'][] = new ValuesRowView($view, $item);
@@ -93,6 +85,7 @@ final class DataTableType implements DataTableTypeInterface
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'label_translation_domain' => null,
             'personalization_enabled' => false,
             'personalization_persistence_enabled' => false,
             'personalization_persistence_adapter' => null,
@@ -126,11 +119,34 @@ final class DataTableType implements DataTableTypeInterface
         return null;
     }
 
-    private function getFormView(FormInterface $form, DataTableView $dataTableView): FormView
+    private function getVisibleColumns(DataTableInterface $dataTable): array
     {
-        $view = $form->createView();
-        $view->vars['data_table'] = $dataTableView;
+        $columns = $dataTable->getConfig()->getColumns();
 
-        return $view;
+        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
+            $personalizationData = $dataTable->getPersonalizationForm()->getData();
+
+            if ($personalizationData instanceof PersonalizationData) {
+                $columns = $personalizationData->compute($columns);
+            }
+        }
+
+        return $columns;
+    }
+
+    private function getPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
+    {
+        $formView = $dataTable->getPersonalizationForm()->createView();
+
+        foreach ($formView->children['columns']->children as $child) {
+            /** @var PersonalizationColumnData $personalizationColumnData */
+            $personalizationColumnData = $child->vars['value'];
+
+            $column = $dataTable->getConfig()->getColumn($personalizationColumnData->getName());
+
+            $child->vars['column'] = $column->createView($view);
+        }
+
+        return $formView;
     }
 }

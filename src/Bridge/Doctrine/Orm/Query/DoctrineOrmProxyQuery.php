@@ -83,11 +83,9 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
 
         $paginator = new Paginator($this->queryBuilder->getQuery(), $hasSingleIdentifierName && $hasJoins);
 
-        $currentPageNumber = (int) ($this->queryBuilder->getFirstResult() / $this->queryBuilder->getMaxResults()) + 1;
-
         return new Pagination(
             items: $paginator->getIterator(),
-            currentPageNumber: $currentPageNumber,
+            currentPageNumber: $this->getCurrentPageNumber(),
             totalItemCount: $paginator->count(),
             itemNumberPerPage: $this->queryBuilder->getMaxResults(),
         );
@@ -96,5 +94,13 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function getUniqueParameterId(): int
     {
         return $this->uniqueParameterId++;
+    }
+
+    private function getCurrentPageNumber(): int
+    {
+        $firstResult = $this->queryBuilder->getFirstResult();
+        $maxResults = $this->queryBuilder->getMaxResults() ?? 1;
+
+        return (int) ($firstResult / $maxResults) + 1;
     }
 }

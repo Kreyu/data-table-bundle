@@ -10,6 +10,6 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.type_extension.default_configuration', DefaultConfigurationExtension::class)
-        ->tag('kreyu_data_table.type_extension')
+        ->tag('kreyu_data_table.type_extension', ['priority' => 999])
     ;
 };

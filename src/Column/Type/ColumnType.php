@@ -61,10 +61,10 @@ final class ColumnType implements ColumnTypeInterface
                 $options['value'] = $formatter($value);
             }
 
-            $options = $this->normalizeOptions(
-                array_diff_key($options, ['formatter' => true]),
+            $options = array_merge($options, $this->normalizeOptions(
+                array_diff_key($options, array_flip($options['non_normalizable_options'])),
                 $value,
-            );
+            ));
         }
 
         $options['data_table'] = $view->parent;
@@ -88,6 +88,9 @@ final class ColumnType implements ColumnTypeInterface
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'formatter' => null,
                 'exportable' => true,
+                'non_normalizable_options' => [
+                    'exportable',
+                ],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
@@ -100,6 +103,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('formatter', ['null', 'callable'])
             ->setAllowedTypes('exportable', ['bool'])
+            ->setAllowedTypes('non_normalizable_options', ['string[]'])
         ;
     }
 

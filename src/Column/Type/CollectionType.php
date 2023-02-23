@@ -37,6 +37,9 @@ class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
                 'entry_type' => TextType::class,
                 'entry_options' => [],
                 'separator' => ',',
+                'non_normalizable_options' => [
+                    'entry_options',
+                ],
             ])
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])

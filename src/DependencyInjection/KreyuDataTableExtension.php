@@ -96,11 +96,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
 
     public function prepend(ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(
-            new Configuration(),
-            $container->getExtensionConfig($this->getAlias()),
-        );
-
         if ($container->hasExtension('framework')) {
             $container->prependExtensionConfig('framework', [
                 'cache' => [
@@ -110,12 +105,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
                         ],
                     ],
                 ],
-            ]);
-        }
-
-        if ($container->hasExtension('twig')) {
-            $container->prependExtensionConfig('twig', [
-                'form_themes' => $config['themes'],
             ]);
         }
     }

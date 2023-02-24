@@ -3,10 +3,40 @@
 {# Bootstrap 5 Theme #}
 {# @see https://getbootstrap.com/docs/5.0/ #}
 
-{% block stylesheets %}{% endblock %}
+{% block stylesheets %}
+    <style>
+        svg.sort-arrow {
+            width: 12px;
+            height: 12px;
+        }
+
+        th {
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        th a {
+            margin: -1em;
+            padding: 1em;
+            display: block;
+            border: 1px solid black;
+        }
+
+        th a:not([href]) {
+            cursor: inherit;
+        }
+    </style>
+{% endblock %}
 
 {% block table %}
     {% with { table_attr: { class: 'table table-hover align-middle' }|merge(table_attr|default({})) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block kreyu_data_table_column_header %}
+    {% with { attr: { class: 'text-decoration-none text-reset' }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -302,18 +332,6 @@
     </div>
 {% endblock %}
 
-{% block sort_arrow_asc %}
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-    </svg>
-{% endblock %}
-
-{% block sort_arrow_desc %}
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-    </svg>
-{% endblock %}
-
 {% block kreyu_data_table_pagination %}
     {% if page_count > 1 %}
         {% set current_page = app.request.query.get(page_parameter_name) %}
@@ -406,4 +424,16 @@
     {% with { icon, attr: { class: 'text-decoration-none' } } %}
         {{ parent() }}
     {% endwith %}
+{% endblock %}
+
+{% block sort_arrow_asc %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="sort-arrow bi bi-chevron-up" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+    </svg>
+{% endblock %}
+
+{% block sort_arrow_desc %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="sort-arrow bi bi-chevron-down" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+    </svg>
 {% endblock %}

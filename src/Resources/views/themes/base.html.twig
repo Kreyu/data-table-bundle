@@ -100,22 +100,26 @@
 
         {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
 
-        <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({
-            (sort_parameter_name ~ '[field]'): sort_field,
-            (sort_parameter_name ~ '[direction]'): opposite_sort_direction
-        })) }}">
+        {% set attr = {
+            href: path(app.request.get('_route'), app.request.query.all|merge({
+                (sort_parameter_name ~ '[field]'): sort_field,
+                (sort_parameter_name ~ '[direction]'): opposite_sort_direction
+            }))
+        }|merge(attr|default({})) %}
+
+        <a {{ block('attributes') }}>
             {{ block('kreyu_data_table_column_label', theme, _context) }}
 
             {% if sort_field == current_sort_field %}
                 {% if current_sort_direction == 'asc' %}
-                    {% block sort_arrow_asc %}↑{% endblock %}
+                    {{ block('sort_arrow_asc', theme, _context) }}
                 {% else %}
-                    {% block sort_arrow_desc %}↓{% endblock %}
+                    {{ block('sort_arrow_desc', theme, _context) }}
                 {% endif %}
             {% endif %}
         </a>
     {% else %}
-        {{ block('kreyu_data_table_column_label', theme, _context) }}
+        <a {{ block('attributes') }} role="button">{{ block('kreyu_data_table_column_label', theme, _context) }}</a>
     {% endif %}
 {% endblock %}
 
@@ -238,6 +242,10 @@
         {{- include(action.template_path, action.template_vars) -}}
     {% endfor %}
 {% endblock %}
+
+{% block sort_arrow_asc %}↑{% endblock %}
+
+{% block sort_arrow_desc %}↓{% endblock %}
 
 {% block attributes %}
     {% for key, value in attr|default([]) %}{{ key }}="{{ value }}"{% endfor %}

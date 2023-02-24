@@ -6,7 +6,7 @@
 {% block stylesheets %}{% endblock %}
 
 {% block table %}
-    {% with { table_attr: { class: 'table table-vcenter' } } %}
+    {% with { table_attr: { class: 'table table-hover align-middle' } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -409,7 +409,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_boolean %}
-    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green' : 'bg-red') } } %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'text-bg-success' : 'text-bg-danger') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

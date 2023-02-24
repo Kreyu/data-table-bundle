@@ -222,6 +222,8 @@
 {% endblock %}
 
 {% block kreyu_data_table_export_form %}
+    {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
+
     <div>
         {{ form_start(form) }}
             <div class="mb-3">

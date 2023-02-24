@@ -10,5 +10,7 @@ interface ExporterInterface
 {
     public function getName(): string;
 
+    public function getOption(string $name, mixed $default = null): mixed;
+
     public function export(DataTableView $view, string $filename): ExportFile;
 }

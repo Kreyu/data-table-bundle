@@ -24,10 +24,10 @@ class ExportDataType extends AbstractType
                 'data' => $options['default_filename'],
             ])
             ->add('exporter', ChoiceType::class, [
-                'choices' => array_map(
-                    fn (ExporterInterface $exporter) => $exporter->getName(),
+                'choices' => array_flip(array_map(
+                    fn (ExporterInterface $exporter) => $exporter->getOption('label', $exporter->getName()),
                     $options['exporters'],
-                ),
+                )),
                 'getter' => fn (ExportData $data) => $data->exporter->getName(),
                 'setter' => fn (ExportData $data, mixed $exporter) => $data->exporter = $options['exporters'][$exporter],
             ])

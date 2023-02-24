@@ -21,6 +21,11 @@ class Exporter implements ExporterInterface
         return $this->name;
     }
 
+    public function getOption(string $name, mixed $default = null): mixed
+    {
+        return $this->options[$name] ?? $default;
+    }
+
     public function export(DataTableView $view, string $filename): ExportFile
     {
         return $this->type->getInnerType()->export($view, $filename, $this->options);

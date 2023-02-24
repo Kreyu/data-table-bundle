@@ -20,7 +20,6 @@
             margin: -1em;
             padding: 1em;
             display: block;
-            border: 1px solid black;
         }
 
         th a:not([href]) {
@@ -30,9 +29,11 @@
 {% endblock %}
 
 {% block table %}
-    {% with { table_attr: { class: 'table table-hover align-middle' }|merge(table_attr|default({})) } %}
-        {{ parent() }}
-    {% endwith %}
+    <div class="table-responsive">
+        {% with { table_attr: { class: 'table table-hover align-middle' }|merge(table_attr|default({})) } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
 {% endblock %}
 
 {% block kreyu_data_table_column_header %}

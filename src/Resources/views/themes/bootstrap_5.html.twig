@@ -120,7 +120,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_filters_form %}
-    {% form_theme form 'bootstrap_5_layout.html.twig' %}
+    {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
     {% if form.count > 0 %}
         <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
@@ -144,7 +144,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_personalization_form %}
-    {% form_theme form 'bootstrap_5_layout.html.twig' %}
+    {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
     <div data-controller="kreyu--data-table-bundle--personalization">
         {{ form_start(form) }}

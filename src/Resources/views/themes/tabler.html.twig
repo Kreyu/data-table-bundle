@@ -3,6 +3,15 @@
 {# Tabler Theme #}
 {# @see https://tabler.io/ #}
 
+{% block stylesheets %}
+    <style>
+        svg.sort-arrow {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+{% endblock %}
+
 {% block action_filter %}
     <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -74,6 +83,26 @@
 
         <span class="mx-2" aria-hidden="true">&times;</span>
     </a>
+{% endblock %}
+
+{% block sort_arrow_asc %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="sort-arrow icon icon-tabler icon-tabler-chevron-up" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M6 15l6 -6l6 6"></path>
+    </svg>
+{% endblock %}
+
+{% block sort_arrow_desc %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="sort-arrow icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M6 9l6 6l6 -6"></path>
+    </svg>
+{% endblock %}
+
+{% block kreyu_data_table_column_boolean %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green' : 'bg-red') } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
 
 {% block table_body_row_no_results %}

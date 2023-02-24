@@ -6,7 +6,7 @@
 {% block stylesheets %}{% endblock %}
 
 {% block table %}
-    {% with { table_attr: { class: 'table table-hover align-middle' } } %}
+    {% with { table_attr: { class: 'table table-hover align-middle' }|merge(table_attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -154,12 +154,9 @@
 
             {% block personalization_form_help %}
                 <div class="alert d-flex align-items-center">
-                    <div class="p-2">
-                        <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Info:">
-                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                        </svg>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8l.01 0" /><path d="M11 12l1 0l0 4l1 0" /></svg>
                     </div>
-
                     <span>{{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans({}, 'KreyuDataTable') }}.</span>
                 </div>
             {% endblock %}
@@ -305,38 +302,16 @@
     </div>
 {% endblock %}
 
-{% block kreyu_data_table_column_header %}
-    {% if data_table.vars.sorting_enabled and sort_field %}
-        {% set query_parameters = app.request.query.all() %}
+{% block sort_arrow_asc %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+    </svg>
+{% endblock %}
 
-        {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
-
-        {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
-        {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
-
-        {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
-
-        <a class="text-decoration-none" href="{{ path(app.request.get('_route'), app.request.query.all|merge({
-            (sort_parameter_name ~ '[field]'): sort_field,
-            (sort_parameter_name ~ '[direction]'): opposite_sort_direction
-        })) }}">
-            {{ block('kreyu_data_table_column_label', theme, _context) }}
-
-            {% if sort_field == current_sort_field %}
-                {% if current_sort_direction == 'asc' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-                    </svg>
-                {% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-                    </svg>
-                {% endif %}
-            {% endif %}
-        </a>
-    {% else %}
-        {{ block('kreyu_data_table_column_label', theme, _context) }}
-    {% endif %}
+{% block sort_arrow_desc %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+    </svg>
 {% endblock %}
 
 {% block kreyu_data_table_pagination %}
@@ -409,13 +384,13 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_number %}
-    {% with { attr: { class: 'text-end' } } %}
+    {% with { attr: { class: 'text-end' }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
 
 {% block kreyu_data_table_column_boolean %}
-    {% with { attr: { class: 'badge ' ~ (value ? 'text-bg-success' : 'text-bg-danger') } } %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'text-bg-success' : 'text-bg-danger') }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

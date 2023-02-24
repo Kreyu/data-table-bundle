@@ -79,7 +79,7 @@
 
 {% block kreyu_data_table_headers_row %}
     {% for column in columns %}
-        <td {{ block('attributes') }}>{{ data_table_column_header(column) }}</td>
+        <th {{ block('attributes') }}>{{ data_table_column_header(column) }}</th>
     {% endfor %}
 {% endblock %}
 
@@ -108,9 +108,9 @@
 
             {% if sort_field == current_sort_field %}
                 {% if current_sort_direction == 'asc' %}
-                    ↑
+                    {% block sort_arrow_asc %}↑{% endblock %}
                 {% else %}
-                    ↓
+                    {% block sort_arrow_desc %}↓{% endblock %}
                 {% endif %}
             {% endif %}
         </a>

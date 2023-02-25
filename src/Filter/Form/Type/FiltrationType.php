@@ -22,7 +22,10 @@ class FiltrationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('csrf_protection', false)
+            ->setDefaults([
+                'method' => 'GET',
+                'csrf_protection' => false,
+            ])
             ->setRequired('filters')
             ->setAllowedTypes('filters', FilterInterface::class.'[]')
         ;

@@ -242,7 +242,6 @@ class DataTable implements DataTableInterface
             name: $this->config->getFiltrationParameterName(),
             type: FiltrationType::class,
             options: [
-                'method' => 'GET',
                 'filters' => $this->config->getFilters(),
             ],
         );

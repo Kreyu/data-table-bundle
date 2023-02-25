@@ -49,10 +49,6 @@ final class DataTableType implements DataTableTypeInterface
         $view->vars += [
             'name' => $dataTable->getConfig()->getName(),
             'columns' => $this->getVisibleColumns($dataTable),
-            'filters' => array_map(
-                fn (FilterInterface $filter) => $filter->createView($view),
-                $dataTable->getConfig()->getFilters(),
-            ),
             'exporters' => $dataTable->getConfig()->getExporters(),
             'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
@@ -72,6 +68,12 @@ final class DataTableType implements DataTableTypeInterface
             'values_rows' => [],
         ];
 
+        $view->vars['filters'] = array_map(
+            fn (FilterInterface $filter) => $filter->createView($view),
+            $dataTable->getConfig()->getFilters(),
+        );
+
+        $view->vars['filtration_form'] = $this->getFiltrationFormView($view, $dataTable);
         $view->vars['personalization_form'] = $this->getPersonalizationFormView($view, $dataTable);
 
         foreach ($dataTable->getPagination()->getItems() as $item) {
@@ -145,6 +147,23 @@ final class DataTableType implements DataTableTypeInterface
             $column = $dataTable->getConfig()->getColumn($personalizationColumnData->getName());
 
             $child->vars['column'] = $column->createView($view);
+        }
+
+        return $formView;
+    }
+
+    private function getFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
+    {
+        $formView = $dataTable->getFiltrationForm()->createView();
+
+        foreach ($formView->children as $child) {
+            try {
+                $filter = $dataTable->getConfig()->getFilter($child->vars['name']);
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+
+            $child->vars['filter'] = $filter->createView($view);
         }
 
         return $formView;

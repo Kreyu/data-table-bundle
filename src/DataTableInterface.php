@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -19,7 +18,7 @@ interface DataTableInterface
 
     public function sort(SortingData $data): void;
 
-    public function filter(FiltrationData $data): void;
+    public function filter(array $data): void;
 
     public function paginate(PaginationData $data): void;
 

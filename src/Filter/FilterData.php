@@ -10,37 +10,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FilterData
 {
     public function __construct(
-        private null|Operator $operator,
-        private mixed $value,
+        public mixed $value = '',
+        public mixed $operator = null,
     ) {
     }
 
     public static function fromArray(array $data = []): self
     {
         ($resolver = new OptionsResolver())
-            ->setDefaults([
-                'operator' => null,
-                'value' => null,
-            ])
+            ->setRequired(['value', 'operator'])
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
             ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
-                if (null === $value) {
-                    return null;
-                }
-
-                if ($value instanceof Operator) {
-                    return $value;
-                }
-
-                return Operator::tryFrom((string) $value);
+                return is_string($value) ? Operator::from($value) : $value;
             })
         ;
 
         $data = $resolver->resolve($data);
 
         return new self(
-            operator: $data['operator'],
             value: $data['value'],
+            operator: $data['operator'],
         );
     }
 

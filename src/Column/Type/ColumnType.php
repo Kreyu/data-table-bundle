@@ -45,8 +45,6 @@ final class ColumnType implements ColumnTypeInterface
         unset($options['sort']);
 
         $value = $options['value'];
-        $formatter = $options['formatter'];
-        $exportableFormatter = $options['exportable_formatter'];
         $propertyPath = $options['property_path'];
         $propertyAccessor = $options['property_accessor'];
 
@@ -56,27 +54,30 @@ final class ColumnType implements ColumnTypeInterface
             }
         }
 
+        $options['value'] = $options['exportable_value'] = $value;
+
         if (null !== $column->getData()) {
-            $options['value'] = $value;
-            $options['exportable_value'] = $value;
+            $normalizableOptions = array_diff_key($options, array_flip($options['non_normalizable_options'] + [
+                'formatter',
+                'exportable_formatter',
+            ]));
 
-            if (is_callable($formatter)) {
-                $options['value'] = $formatter($value);
+            $normalizedOptions = $this->normalizeOptions($normalizableOptions, $value);
+
+            $options = array_merge($options, $normalizedOptions);
+
+            if (is_callable($formatter = $options['formatter'])) {
+                $options['value'] = $formatter($value, $column, $options);
             }
 
-            if (is_callable($exportableFormatter)) {
-                $options['exportable_value'] = $exportableFormatter($value);
+            if (is_callable($exportableFormatter = $options['exportable_formatter'])) {
+                $options['exportable_value'] = $exportableFormatter($value, $column, $options);
             }
-
-            $options = array_merge($options, $this->normalizeOptions(
-                array_diff_key($options, array_flip($options['non_normalizable_options'])),
-                $value,
-            ));
         }
 
         $options['data_table'] = $view->parent;
 
-        $view->vars = $options;
+        $view->vars += $options;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -96,10 +97,7 @@ final class ColumnType implements ColumnTypeInterface
                 'formatter' => null,
                 'exportable' => true,
                 'exportable_formatter' => null,
-                'non_normalizable_options' => [
-                    'exportable',
-                    'exportable_formatter',
-                ],
+                'non_normalizable_options' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])

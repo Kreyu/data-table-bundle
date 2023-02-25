@@ -8,9 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterDataType;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
@@ -92,21 +90,24 @@ class DataTable implements DataTableInterface
         }
     }
 
-    public function filter(FiltrationData $data): void
+    public function filter(array $data): void
     {
         if (!$this->config->isFiltrationEnabled()) {
             return;
         }
 
+        $form = $this->getFiltrationForm();
+        $form->submit($data);
+
+        $data = $form->getData();
+
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $data->getFilter($filter);
+            $filterData = $data[$filter->getName()];
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
             }
         }
-
-        $this->getFiltrationForm()->setData($data);
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
@@ -177,7 +178,13 @@ class DataTable implements DataTableInterface
 
     public function hasActiveFilters(): bool
     {
-        return $this->getFiltrationForm()->getData()->hasActiveFilters();
+        foreach ($this->getFiltrationForm()->getData() as $data) {
+            if ($data && $data->hasValue()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function handleRequest(mixed $request): void
@@ -215,7 +222,7 @@ class DataTable implements DataTableInterface
             throw new \LogicException('The data table has no configured columns.');
         }
 
-        if (null === $this->getFiltrationForm()->getData()) {
+        if (!$this->getFiltrationForm()->isSubmitted()) {
             $this->initializeFiltration();
         }
 
@@ -233,22 +240,12 @@ class DataTable implements DataTableInterface
     {
         $formBuilder = $this->config->getFiltrationFormFactory()->createNamedBuilder(
             name: $this->config->getFiltrationParameterName(),
-            type: FiltrationDataType::class,
+            type: FiltrationType::class,
             options: [
                 'method' => 'GET',
                 'filters' => $this->config->getFilters(),
             ],
         );
-
-        foreach ($this->config->getFilters() as $filter) {
-            $formBuilder->add(
-                $filter->getFormName(),
-                FilterDataType::class,
-                $filter->getFormOptions() + [
-                    'getter' => fn (FiltrationData $data) => $data->getFilter($filter),
-                ],
-            );
-        }
 
         return $formBuilder->getForm();
     }
@@ -333,7 +330,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $data = $this->config->getDefaultFiltrationData() ?? new FiltrationData();
+        $data = $this->config->getDefaultFiltrationData();
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {

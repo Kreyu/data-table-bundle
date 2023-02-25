@@ -9,7 +9,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -87,7 +86,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
 
-    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static;
+    public function setDefaultFiltrationData(array $defaultFiltrationData): static;
 
     public function setSortingEnabled(bool $sortingEnabled): static;
 

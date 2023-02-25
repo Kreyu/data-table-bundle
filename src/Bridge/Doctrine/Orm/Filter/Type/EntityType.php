@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType as EntityFormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityType extends AbstractType
 {
@@ -40,6 +41,7 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('field_type', EntityFormType::class);
+
         $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
             $resolver->setDefaults([
                 'visible' => false,
@@ -50,6 +52,16 @@ class EntityType extends AbstractType
                     Operator::NOT_CONTAINS,
                 ],
             ]);
+        });
+
+        $resolver->setDefault('active_filter_formatter', function (FilterData $data, array $options): mixed {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+            if ($path = $options['field_options']['choice_label']) {
+                return $propertyAccessor->getValue($data->getValue(), $path);
+            }
+
+            return $data->getValue();
         });
     }
 

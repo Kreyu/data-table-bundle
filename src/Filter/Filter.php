@@ -39,6 +39,7 @@ class Filter implements FilterInterface
             'field_options' => $this->getOption('field_options'),
             'operator_type' => $this->getOption('operator_type'),
             'operator_options' => $this->getOption('operator_options'),
+            'active_filter_formatter' => $this->getOption('active_filter_formatter'),
             'label' => $this->getOption('label'),
         ];
     }

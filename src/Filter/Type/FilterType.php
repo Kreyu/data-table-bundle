@@ -27,6 +27,7 @@ final class FilterType implements FilterTypeInterface
             ->setDefaults([
                 'name' => $filter->getName(),
                 'label' => ucfirst($filter->getName()),
+                'translation_domain' => $view->parent->vars['label_translation_domain'],
                 'query_path' => $filter->getName(),
             ])
         ;
@@ -42,7 +43,7 @@ final class FilterType implements FilterTypeInterface
             ->setDefaults([
                 'label' => null,
                 'label_translation_parameters' => [],
-                'translation_domain' => 'KreyuDataTable',
+                'translation_domain' => null,
                 'query_path' => null,
                 'field_type' => TextType::class,
                 'field_options' => [],
@@ -51,6 +52,9 @@ final class FilterType implements FilterTypeInterface
                     'visible' => false,
                     'choices' => [],
                 ],
+                'active_filter_formatter' => function (FilterData $data): mixed {
+                    return $data->getValue();
+                },
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('query_path', ['null', 'string'])

@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -46,15 +45,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     {
         $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
 
-        $filtrationData = FiltrationData::fromArray([
-            'filters' => $this->extractQueryParameter($request, "[$filtrationParameterName]", []),
-        ]);
+        $data = $this->extractQueryParameter($request, "[$filtrationParameterName]", []);
 
-        if ($filtrationData->isEmpty()) {
+        if (empty($data)) {
             return;
         }
 
-        $dataTable->filter($filtrationData);
+        $dataTable->filter($data);
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void

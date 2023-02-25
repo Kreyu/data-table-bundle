@@ -53,7 +53,7 @@
             {% endblock %}
 
             {% block action_bar_right %}
-                <div class="d-inline-block float-end my-2">
+                <div class="d-inline-block float-end mb-2">
                     {% if display_filter_action %}
                         {% block action_filter %}
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
@@ -100,7 +100,7 @@
 {% endblock %}
 
 {% block active_filters %}
-    <div class="d-inline-block my-2">
+    <div class="d-inline-block mb-1">
         {% if has_active_filters %}
             {% block filter_clear_all_button %}
                 {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
@@ -133,7 +133,7 @@
                         title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
                     >
                         <small>
-                            {{ filter.vars.label }}
+                            {{ filter.vars.label|trans({}, filter.vars.translation_domain) }}
 
                             {% if filter.vars.operator_options.visible %}
                                 ({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})
@@ -157,17 +157,17 @@
         <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
             <div class="mb-4">
                 {{ form_start(form) }}
-                <div class="row">
-                    {% for child in form.children %}
+                    <div class="row">
+                        {% for child in form.children %}
+                            <div class="col-12 col-md-6 col-lg-3">
+                                {{ form_row(child) }}
+                            </div>
+                        {% endfor %}
                         <div class="col-12 col-md-6 col-lg-3">
-                            {{ form_row(child) }}
+                            <div class="col-form-label">&nbsp;</div>
+                            <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
                         </div>
-                    {% endfor %}
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="col-form-label">&nbsp;</div>
-                        <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
                     </div>
-                </div>
                 {{ form_end(form) }}
             </div>
         </div>
@@ -333,11 +333,17 @@
     </div>
 {% endblock %}
 
+{% block pagination %}
+    <div class="w-100 d-flex justify-content-center">
+        {{ parent() }}
+    </div>
+{% endblock %}
+
 {% block kreyu_data_table_pagination %}
     {% if page_count > 1 %}
         {% set current_page = app.request.query.get(page_parameter_name) %}
 
-        <div>
+        <div class="mt-3">
             <ul class="pagination m-0 ms-auto">
                 <li class="page-item {% if not has_previous_page %}disabled{% endif %}">
                     <a class="page-link"
@@ -374,12 +380,14 @@
 
 {% block kreyu_data_table_filter_data_row %}
     <div class="row">
-        {{ form_label(form) }}
+        {{ form_label(form, null, { translation_domain: filter.vars.translation_domain }) }}
 
         {% if form.operator.vars.visible %}
-            <div class="input-group">
-                {{ form_widget(form.value) }}
-                {{ form_widget(form.operator) }}
+            <div class="col-12">
+                <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} input-group">
+                    {{ form_widget(form.value) }}
+                    {{ form_widget(form.operator) }}
+                </div>
             </div>
         {% else %}
             <div class="col-12">

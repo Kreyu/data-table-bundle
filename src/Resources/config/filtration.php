@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringType;
@@ -79,6 +81,16 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.filter.type.doctrine_orm_callback', CallbackType::class)
+        ->tag('kreyu_data_table.filter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.filter.type.doctrine_orm_datetime', DateTimeType::class)
+        ->tag('kreyu_data_table.filter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.filter.type.doctrine_orm_date', DateType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 };

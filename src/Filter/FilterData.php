@@ -7,7 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FilterData
+readonly class FilterData
 {
     public function __construct(
         public mixed $value = '',
@@ -18,7 +18,8 @@ class FilterData
     public static function fromArray(array $data = []): self
     {
         ($resolver = new OptionsResolver())
-            ->setRequired(['value', 'operator'])
+            ->setRequired('value')
+            ->setDefault('operator', null)
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
             ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
                 return is_string($value) ? Operator::from($value) : $value;
@@ -31,6 +32,14 @@ class FilterData
             value: $data['value'],
             operator: $data['operator'],
         );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'value' => $this->value,
+            'operator' => $this->operator,
+        ];
     }
 
     public function getOperator(): ?Operator

@@ -50,6 +50,8 @@ class FilterDataType extends AbstractType implements DataMapperInterface
             fn (mixed $value) => $value,
             fn (mixed $value) => $value instanceof Operator ? $value->value : $value,
         ));
+
+        $builder->setDataMapper($this);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -87,5 +89,10 @@ class FilterDataType extends AbstractType implements DataMapperInterface
         $forms = iterator_to_array($forms);
 
         /* @var FormInterface[] $forms */
+
+        $viewData = new FilterData(
+            value: $forms['value']->getData(),
+            operator: $forms['operator']->getData(),
+        );
     }
 }

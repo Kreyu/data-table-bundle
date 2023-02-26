@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
@@ -146,7 +147,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     /**
      * Default filtration data, which is applied to the data table if no data is given by the user.
      */
-    private array $defaultFiltrationData = [];
+    private null|FiltrationData $defaultFiltrationData = null;
 
     /**
      * Determines whether the data table sorting feature is enabled.
@@ -421,22 +422,6 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
-    public function getBatchActionFactory(): BatchActionFactoryInterface
-    {
-        return $this->batchActionFactory;
-    }
-
-    public function setBatchActionFactory(BatchActionFactoryInterface $batchActionFactory): static
-    {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
-        $this->batchActionFactory = $batchActionFactory;
-
-        return $this;
-    }
-
     public function isExportingEnabled(): bool
     {
         return $this->exportingEnabled;
@@ -645,12 +630,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
-    public function getDefaultFiltrationData(): array
+    public function getDefaultFiltrationData(): ?FiltrationData
     {
         return $this->defaultFiltrationData;
     }
 
-    public function setDefaultFiltrationData(array $defaultFiltrationData): static
+    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();

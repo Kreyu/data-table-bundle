@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
@@ -90,19 +91,17 @@ class DataTable implements DataTableInterface
         }
     }
 
-    public function filter(array $data): void
+    public function filter(FiltrationData $data): void
     {
         if (!$this->config->isFiltrationEnabled()) {
             return;
         }
 
         $form = $this->getFiltrationForm();
-        $form->submit($data);
-
-        $data = $form->getData();
+        $form->submit($data->toArray());
 
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $data[$filter->getName()];
+            $filterData = $data->getFilter($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
@@ -178,13 +177,7 @@ class DataTable implements DataTableInterface
 
     public function hasActiveFilters(): bool
     {
-        foreach ($this->getFiltrationForm()->getData() as $data) {
-            if ($data && $data->hasValue()) {
-                return true;
-            }
-        }
-
-        return false;
+        return (bool) $this->getFiltrationForm()->getData()?->hasActiveFilters();
     }
 
     public function handleRequest(mixed $request): void
@@ -343,7 +336,9 @@ class DataTable implements DataTableInterface
             $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
         }
 
-        $this->filter($data);
+        if (null !== $data) {
+            $this->filter($data);
+        }
     }
 
     private function initializePersonalization(): void

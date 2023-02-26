@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SortingData
+readonly class SortingData
 {
     /**
      * @param array<SortingFieldData> $fields
@@ -24,27 +23,20 @@ class SortingData
 
     public static function fromArray(array $data): static
     {
-        ($resolver = new OptionsResolver())
-            ->setDefault('fields', function (OptionsResolver $resolver) {
-                $resolver
-                    ->setPrototype(true)
-                    ->setRequired([
-                        'name',
-                    ])
-                    ->setDefaults([
-                        'direction' => 'asc',
-                    ])
-                ;
-            })
-            ->setAllowedTypes('fields', ['array'])
-        ;
+        $fields = [];
 
-        $data = $resolver->resolve($data);
-
-        $fields = array_map(
-            fn (array $field) => SortingFieldData::fromArray($field),
-            $data['fields'],
-        );
+        foreach ($data as $key => $value) {
+            if ($value instanceof SortingFieldData) {
+                $fields[$value->getName()] = $value;
+            } elseif (is_array($value)) {
+                $fields[$key] = SortingFieldData::fromArray($value);
+            } elseif (is_string($key) && is_string($value)) {
+                $fields[$key] = SortingFieldData::fromArray([
+                    'name' => $key,
+                    'direction' => $value,
+                ]);
+            }
+        }
 
         return new static($fields);
     }

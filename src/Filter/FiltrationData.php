@@ -4,19 +4,40 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+
 readonly class FiltrationData
 {
+    /**
+     * @param array<FilterData> $filters
+     */
     public function __construct(
-        private array $filters = [],
+        private array $filters = []
     ) {
+        foreach ($filters as $filter) {
+            if (!$filter instanceof FilterData) {
+                throw new UnexpectedTypeException($filter, FilterData::class);
+            }
+        }
     }
 
     public static function fromArray(array $data): static
     {
-        return new static(array_map(
-            fn (array $data) => FilterData::fromArray($data),
-            $data,
-        ));
+        $filters = [];
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof FilterData) {
+                $filters[$key] = $value;
+            } elseif (is_array($value)) {
+                $filters[$key] = FilterData::fromArray($value);
+            } else {
+                $filters[$key] = FilterData::fromArray([
+                    'value' => $value,
+                ]);
+            }
+        }
+
+        return new static($filters);
     }
 
     public function toArray(): array

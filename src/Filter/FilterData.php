@@ -10,8 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 readonly class FilterData
 {
     public function __construct(
-        public mixed $value = '',
-        public mixed $operator = null,
+        private mixed $value = '',
+        private mixed $operator = null,
     ) {
     }
 

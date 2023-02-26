@@ -20,15 +20,7 @@ class DateTimeType extends AbstractType
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
         $operator = $data->getOperator() ?? Operator::EQUALS;
-        $value = $data->getValue();
-
-        if (is_string($value)) {
-            $dateTime = \DateTime::createFromFormat('Y-m-d\TH:i', $value);
-        } else {
-            $dateTime = new \DateTime();
-            $dateTime->setDate((int) $value['date']['year'] ?: 0, (int) $value['date']['month'] ?: 0, (int) $value['date']['day'] ?: 0);
-            $dateTime->setTime((int) $value['time']['hour'] ?: 0, (int) $value['time']['minute'] ?: 0);
-        }
+        $value = $this->getDateTimeValue($data);
 
         try {
             $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
@@ -42,7 +34,7 @@ class DateTimeType extends AbstractType
 
         $query
             ->andWhere($expression)
-            ->setParameter($parameterName, $dateTime);
+            ->setParameter($parameterName, $value);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -99,5 +91,33 @@ class DateTimeType extends AbstractType
             Operator::LESS_THAN_EQUALS => 'lte',
             default => throw new \InvalidArgumentException('Operator not supported'),
         };
+    }
+
+    private function getDateTimeValue(FilterData $data): \DateTimeInterface
+    {
+        $value = $data->getValue();
+
+        if ($value instanceof \DateTimeInterface) {
+            $dateTime = $value;
+        } elseif (is_string($value)) {
+            $dateTime = \DateTime::createFromFormat('Y-m-d\TH:i', $value);
+        } elseif (is_array($value)) {
+            $dateTime = (new \DateTime())
+                ->setDate(
+                    year: (int) $value['date']['year'] ?: 0,
+                    month: (int) $value['date']['month'] ?: 0,
+                    day: (int) $value['date']['day'] ?: 0
+                )
+                ->setTime(
+                    hour: (int) $value['time']['hour'] ?: 0,
+                    minute: (int) $value['time']['minute'] ?: 0,
+                    second: (int) $value['time']['second'] ?: 0
+                )
+            ;
+        } else {
+            throw new \InvalidArgumentException(sprintf('Unable to convert data of type "%s" to DateTime object.', get_debug_type($value)));
+        }
+
+        return $dateTime;
     }
 }

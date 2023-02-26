@@ -87,7 +87,7 @@
             </span>
         </div>
 
-        <span class="">{{ field.vars.value }}</span>
+        <span class="">{{ field.vars.value|trans({}, filter.vars.translation_domain) }}</span>
 
         <span class="mx-2" aria-hidden="true">&times;</span>
     </a>

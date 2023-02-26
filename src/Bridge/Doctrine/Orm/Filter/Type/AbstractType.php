@@ -28,7 +28,7 @@ abstract class AbstractType extends BaseAbstractType
 
         $queryPath = $filter->getQueryPath();
 
-        if ($rootAlias && !str_contains($queryPath, '.')) {
+        if ($rootAlias && !str_contains($queryPath, '.') && $filter->getOption('auto_alias_resolving')) {
             $queryPath = $rootAlias.'.'.$queryPath;
         }
 

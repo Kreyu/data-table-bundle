@@ -52,6 +52,7 @@ final class FilterType implements FilterTypeInterface
                     'visible' => false,
                     'choices' => [],
                 ],
+                'auto_alias_resolving' => true,
                 'active_filter_formatter' => function (FilterData $data): mixed {
                     return $data->getValue();
                 },
@@ -62,6 +63,8 @@ final class FilterType implements FilterTypeInterface
             ->setAllowedTypes('field_options', ['array'])
             ->setAllowedTypes('operator_type', ['string'])
             ->setAllowedTypes('operator_options', ['array'])
+            ->setAllowedTypes('auto_alias_resolving', ['bool'])
+            ->setAllowedTypes('active_filter_formatter', ['null', 'callable'])
         ;
     }
 

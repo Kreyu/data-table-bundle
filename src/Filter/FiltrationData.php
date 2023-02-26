@@ -29,6 +29,10 @@ readonly class FiltrationData
             if ($value instanceof FilterData) {
                 $filters[$key] = $value;
             } elseif (is_array($value)) {
+                if (!array_key_exists('value', $value)) {
+                    $value = ['value' => ''];
+                }
+
                 $filters[$key] = FilterData::fromArray($value);
             } else {
                 $filters[$key] = FilterData::fromArray([

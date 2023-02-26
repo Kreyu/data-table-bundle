@@ -48,11 +48,7 @@ class FiltrationType extends AbstractType implements DataMapperInterface
         $data = [];
 
         foreach ($forms as $child) {
-            $data = $child->getData();
-
-            if ($data instanceof FilterData) {
-                $data[$child->getName()] = $child->getData();
-            }
+            $data[$child->getName()] = $child->getData();
         }
 
         $viewData = new FiltrationData($data);

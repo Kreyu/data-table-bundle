@@ -11,6 +11,19 @@
     </turbo-frame>
 {% endblock %}
 
+{% block kreyu_data_table_form_aware %}
+    <turbo-frame id="kreyu_data_table_{{ name }}">
+        {{ block('stylesheets') }}
+        {{ block('action_bar') }}
+
+        {{ form_start(form, form_variables) }}
+            {{ block('table') }}
+        {{ form_end(form, { render_rest: false }) }}
+
+        {{ block('pagination') }}
+    </turbo-frame>
+{% endblock %}
+
 {% block kreyu_data_table_table %}
     {{ block('table') }}
 {% endblock %}

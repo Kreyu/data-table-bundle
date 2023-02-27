@@ -18,6 +18,16 @@ You will mostly use this helper for prototyping or if you use custom theme.
 If you need more flexibility in rendering the data table, you should use the other helpers 
 to render individual parts of the data table instead.
 
+### `data_table_form_aware(data_table_view, form_view, data_table_variables, form_variables)`
+
+Renders the HTML of the data table with table part wrapped in the given form.
+
+```twig
+{# render the data table wrapped in form and display a submit button next to it #}
+{{ data_table_form_aware(data_table, form, form_variables={ attr: { id: form.vars.id } }) }}
+<input type="submit" form="{{ form.vars.id }}" value="Submit"/>
+```
+
 ### `data_table_table(data_table_view, variables)`
 
 Renders the HTML of the data table.

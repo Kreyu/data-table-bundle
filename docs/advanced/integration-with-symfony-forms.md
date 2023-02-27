@@ -102,23 +102,32 @@ class ProductController extends AbstractController
 
 Now, let's handle the templating part:
 
-If your data table is **NOT** using neither filtration, exporting nor personalization features, 
-you can use the [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) as usual, wrapping it in the form:
-
 ```twig
 {# templates/product/index.html.twig #}
-{% extends 'base.html.twig' %}
 
-{% block content %}
-    {{ form_start(form) }}
-        {{ data_table(data_table) }}
+{{ data_table_form_aware(data_table, form, form_variables={ attr: { id: form.vars.id } }) }}
 
-        <div class="mt-2">
-            <button class="btn btn-primary">Update</button>
-        </div>
-    {# Important: notice the "render_rest" option! #}
-    {{ form_end(form, { render_rest: false }) }}
-{% endblock %}
+<input type="submit" form="{{ form.vars.id }}" value="Submit"/>
+```
+
+Notice the use of [data_table_form_aware() function](../reference/twig.md#datatableformawaredatatableview-formview-datatablevariables-formvariables).
+This takes care of wrapping only the table part in the form. 
+Because we are rendering the submit button outside the form, the `form` attribute is used on the submit button, which links to the form by `id`.
+
+## Rendering without helper function
+
+If your data table is **NOT** using neither filtration, exporting nor personalization features, 
+you can use the [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) as usual, wrapping it in the form:
+```twig
+{# templates/product/index.html.twig #}
+
+{{ form_start(form) }}
+    {{ data_table(data_table) }}
+
+    <div class="mt-2">
+        <button class="btn btn-primary">Update</button>
+    </div>
+{{ form_end(form, { render_rest: false }) }} {# Important: notice the "render_rest" option! #}
 ```
 
 !!! Warning
@@ -132,22 +141,18 @@ renders out whole data table with corresponding feature form, and HTML forms can
 
 ```twig
 {# templates/product/index.html.twig #}
-{% extends 'base.html.twig' %}
 
-{% block content %}
-    {{ data_table_action_bar(data_table) }}
+{{ data_table_action_bar(data_table) }}
 
-    {{ form_start(form) }}
-        {{ data_table_table(data_table) }}
+{{ form_start(form) }}
+    {{ data_table_table(data_table) }}
 
-        <div class="mt-2">
-            <button class="btn btn-primary">Update</button>
-        </div>
-    {# Important: notice the "render_rest" option! #}
-    {{ form_end(form, { render_rest: false }) }}
+    <div class="mt-2">
+        <button class="btn btn-primary">Update</button>
+    </div>
+{{ form_end(form, { render_rest: false }) }} {# Important: notice the "render_rest" option! #}
 
-    {{ data_table_pagination(data_table) }}
-{% endblock %}
+{{ data_table_pagination(data_table) }}
 ```
 
 !!! Warning
@@ -155,6 +160,11 @@ renders out whole data table with corresponding feature form, and HTML forms can
     You **HAVE TO** disable rendering rest of the fields in the `form_end` helper by passing the `render_rest` option as `false`, 
     otherwise all the form fields will be rendered again below the table. This is because the Symfony Forms have no way 
     of knowing the data table has rendered its form fields, because the bundle manually creates each field `FormView` in the background.
+
+!!! Note
+
+    If your application uses [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html#usage), remember to wrap
+    the whole data table in `<turbo-frame>` like in the base HTML template!
 
 ## Passing the form to the data table type class
 

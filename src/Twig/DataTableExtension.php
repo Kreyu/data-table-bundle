@@ -28,6 +28,7 @@ class DataTableExtension extends AbstractExtension
     {
         $definitions = [
             'data_table' => $this->renderDataTable(...),
+            'data_table_form_aware' => $this->renderDataTableFormAware(...),
             'data_table_table' => $this->renderDataTableTable(...),
             'data_table_action_bar' => $this->renderDataTableActionBar(...),
             'data_table_headers_row' => $this->renderHeadersRow(...),
@@ -62,6 +63,18 @@ class DataTableExtension extends AbstractExtension
             environment: $environment,
             blockName: 'kreyu_data_table',
             context: array_merge($view->vars, $variables),
+        );
+    }
+
+    /**
+     * @throws TwigException|\Throwable
+     */
+    public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
+    {
+        return $this->renderBlock(
+            environment: $environment,
+            blockName: 'kreyu_data_table_form_aware',
+            context: array_merge($view->vars, $dataTableVariables, ['form' => $formView, 'form_variables' => $formVariables]),
         );
     }
 

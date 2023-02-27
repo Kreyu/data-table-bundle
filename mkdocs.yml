@@ -28,6 +28,7 @@ nav:
     - 'Twig': 'reference/twig.md'
   - 'Advanced':
     - 'Integration with Symfony UX Turbo': 'advanced/integration-with-symfony-ux-turbo.md'
+    - 'Integration with Symfony Forms': 'advanced/integration-with-symfony-forms.md'
     - 'Creating custom request handler': 'advanced/creating-custom-request-handler.md'
     - 'Creating data table type extension': 'advanced/creating-data-table-type-extension.md'
 

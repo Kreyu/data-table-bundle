@@ -27,16 +27,18 @@ class DataTableExtension extends AbstractExtension
     public function getFunctions(): array
     {
         $definitions = [
-            'data_table' => [$this, 'renderDataTable'],
-            'data_table_headers_row' => [$this, 'renderHeadersRow'],
-            'data_table_values_row' => [$this, 'renderValuesRow'],
-            'data_table_column_label' => [$this, 'renderColumnLabel'],
-            'data_table_column_header' => [$this, 'renderColumnHeader'],
-            'data_table_column_value' => [$this, 'renderColumnValue'],
-            'data_table_pagination' => [$this, 'renderPagination'],
-            'data_table_filters_form' => [$this, 'renderFiltersForm'],
-            'data_table_personalization_form' => [$this, 'renderPersonalizationForm'],
-            'data_table_export_form' => [$this, 'renderExportForm'],
+            'data_table' => $this->renderDataTable(...),
+            'data_table_table' => $this->renderDataTableTable(...),
+            'data_table_action_bar' => $this->renderDataTableActionBar(...),
+            'data_table_headers_row' => $this->renderHeadersRow(...),
+            'data_table_values_row' => $this->renderValuesRow(...),
+            'data_table_column_label' => $this->renderColumnLabel(...),
+            'data_table_column_header' => $this->renderColumnHeader(...),
+            'data_table_column_value' => $this->renderColumnValue(...),
+            'data_table_pagination' => $this->renderPagination(...),
+            'data_table_filters_form' => $this->renderFiltersForm(...),
+            'data_table_personalization_form' => $this->renderPersonalizationForm(...),
+            'data_table_export_form' => $this->renderExportForm(...),
         ];
 
         $functions = [];
@@ -59,6 +61,30 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table',
+            context: array_merge($view->vars, $variables),
+        );
+    }
+
+    /**
+     * @throws TwigException|\Throwable
+     */
+    public function renderDataTableTable(Environment $environment, DataTableView $view, array $variables = []): string
+    {
+        return $this->renderBlock(
+            environment: $environment,
+            blockName: 'kreyu_data_table_table',
+            context: array_merge($view->vars, $variables),
+        );
+    }
+
+    /**
+     * @throws TwigException|\Throwable
+     */
+    public function renderDataTableActionBar(Environment $environment, DataTableView $view, array $variables = []): string
+    {
+        return $this->renderBlock(
+            environment: $environment,
+            blockName: 'kreyu_data_table_action_bar',
             context: array_merge($view->vars, $variables),
         );
     }
@@ -126,8 +152,12 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderPagination(Environment $environment, PaginationView $view, array $variables = []): string
+    public function renderPagination(Environment $environment, DataTableView|PaginationView $view, array $variables = []): string
     {
+        if ($view instanceof DataTableView) {
+            $view = $view->vars['pagination'];
+        }
+
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_pagination',

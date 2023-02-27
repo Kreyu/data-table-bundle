@@ -11,6 +11,14 @@
     </turbo-frame>
 {% endblock %}
 
+{% block kreyu_data_table_table %}
+    {{ block('table') }}
+{% endblock %}
+
+{% block kreyu_data_table_action_bar %}
+    {{ block('action_bar') }}
+{% endblock %}
+
 {% block stylesheets %}
     <style>
         table, th, td {
@@ -228,13 +236,29 @@
 
 {% block kreyu_data_table_column_collection %}
     {% for child in children %}
-        {{- data_table_column_value(child) -}}
+        {{- data_table_column_value(child, { row_index }) -}}
         <span>{% if not loop.last %}{{ separator }}{% endif %}</span>
     {% endfor %}
 {% endblock %}
 
 {% block kreyu_data_table_column_template %}
     {{- include(template_path, template_vars) -}}
+{% endblock %}
+
+{% block kreyu_data_table_column_form %}
+    {% if form_child_path is not same as false %}
+        {% set form = form[row_index][form_child_path].createView() %}
+    {% else %}
+        {% set form = form[row_index].createView() %}
+    {% endif %}
+
+    {% set form_themes = form_themes|default(null) %}
+
+    {% if form_themes is not null %}
+        {% form_theme form with form_themes %}
+    {% endif %}
+
+    {{ form_widget(form) }}
 {% endblock %}
 
 {% block kreyu_data_table_column_actions %}

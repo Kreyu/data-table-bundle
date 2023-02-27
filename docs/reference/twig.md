@@ -7,7 +7,7 @@ they are very useful because they take use the theme configured in bundle.
 
 ### `data_table(data_table_view, variables)`
 
-Renders the HTML of a complete data table.
+Renders the HTML of a complete data table, with action bar, filtration, pagination, etc.
 
 ```twig
 {# render the data table and disable the filtration feature #}
@@ -17,6 +17,14 @@ Renders the HTML of a complete data table.
 You will mostly use this helper for prototyping or if you use custom theme.
 If you need more flexibility in rendering the data table, you should use the other helpers 
 to render individual parts of the data table instead.
+
+### `data_table_table(data_table_view, variables)`
+
+Renders the HTML of the data table.
+
+### `data_table_action_bar(data_table_view, variables)`
+
+Renders the HTML of the data table action bar, which includes filtration, exporting and personalization features.
 
 ### `data_table_headers_row(headers_row_view, variables)`
 
@@ -59,6 +67,9 @@ If given value is instance of `FormInterface`, the `createView()` method will be
 
 Renders the pagination controls.
 
+Additionally, accepts the data table view as a first argument.
+In this case, the pagination view is extracted from the data table view "pagination" variable.
+
 ## Variables
 
 Certain types may define even more variables, and some variables here only really apply to certain types.
@@ -87,6 +98,8 @@ The following variables are common to every data table type.
 | `headers_row`                    | Holds an instance of the headers row view.                                                                                             |
 | `values_rows`                    | List of value rows views.                                                                                                              |
 | `pagination`                     | Holds an instance of the pagination view.                                                                                              |
+| `has_active_filters`             | Contains information whether the data table has at least one filter active.                                                            |
+| `label_translation_domain`       | Contains a translation domain used to translate column & filter labels, unless specified manually on the column or filter              |
 
 ### Column Variables
 
@@ -102,6 +115,7 @@ The following variables are common to every column type.
 | `block_name`                   | See [block_name option documentation](/reference/columns/#block_name).                                                                                                                           |
 | `block_prefix`                 | See [block_prefix option documentation](/reference/columns/#block_prefix).                                                                                                                       |
 | `value`                        | Final value that can be rendered to the user.                                                                                                                                                    |
+| `exportable_value`             | Final value that can be used in exports.                                                                                                                                                         |
 
 ### Filter Variables
 

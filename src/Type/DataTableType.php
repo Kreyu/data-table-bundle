@@ -76,8 +76,8 @@ final class DataTableType implements DataTableTypeInterface
         $view->vars['filtration_form'] = $this->getFiltrationFormView($view, $dataTable);
         $view->vars['personalization_form'] = $this->getPersonalizationFormView($view, $dataTable);
 
-        foreach ($dataTable->getPagination()->getItems() as $item) {
-            $view->vars['values_rows'][] = new ValuesRowView($view, $item);
+        foreach ($dataTable->getPagination()->getItems() as $rowIndex => $item) {
+            $view->vars['values_rows'][] = new ValuesRowView($view, $rowIndex, $item);
         }
 
         $view->vars['pagination'] = new PaginationView($view, $dataTable->getPagination());

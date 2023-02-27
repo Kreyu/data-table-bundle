@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\FormType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
@@ -65,6 +66,11 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.column.type.collection', CollectionType::class)
         ->tag('kreyu_data_table.column.type')
         ->call('setColumnFactory', [service('kreyu_data_table.column.factory')])
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.form', FormType::class)
+        ->tag('kreyu_data_table.column.type')
     ;
 
     $services

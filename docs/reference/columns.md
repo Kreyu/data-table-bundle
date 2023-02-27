@@ -13,6 +13,7 @@ The following column types are natively available in the bundle:
     - [LinkType](#linktype)
 - Special types
     - [CollectionType](#collectiontype)
+    - [FormType](#formtype)
     - [TemplateType](#templatetype)
     - [ActionsType](#actionstype)
 - Base types
@@ -29,6 +30,7 @@ The following column types are natively available in the bundle:
 {% include-markdown "columns/types/datetime.md" heading-offset=2 %}
 {% include-markdown "columns/types/link.md" heading-offset=2 %}
 {% include-markdown "columns/types/collection.md" heading-offset=2 %}
+{% include-markdown "columns/types/form.md" heading-offset=2 %}
 {% include-markdown "columns/types/template.md" heading-offset=2 %}
 {% include-markdown "columns/types/actions.md" heading-offset=2 %}
 {% include-markdown "columns/types/column.md" heading-offset=2 %}

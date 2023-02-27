@@ -12,6 +12,7 @@ class ValuesRowView
 
     public function __construct(
         public DataTableView $parent,
+        public int $rowIndex,
         public mixed $data = null,
     ) {
         /**
@@ -19,12 +20,14 @@ class ValuesRowView
          */
         $columns = (clone $parent)->vars['columns'];
 
+        $this->vars['row_index'] = $rowIndex;
         $this->vars['columns'] = [];
 
         foreach ($columns as $column) {
             $column->setData($this->data);
 
             $view = $column->createView($parent);
+            $view->vars['row_index'] = $this->rowIndex;
 
             $this->vars['columns'][$column->getName()] = $view;
         }

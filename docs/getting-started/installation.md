@@ -12,10 +12,6 @@ composer require kreyu/data-table-bundle:dev-main
 
 ## Enable the bundle
 
-!!! Note
-
-    If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), you can skip this step. 
-
 Enable the bundle by adding it to the `bundles.php`:
 
 ```php
@@ -30,11 +26,6 @@ return [
 
 This bundle provides front-end scripts created using the [Stimulus JavaScript framework](https://stimulus.hotwired.dev/).
 To begin with, make sure your application uses the [Symfony Stimulus Bridge](https://github.com/symfony/stimulus-bridge).
-
-!!! Note
-
-    If your application uses [Symfony Flex](https://symfony.com/components/Symfony%20Flex), 
-    you can ignore following steps and simply install dependencies and build the front-end.
 
 ### Add dependency to package.json
 
@@ -90,3 +81,25 @@ framework:
     default_path: '%kernel.project_dir%/translations'
 ```
 
+This bundle supports two locales out of the box: English (`en`) and Polish (`pl`).
+
+## Select theme
+
+By default, a base HTML theme is used. It's primary role is to work as a base theme for other themes.
+
+The following themes are natively available in the bundle:
+
+- [@KreyuDataTable/themes/bootstrap_5.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/bootstrap_5.html.twig) - integrates [Bootstrap 5](https://getbootstrap.com/docs/5.0/);
+- [@KreyuDataTable/themes/tabler.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/tabler.html.twig) - integrates [Tabler UI Kit](https://tabler.io/);
+- [@KreyuDataTable/themes/base.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) - base HTML template;
+
+To select a theme, provide which one to use in the bundle configuration file:
+
+```yaml
+# config/packages/kreyu_data_table.yaml
+kreyu_data_table:
+  themes:
+    - '@KreyuDataTable/themes/bootstrap_5.html.twig'
+```
+
+For more information, see [theming documentation section](../reference/theming.md).

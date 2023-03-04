@@ -49,7 +49,7 @@ abstract class AbstractType extends BaseAbstractType
             $headersRow = $view->vars['headers_row'];
 
             $columns = array_filter($headersRow->vars['columns'], function (ColumnView $view) {
-                return $view->vars['export'];
+                return false !== $view->vars['export'];
             });
 
             $this->appendRow(
@@ -62,7 +62,7 @@ abstract class AbstractType extends BaseAbstractType
 
         foreach ($view->vars['values_rows'] as $valuesRow) {
             $columns = array_filter($valuesRow->vars['columns'], function (ColumnView $view) {
-                return $view->vars['export'];
+                return false !== $view->vars['export'];
             });
 
             $this->appendRow(

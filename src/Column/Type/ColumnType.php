@@ -43,7 +43,6 @@ final class ColumnType implements ColumnTypeInterface
                 'display_personalization_button' => false,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'export' => true,
-                'export_options' => [],
                 'non_resolvable_options' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
@@ -55,8 +54,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('display_personalization_button', ['bool'])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
-            ->setAllowedTypes('export', ['bool'])
-            ->setAllowedTypes('export_options', ['array'])
+            ->setAllowedTypes('export', ['bool', 'array'])
             ->setAllowedTypes('non_resolvable_options', ['string[]'])
         ;
     }
@@ -163,7 +161,11 @@ final class ColumnType implements ColumnTypeInterface
 
             // Because "value" options are getting resolved earlier only if the column data is present,
             // they have to get excluded from the latter resolving whatsoever.
-            unset($resolvableOptions['value'], $resolvableOptions['export_options']['value']);
+            unset($resolvableOptions['value']);
+
+            if (isset($resolvableOptions['export']['value'])) {
+                unset($resolvableOptions['export']['value']);
+            }
 
             // Resolve the callable options, passing the value, column and options.
             // Note: the options passed to the callables are not resolved yet!
@@ -173,18 +175,16 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         if ($options['export'] ?? false) {
-            // Exclude the "export" and "export_options" options,
-            // as they are irrelevant to the export options whatsoever.
-            $inheritedExportOptions = array_diff_key($options, [
-                'export' => true,
-                'export_options' => true,
-            ]);
+            $options['export'] = [];
+
+            // Exclude the "export" option, as it's irrelevant to the export options whatsoever.
+            $inheritedExportOptions = array_diff_key($options, ['export' => true]);
 
             // Provided export options should be filled with inherited column options.
             // Merging it this way, allows user to override only some export options.
-            $options['export_options'] = array_merge(
+            $options['export'] = array_merge(
                 $this->resolveDefaultOptions($view, $column, $inheritedExportOptions),
-                $options['export_options'],
+                $options['export'],
             );
         }
 

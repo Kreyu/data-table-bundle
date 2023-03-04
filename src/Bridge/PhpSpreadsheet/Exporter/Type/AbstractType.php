@@ -55,7 +55,7 @@ abstract class AbstractType extends BaseAbstractType
             $this->appendRow(
                 $worksheet,
                 array_map(function (ColumnView $column) {
-                    return $column->vars['export_options']['label'];
+                    return $column->vars['export']['label'];
                 }, $columns),
             );
         }
@@ -68,7 +68,7 @@ abstract class AbstractType extends BaseAbstractType
             $this->appendRow(
                 $worksheet,
                 array_map(function (ColumnView $column) {
-                    return $column->vars['export_options']['value'];
+                    return $column->vars['export']['value'];
                 }, $columns),
             );
         }

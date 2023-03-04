@@ -34,7 +34,8 @@ Setting the option to `false` disables property accessor (for situations, where 
 
 **type**: `bool` or `string` **default**: `false` - the sortable behavior is disabled
 
-Sets the sort field used by the sortable behavior.   
+Sets the sort field used by the sortable behavior.
+
 Setting the option to `true` enables column sorting and uses the column name as a sort field name.  
 Setting the option to `false` disables column sorting.
 
@@ -56,15 +57,11 @@ Useful for example if you have multiple instances of the same column type, and y
 
 ### `export`
 
-**type**: `bool` **default**: `true` with some exceptions on built-in types (e.g. [ActionsType](actions.md))
+**type**: `bool` or `array` **default**: `[]` with some exceptions on built-in types (e.g. [ActionsType](actions.md))
 
-If this value is true, the column will be included in the export results.
+Determines whether the column should be included in the exports.
 
-### `export_options`
-
-**type**: `array` **default**: `[]`
-
-Options used in exporting process. It can contain any option that is available for the column type.  
+This option accepts an array of options available for the column type.
 It is used to differentiate options for regular rendering, and excel rendering.
 
 For example, if you wish to display quantity column with "Quantity" label, but export with a "Qty" header:
@@ -73,9 +70,17 @@ For example, if you wish to display quantity column with "Quantity" label, but e
 $columns
     ->add('quantity', NumberType::class, [
         'label' => 'Quantity',
-        'export_options' => [
+        'translation_domain' => 'product',
+        'export' => [
             'label' => 'Qty',
-        ],    
+            // Rest of the options are inherited, therefore "translation_domain" equals "product", etc.
+        ],
     ])
 ;
 ```
+
+Rest of the options are inherited from the column options.
+
+Setting this option to `true` automatically copies the column options as the export column options.  
+Setting this option to `false` excludes the column from the exports.
+

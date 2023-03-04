@@ -6,13 +6,13 @@ The [BooleanType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Colum
 
 ### `label_true`
 
-**type**: `string` or `TranslatableMessage` **default**: `'Yes'`
+**type**: `string` or `Symfony\Component\Translation\TranslatableMessage` **default**: `'Yes'`
 
 Sets the value that will be displayed if row value is true.
 
 ### `label_false`
 
-**type**: `string` or `TranslatableMessage` **default**: `'No'`
+**type**: `string` or `Symfony\Component\Translation\TranslatableMessage` **default**: `'No'`
 
 Sets the value that will be displayed if row value is false.
 

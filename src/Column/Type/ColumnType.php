@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Closure;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -46,7 +47,7 @@ final class ColumnType implements ColumnTypeInterface
                 'non_resolvable_options' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_parameters', ['array', 'callable'])
+            ->setAllowedTypes('label_translation_parameters', ['array', Closure::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('sort', ['bool', 'string'])
@@ -74,15 +75,15 @@ final class ColumnType implements ColumnTypeInterface
      * Resolve the callable options, by calling each one, passing as the arguments
      * the column value, an instance of the column object, and a whole options array.
      */
-    private function resolveCallableOptions(array $resolvableOptions, mixed $value, ColumnInterface $column, array $options): array
+    private function resolveCallableOptions(array $resolvableOptions, ColumnInterface $column, array $options): array
     {
         foreach ($resolvableOptions as $key => $option) {
             if (is_array($option)) {
-                $option = $this->resolveCallableOptions($option, $value, $column, $options);
+                $option = $this->resolveCallableOptions($option, $column, $options);
             }
 
-            if ($option instanceof \Closure) {
-                $option = $option($value, $column, $options);
+            if ($option instanceof Closure) {
+                $option = $option($options['value'], $options['data'], $column, $options);
             }
 
             $resolvableOptions[$key] = $option;
@@ -103,32 +104,18 @@ final class ColumnType implements ColumnTypeInterface
 
         // The column can have "value" option preconfigured.
         // In that case, disable the property accessor feature.
-        if (isset($options['value']) && null !== $options['data']) {
+        if (isset($options['value'])) {
             $options['property_path'] = false;
 
             // The "value" option can be callable, that should be called with the column data.
             // This way, the user can retrieve a column value manually.
-            if (is_callable($options['value'])) {
-                $options['value'] = $options['value']($options['data'], $column, $options);
-            }
-        }
-
-        // Similar to the "value" option, the column can have "export_value" option preconfigured.
-        if (isset($options['value']) && null !== $options['data']) {
-            $options['property_path'] = false;
-
-            // The "value" option can be callable, that should be called with the column data.
-            // This way, the user can retrieve a column value manually.
-            if (is_callable($options['value'])) {
+            if (is_callable($options['value']) && null !== $options['data']) {
                 $options['value'] = $options['value']($options['data'], $column, $options);
             }
         }
 
         // The column "value" option by default should contain the column data.
         $options['value'] ??= $column->getData();
-
-        // The column "export_value" option by default should contain the column data.
-        $options['export_value'] ??= $column->getData();
 
         // If the label is not given, then it should be replaced with a column name.
         // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
@@ -174,9 +161,13 @@ final class ColumnType implements ColumnTypeInterface
             // just in case if the user actually expects the option to be a callable.
             $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']));
 
+            // Because "value" options are getting resolved earlier only if the column data is present,
+            // they have to get excluded from the latter resolving whatsoever.
+            unset($resolvableOptions['value'], $resolvableOptions['export_options']['value']);
+
             // Resolve the callable options, passing the value, column and options.
             // Note: the options passed to the callables are not resolved yet!
-            $resolvedOptions = $this->resolveCallableOptions($resolvableOptions, $options['value'], $column, $options);
+            $resolvedOptions = $this->resolveCallableOptions($resolvableOptions, $column, $options);
 
             $options = array_merge($options, $resolvedOptions);
         }

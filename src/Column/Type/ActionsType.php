@@ -24,8 +24,8 @@ class ActionsType extends AbstractType
                         ->setDefaults([
                             'template_vars' => [],
                         ])
-                        ->setAllowedTypes('template_path', ['string', 'callable'])
-                        ->setAllowedTypes('template_vars', ['array', 'callable'])
+                        ->setAllowedTypes('template_path', ['string', \Closure::class])
+                        ->setAllowedTypes('template_vars', ['array', \Closure::class])
                     ;
                 },
             ])

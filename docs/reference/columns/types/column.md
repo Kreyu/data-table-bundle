@@ -6,7 +6,7 @@ The [ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column
 
 ### `label`
 
-**type**: `string` or `TranslatableMessage` **default**: the label is "guessed" from the column name
+**type**: `string` or `Symfony\Component\Translation\TranslatableMessage` **default**: the label is "guessed" from the column name
 
 Sets the label that will be used when rendering the column header.
 
@@ -40,7 +40,7 @@ Setting the option to `false` disables column sorting.
 
 ### `block_name`
 
-**type**: `string` **default**: `kreyu_data_table_column_`  + column type block prefix
+**type**: `string` **default**: `kreyu_data_table_column_` + column type block prefix
 
 Allows you to add a custom block name to the ones used by default to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of the columns individually.
@@ -54,38 +54,28 @@ By default, if column type class name is `TextType`, the block name option will 
 Allows you to add a custom block prefix and override the block name used to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of all of them without the need to create a new column type.
 
-### `formatter`
+### `export`
 
-**type**: `callable` **default**: `null`
-
-Formats the value retrieved by the property accessor to string:
-
-```php
-$builder
-    ->addColumn('ean', TextType::class, [
-        'formatter' => fn (string $value) => trim($value),
-    ])
-    ->addColumn('quantity', TextType::class, [
-        'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
-    ])
-;
-```
-
-If you disabled property accessor by setting the `property_path` option to `false`, this is a way to retrieve a value manually:
-
-```php
-$builder
-    ->addColumn('fullName', TextType::class, [
-        'property_path' => false,
-        'formatter' => fn (User $value) => implode(' ', [$user->name, $user->surname]),    
-    ])
-;
-```
-
-Because property accessor is not called, the value passed as the first argument is a "raw" row value (and for most cases it will be an entity).
-
-### `exportable`
-
-**type**: `bool` **default**: `true`
+**type**: `bool` **default**: `true` with some exceptions on built-in types (e.g. [ActionsType](actions.md))
 
 If this value is true, the column will be included in the export results.
+
+### `export_options`
+
+**type**: `array` **default**: `[]`
+
+Options used in exporting process. It can contain any option that is available for the column type.  
+It is used to differentiate options for regular rendering, and excel rendering.
+
+For example, if you wish to display quantity column with "Quantity" label, but export with a "Qty" header:
+
+```php
+$columns
+    ->add('quantity', NumberType::class, [
+        'label' => 'Quantity',
+        'export_options' => [
+            'label' => 'Qty',
+        ],    
+    ])
+;
+```

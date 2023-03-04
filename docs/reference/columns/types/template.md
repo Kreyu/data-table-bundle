@@ -6,17 +6,17 @@ The [TemplateType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Colu
 
 ### `template_path`
 
-**type**: `string` or `callable`
+**type**: `string` or `\Closure`
 
 Sets the path to the template that should be rendered.  
-Callable can be used to provide an option value based on a row value, which is passed as a first argument.
+Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ### `template_vars`
 
-**type**: `string` or `callable` **default**: `'#'`
+**type**: `string` or `\Closure` **default**: `'#'`
 
 Sets the variables used within the template.  
-Callable can be used to provide an option value based on a row value, which is passed as a first argument.
+Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ## Inherited options
 

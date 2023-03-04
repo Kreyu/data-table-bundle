@@ -12,7 +12,7 @@ class ActionsType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'exportable' => false,
+                'export' => false,
                 'property_path' => false,
                 'display_personalization_button' => true,
                 'actions' => function (OptionsResolver $resolver) {

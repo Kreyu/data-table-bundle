@@ -49,26 +49,26 @@ abstract class AbstractType extends BaseAbstractType
             $headersRow = $view->vars['headers_row'];
 
             $columns = array_filter($headersRow->vars['columns'], function (ColumnView $view) {
-                return $view->vars['exportable'] ?? true;
+                return $view->vars['export'];
             });
 
             $this->appendRow(
                 $worksheet,
                 array_map(function (ColumnView $column) {
-                    return $column->vars['label'];
+                    return $column->vars['export_options']['label'];
                 }, $columns),
             );
         }
 
         foreach ($view->vars['values_rows'] as $valuesRow) {
             $columns = array_filter($valuesRow->vars['columns'], function (ColumnView $view) {
-                return $view->vars['exportable'] ?? true;
+                return $view->vars['export'];
             });
 
             $this->appendRow(
                 $worksheet,
                 array_map(function (ColumnView $column) {
-                    return $column->vars['exportable_value'];
+                    return $column->vars['export_options']['value'];
                 }, $columns),
             );
         }

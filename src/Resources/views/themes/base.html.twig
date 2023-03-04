@@ -111,7 +111,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_header %}
-    {% if data_table.vars.sorting_enabled and sort_field %}
+    {% if data_table.vars.sorting_enabled and sort %}
         {% set query_parameters = app.request.query.all() %}
 
         {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
@@ -123,7 +123,7 @@
 
         {% set attr = {
             href: path(app.request.get('_route'), app.request.query.all|merge({
-                (sort_parameter_name ~ '[field]'): sort_field,
+                (sort_parameter_name ~ '[field]'): sort,
                 (sort_parameter_name ~ '[direction]'): opposite_sort_direction
             }))
         }|merge(attr|default({})) %}
@@ -131,7 +131,7 @@
         <a {{ block('attributes') }}>
             {{ block('kreyu_data_table_column_label', theme, _context) }}
 
-            {% if sort_field == current_sort_field %}
+            {% if sort == current_sort_field %}
                 {% if current_sort_direction == 'asc' %}
                     {{ block('sort_arrow_asc', theme, _context) }}
                 {% else %}

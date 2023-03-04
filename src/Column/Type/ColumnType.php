@@ -174,11 +174,14 @@ final class ColumnType implements ColumnTypeInterface
             $options = array_merge($options, $resolvedOptions);
         }
 
-        if ($options['export'] ?? false) {
-            $options['export'] = [];
-
+        // The "export" option has to inherit options from the column.
+        if (false !== ($options['export'] ?? false)) {
             // Exclude the "export" option, as it's irrelevant to the export options whatsoever.
             $inheritedExportOptions = array_diff_key($options, ['export' => true]);
+
+            if (true === $options['export']) {
+                $options['export'] = $inheritedExportOptions;
+            }
 
             // Provided export options should be filled with inherited column options.
             // Merging it this way, allows user to override only some export options.

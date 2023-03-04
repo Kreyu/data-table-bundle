@@ -55,6 +55,32 @@ By default, if column type class name is `TextType`, the block name option will 
 Allows you to add a custom block prefix and override the block name used to render the column type.
 Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of all of them without the need to create a new column type.
 
+### `formatter`
+
+**type**: `null` or `callable` **default**: `null`
+
+Formats the value to the desired string.
+
+The value passed as the argument can come either from the `value` option, 
+or the property accessor after the extraction using the `property_path` option.
+
+```php
+$builder
+    ->addColumn('ean', TextType::class, [
+        'value' => fn (Product $product) => $product->getEan(), 
+        'formatter' => fn (string $value) => trim($value),
+    ])
+    ->addColumn('quantity', NumberType::class, [
+        // no value specified, so property accessor will retrieve the value of the product "quantity"
+        'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
+    ])
+    ->addColumn('name', TextType::class, [
+        // the option accepts callables, not only closures 
+        'formatter' => 'trim',    
+    ])
+;
+```
+
 ### `export`
 
 **type**: `bool` or `array` **default**: `[]` with some exceptions on built-in types (e.g. [ActionsType](actions.md))
@@ -73,7 +99,7 @@ $columns
         'translation_domain' => 'product',
         'export' => [
             'label' => 'Qty',
-            // Rest of the options are inherited, therefore "translation_domain" equals "product", etc.
+            // rest of the options are inherited, therefore "translation_domain" equals "product", etc.
         ],
     ])
 ;
@@ -84,3 +110,36 @@ Rest of the options are inherited from the column options.
 Setting this option to `true` automatically copies the column options as the export column options.  
 Setting this option to `false` excludes the column from the exports.
 
+### `non_resolvable_options`
+
+**type**: `array` **default**: `[]`
+
+Because some column options can be an instance of `\Closure`, the bundle will automatically
+call them, passing column value, data, whole column object and array of options, as the closure arguments.
+
+This process is called "resolving", and the [formatter](#formatter) and [value](#value) options are excluded from the process.
+Because it may be possible, that the user does **not** want to get an option resolved (not call the closure at all),
+it is possible to pass the option name to this array, to exclude it from the resolving process.
+
+For example:
+
+```php
+$columns
+    ->add('id', CustomType::class, [
+        'uniqid' => function (string $prefix) {
+            return uniqid($prefix);
+        },
+        'non_resolvable_options' => [
+            'uniqid',
+        ],
+    ])
+;
+```
+
+The `uniqid` option will be available in the column views as a callable. For example, in templates:
+
+```twig
+{% block kreyu_data_table_column_custom %}
+    {{ value }} ({{ uniqid('product_') }})
+{% endblock %}
+```

@@ -43,6 +43,7 @@ final class ColumnType implements ColumnTypeInterface
                 'display_personalization_button' => false,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'export' => true,
+                'formatter' => null,
                 'non_resolvable_options' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
@@ -55,6 +56,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('display_personalization_button', ['bool'])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('export', ['bool', 'array'])
+            ->setAllowedTypes('formatter', ['null', Closure::class])
             ->setAllowedTypes('non_resolvable_options', ['string[]'])
         ;
     }
@@ -157,7 +159,9 @@ final class ColumnType implements ColumnTypeInterface
             // Because every callable option is resolved by default, a way to exclude
             // some options from this process may be necessary - a "non_resolvable_option" option,
             // just in case if the user actually expects the option to be a callable.
-            $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']));
+            $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']) + [
+                'formatter' => true,
+            ]);
 
             // Because "value" options are getting resolved earlier only if the column data is present,
             // they have to get excluded from the latter resolving whatsoever.
@@ -189,6 +193,11 @@ final class ColumnType implements ColumnTypeInterface
                 $this->resolveDefaultOptions($view, $column, $inheritedExportOptions),
                 $options['export'],
             );
+        }
+
+        // Apply the formatter at the end of the process.
+        if (null !== $options['data'] && is_callable($options['formatter'])) {
+            $options['value'] = $options['formatter']($options['value']);
         }
 
         return $options;

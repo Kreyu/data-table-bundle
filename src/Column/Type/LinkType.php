@@ -16,8 +16,8 @@ class LinkType extends AbstractType
                 'target' => '_self',
                 'display_icon' => true,
             ])
-            ->setAllowedTypes('href', ['string', 'callable'])
-            ->setAllowedTypes('target', ['string', 'callable'])
+            ->setAllowedTypes('href', ['string', \Closure::class])
+            ->setAllowedTypes('target', ['string', \Closure::class])
             ->setAllowedTypes('display_icon', ['boolean'])
         ;
     }

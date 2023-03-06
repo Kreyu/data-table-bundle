@@ -12,7 +12,7 @@ class ActionsType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'exportable' => false,
+                'export' => false,
                 'property_path' => false,
                 'display_personalization_button' => true,
                 'actions' => function (OptionsResolver $resolver) {
@@ -24,8 +24,8 @@ class ActionsType extends AbstractType
                         ->setDefaults([
                             'template_vars' => [],
                         ])
-                        ->setAllowedTypes('template_path', ['string', 'callable'])
-                        ->setAllowedTypes('template_vars', ['array', 'callable'])
+                        ->setAllowedTypes('template_path', ['string', \Closure::class])
+                        ->setAllowedTypes('template_vars', ['array', \Closure::class])
                     ;
                 },
             ])

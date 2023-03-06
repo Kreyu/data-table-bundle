@@ -6,15 +6,14 @@ The [LinkType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/T
 
 ### `href`
 
-**type**: `string` or `callable` **default**: `'#'`
+**type**: `string` or `\Closure` **default**: `'#'`
 
 Sets the value that will be used as a link `href` attribute (see [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href)).  
-Callable can be used to provide an option value based on a row value, which is passed as a first argument.
+Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ```php
 $columns
     ->add('category', LinkType::class, [
-        'property_path' => false,
         'value' => function (Category $category): string {
             return $category->getName(),
         },
@@ -29,10 +28,10 @@ $columns
 
 ### `target`
 
-**type**: `string` or `callable` **default**: `'_self'`
+**type**: `string` or `\Closure` **default**: `'_self'`
 
 Sets the value that will be used as an anchor `target` attribute (see [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target)).  
-Callable can be used to provide an option value based on a row value, which is passed as a first argument.
+Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ### `display_icon`
 

@@ -35,16 +35,15 @@ final class ColumnType implements ColumnTypeInterface
                 'label' => null,
                 'label_translation_parameters' => [],
                 'translation_domain' => null,
-                'property_path' => null,
-                'sort' => false,
                 'block_name' => null,
                 'block_prefix' => null,
                 'value' => null,
-                'display_personalization_button' => false,
-                'property_accessor' => PropertyAccess::createPropertyAccessor(),
+                'sort' => false,
                 'export' => true,
                 'formatter' => null,
                 'non_resolvable_options' => [],
+                'property_path' => null,
+                'property_accessor' => PropertyAccess::createPropertyAccessor(),
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', Closure::class])
@@ -53,7 +52,6 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
-            ->setAllowedTypes('display_personalization_button', ['bool'])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('export', ['bool', 'array'])
             ->setAllowedTypes('formatter', ['null', Closure::class])
@@ -123,7 +121,7 @@ final class ColumnType implements ColumnTypeInterface
 
         // If the translation domain is not given, then it should be inherited
         // from the parent data table view "label_translation_domain" option.
-        $options['translation_domain'] ??= $view->parent->vars['label_translation_domain'];
+        $options['translation_domain'] ??= $view->parent->vars['label_translation_domain'] ?? false;
 
         // If the property path is not given, then the column name should be used.
         // Thanks to that, similar to "label" option, the boilerplate code is reduced.
@@ -161,6 +159,7 @@ final class ColumnType implements ColumnTypeInterface
             // just in case if the user actually expects the option to be a callable.
             $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']) + [
                 'formatter' => true,
+                'export' => true,
             ]);
 
             // Because "value" options are getting resolved earlier only if the column data is present,
@@ -189,10 +188,9 @@ final class ColumnType implements ColumnTypeInterface
 
             // Provided export options should be filled with inherited column options.
             // Merging it this way, allows user to override only some export options.
-            $options['export'] = array_merge(
-                $this->resolveDefaultOptions($view, $column, $inheritedExportOptions),
-                $options['export'],
-            );
+            $inheritedExportOptions = array_merge($inheritedExportOptions, $options['export']);
+
+            $options['export'] = $this->resolveDefaultOptions($view, $column, $inheritedExportOptions);
         }
 
         // Apply the formatter at the end of the process.

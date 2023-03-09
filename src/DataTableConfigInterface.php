@@ -26,6 +26,13 @@ interface DataTableConfigInterface
     public const PERSONALIZATION_PARAMETER = 'personalization';
     public const EXPORT_PARAMETER = 'export';
 
+    public const PERSISTENCE_CONTEXTS = [
+        'sorting',
+        'pagination',
+        'filtration',
+        'personalization',
+    ];
+
     public function getName(): string;
 
     public function getType(): ResolvedDataTableTypeInterface;

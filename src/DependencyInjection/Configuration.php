@@ -6,8 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class Configuration implements ConfigurationInterface
 {
@@ -40,10 +38,10 @@ class Configuration implements ConfigurationInterface
                                     ->defaultFalse()
                                 ->end()
                                 ->scalarNode('persistence_adapter')
-                                    ->defaultValue($this->getDefaultPersistenceAdapter('sorting'))
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('persistence_subject_provider')
-                                    ->defaultValue($this->getDefaultPersistenceSubjectProvider())
+                                    ->defaultNull()
                                 ->end()
                             ->end()
                         ->end()
@@ -57,10 +55,10 @@ class Configuration implements ConfigurationInterface
                                     ->defaultFalse()
                                 ->end()
                                 ->scalarNode('persistence_adapter')
-                                    ->defaultValue($this->getDefaultPersistenceAdapter('pagination'))
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('persistence_subject_provider')
-                                    ->defaultValue($this->getDefaultPersistenceSubjectProvider())
+                                    ->defaultNull()
                                 ->end()
                             ->end()
                         ->end()
@@ -74,10 +72,10 @@ class Configuration implements ConfigurationInterface
                                     ->defaultFalse()
                                 ->end()
                                 ->scalarNode('persistence_adapter')
-                                    ->defaultValue($this->getDefaultPersistenceAdapter('filtration'))
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('persistence_subject_provider')
-                                    ->defaultValue($this->getDefaultPersistenceSubjectProvider())
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('filter_factory')
                                     ->defaultValue('kreyu_data_table.filter.factory')
@@ -97,10 +95,10 @@ class Configuration implements ConfigurationInterface
                                     ->defaultFalse()
                                 ->end()
                                 ->scalarNode('persistence_adapter')
-                                    ->defaultValue($this->getDefaultPersistenceAdapter('personalization'))
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('persistence_subject_provider')
-                                    ->defaultValue($this->getDefaultPersistenceSubjectProvider())
+                                    ->defaultNull()
                                 ->end()
                                 ->scalarNode('form_factory')
                                     ->defaultValue('form.factory')
@@ -127,23 +125,5 @@ class Configuration implements ConfigurationInterface
         ;
 
         return $treeBuilder;
-    }
-
-    private function getDefaultPersistenceAdapter(string $context): ?string
-    {
-        if (class_exists(CacheInterface::class)) {
-            return "kreyu_data_table.$context.persistence.adapter.cache";
-        }
-
-        return null;
-    }
-
-    private function getDefaultPersistenceSubjectProvider(): ?string
-    {
-        if (class_exists(TokenStorageInterface::class)) {
-            return 'kreyu_data_table.persistence.subject_provider.token_storage';
-        }
-
-        return null;
     }
 }

@@ -44,6 +44,8 @@ final class ColumnType implements ColumnTypeInterface
                 'property_path' => null,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'getter' => null,
+                'header_attr' => [],
+                'value_attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', Closure::class])
@@ -57,6 +59,8 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('getter', ['null', Closure::class])
+            ->setAllowedTypes('header_attr', ['array'])
+            ->setAllowedTypes('value_attr', ['array'])
         ;
     }
 

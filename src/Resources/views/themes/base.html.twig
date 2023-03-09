@@ -100,13 +100,17 @@
 
 {% block kreyu_data_table_headers_row %}
     {% for column in columns %}
-        <th {{ block('attributes') }}>{{ data_table_column_header(column) }}</th>
+        <th {% with { attr: attr|default({})|merge(column.vars.header_attr) } %}{{ block('attributes') }}{% endwith %}>
+            {{ data_table_column_header(column) }}
+        </th>
     {% endfor %}
 {% endblock %}
 
 {% block kreyu_data_table_values_row %}
     {% for column in columns %}
-        <td {{ block('attributes') }}>{{- data_table_column_value(column) -}}</td>
+        <td {% with { attr: attr|default({})|merge(column.vars.value_attr) } %}{{ block('attributes') }}{% endwith %}>
+            {{- data_table_column_value(column) -}}
+        </td>
     {% endfor %}
 {% endblock %}
 

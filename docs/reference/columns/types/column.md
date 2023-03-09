@@ -30,6 +30,24 @@ Setting the option to `false` disables translation for the column.
 Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.  
 Setting the option to `false` disables property accessor (for situations, where you want to manually retrieve the value).
 
+### `getter`
+
+**type**: `null` or `callable` **default**: `null`
+
+When provided, this callable will be invoked to read the value from the underlying object that will be used within the column.
+This disables the usage of the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html), described in the [property_path](#propertypath) option.
+
+Value returned from given callable will be passed to every other callable option.
+
+```php
+$builder
+    ->addColumn('seller', TextType::class, [
+        'getter' => fn (Product $product) => $product->getSeller()->getUser(), // Returns an instance of User
+        'formatter' => fn (User $user) => $user->getName(), // User returned in "getter" option is passed here
+    ])
+;
+```
+
 ### `sort`
 
 **type**: `bool` or `string` **default**: `false` - the sortable behavior is disabled
@@ -66,17 +84,11 @@ or the property accessor after the extraction using the `property_path` option.
 
 ```php
 $builder
-    ->addColumn('ean', TextType::class, [
-        'value' => fn (Product $product) => $product->getEan(), 
-        'formatter' => fn (string $value) => trim($value),
+    ->addColumn('name', TextType::class, [
+        'formatter' => 'trim',    
     ])
     ->addColumn('quantity', NumberType::class, [
-        // no value specified, so property accessor will retrieve the value of the product "quantity"
         'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
-    ])
-    ->addColumn('name', TextType::class, [
-        // the option accepts callables, not only closures 
-        'formatter' => 'trim',    
     ])
 ;
 ```
@@ -117,7 +129,7 @@ Setting this option to `false` excludes the column from the exports.
 Because some column options can be an instance of `\Closure`, the bundle will automatically
 call them, passing column value, data, whole column object and array of options, as the closure arguments.
 
-This process is called "resolving", and the [formatter](#formatter) and [value](#value) options are excluded from the process.
+This process is called "resolving", and the [formatter](#formatter) option is excluded from the process.
 Because it may be possible, that the user does **not** want to get an option resolved (not call the closure at all),
 it is possible to pass the option name to this array, to exclude it from the resolving process.
 
@@ -126,9 +138,7 @@ For example:
 ```php
 $columns
     ->add('id', CustomType::class, [
-        'uniqid' => function (string $prefix) {
-            return uniqid($prefix);
-        },
+        'uniqid' => fn (string $prefix) => uniqid($prefix),
         'non_resolvable_options' => [
             'uniqid',
         ],

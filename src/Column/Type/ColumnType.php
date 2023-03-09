@@ -37,25 +37,26 @@ final class ColumnType implements ColumnTypeInterface
                 'translation_domain' => null,
                 'block_name' => null,
                 'block_prefix' => null,
-                'value' => null,
                 'sort' => false,
                 'export' => true,
                 'formatter' => null,
                 'non_resolvable_options' => [],
                 'property_path' => null,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
+                'getter' => null,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array', Closure::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
-            ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
-            ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
+            ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('export', ['bool', 'array'])
             ->setAllowedTypes('formatter', ['null', Closure::class])
             ->setAllowedTypes('non_resolvable_options', ['string[]'])
+            ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
+            ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
+            ->setAllowedTypes('getter', ['null', Closure::class])
         ;
     }
 
@@ -100,21 +101,6 @@ final class ColumnType implements ColumnTypeInterface
         // This way, it can be referenced later if needed.
         $options['data'] = $column->getData();
 
-        // The column can have "value" option preconfigured.
-        // In that case, disable the property accessor feature.
-        if (isset($options['value'])) {
-            $options['property_path'] = false;
-
-            // The "value" option can be callable, that should be called with the column data.
-            // This way, the user can retrieve a column value manually.
-            if (is_callable($options['value']) && null !== $options['data']) {
-                $options['value'] = $options['value']($options['data'], $column, $options);
-            }
-        }
-
-        // The column "value" option by default should contain the column data.
-        $options['value'] ??= $column->getData();
-
         // If the label is not given, then it should be replaced with a column name.
         // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
         $options['label'] ??= ucfirst($column->getName());
@@ -139,26 +125,18 @@ final class ColumnType implements ColumnTypeInterface
             $options['sort'] = $column->getName();
         }
 
-        $value = $options['value'];
-        $propertyPath = $options['property_path'];
-        $propertyAccessor = $options['property_accessor'];
-
-        // Use property accessor to retrieve the value from the configured property path.
-        // Note: property accessor only supports array and object values!
-        if (false !== $propertyPath && (is_array($value) || is_object($value))) {
-            if ($propertyAccessor->isReadable($value, $propertyPath)) {
-                $options['value'] = $propertyAccessor->getValue($value, $propertyPath);
-            }
-        }
-
         // Because the user can provide callable options, every single one of those
         // should be called with resolved column value, whole column for reference and an array of options.
         if (null !== $options['data']) {
+            // Resolve the "value" option.
+            $options['value'] = $this->resolveValueOption($column, $options);
+
             // Because every callable option is resolved by default, a way to exclude
             // some options from this process may be necessary - a "non_resolvable_option" option,
             // just in case if the user actually expects the option to be a callable.
             $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']) + [
                 'formatter' => true,
+                'getter' => true,
                 'export' => true,
             ]);
 
@@ -199,5 +177,34 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         return $options;
+    }
+
+    /**
+     * Resolve the "value" option, by either using "getter" option,
+     * a property accessor, or falling back to the unmodified column data.
+     *
+     * @param array{
+     *     getter: null|callable,
+     *     property_path: string,
+     *     property_accessor: PropertyAccessorInterface
+     * } $options
+     */
+    private function resolveValueOption(ColumnInterface $column, array $options): mixed
+    {
+        $data = $column->getData();
+
+        // Use getter to manually retrieve the value from the column data.
+        if (is_callable($getter = $options['getter'])) {
+            return $getter($data, $column, $options);
+        }
+
+        // Use property accessor to retrieve the value from the column data on the configured property path.
+        // Note: property accessor only supports array and object values!
+        if (is_string($propertyPath = $options['property_path']) && (is_array($data) || is_object($data))) {
+            return $options['property_accessor']->getValue($data, $propertyPath);
+        }
+
+        // Fallback to the unmodified column data.
+        return $data;
     }
 }

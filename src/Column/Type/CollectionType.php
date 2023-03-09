@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
@@ -37,13 +38,20 @@ class CollectionType extends AbstractType implements ColumnFactoryAwareInterface
                 'entry_type' => TextType::class,
                 'entry_options' => [],
                 'separator' => ',',
-                'non_resolvable_options' => [
-                    'entry_options',
-                ],
             ])
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])
             ->setAllowedTypes('separator', ['null', 'string'])
+            ->setNormalizer('entry_options', function (Options $options, array $value): array {
+                return $value + ['property_path' => false];
+            })
+            ->setNormalizer('non_resolvable_options', function (Options $options, array $value): array {
+                if (!in_array('entry_options', $value)) {
+                    $value[] = 'entry_options';
+                }
+
+                return $value;
+            })
         ;
     }
 

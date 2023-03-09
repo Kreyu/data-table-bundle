@@ -880,14 +880,7 @@ class DataTableBuilder implements DataTableBuilderInterface
             throw new \LogicException('The data table has no configured columns. You must provide them using the builder "addColumn()" method.');
         }
 
-        $persistenceContexts = [
-            'sorting',
-            'pagination',
-            'filtration',
-            'personalization',
-        ];
-
-        foreach ($persistenceContexts as $context) {
+        foreach (static::PERSISTENCE_CONTEXTS as $context) {
             if (!$this->{$context.'Enabled'} || !$this->{$context.'PersistenceEnabled'}) {
                 continue;
             }

@@ -11,6 +11,7 @@
             "email": "kontakt@swroblewski.pl"
         }
     ],
+    "license": "MIT",
     "require": {
         "php": "^8.2",
         "symfony/framework-bundle": "^6.0",

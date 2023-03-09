@@ -65,7 +65,17 @@ services:
 
 Persistence subject can be any object that implements `PersistenceSubjectInterface`.
 
-In most cases, the persistence subject will be a User entity, so don't forget to implement the required interface:
+The value returned in the `getDataTablePersistenceIdentifier()` is used in 
+[persistence adapters](#persistence-adapters) to associate persistent data with the subject.
+
+## Persistence subject providers
+
+Persistence subject providers are classes that allows retrieving the [persistence subjects](#persistence-subjects).  
+Those classes contain `provide` method, that should return the subject, or throw an `PersistenceSubjectNotFoundException`.  
+
+By default, there's only one provider, integrating with Symfony token storage, to retrieve currently logged-in user.
+The token storage persistence subject provider uses the [UserInterface getUserIdentifier() method](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Security/Core/User/UserInterface.php#L60)
+is used as the persistence identifier. If you wish to override this behavior without modifying the `getUserIdentifier()` method, implement the `PersistenceSubjectInterface` on the User entity:
 
 ```php
 // src/Entity/User.php
@@ -73,23 +83,14 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 
 class User implements PersistenceSubjectInterface
 {
-    private ?int $id = null;
+    private Uuid $uuid;
     
     public function getDataTablePersistenceIdentifier(): string
     {
-        return (string) $this->id;
+        return (string) $this->uuid;
     }
 }
 ```
-
-The value returned in the `getDataTablePersistenceIdentifier()` is used in [persistence adapters](#persistence-adapters)
-to associate persistent data with the subject.
-
-## Persistence subject providers
-
-Persistence subject providers are classes that allows retrieving the [persistence subjects](#persistence-subjects).  
-Those classes contain `provide` method, that should return the subject, or throw an `PersistenceSubjectNotFoundException`.  
-By default, there's only one provider, integrating with Symfony token storage, to retrieve currently logged-in user.
 
 ### Creating custom persistence subject providers
 

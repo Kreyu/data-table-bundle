@@ -105,8 +105,8 @@ It is used to differentiate options for regular rendering, and excel rendering.
 For example, if you wish to display quantity column with "Quantity" label, but export with a "Qty" header:
 
 ```php
-$columns
-    ->add('quantity', NumberType::class, [
+$builder
+    ->addColumn('quantity', NumberType::class, [
         'label' => 'Quantity',
         'translation_domain' => 'product',
         'export' => [
@@ -136,8 +136,8 @@ it is possible to pass the option name to this array, to exclude it from the res
 For example:
 
 ```php
-$columns
-    ->add('id', CustomType::class, [
+$builder
+    ->addColumn('id', CustomType::class, [
         'uniqid' => fn (string $prefix) => uniqid($prefix),
         'non_resolvable_options' => [
             'uniqid',
@@ -152,4 +152,40 @@ The `uniqid` option will be available in the column views as a callable. For exa
 {% block kreyu_data_table_column_custom %}
     {{ value }} ({{ uniqid('product_') }})
 {% endblock %}
+```
+
+### `header_attr`
+
+**type**: `array` **default**: `[]`
+
+If you want to add extra attributes to an HTML column header representation (`<th>`) you can use the attr option. 
+It's an associative array with HTML attributes as keys. 
+This can be useful when you need to set a custom class for some column:
+
+```php
+$builder
+    ->addColumn('quantity', NumberType::class, [
+        'header_attr' => [
+            'class' => 'text-end',
+        ],
+    ])
+;
+```
+
+### `value_attr`
+
+**type**: `array` **default**: `[]`
+
+If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
+It's an associative array with HTML attributes as keys.
+This can be useful when you need to set a custom class for some column:
+
+```php
+$builder
+    ->addColumn('quantity', NumberType::class, [
+        'value_attr' => [
+            'class' => 'text-end',
+        ],
+    ])
+;
 ```

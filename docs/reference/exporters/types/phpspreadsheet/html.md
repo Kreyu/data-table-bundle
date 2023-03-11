@@ -36,10 +36,10 @@ You might want to see:
 Use this option to achieve this result:
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlExporterType;
 
 $builder
-    ->addExporter('html', HtmlType::class, [
+    ->addExporter('html', HtmlExporterType::class, [
         'images_root' => 'https://www.domain.com',
     ])
 ;
@@ -71,10 +71,10 @@ Accepts a callback function to edit the generated html before saving.
 For example, you could change the gridlines from a thin solid black line:
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlExporterType;
 
 $builder
-    ->addExporter('html', HtmlType::class, [
+    ->addExporter('html', HtmlExporterType::class, [
         'edit_html_callback' => function (string $html): string {
             return str_replace(
                 '{border: 1px solid black;}',

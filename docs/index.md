@@ -23,4 +23,4 @@ Streamlines creation process of the data tables in Symfony applications.
 
 ## License
 
-The MIT License (MIT). Please see [license file](LICENSE) for more information.
+The MIT License (MIT). Please see [license file](../LICENSE) for more information.

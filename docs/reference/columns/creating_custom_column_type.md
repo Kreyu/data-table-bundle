@@ -10,15 +10,15 @@ Imagine, that your project displays a column with link to the related entity `sh
 This can be implemented with a [LinkType](#linktype), where the `href` option is set to the url to the `show` view:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
@@ -29,7 +29,7 @@ class ProductType extends AbstractType
     {
         $builder
             // ...
-            ->addColumn('category', LinkType::class, [
+            ->addColumn('category', LinkColumnType::class, [
                 'href' => function (Category $category): string {
                     return $this->urlGenerator->generate('app_category_show', [
                         'id' => $category->getId(),
@@ -57,12 +57,12 @@ By convention, they are stored in the `src/DataTable/Column/Type/` directory:
 // src/DataTable/Column/Type/CategoryLinkType.php
 namespace App\DataTable\Column\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CategoryLinkType extends AbstractType
+class CategoryLinkType extends AbstractColumnType
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
@@ -85,7 +85,7 @@ class CategoryLinkType extends AbstractType
     
     public function getParent(): ?string
     {
-         return LinkType::class;
+         return LinkColumnType::class;
     }
 }
 ```
@@ -97,14 +97,14 @@ The resulting column type is a link column with predefined `href` and `formatter
 Now, you can add this column type when creating data table:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
 use App\DataTable\Column\Type\CategoryLinkType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
@@ -127,9 +127,9 @@ As explained above, column types are PHP classes that implement [ColumnTypeInter
 // src/DataTable/Column/Type/QuantityType.php
 namespace App\DataTable\Column\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
 
-class QuantityType extends AbstractType
+class QuantityType extends AbstractColumnType
 {
     // ...
 } 
@@ -169,10 +169,10 @@ The options are defined in the `configureOptions()` method, and you can use all 
 // src/DataTable/Column/Type/QuantityType.php
 namespace App\DataTable\Column\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class QuantityType extends AbstractType
+class QuantityType extends AbstractColumnType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -202,14 +202,14 @@ class QuantityType extends AbstractType
 Now you can configure these options when using the column type:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
 use App\DataTable\Column\Type\QuantityType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
@@ -277,12 +277,12 @@ namespace App\DataTable\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
-use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class QuantityType extends AbstractType
+class QuantityType extends AbstractColumnType
 {
     public function __construct(private UnitConverterInterface $unitConverter)
     {

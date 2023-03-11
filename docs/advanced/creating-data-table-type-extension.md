@@ -13,19 +13,19 @@ First, create the data table type extension class extending from [AbstractTypeEx
 (you can implement [DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/srcsrc/Extension/DataTableTypeExtensionInterface.php) instead if you prefer):
 
 ```php
-// src/DataTable/Extension/LoggedUserExtension.php
+// src/DataTable/Extension/LoggedUserDataTableTypeExtension.php
 namespace App\DataTable\Extension;
 
-use App\DataTable\Type\ProductType;
-use Kreyu\Bundle\DataTableBundle\Extension\AbstractTypeExtension;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 
-class LoggedUserExtension extends AbstractTypeExtension
+class LoggedUserDataTableTypeExtension extends AbstractDataTableTypeExtension
 {
     public static function getExtendedTypes(): iterable
     {
         // return [DataTableType::class] to modify (nearly) every data table in the system
-        return [ProductType::class];
+        return [ProductDataTableType::class];
     }
 }
 ```

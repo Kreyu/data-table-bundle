@@ -41,9 +41,9 @@ namespace App\Controller;
 
 use App\Form\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\FormType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -63,11 +63,11 @@ class ProductController extends AbstractController
         ]);
         
         $dataTable = $this->createDataTableBuilder($query)
-            ->addColumn('id', NumberType::class)
-            ->addColumn('name', FormType::class, [
+            ->addColumn('id', NumberColumnType::class)
+            ->addColumn('name', FormColumnType::class, [
                 'form' => $form,
             ])
-            ->addColumn('quantity', FormType::class, [
+            ->addColumn('quantity', FormColumnType::class, [
                 'form' => $form,
                 // Specifying form child path is optional.
                 // By default, the column name is used.
@@ -172,36 +172,36 @@ While the above example is simple, it's not really re-usable, due to the usage o
 That's why it's recommended to pass the form to the data table type:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\FormType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addColumn('id', NumberType::class);
+        $builder->addColumn('id', NumberColumnType::class);
         
         if (null !== $form = $options['form']) {
             $builder
-                ->addColumn('name', FormType::class, [
+                ->addColumn('name', FormColumnType::class, [
                     'form' => $form,                
                 ])
-                ->addColumn('quantity', FormType::class, [
+                ->addColumn('quantity', FormColumnType::class, [
                     'form' => $form,                
                 ])
             ;           
         } else {
             $builder
-                ->addColumn('name', TextType::class)
-                ->addColumn('quantity', NumberType::class)
+                ->addColumn('name', TextColumnType::class)
+                ->addColumn('quantity', NumberColumnType::class)
             ;
         }
     }
@@ -244,12 +244,12 @@ class ProductController extends AbstractController
         ]);
         
         // The data table with "name" and "quantity" columns displayed as a form inputs.
-        $dataTable = $this->createDataTable(DataTable\ProductType::class, $query, [
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query, [
             'form' => $form,
         ]);
         
         // The data table with "name" and "quantity" columns displayed regularly, because form is not passed.
-        $dataTable = $this->createDataTable(DataTable\ProductType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
 
         // ...
     }

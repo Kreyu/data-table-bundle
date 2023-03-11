@@ -6,18 +6,18 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\FormType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\LinkType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TemplateType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -53,48 +53,48 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.actions', ActionsType::class)
+        ->set('kreyu_data_table.column.type.actions', ActionsColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.boolean', BooleanType::class)
+        ->set('kreyu_data_table.column.type.boolean', BooleanColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.collection', CollectionType::class)
+        ->set('kreyu_data_table.column.type.collection', CollectionColumnType::class)
         ->tag('kreyu_data_table.column.type')
         ->call('setColumnFactory', [service('kreyu_data_table.column.factory')])
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.form', FormType::class)
+        ->set('kreyu_data_table.column.type.form', FormColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.link', LinkType::class)
+        ->set('kreyu_data_table.column.type.link', LinkColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.number', NumberType::class)
+        ->set('kreyu_data_table.column.type.number', NumberColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.template', TemplateType::class)
+        ->set('kreyu_data_table.column.type.template', TemplateColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.datetime', DateTimeType::class)
+        ->set('kreyu_data_table.column.type.datetime', DateTimeColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.text', TextType::class)
+        ->set('kreyu_data_table.column.type.text', TextColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 };

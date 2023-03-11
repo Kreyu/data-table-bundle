@@ -47,7 +47,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
 
         $data = FiltrationData::fromArray(
-            $this->extractQueryParameter($request, "[$filtrationParameterName]", [])
+            $this->extractQueryParameter($request, "[$filtrationParameterName]", []),
         );
 
         if ($data->isEmpty()) {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\BooleanType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\BooleanFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
@@ -66,37 +66,37 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_string', StringType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_string', StringFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_numeric', NumericType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_numeric', NumericFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_entity', EntityType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_entity', EntityFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_callback', CallbackType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_callback', CallbackFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_datetime', DateTimeType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_datetime', DateTimeFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_date', DateType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_date', DateFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_boolean', BooleanType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_boolean', BooleanFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 };

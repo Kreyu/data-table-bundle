@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvType;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\PhpSpreadsheetType;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsType;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsxType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvExporterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\PhpSpreadsheetExporterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsExporterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsxExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactory;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
@@ -47,22 +47,22 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.exporter.type.phpspreadsheet', PhpSpreadsheetType::class)
+        ->set('kreyu_data_table.exporter.type.phpspreadsheet', PhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.exporter.type.phpspreadsheet_csv', CsvType::class)
+        ->set('kreyu_data_table.exporter.type.phpspreadsheet_csv', CsvExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.exporter.type.phpspreadsheet_xls', XlsType::class)
+        ->set('kreyu_data_table.exporter.type.phpspreadsheet_xls', XlsExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.exporter.type.phpspreadsheet_xlsx', XlsxType::class)
+        ->set('kreyu_data_table.exporter.type.phpspreadsheet_xlsx', XlsxExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 };

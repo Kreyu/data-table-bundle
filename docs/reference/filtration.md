@@ -53,13 +53,13 @@ By default, the operator selector is not visible to the user. Because of that, f
 To display the operator selector, pass the `operator_options.visible` option to the filter:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
@@ -80,13 +80,13 @@ class ProductType extends AbstractType
 If you wish to restrain operators available to select, pass the `operator_options.choices` option to the filter:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {

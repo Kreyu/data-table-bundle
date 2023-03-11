@@ -15,7 +15,7 @@ First, create the column type extension class extending from [AbstractTypeExtens
 // src/DataTable/Column/Extension/TextTypeExtension.php
 namespace App\DataTable\Column\Extension;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Symfony\Component\Form\AbstractTypeExtension;
 
 class TextTypeExtension extends AbstractTypeExtension
@@ -23,7 +23,7 @@ class TextTypeExtension extends AbstractTypeExtension
     public static function getExtendedTypes(): iterable
     {
         // return [ColumnType::class] to modify (nearly) every column in the system
-        return [TextType::class];
+        return [TextColumnType::class];
     }
 }
 ```

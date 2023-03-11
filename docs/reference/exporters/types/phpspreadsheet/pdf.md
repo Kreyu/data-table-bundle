@@ -36,11 +36,11 @@ PhpSpreadsheet will attempt to honor the orientation and paper size specified in
 if the renderer supports that. However, you can set all pages to have the same orientation and paper size, e.g.
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\PdfType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\PdfExporterType;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 $builder
-    ->addExporter('pdf', PdfType::class, [
+    ->addExporter('pdf', PdfExporterType::class, [
         'orientation' => PageSetup::ORIENTATION_LANDSCAPE,
     ])
 ;

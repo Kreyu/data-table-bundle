@@ -235,7 +235,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_date_time %}
-    <span {{ block('attributes') }}>{{- value|date(format) -}}</span>
+    <span {{ block('attributes') }}>{% if value is not null %}{{- value|date(format) -}}{% endif %}</span>
 {% endblock %}
 
 {% block kreyu_data_table_column_boolean %}

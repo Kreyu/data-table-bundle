@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
-use Closure;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -48,17 +47,17 @@ final class ColumnType implements ColumnTypeInterface
                 'value_attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_parameters', ['array', Closure::class])
+            ->setAllowedTypes('label_translation_parameters', ['array', \Closure::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('export', ['bool', 'array'])
-            ->setAllowedTypes('formatter', ['null', Closure::class])
+            ->setAllowedTypes('formatter', ['null', \Closure::class])
             ->setAllowedTypes('non_resolvable_options', ['string[]'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
-            ->setAllowedTypes('getter', ['null', Closure::class])
+            ->setAllowedTypes('getter', ['null', \Closure::class])
             ->setAllowedTypes('header_attr', ['array'])
             ->setAllowedTypes('value_attr', ['array'])
         ;
@@ -85,7 +84,7 @@ final class ColumnType implements ColumnTypeInterface
                 $option = $this->resolveCallableOptions($option, $column, $options);
             }
 
-            if ($option instanceof Closure) {
+            if ($option instanceof \Closure) {
                 $option = $option($options['value'], $options['data'], $column, $options);
             }
 
@@ -120,7 +119,7 @@ final class ColumnType implements ColumnTypeInterface
         // If the block prefix or name is not specified, then the values
         // should be inherited from the column type.
         $options['block_prefix'] ??= $column->getType()->getBlockPrefix();
-        $options['block_name'] ??= self::DEFAULT_BLOCK_PREFIX . $options['block_prefix'];
+        $options['block_name'] ??= self::DEFAULT_BLOCK_PREFIX.$options['block_prefix'];
 
         // Because by default, the sorting feature is disabled, the user can enable it
         // by setting the "sort" option to either sort field path, or just a true.

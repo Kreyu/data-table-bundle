@@ -34,8 +34,8 @@ If your controller uses the [DataTableControllerTrait](https://github.com/Kreyu/
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +50,8 @@ class ProductController extends AbstractController
         $query = $repository->createQueryBuilder('product');
 
         $dataTable = $this->createDataTableBuilder($query)
-            ->addColumn('id', NumberType::class)
-            ->addColumn('name', TextType::class)
+            ->addColumn('id', NumberColumnType::class)
+            ->addColumn('name', TextColumnType::class)
             ->getDataTable();
             
         // ...
@@ -72,21 +72,21 @@ Data table classes are the data table types that implement [DataTableTypeInterfa
 However, it's better to extend from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractType.php), which already implements the interface and provides some utilities:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addColumn('id', NumberType::class)
-            ->addColumn('name', TextType::class)
+            ->addColumn('id', NumberColumnType::class)
+            ->addColumn('name', TextColumnType::class)
         ;
     }
 }
@@ -104,7 +104,7 @@ In controllers using the [DataTableControllerTrait](https://github.com/Kreyu/dat
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;
+use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -119,7 +119,7 @@ class ProductController extends AbstractController
     {
         $query = $repository->createQueryBuilder('product');
         
-        $dataTable = $this->createDataTable(ProductType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
             
         // ...
     }
@@ -134,10 +134,10 @@ Now that the data table has been created, the next step is to render it:
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;
+use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -151,7 +151,7 @@ class ProductController extends AbstractController
     {
         $query = $repository->createQueryBuilder('product');
         
-        $dataTable = $this->createDataTable(ProductType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
             
         return $this->render('product/index.html.twig', [
             'data_table' => $dataTable->createView(),        
@@ -201,10 +201,10 @@ To make this happen, the submitted data from the user must be written into the d
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;
+use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -218,7 +218,7 @@ class ProductController extends AbstractController
     {
         $query = $repository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTable(ProductType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
         $dataTable->handleRequest($request);
 
         return $this->render('product/index.html.twig', [
@@ -259,10 +259,10 @@ If you [create data tables in classes](#creating-data-table-classes), when build
 // src/Controller/ProductController.php
 namespace App\Controller;
 
-use App\DataTable\Type\ProductType;
+use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -279,7 +279,7 @@ class ProductController extends AbstractController
         // use some PHP logic to decide if this column is displayed or not
         $displayIdentifierColumn = ...;
 
-        $dataTable = $this->createDataTable(ProductType::class, $query, [
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $query, [
             'display_identifier_column' => $displayIdentifierColumn,
         ]);
 
@@ -292,13 +292,13 @@ If you try to use the data table now, you'll see an error message: _The option "
 That's because data tables must declare all the options they accept using the `configureOptions()` method:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     // ...
 
@@ -319,24 +319,24 @@ class ProductType extends AbstractType
 Now you can use this new data table option inside the `buildDataTable()` method:
 
 ```php
-// src/DataTable/Type/ProductType.php
+// src/DataTable/Type/ProductDataTableType.php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumberType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\TextType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductType extends AbstractType
+class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         if ($options['display_identifier_column']) {
-            $builder->addColumn('id', NumberType::class);
+            $builder->addColumn('id', NumberColumnType::class);
         }
         
-        $builder->addColumn('name', TextType::class);
+        $builder->addColumn('name', TextColumnType::class);
     }
     
     // ...

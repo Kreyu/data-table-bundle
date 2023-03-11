@@ -12,7 +12,7 @@ readonly class FiltrationData
      * @param array<FilterData> $filters
      */
     public function __construct(
-        private array $filters = []
+        private array $filters = [],
     ) {
         foreach ($filters as $filter) {
             if (!$filter instanceof FilterData) {
@@ -48,7 +48,7 @@ readonly class FiltrationData
     {
         return array_map(
             fn (FilterData $filter) => $filter->toArray(),
-            $this->filters
+            $this->filters,
         );
     }
 

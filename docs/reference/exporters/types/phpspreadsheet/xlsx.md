@@ -1,6 +1,6 @@
-# XlsxType
+# XlsxExporterType
 
-The [XlsxType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/XlsxType.php) represents an exporter that uses a [PhpSpreadsheet XLSX writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Xlsx.php).
+The [XlsxExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/XlsxExporterType.php) represents an exporter that uses a [PhpSpreadsheet XLSX writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Xlsx.php).
 
 ## Options
 
@@ -16,4 +16,5 @@ resulting in a lower-featured Office2007 spreadsheet!
 
 ## Inherited options
 
-See [base PhpSpreadsheet exporter type documentation](/reference/exporting/#phpspreadsheettype).
+{% include-markdown "_phpspreadsheet_options.md" heading-offset=2 %}
+{% include-markdown "../_exporter_options.md" heading-offset=2 %}

@@ -1,7 +1,6 @@
-# Filtration
+# Filters
 
-A data table can be filtered with a set of _filters_, each of which are built 
-with the help of a filter _type_ (e.g. `StringType`, `EntityType`, etc),
+A data table can be filtered with a set of _filters_, each of which are built with the help of a filter _type_.
 
 ## Configuring the filtration feature
 
@@ -14,7 +13,7 @@ Every part of the feature can be configured using the [data table options](#pass
 - `filtration_persistence_adapter` - to change the [persistence adapter](#persistence-adapters);
 - `filtration_persistence_subject` - to change the [persistence subject](#persistence-subjects) directly;
 
-By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) 
+By default, if the feature is enabled, the [persistence adapter](#persistence-adapters)
 and [subject provider](#persistence-subject-providers) are autoconfigured.
 
 ## Built-in filter types
@@ -22,15 +21,12 @@ and [subject provider](#persistence-subject-providers) are autoconfigured.
 The following filter types are natively available in the bundle:
 
 - Doctrine ORM
-    - [StringType](#stringtype)
-    - [NumericType](#numerictype)
-    - [EntityType](#entitytype)
-    - [CallbackType](#callbacktype)
+    - [String](types/doctrine-orm/string.md)
+    - [Numeric](types/doctrine-orm/numeric.md)
+    - [Entity](types/doctrine-orm/entity.md)
+    - [Callback](types/doctrine-orm/callback.md)
 - Base types
-    - [FilterType](#filtertype)
-
-{% include-markdown "filters/creating_custom_filter_type.md" heading-offset=1 %}
-{% include-markdown "filters/creating_filter_type_extension.md" heading-offset=1 %}
+    - [Filter](types/filter.md)
 
 ## Using filter operators
 
@@ -110,18 +106,5 @@ class ProductDataTableType extends AbstractDataTableType
 
 ## Changing operator form field type
 
-If you wish to override the operator selector completely, create custom form type 
+If you wish to override the operator selector completely, create custom form type
 and pass it as the `operator_type` option. Options passed as `operator_options` are used in that type.
-
-## Built-in types reference
-
-### Doctrine ORM
-
-{% include-markdown "filters/types/doctrine-orm/string.md" heading-offset=3 %}
-{% include-markdown "filters/types/doctrine-orm/numeric.md" heading-offset=3 %}
-{% include-markdown "filters/types/doctrine-orm/entity.md" heading-offset=3 %}
-{% include-markdown "filters/types/doctrine-orm/callback.md" heading-offset=3 %}
-
-### Base types
-
-{% include-markdown "filters/types/filter.md" heading-offset=3 %}

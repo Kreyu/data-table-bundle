@@ -45,7 +45,7 @@ class ProductController extends AbstractController
 {
     use DataTableControllerTrait;
     
-    public function index(Request $request, ProductRepository $repository): Response
+    public function index(ProductRepository $repository): Response
     {
         $query = $repository->createQueryBuilder('product');
 
@@ -69,7 +69,7 @@ That's why it's better to move complex data tables to dedicated classes instead 
 Besides, data tables defined in classes can be reused in multiple actions and services.
 
 Data table classes are the data table types that implement [DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php).
-However, it's better to extend from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractType.php), which already implements the interface and provides some utilities:
+However, it's better to extend from [AbstractType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableType.php), which already implements the interface and provides some utilities:
 
 ```php
 // src/DataTable/Type/ProductDataTableType.php

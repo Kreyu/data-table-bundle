@@ -1,6 +1,6 @@
-# LinkType
+# LinkColumnType
 
-The [LinkType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/LinkType.php) represents a column with value displayed as a link.
+The [:material-github: LinkColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/LinkColumnType.php) represents a column with value displayed as a link.
 
 ## Options
 
@@ -13,7 +13,7 @@ Closure can be used to provide an option value based on a row value, which is pa
 
 ```php
 $columns
-    ->add('category', LinkType::class, [
+    ->add('category', LinkColumnType::class, [
         'value' => function (Category $category): string {
             return $category->getName(),
         },
@@ -41,4 +41,4 @@ If this value is true, an icon will be visible next to the link label.
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

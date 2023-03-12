@@ -1,6 +1,6 @@
-# CsvType
+# CsvExporterType
 
-The [CsvType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/CsvType.php) represents an exporter that uses a [PhpSpreadsheet CSV writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Csv.php).
+The [CsvExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/CsvExporterType.php) represents an exporter that uses a [PhpSpreadsheet CSV writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Csv.php).
 
 !!! Note
 
@@ -90,4 +90,5 @@ But to avoid problems it is recommended to set the character explicitly.
 
 ## Inherited options
 
-See [base PhpSpreadsheet exporter type documentation](/reference/exporting/#phpspreadsheettype).
+{% include-markdown "_phpspreadsheet_options.md" heading-offset=2 %}
+{% include-markdown "../_exporter_options.md" heading-offset=2 %}

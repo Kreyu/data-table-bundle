@@ -25,7 +25,7 @@ either by passing it as a data table option, or by using the data table builder 
 
 !!! Note
 
-    The default configuration is loaded by the [DefaultConfigurationExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Core/DefaultConfigurationExtension.php),
+    The default configuration is loaded by the [:material-github: DefaultConfigurationDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Core/DefaultConfigurationDataTableTypeExtension.php),
     that extends every data table type class with [DataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableType.php) specified as a parent.
 
 The given values represent the default ones, unless specifically stated otherwise:

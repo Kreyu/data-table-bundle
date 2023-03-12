@@ -14,3 +14,8 @@ Every part of the feature can be configured using the [data table options](#pass
 - `pagination_persistence_subject` - to change the persistence subject directly;
 
 By default, if the feature is enabled, the [persistence adapter](#persistence-adapters) and [subject provider](#persistence-subject-providers) are autoconfigured.
+
+!!! Info
+
+    In the built-in themes, the pagination controls are not visible, if the data table contains only one page!  
+    By default, each data table page displays 25 records.

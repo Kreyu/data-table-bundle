@@ -5,9 +5,9 @@ However, it's common to create custom column types to solve specific purposes in
 
 ## Creating types based on built-in types
 
-The easiest way to create a column type is to base it on one of the [existing column types](#built-in-column-types).
+The easiest way to create a column type is to base it on one of the [existing column types](index.md#built-in-column-types).
 Imagine, that your project displays a column with link to the related entity `show` view.
-This can be implemented with a [LinkColumnType](#linktype), where the `href` option is set to the url to the `show` view:
+This can be implemented with a [LinkColumnType](types/link.md), where the `href` option is set to the url to the `show` view:
 
 ```php
 // src/DataTable/Type/ProductDataTableType.php

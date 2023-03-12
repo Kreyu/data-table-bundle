@@ -9,7 +9,7 @@ The [HtmlExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/
 
 ## Options
 
-{% include-markdown "_exporter_options.md" heading-offset=2 %}
+{% include-markdown "_html_options.md" heading-offset=2 %}
 
 ## Inherited options
 

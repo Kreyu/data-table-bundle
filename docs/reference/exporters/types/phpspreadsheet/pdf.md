@@ -48,6 +48,6 @@ $builder
 
 ## Inherited options
 
-{% include-markdown "_exporter_options.md" heading-offset=2 %}
+{% include-markdown "_html_options.md" heading-offset=2 %}
 {% include-markdown "_phpspreadsheet_options.md" heading-offset=2 %}
 {% include-markdown "../_exporter_options.md" heading-offset=2 %}

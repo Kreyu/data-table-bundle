@@ -1,6 +1,6 @@
-# ActionsType
+# ActionsColumnType
 
-The [ActionsType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ActionsType.php) represents a column with value displayed as a list of actions.
+The [:material-github: ActionsColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ActionsColumnType.php) represents a column with value displayed as a list of actions.
 
 ## Options
 
@@ -21,7 +21,7 @@ Example usage:
 
 ```php
 $builder
-    ->addColumn('actions', ActionsType::class, [
+    ->addColumn('actions', ActionsColumnType::class, [
         'actions' => [
             'show' => [
                 'template_path' => '@KreyuDataTable\Action\action_link_button.html.twig',
@@ -41,4 +41,4 @@ $builder
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

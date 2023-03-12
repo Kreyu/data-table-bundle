@@ -6,13 +6,13 @@ This bundle can be installed at any moment during a project’s lifecycle.
 
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
-```bash
-composer require kreyu/data-table-bundle:dev-main
+```shell
+composer require kreyu/data-table-bundle
 ```
 
 ## Enable the bundle
 
-Enable the bundle by adding it to the `bundles.php`:
+Enable the bundle by adding it to the `config/bundles.php`:
 
 ```php
 // config/bundles.php
@@ -58,20 +58,14 @@ which should contain the `@kreyu/data-table-bundle` configuration:
 
 ### Install dependencies and build the front-end
 
-```bash
-# if using npm
-npm install
-npm run build
-
-# if using yarn
-yarn
-yarn build
+```shell
+yarn install && yarn build
 ```
 
 ## Enable the translator service
 
 The translator service is required by the bundle to display all labels properly.
-For more information, see [Symfony translation documentation](https://symfony.com/doc/current/translation.html#configuration).
+For more information, see [:material-symfony: Symfony translation documentation](https://symfony.com/doc/current/translation.html#configuration).
 
 ```yaml
 # config/packages/translation.yaml
@@ -89,9 +83,9 @@ By default, a base HTML theme is used. It's primary role is to work as a base th
 
 The following themes are natively available in the bundle:
 
-- [@KreyuDataTable/themes/bootstrap_5.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/bootstrap_5.html.twig) - integrates [Bootstrap 5](https://getbootstrap.com/docs/5.0/);
-- [@KreyuDataTable/themes/tabler.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/tabler.html.twig) - integrates [Tabler UI Kit](https://tabler.io/);
-- [@KreyuDataTable/themes/base.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) - base HTML template;
+- [:material-github: @KreyuDataTable/themes/bootstrap_5.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/bootstrap_5.html.twig) - integrates [Bootstrap 5](https://getbootstrap.com/docs/5.0/);
+- [:material-github: @KreyuDataTable/themes/tabler.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/tabler.html.twig) - integrates [Tabler UI Kit](https://tabler.io/);
+- [:material-github: @KreyuDataTable/themes/base.html.twig](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) - base HTML template;
 
 To select a theme, provide which one to use in the bundle configuration file:
 

@@ -1,6 +1,6 @@
-# PdfType
+# PdfExporterType
 
-The [PdfType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/PdfType.php) represents an exporter that uses a [PhpSpreadsheet PDF writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Pdf.php).
+The [PdfExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/PdfExporterType.php) represents an exporter that uses a [PhpSpreadsheet PDF writer](https://github.com/PHPOffice/PhpSpreadsheet/blob/master/src/PhpSpreadsheet/Writer/Pdf.php).
 
 !!! Note
 
@@ -48,4 +48,6 @@ $builder
 
 ## Inherited options
 
-See [HTML exporter type documentation](html.md).
+{% include-markdown "_exporter_options.md" heading-offset=2 %}
+{% include-markdown "_phpspreadsheet_options.md" heading-offset=2 %}
+{% include-markdown "../_exporter_options.md" heading-offset=2 %}

@@ -1,6 +1,6 @@
-# DateTimeType
+# DateTimeColumnType
 
-The [DateTimeType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/DateTimeType.php) column represents a column with a value displayed as a readable date time string.
+The [:material-github: DateTimeColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/DateTimeColumnType.php) column represents a column with a value displayed as a readable date time string.
 
 ## Options
 
@@ -19,4 +19,4 @@ Sets the timezone passed to the date formatters.
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

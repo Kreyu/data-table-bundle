@@ -1,6 +1,6 @@
-# FormType
+# FormColumnType
 
-The [FormType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/FormType.php) column represents a column with value displayed as a form input.
+The [:material-github: FormColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/FormColumnType.php) column represents a column with value displayed as a form input.
 
 For more details about how to use this column type, see [integration with Symfony Forms](../../../advanced/integration-with-symfony-forms.md). 
 
@@ -24,4 +24,4 @@ Setting this option to `false` disables this functionality and renders the colle
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

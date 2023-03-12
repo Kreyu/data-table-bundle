@@ -1,6 +1,6 @@
-# BooleanType
+# BooleanColumnType
 
-The [BooleanType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/BooleanType.php) column represents a column with value displayed as a "yes" or "no" badge.
+The [:material-github: BooleanColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/BooleanColumnType.php) column represents a column with value displayed as a "yes" or "no" badge.
 
 ## Options
 
@@ -18,4 +18,4 @@ Sets the value that will be displayed if row value is false.
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

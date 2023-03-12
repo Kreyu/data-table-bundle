@@ -1,28 +1,28 @@
-# CollectionType
+# CollectionColumnType
 
-The [CollectionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/CollectionType.php) column represents a column with value displayed as a list of other column type.
+The [:material-github: CollectionColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/CollectionColumnType.php) column represents a column with value displayed as a list of other column type.
 
 ## Options
 
 ### `entry_type`
 
-**type**: `string` **default**: `'Kreyu\Bundle\DataTableBundle\Column\Type\TextType'`
+**type**: `string` **default**: `'Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType'`
 
-This is the column type for each item in this collection (e.g. [TextType](text.md), [LinkType](link.md), etc). 
-For example, if you have an array of entities, you'd probably want to use the [LinkType](link.md) to display them as links to their details view. 
+This is the column type for each item in this collection (e.g. [TextColumnType](text.md), [LinkColumnType](link.md), etc). 
+For example, if you have an array of entities, you'd probably want to use the [LinkColumnType](link.md) to display them as links to their details view. 
 
 ### `entry_options`
 
 **type**: `array` **default**: `['property_path' => false]`
 
 This is the array that's passed to the column type specified in the `entry_type` option. 
-For example, if you used the [LinkType](link.md) as your `entry_type` option (e.g. for a collection of links of product tags), 
+For example, if you used the [LinkColumnType](link.md) as your `entry_type` option (e.g. for a collection of links of product tags), 
 then you'd want to pass the `href` option to the underlying type:
 
 ```php
-$columns
-    ->add('tags', CollectionType::class, [
-        'entry_type' => LinkType::class,
+$builder
+    ->addColumn('tags', CollectionColumnType::class, [
+        'entry_type' => LinkColumnType::class,
         'entry_options' => [
             'href' => function (Tag $tag): string {
                 return $this->urlGenerator->generate('tag_show', [
@@ -55,4 +55,4 @@ The options resolver normalizer ensures the `entry_options` is always present in
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

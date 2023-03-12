@@ -1,6 +1,6 @@
-# TemplateType
+# TemplateColumnType
 
-The [TemplateType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TemplateType.php) represents a column with value displayed as a link.
+The [:material-github: TemplateColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TemplateColumnType.php) represents a column with value displayed as a link.
 
 ## Options
 
@@ -20,4 +20,4 @@ Closure can be used to provide an option value based on a row value, which is pa
 
 ## Inherited options
 
-See [base column type documentation](column.md).
+{% include-markdown "_column_options.md" heading-offset=2 %}

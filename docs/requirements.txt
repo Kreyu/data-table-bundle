@@ -4,3 +4,4 @@ pymdown-extensions>=7.0.0
 Pygments>=2.4
 mkdocs-include-markdown-plugin>=4.0.3
 jinja2==3.0.3
+mkdocs-material-extensions==1.1.1

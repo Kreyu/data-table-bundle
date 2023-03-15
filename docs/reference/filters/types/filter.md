@@ -5,4 +5,4 @@ used as a parent for every other type in the bundle.
 
 ## Options
 
-TODO
+{% include-markdown "_filter_options.md" heading-offset=2 %}

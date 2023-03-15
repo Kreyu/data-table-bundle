@@ -9,10 +9,12 @@ they are very useful because they take use the theme configured in bundle.
 
 Renders the HTML of a complete data table, with action bar, filtration, pagination, etc.
 
+{% raw %}
 ```twig
 {# render the data table and disable the filtration feature #}
 {{ data_table(data_table, { 'filtration_enabled': false }) }}
 ```
+{% endraw %}
 
 You will mostly use this helper for prototyping or if you use custom theme.
 If you need more flexibility in rendering the data table, you should use the other helpers 

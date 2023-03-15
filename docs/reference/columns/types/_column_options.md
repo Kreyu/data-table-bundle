@@ -89,7 +89,7 @@ $builder
 
 # `export`
 
-**type**: `bool` or `array` **default**: `[]` with some exceptions on built-in types (e.g. [ActionsType](actions.md))
+**type**: `bool` or `array` **default**: `[]` with some exceptions on built-in types (e.g. [ActionsColumnType](./actions.md))
 
 Determines whether the column should be included in the exports.
 
@@ -142,11 +142,13 @@ $builder
 
 The `uniqid` option will be available in the column views as a callable. For example, in templates:
 
+{% raw %}
 ```twig
 {% block kreyu_data_table_column_custom %}
     {{ value }} ({{ uniqid('product_') }})
 {% endblock %}
 ```
+{% endraw %}
 
 # `header_attr`
 

@@ -252,6 +252,7 @@ kreyu_data_table:
 The last step is to create the actual Twig template that will render the type.
 The template contents depend on which HTML, CSS and JavaScript frameworks and libraries are used in your application:
 
+{% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
@@ -260,6 +261,7 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
     {# ... #}
 {% endblock %}
 ```
+{% endraw %}
 
 Every block is prefixed with `kreyu_data_table_column_` by default.
 Last part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityColumnType` -> `quantity`).
@@ -311,6 +313,7 @@ class QuantityColumnType extends AbstractColumnType
 
 The variables added in `buildView()` are available in the column type template as any other regular Twig variable:
 
+{% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
@@ -321,3 +324,4 @@ The variables added in `buildView()` are available in the column type template a
     {% endif %}
 {% endblock %}
 ```
+{% endraw %}

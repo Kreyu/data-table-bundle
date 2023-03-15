@@ -102,6 +102,7 @@ class ProductController extends AbstractController
 
 Now, let's handle the templating part:
 
+{% raw %}
 ```twig
 {# templates/product/index.html.twig #}
 
@@ -109,6 +110,7 @@ Now, let's handle the templating part:
 
 <input type="submit" form="{{ form.vars.id }}" value="Submit"/>
 ```
+{% endraw %}
 
 Notice the use of [data_table_form_aware() function](../reference/twig.md#datatableformawaredatatableview-formview-datatablevariables-formvariables).
 This takes care of wrapping only the table part in the form. 
@@ -118,6 +120,8 @@ Because we are rendering the submit button outside the form, the `form` attribut
 
 If your data table is **NOT** using neither filtration, exporting nor personalization features, 
 you can use the [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) as usual, wrapping it in the form:
+
+{% raw %}
 ```twig
 {# templates/product/index.html.twig #}
 
@@ -129,6 +133,7 @@ you can use the [data_table() function](../reference/twig.md#data_tabledata_tabl
     </div>
 {{ form_end(form, { render_rest: false }) }} {# Important: notice the "render_rest" option! #}
 ```
+{% endraw %}
 
 !!! Warning
 
@@ -139,6 +144,7 @@ If your data table is using either a filtration, exporting or personalization fe
 part of the table individually, because the [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) 
 renders out whole data table with corresponding feature form, and HTML forms cannot be nested, and this will totally break the markup;
 
+{% raw %}
 ```twig
 {# templates/product/index.html.twig #}
 
@@ -154,6 +160,7 @@ renders out whole data table with corresponding feature form, and HTML forms can
 
 {{ data_table_pagination(data_table) }}
 ```
+{% endraw %}
 
 !!! Warning
 

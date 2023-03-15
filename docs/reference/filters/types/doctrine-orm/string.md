@@ -1,11 +1,11 @@
-# StringType
+# StringFilterType
 
-The [StringType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/StringType.php) represents a filter that operates on string values.
+The [StringFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/StringFilterType.php) represents a filter that operates on string values.
 
 ## Supported operators
 
-- `Operator::EQUAL`
-- `Operator::NOT_EQUAL`
+- `Operator::EQUALS`
+- `Operator::NOT_EQUALS`
 - `Operator::CONTAINS`
 - `Operator::NOT_CONTAINS`
 
@@ -15,4 +15,4 @@ This filter has no additional options.
 
 ## Inherited options
 
-See [base filter type documentation](https://github.com/Kreyu/data-table-bundle/blob/main/docs/filter/types/filter.md).
+{% include-markdown "../_filter_options.md" heading-offset=2 %}

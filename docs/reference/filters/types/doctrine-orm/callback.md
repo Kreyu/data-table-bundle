@@ -1,6 +1,6 @@
-# CallbackType
+# CallbackFilterType
 
-The [CallbackType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CallbackType.php) represents a filter 
+The [CallbackFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/CallbackFilterType.php) represents a filter 
 that allows manual application of complex conditions to the query. 
 
 ## Supported operators
@@ -44,10 +44,4 @@ $builder
 
 ## Inherited options
 
-See [base filter type documentation](https://github.com/Kreyu/data-table-bundle/blob/main/docs/filter/types/filter.md).
-
-## Overridden options
-
-### `field_type`
-
-**type**: `string` **default**: `'Symfony\Bridge\Doctrine\Form\Type\EntityType'`
+{% include-markdown "../_filter_options.md" heading-offset=2 %}

@@ -20,6 +20,9 @@ For example, if you used the [LinkColumnType](link.md) as your `entry_type` opti
 then you'd want to pass the `href` option to the underlying type:
 
 ```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
+
 $builder
     ->addColumn('tags', CollectionColumnType::class, [
         'entry_type' => LinkColumnType::class,

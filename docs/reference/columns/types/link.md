@@ -12,11 +12,10 @@ Sets the value that will be used as a link `href` attribute (see [href attribute
 Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ```php
-$columns
-    ->add('category', LinkColumnType::class, [
-        'value' => function (Category $category): string {
-            return $category->getName(),
-        },
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
+
+$builder
+    ->addColumn('category', LinkColumnType::class, [
         'href' => function (Category $category): string {
             return $this->urlGenerator->generate('category_show', [
                 'id' => $category->getId(),

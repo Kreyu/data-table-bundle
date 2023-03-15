@@ -10,6 +10,7 @@ The following column types are natively available in the bundle:
     - [Text](types/text.md)
     - [Number](types/number.md)
     - [Boolean](types/boolean.md)
+    - [DateTime](types/datetime.md)
     - [Link](types/link.md)
 - Special types
     - [Collection](types/collection.md)

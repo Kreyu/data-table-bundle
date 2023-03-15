@@ -1,15 +1,15 @@
-# NumericType
+# NumericFilterType
 
-The [NumericType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/NumericType.php) represents a filter that operates on numeric values.
+The [NumericFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/NumericFilterType.php) represents a filter that operates on numeric values.
 
 ## Supported operators
 
-- `Operator::EQUAL`
-- `Operator::NOT_EQUAL`
-- `Operator::GREATER_EQUAL`
+- `Operator::EQUALS`
+- `Operator::NOT_EQUALS`
 - `Operator::GREATER_THAN`
-- `Operator::LESS_EQUAL`
+- `Operator::GREATER_THAN_EQUALS`
 - `Operator::LESS_THAN`
+- `Operator::LESS_THEN_EQUALS`
 
 ## Options
 
@@ -17,10 +17,4 @@ This filter has no additional options.
 
 ## Inherited options
 
-See [base filter type documentation](https://github.com/Kreyu/data-table-bundle/blob/main/docs/filter/types/filter.md).
-
-## Overridden options
-
-### `field_type`
-
-**type**: `string` **default**: `'Symfony\Component\Form\Extension\Core\Type\NumberType'`
+{% include-markdown "../_filter_options.md" heading-offset=2 %}

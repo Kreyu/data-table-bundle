@@ -162,10 +162,12 @@ class ProductController extends AbstractController
 
 Then, use some [data table helper functions](../reference/twig.md#functions) to render the data table contents:
 
+{% raw %}
 ```html
 {# templates/product/index.html.twig #}
 {{ data_table(data_table) }}
 ```
+{% endraw %}
 
 That's it! The [data_table() function](../reference/twig.md#data_tabledata_table_view-variables) renders a complete data table.
 

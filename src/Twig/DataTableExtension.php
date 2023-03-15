@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Twig;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\HeadersRowView;
@@ -36,6 +37,7 @@ class DataTableExtension extends AbstractExtension
             'data_table_column_label' => $this->renderColumnLabel(...),
             'data_table_column_header' => $this->renderColumnHeader(...),
             'data_table_column_value' => $this->renderColumnValue(...),
+            'data_table_action' => $this->renderAction(...),
             'data_table_pagination' => $this->renderPagination(...),
             'data_table_filters_form' => $this->renderFiltersForm(...),
             'data_table_personalization_form' => $this->renderPersonalizationForm(...),
@@ -158,6 +160,18 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_column_value',
+            context: array_merge($view->vars, $variables),
+        );
+    }
+
+    /**
+     * @throws TwigException|\Throwable
+     */
+    public function renderAction(Environment $environment, ActionView $view, array $variables = []): string
+    {
+        return $this->renderBlock(
+            environment: $environment,
+            blockName: 'kreyu_data_table_action',
             context: array_merge($view->vars, $variables),
         );
     }

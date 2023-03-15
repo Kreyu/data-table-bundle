@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
@@ -67,6 +68,11 @@ final class DataTableType implements DataTableTypeInterface
             'label_translation_domain' => $options['label_translation_domain'] ?? $dataTable->getConfig()->getName(),
             'values_rows' => [],
         ];
+
+        $view->vars['actions'] = array_map(
+            fn (ActionInterface $action) => $action->createView($view),
+            $dataTable->getConfig()->getActions(),
+        );
 
         $view->vars['filters'] = array_map(
             fn (FilterInterface $filter) => $filter->createView($view),

@@ -54,6 +54,10 @@
 
             {% block action_bar_right %}
                 <div class="d-inline-block float-end mb-2">
+                    {% for action in actions %}
+                        {{ data_table_action(action) }}
+                    {% endfor %}
+
                     {% if display_filter_action %}
                         {% block action_filter %}
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
@@ -438,6 +442,16 @@
 {% block kreyu_data_table_column_form %}
     {% with { form_themes: [_self, 'bootstrap_5_layout.html.twig'] } %}
         {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block kreyu_data_table_action_link %}
+    {{ parent() }}
+{% endblock %}
+
+{% block kreyu_data_table_action_button %}
+    {% with { attr: { class: 'btn btn-primary' }|merge(attr|default({})) } %}
+        {{- block('kreyu_data_table_action_link') -}}
     {% endwith %}
 {% endblock %}
 

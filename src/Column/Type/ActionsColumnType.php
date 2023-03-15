@@ -4,28 +4,49 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ActionsColumnType extends AbstractColumnType
 {
+    public function __construct(
+        private ActionFactoryInterface $actionFactory,
+    ) {
+    }
+
+    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    {
+        $actions = [];
+
+        foreach ($options['actions'] as $name => $actionOptions) {
+            $action = $this->actionFactory->create($name, $actionOptions['type'], $actionOptions['type_options']);
+            $action->setData($column->getData());
+
+            $actions[$name] = $action->createView($view->parent);
+        }
+
+        $view->vars['actions'] = $actions;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
                 'export' => false,
                 'property_path' => false,
-                'display_personalization_button' => true,
                 'actions' => function (OptionsResolver $resolver) {
                     $resolver
                         ->setPrototype(true)
                         ->setRequired([
-                            'template_path',
+                            'type',
                         ])
                         ->setDefaults([
-                            'template_vars' => [],
+                            'type_options' => [],
                         ])
-                        ->setAllowedTypes('template_path', ['string', \Closure::class])
-                        ->setAllowedTypes('template_vars', ['array', \Closure::class])
+                        ->setAllowedTypes('type', ['string'])
+                        ->setAllowedTypes('type_options', ['array', \Closure::class])
                     ;
                 },
             ])

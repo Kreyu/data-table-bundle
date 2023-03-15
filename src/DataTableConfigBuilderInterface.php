@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -49,6 +51,17 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function getFilterFactory(): FilterFactoryInterface;
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static;
+
+    /**
+     * @param class-string<ActionTypeInterface> $type
+     */
+    public function addAction(string $name, string $type, array $options = []): static;
+
+    public function removeAction(string $name): static;
+
+    public function getActionFactory(): ActionFactoryInterface;
+
+    public function setActionFactory(ActionFactoryInterface $actionFactory): static;
 
     /**
      * @param class-string<ExporterTypeInterface> $type

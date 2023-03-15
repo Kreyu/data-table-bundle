@@ -280,8 +280,28 @@
 
 {% block kreyu_data_table_column_actions %}
     {% for action in actions %}
-        {{- include(action.template_path, action.template_vars) -}}
+        {{ data_table_action(action) }}
     {% endfor %}
+{% endblock %}
+
+{% block kreyu_data_table_action %}
+    {% if block(block_name, theme) is defined %}
+        {{- block(block_name, theme) -}}
+    {% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_action_link %}
+    {% set attr = { href, target }|merge(attr|default({})) %}
+
+    <a {{ block('attributes') }}>
+        {{- label|trans(label_translation_parameters, translation_domain) -}}
+    </a>
+{% endblock %}
+
+{% block kreyu_data_table_action_button %}
+    <button {{ block('attributes') }}>
+        {{- block('kreyu_data_table_action_link') -}}
+    </button>
 {% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}

@@ -30,6 +30,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('columns.php');
         $loader->load('core.php');
+        $loader->load('actions.php');
         $loader->load('exporter.php');
         $loader->load('extensions.php');
         $loader->load('filtration.php');
@@ -118,6 +119,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'persistence_subject_provider',
             'form_factory',
             'column_factory',
+            'action_factory',
             'filter_factory',
             'exporter_factory',
             'request_handler',

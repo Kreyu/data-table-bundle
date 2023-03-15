@@ -57,8 +57,14 @@ class EntityFilterType extends AbstractFilterType
         $resolver->setDefault('active_filter_formatter', function (FilterData $data, array $options): mixed {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-            if ($path = $options['field_options']['choice_label']) {
-                return $propertyAccessor->getValue($data->getValue(), $path);
+            $choiceLabel = $options['field_options']['choice_label'];
+
+            if (is_string($choiceLabel)) {
+                return $propertyAccessor->getValue($data->getValue(), $choiceLabel);
+            }
+
+            if (is_callable($choiceLabel)) {
+                return $choiceLabel($data->getValue());
             }
 
             return $data->getValue();

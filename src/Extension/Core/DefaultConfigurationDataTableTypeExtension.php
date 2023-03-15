@@ -22,6 +22,7 @@ class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeEx
     {
         $builder
             ->setColumnFactory($this->defaults['column_factory'])
+            ->setActionFactory($this->defaults['action_factory'])
             ->setRequestHandler($this->defaults['request_handler'])
         ;
 

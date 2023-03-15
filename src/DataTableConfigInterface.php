@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
@@ -58,6 +59,16 @@ interface DataTableConfigInterface
      * @throws \InvalidArgumentException if filter of given name does not exist
      */
     public function getFilter(string $name): FilterInterface;
+
+    /**
+     * @return array<ActionInterface>
+     */
+    public function getActions(): array;
+
+    /**
+     * @throws \InvalidArgumentException if action of given name does not exist
+     */
+    public function getAction(string $name): ActionInterface;
 
     /**
      * @return array<ExporterInterface>

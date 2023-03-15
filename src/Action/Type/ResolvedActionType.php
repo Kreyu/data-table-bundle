@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Kreyu\Bundle\DataTableBundle\Column\Type;
+namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
-use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\Action\Extension\ActionTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ResolvedColumnType implements ResolvedColumnTypeInterface
+class ResolvedActionType implements ResolvedActionTypeInterface
 {
     private OptionsResolver $optionsResolver;
 
     /**
-     * @param array<ColumnTypeExtensionInterface> $typeExtensions
+     * @param array<ActionTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private ColumnTypeInterface $innerType,
+        private ActionTypeInterface $innerType,
         private array $typeExtensions = [],
-        private ?ResolvedColumnTypeInterface $parent = null,
+        private ?ResolvedActionTypeInterface $parent = null,
     ) {
     }
 
@@ -29,12 +29,12 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         return $this->innerType->getBlockPrefix();
     }
 
-    public function getParent(): ?ResolvedColumnTypeInterface
+    public function getParent(): ?ResolvedActionTypeInterface
     {
         return $this->parent;
     }
 
-    public function getInnerType(): ColumnTypeInterface
+    public function getInnerType(): ActionTypeInterface
     {
         return $this->innerType;
     }
@@ -44,19 +44,19 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         return $this->typeExtensions;
     }
 
-    public function createView(ColumnInterface $column, DataTableView $parent = null): ColumnView
+    public function createView(ActionInterface $action, DataTableView $parent = null): ActionView
     {
-        return new ColumnView($parent);
+        return new ActionView($parent);
     }
 
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        $this->parent?->buildView($view, $column, $options);
+        $this->parent?->buildView($view, $action, $options);
 
-        $this->innerType->buildView($view, $column, $options);
+        $this->innerType->buildView($view, $action, $options);
 
         foreach ($this->typeExtensions as $extension) {
-            $extension->buildView($view, $column, $options);
+            $extension->buildView($view, $action, $options);
         }
     }
 

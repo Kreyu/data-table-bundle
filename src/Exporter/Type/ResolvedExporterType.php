@@ -8,6 +8,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedExporterType implements ResolvedExporterTypeInterface
 {
+    private OptionsResolver $optionsResolver;
+
     public function __construct(
         private ExporterTypeInterface $innerType,
         private ?ResolvedExporterTypeInterface $parent = null,

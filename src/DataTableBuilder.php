@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -58,6 +60,13 @@ class DataTableBuilder implements DataTableBuilderInterface
     private array $filters = [];
 
     /**
+     * Stores an array of actions, used to interact with data in various ways.
+     *
+     * @var array<ActionInterface>
+     */
+    private array $actions = [];
+
+    /**
      * Stores an array of exporters, used to output data to various file types.
      *
      * @var array<ExporterInterface>
@@ -73,6 +82,11 @@ class DataTableBuilder implements DataTableBuilderInterface
      * Factory used to create proper filter models.
      */
     private FilterFactoryInterface $filterFactory;
+
+    /**
+     * Factory used to create proper action models.
+     */
+    private ActionFactoryInterface $actionFactory;
 
     /**
      * Factory used to create proper exporter models.
@@ -342,6 +356,38 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function getActions(): array
+    {
+        return $this->actions;
+    }
+
+    public function getAction(string $name): ActionInterface
+    {
+        return $this->actions[$name] ?? throw new \InvalidArgumentException("Action \"$name\" does not exist");
+    }
+
+    public function addAction(string $name, string $type, array $options = []): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->actions[$name] = $this->getActionFactory()->create($name, $type, $options);
+
+        return $this;
+    }
+
+    public function removeAction(string $name): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->actions[$name]);
+
+        return $this;
+    }
+
     public function getExporters(): array
     {
         return $this->exporters;
@@ -402,6 +448,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->filterFactory = $filterFactory;
+
+        return $this;
+    }
+
+    public function getActionFactory(): ActionFactoryInterface
+    {
+        return $this->actionFactory;
+    }
+
+    public function setActionFactory(ActionFactoryInterface $actionFactory): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->actionFactory = $actionFactory;
 
         return $this;
     }

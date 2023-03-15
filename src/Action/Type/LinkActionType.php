@@ -14,9 +14,11 @@ class LinkActionType extends AbstractActionType
             ->setDefaults([
                 'href' => '#',
                 'target' => '_self',
+                'display_icon' => true,
             ])
             ->setAllowedTypes('href', ['string', \Closure::class])
             ->setAllowedTypes('target', ['string', \Closure::class])
+            ->setAllowedTypes('display_icon', ['boolean'])
         ;
     }
 }

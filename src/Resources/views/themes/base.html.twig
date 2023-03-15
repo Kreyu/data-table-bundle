@@ -295,6 +295,7 @@
 
     <a {{ block('attributes') }}>
         {{- label|trans(label_translation_parameters, translation_domain) -}}
+        {% if display_icon %}{{ icon|default('⤷') }}{% endif %}
     </a>
 {% endblock %}
 

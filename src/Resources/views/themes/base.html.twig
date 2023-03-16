@@ -300,12 +300,10 @@
 {% endblock %}
 
 {% block kreyu_data_table_action_button %}
-    <button {{ block('attributes') }}>
-        <a {% with { attr: { href, target }|merge(link_attr) } %}{{ block('attributes') }}{% endwith %}>
-            {% if icon_attr %}<i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>{% endif %}
-            {{- label|trans(label_translation_parameters, translation_domain) -}}
-        </a>
-    </button>
+    <a {% with { attr: { href, target }|merge(attr) } %}{{ block('attributes') }}{% endwith %}>
+        {% if icon_attr %}<i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>{% endif %}
+        {{- label|trans(label_translation_parameters, translation_domain) -}}
+    </a>
 {% endblock %}
 
 {% block kreyu_data_table_action_form %}

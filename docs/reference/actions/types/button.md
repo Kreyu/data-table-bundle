@@ -12,13 +12,11 @@ Sets the value that will be used as a link `href` attribute (see [href attribute
 Closure can be used to provide an option value based on a row value, which is passed as a first argument.
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
-    ->addAction('show', LinkActionType::class, [
-        'href' => $this->urlGenerator->generate('category_show', [
-            'id' => $category->getId(),
-        ]),
+    ->addAction('create', ButtonActionType::class, [
+        'href' => $this->urlGenerator->generate('category_create'),
     ])
 ;
 ```
@@ -29,13 +27,6 @@ $builder
 
 Sets the value that will be used as an anchor `target` attribute (see [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target)).  
 Closure can be used to provide an option value based on a row value, which is passed as a first argument.
-
-### `link_attr`
-
-**type**: `array` **default**: `[]`
-
-If you want to add extra attributes to an HTML representation of the button's link, you can use the link_attr option.
-It's an associative array with HTML attributes as keys. 
 
 ### `icon_attr`
 

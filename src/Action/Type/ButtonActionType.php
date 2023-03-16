@@ -14,12 +14,10 @@ class ButtonActionType extends AbstractActionType
             ->setDefaults([
                 'href' => '#',
                 'target' => '_self',
-                'link_attr' => [],
                 'icon_attr' => [],
             ])
             ->setAllowedTypes('href', ['string', 'callable'])
             ->setAllowedTypes('target', ['string', 'callable'])
-            ->setAllowedTypes('link_attr', ['array', 'callable'])
             ->setAllowedTypes('icon_attr', ['array', 'callable'])
         ;
     }

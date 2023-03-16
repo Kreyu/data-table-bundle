@@ -445,6 +445,10 @@
     {% endwith %}
 {% endblock %}
 
+{% block kreyu_data_table_column_actions_single %}
+    <div class="me-1">{{ parent() }}</div>
+{% endblock %}
+
 {% block kreyu_data_table_action_link %}
     {% set icon %}
         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">

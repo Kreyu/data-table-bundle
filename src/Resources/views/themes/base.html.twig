@@ -280,8 +280,12 @@
 
 {% block kreyu_data_table_column_actions %}
     {% for action in actions %}
-        {{ data_table_action(action) }}
+        {{ block('kreyu_data_table_column_actions_single') }}
     {% endfor %}
+{% endblock %}
+
+{% block kreyu_data_table_column_actions_single %}
+    {{ data_table_action(action) }}
 {% endblock %}
 
 {% block kreyu_data_table_action %}

@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
-readonly class SortingData
+class SortingData
 {
     /**
      * @param array<SortingFieldData> $fields

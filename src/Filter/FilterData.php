@@ -7,7 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-readonly class FilterData
+class FilterData
 {
     public function __construct(
         private mixed $value = '',

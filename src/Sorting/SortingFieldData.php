@@ -7,7 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Sorting;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-readonly class SortingFieldData
+class SortingFieldData
 {
     public function __construct(
         private string $name,

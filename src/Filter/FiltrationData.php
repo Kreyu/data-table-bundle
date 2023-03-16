@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
-readonly class FiltrationData
+class FiltrationData
 {
     /**
      * @param array<FilterData> $filters

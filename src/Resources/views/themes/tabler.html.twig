@@ -120,7 +120,13 @@
 {% endblock %}
 
 {% block kreyu_data_table_action_button %}
-    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(attr|default({})) } %}
+    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(attr) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block kreyu_data_table_action_form %}
+    {% with { button_attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(button_attr) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

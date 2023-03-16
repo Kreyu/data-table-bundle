@@ -301,8 +301,28 @@
 
 {% block kreyu_data_table_action_button %}
     <button {{ block('attributes') }}>
-        {{- block('kreyu_data_table_action_link') -}}
+        <a {% with { attr: { href, target }|merge(link_attr) } %}{{ block('attributes') }}{% endwith %}>
+            {% if icon_attr %}<i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>{% endif %}
+            {{- label|trans(label_translation_parameters, translation_domain) -}}
+        </a>
     </button>
+{% endblock %}
+
+{% block kreyu_data_table_action_form %}
+    {% set non_standard_method = false %}
+
+    {% if method|upper not in ['GET', 'POST'] %}
+        {% set non_standard_method = method %}
+        {% set method = 'POST' %}
+    {% endif %}
+
+    <form {% with { attr: { action, method }|merge(attr) } %}{{ block('attributes') }}{% endwith %}>
+        {% if non_standard_method %}<input type="hidden" name="_method" value="{{ non_standard_method }}"/>{% endif %}
+        <button {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{ block('attributes') }}{% endwith %}>
+            {% if icon_attr %}<i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>{% endif %}
+            {{- label|trans(label_translation_parameters, translation_domain) -}}
+        </button>
+    </form>
 {% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}

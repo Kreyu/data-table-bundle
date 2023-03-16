@@ -458,9 +458,9 @@
     {% endwith %}
 {% endblock %}
 
-{% block kreyu_data_table_action_button %}
-    {% with { attr: { class: 'btn btn-primary' }|merge(attr|default({})) } %}
-        {{- block('kreyu_data_table_action_link') -}}
+{% block kreyu_data_table_action_form %}
+    {% with { button_attr: { class: 'btn btn-primary' }|merge(button_attr|default({})) } %}
+        {{ parent() }}
     {% endwith %}
 {% endblock %}
 

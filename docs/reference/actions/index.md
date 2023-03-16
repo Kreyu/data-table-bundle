@@ -9,5 +9,6 @@ The following action types are natively available in the bundle:
 - Common types
     - [Link](types/link.md)
     - [Button](types/button.md)
+    - [Form](types/form.md)
 - Base types
     - [Action](types/action.md)

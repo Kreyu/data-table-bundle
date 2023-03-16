@@ -118,3 +118,9 @@
         {{ parent() }}
     {% endwith %}
 {% endblock %}
+
+{% block kreyu_data_table_action_button %}
+    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(attr|default({})) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}

@@ -35,7 +35,7 @@ final class ActionType implements ActionTypeInterface
                 'block_prefix' => null,
                 'attr' => [],
             ])
-            ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableMessage::class])
             ->setAllowedTypes('label_translation_parameters', ['array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('block_name', ['null', 'string'])
@@ -102,7 +102,7 @@ final class ActionType implements ActionTypeInterface
             }
 
             if ($option instanceof \Closure) {
-                $option = $option($options['data'], $action, $options);
+                $option = $option($action->getData(), $action, $options);
             }
 
             $options[$key] = $option;

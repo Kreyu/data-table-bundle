@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -25,7 +26,7 @@ final class FilterType implements FilterTypeInterface
 
         $resolver
             ->setDefaults([
-                'name' => $filter->getName(),
+                'name' => StringUtil::camelToSentence($filter->getName()),
                 'label' => ucfirst($filter->getName()),
                 'translation_domain' => $view->parent->vars['label_translation_domain'],
                 'query_path' => $filter->getName(),

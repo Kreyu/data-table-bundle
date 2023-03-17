@@ -6,11 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatableMessage;
+use function Symfony\Component\String\u;
 
 final class ColumnType implements ColumnTypeInterface
 {
@@ -106,7 +108,7 @@ final class ColumnType implements ColumnTypeInterface
 
         // If the label is not given, then it should be replaced with a column name.
         // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
-        $options['label'] ??= ucfirst($column->getName());
+        $options['label'] ??= StringUtil::camelToTitle($column->getName());
 
         // If the translation domain is not given, then it should be inherited
         // from the parent data table view "label_translation_domain" option.

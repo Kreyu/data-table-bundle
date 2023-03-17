@@ -28,4 +28,17 @@ class StringUtil
 
         return null;
     }
+
+    /**
+     * Converts a camel-cased string to sentence case.
+     * For example: "firstName" becomes "First name".
+     */
+    public static function camelToSentence(string $string): string
+    {
+        return ucfirst(strtolower(preg_replace_callback(
+            '/(([A-Z]{1}))/',
+            function ($matches) {return " " .$matches[0];},
+            $string
+        )));
+    }
 }

@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -64,9 +65,9 @@ final class ActionType implements ActionTypeInterface
         // This way, it can be referenced later if needed.
         $options['data'] = $action->getData();
 
-        // If the label is not given, then it should be replaced with a action name.
+        // If the label is not given, then it should be replaced with an action name.
         // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
-        $options['label'] ??= ucfirst($action->getName());
+        $options['label'] ??= StringUtil::camelToSentence($action->getName());
 
         // If the translation domain is not given, then it should be inherited
         // from the parent data table view "label_translation_domain" option.

@@ -108,7 +108,7 @@ final class ColumnType implements ColumnTypeInterface
 
         // If the label is not given, then it should be replaced with a column name.
         // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
-        $options['label'] ??= StringUtil::camelToTitle($column->getName());
+        $options['label'] ??= StringUtil::camelToSentence($column->getName());
 
         // If the translation domain is not given, then it should be inherited
         // from the parent data table view "label_translation_domain" option.

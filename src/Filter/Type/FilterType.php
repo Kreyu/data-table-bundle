@@ -26,8 +26,8 @@ final class FilterType implements FilterTypeInterface
 
         $resolver
             ->setDefaults([
-                'name' => StringUtil::camelToSentence($filter->getName()),
-                'label' => ucfirst($filter->getName()),
+                'name' => $filter->getName(),
+                'label' => StringUtil::camelToSentence($filter->getName()),
                 'translation_domain' => $view->parent->vars['label_translation_domain'],
                 'query_path' => $filter->getName(),
             ])

@@ -18,15 +18,14 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
  */
 class DoctrineOrmProxyQuery implements ProxyQueryInterface
 {
-    /**
-     * @var array<string,mixed>
-     */
-    private array $hints = [];
-
     private int $uniqueParameterId = 0;
 
+    /**
+     * @param array<string, mixed> $hints
+     */
     public function __construct(
         private QueryBuilder $queryBuilder,
+        private array $hints,
     ) {
     }
 

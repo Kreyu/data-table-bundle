@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
@@ -17,6 +18,11 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
  */
 class DoctrineOrmProxyQuery implements ProxyQueryInterface
 {
+    /**
+     * @var array<string,mixed>
+     */
+    private array $hints = [];
+
     private int $uniqueParameterId = 0;
 
     public function __construct(
@@ -81,7 +87,17 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
         $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
 
-        $paginator = new Paginator($this->queryBuilder->getQuery(), $hasSingleIdentifierName && $hasJoins);
+        $query = $this->queryBuilder->getQuery();
+
+        if (!$hasJoins) {
+            $query->setHint(CountWalker::HINT_DISTINCT, false);
+        }
+
+        foreach ($this->hints as $name => $value) {
+            $query->setHint($name, $value);
+        }
+
+        $paginator = new Paginator($query, $hasSingleIdentifierName && $hasJoins);
 
         return new Pagination(
             items: $paginator->getIterator(),
@@ -94,6 +110,11 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function getUniqueParameterId(): int
     {
         return $this->uniqueParameterId++;
+    }
+
+    public function setHint(string $name, mixed $value): void
+    {
+        $this->hints[$name] = $value;
     }
 
     private function getCurrentPageNumber(): int

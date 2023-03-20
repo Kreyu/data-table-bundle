@@ -146,11 +146,19 @@ final class DataTableType implements DataTableTypeInterface
     {
         $formView = $dataTable->getPersonalizationForm()->createView();
 
-        foreach ($formView->children['columns']->children as $child) {
+        foreach ($formView->children['columns']->children as $index => $child) {
             /** @var PersonalizationColumnData $personalizationColumnData */
             $personalizationColumnData = $child->vars['value'];
 
-            $column = $dataTable->getConfig()->getColumn($personalizationColumnData->getName());
+            try {
+                $column = $dataTable->getConfig()->getColumn($personalizationColumnData->getName());
+            } catch (\InvalidArgumentException) {
+                // The column does not exist in the data table, therefore it shouldn't exist in personalization.
+                // This is useful in case a personalization data is persisted, and some column is deleted,
+                // which would throw an error instead of handling it gracefully.
+                unset($formView->children['columns']->children[$index]);
+                continue;
+            }
 
             $child->vars['column'] = $column->createView($view);
         }

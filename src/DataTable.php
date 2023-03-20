@@ -35,6 +35,11 @@ class DataTable implements DataTableInterface
      */
     private null|FormInterface $exportForm = null;
 
+    /**
+     * Lazy-loaded pagination used to retrieve results.
+     */
+    private null|PaginationInterface $pagination = null;
+
     public function __construct(
         private ProxyQueryInterface $query,
         private DataTableConfigInterface $config,
@@ -68,6 +73,8 @@ class DataTable implements DataTableInterface
 
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
+
+        $this->resetPagination();
     }
 
     public function sort(SortingData $data): void
@@ -89,6 +96,8 @@ class DataTable implements DataTableInterface
 
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
+
+        $this->resetPagination();
     }
 
     public function filter(FiltrationData $data): void
@@ -119,6 +128,8 @@ class DataTable implements DataTableInterface
 
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
+
+        $this->resetPagination();
     }
 
     public function personalize(PersonalizationData $data): void
@@ -191,7 +202,7 @@ class DataTable implements DataTableInterface
 
     public function getPagination(): PaginationInterface
     {
-        return $this->query->getPagination();
+        return $this->pagination ??= $this->query->getPagination();
     }
 
     public function getFiltrationForm(): FormInterface
@@ -362,5 +373,10 @@ class DataTable implements DataTableInterface
         }
 
         $this->personalize($personalizationData);
+    }
+
+    private function resetPagination(): void
+    {
+        $this->pagination = null;
     }
 }

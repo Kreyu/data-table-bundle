@@ -141,6 +141,8 @@
                 {% else %}
                     {{ block('sort_arrow_desc', theme, _context) }}
                 {% endif %}
+            {% else %}
+                {{ block('sort_arrow_none', theme, _context) }}
             {% endif %}
         </a>
     {% else %}
@@ -326,6 +328,8 @@
         </button>
     </form>
 {% endblock %}
+
+{% block sort_arrow_none %}{% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}
 

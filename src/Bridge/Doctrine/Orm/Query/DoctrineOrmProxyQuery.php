@@ -25,7 +25,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
      */
     public function __construct(
         private QueryBuilder $queryBuilder,
-        private array $hints,
+        private array $hints = [],
     ) {
     }
 

@@ -7,29 +7,39 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
-use Symfony\Component\OptionsResolver\Options;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAwareInterface
 {
     use ColumnFactoryAwareTrait;
 
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        $view->vars['children'] = [];
+        $children = [];
 
-        foreach ($view->vars['value'] ?? [] as $index => $data) {
+        foreach ($view->value ?? [] as $index => $data) {
             $child = $this->columnFactory->create(
-                $column->getName().'__'.($index + 1),
-                $options['entry_type'],
-                $options['entry_options'],
+                name: $column->getName().'__'.($index + 1),
+                type: $options['entry_type'],
+                options: $options['entry_options'] + [
+                    'property_path' => false,
+                ],
             );
 
-            $child->setData($data);
+            // Create a virtual row view for the child column.
+            $valueRowView = clone $view->parent;
+            $valueRowView->origin = $view->parent;
+            $valueRowView->index = $index;
+            $valueRowView->data = $data;
 
-            $view->vars['children'][] = $child->createView($view->parent);
+            $children[] = $child->createValueView($valueRowView);
         }
+
+        $view->vars = array_replace($view->vars, [
+            'separator' => $options['separator'],
+            'children' => $children,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -43,16 +53,9 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])
             ->setAllowedTypes('separator', ['null', 'string'])
-            ->setNormalizer('entry_options', function (Options $options, array $value): array {
-                return $value + ['property_path' => false];
-            })
-            ->setNormalizer('non_resolvable_options', function (Options $options, array $value): array {
-                if (!in_array('entry_options', $value)) {
-                    $value[] = 'entry_options';
-                }
-
-                return $value;
-            })
+            ->setInfo('entry_type', 'A fully-qualified class name of the column type to render each entry.')
+            ->setInfo('entry_options', 'An array of options passed to the column type.')
+            ->setInfo('separator', 'A string used to visually separate each entry.')
         ;
     }
 }

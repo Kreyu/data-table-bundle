@@ -3,17 +3,6 @@
 {# Tabler Theme #}
 {# @see https://tabler.io/ #}
 
-{% block stylesheets %}
-    {{ parent() }}
-
-    <style>
-        svg.sort-arrow {
-            width: 16px;
-            height: 16px;
-        }
-    </style>
-{% endblock %}
-
 {% block action_filter %}
     <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -41,21 +30,21 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
-            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
         </svg>
     </button>
 {% endblock %}
 
-{% block filter_clear_all_button %}
+{#{% block filter_clear_all_button %}
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
-    <a class="btn btn-icon btn-outline-danger mb-1"
+    <a class="btn btn-icon btn-outline-danger"
        href="{{- filter_clear_all_url(filtration_parameter_name, filters)|trim -}}"
        data-toggle="tooltip"
        data-placement="bottom"
        title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
     >
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M4 7l16 0"></path>
             <path d="M10 11l0 6"></path>
@@ -69,7 +58,7 @@
 {% block filter_clear_button %}
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
-    <a class="btn btn-outline-dark px-2 mb-1"
+    <a class="btn btn-outline-dark px-2"
        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
        data-toggle="tooltip"
        data-placement="bottom"
@@ -91,28 +80,18 @@
 
         <span class="mx-2" aria-hidden="true">&times;</span>
     </a>
-{% endblock %}
+{% endblock %}#}
 
 {% block sort_arrow_none %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-selector" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-        <path d="M8 9l4 -4l4 4"></path>
-        <path d="M16 15l-4 4l-4 -4"></path>
-    </svg>
+    <i class="ti ti-selector"></i>
 {% endblock %}
 
 {% block sort_arrow_asc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-up" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-        <path d="M6 15l6 -6l6 6"></path>
-    </svg>
+    <i class="ti ti-chevron-up"></i>
 {% endblock %}
 
 {% block sort_arrow_desc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-down" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-        <path d="M6 9l6 6l6 -6"></path>
-    </svg>
+    <i class="ti ti-chevron-down"></i>
 {% endblock %}
 
 {% block kreyu_data_table_column_boolean %}

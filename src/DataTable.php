@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
@@ -21,22 +21,32 @@ use Symfony\Component\Form\FormInterface;
 class DataTable implements DataTableInterface
 {
     /**
-     * Lazy-loaded form used to apply filtration criteria to the data table.
+     * The sorting data currently applied to the data table.
      */
-    private null|FormInterface $filtrationForm = null;
+    private ?SortingData $sortingData = null;
 
     /**
-     * Lazy-loaded form used to apply personalization criteria to the data table.
+     * The pagination data currently applied to the data table.
      */
-    private null|FormInterface $personalizationForm = null;
+    private ?PaginationData $paginationData = null;
 
     /**
-     * Lazy-loaded form used to apply export criteria to the export feature.
+     * The filtration data currently applied to the data table.
      */
-    private null|FormInterface $exportForm = null;
+    private ?FiltrationData $filtrationData = null;
 
     /**
-     * Lazy-loaded pagination used to retrieve results.
+     * The personalization data currently applied to the data table.
+     */
+    private ?PersonalizationData $personalizationData = null;
+
+    /**
+     * The export data currently applied to the data table.
+     */
+    private ?ExportData $exportData = null;
+
+    /**
+     * Lazy-loaded pagination used to retrieve the current page results.
      */
     private null|PaginationInterface $pagination = null;
 
@@ -74,6 +84,8 @@ class DataTable implements DataTableInterface
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
 
+        $this->paginationData = $data;
+
         $this->resetPagination();
     }
 
@@ -97,6 +109,8 @@ class DataTable implements DataTableInterface
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
 
+        $this->sortingData = $data;
+
         $this->resetPagination();
     }
 
@@ -106,13 +120,11 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $form = $this->getFiltrationForm();
-        $form->submit($data->toArray());
-
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $data->getFilter($filter->getName());
+            $filterData = $data->getFilterData($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
+                $filter->setData($filterData);
                 $filter->apply($this->query, $filterData);
             }
         }
@@ -129,6 +141,8 @@ class DataTable implements DataTableInterface
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
 
+        $this->filtrationData = $data;
+
         $this->resetPagination();
     }
 
@@ -137,8 +151,6 @@ class DataTable implements DataTableInterface
         if (!$this->config->isPersonalizationEnabled()) {
             return;
         }
-
-        $this->getPersonalizationForm()->setData($data);
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
@@ -151,11 +163,13 @@ class DataTable implements DataTableInterface
 
             $persistenceAdapter->write($this, $persistenceSubject, $data);
         }
+
+        $this->personalizationData = $data;
     }
 
     public function isExporting(): bool
     {
-        return $this->getExportForm()->isSubmitted();
+        return null !== $this->exportData;
     }
 
     public function export(ExportData $exportData = null): ExportFile
@@ -164,12 +178,13 @@ class DataTable implements DataTableInterface
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
-        /* @var ExportData $exportData */
-        $exportData ??= $this->getExportForm()->getData();
+        $exportData ??= $this->exportData;
 
         if (null === $exportData) {
             throw new \RuntimeException('Unable to export the data table without an export data. Explicitly pass the export data as the first argument of the "export()" method.');
         }
+
+        $this->exportData = $exportData;
 
         $dataTable = clone $this;
 
@@ -188,7 +203,7 @@ class DataTable implements DataTableInterface
 
     public function hasActiveFilters(): bool
     {
-        return (bool) $this->getFiltrationForm()->getData()?->hasActiveFilters();
+        return (bool) $this->filtrationData?->hasActiveFilters();
     }
 
     public function handleRequest(mixed $request): void
@@ -205,29 +220,35 @@ class DataTable implements DataTableInterface
         return $this->pagination ??= $this->query->getPagination();
     }
 
-    public function getFiltrationForm(): FormInterface
+    public function getSortingData(): ?SortingData
     {
-        return $this->filtrationForm ??= $this->buildFiltrationForm();
+        return $this->sortingData;
     }
 
-    public function getPersonalizationForm(): FormInterface
+    public function getPaginationData(): ?PaginationData
     {
-        return $this->personalizationForm ??= $this->buildPersonalizationForm();
+        return $this->paginationData;
     }
 
-    public function getExportForm(): FormInterface
+    public function getFiltrationData(): ?FiltrationData
     {
-        return $this->exportForm ??= $this->buildExportForm();
+        return $this->filtrationData;
+    }
+
+    public function getPersonalizationData(): ?PersonalizationData
+    {
+        return $this->personalizationData;
+    }
+
+    public function getExportData(): ?ExportData
+    {
+        return $this->exportData;
     }
 
     public function createView(): DataTableView
     {
         if (empty($this->config->getColumns())) {
             throw new \LogicException('The data table has no configured columns.');
-        }
-
-        if (!$this->getFiltrationForm()->isSubmitted()) {
-            $this->initializeFiltration();
         }
 
         $type = $this->config->getType();
@@ -238,47 +259,6 @@ class DataTable implements DataTableInterface
         $type->buildView($view, $this, $options);
 
         return $view;
-    }
-
-    private function buildFiltrationForm(): FormInterface
-    {
-        $formBuilder = $this->config->getFiltrationFormFactory()->createNamedBuilder(
-            name: $this->config->getFiltrationParameterName(),
-            type: FiltrationType::class,
-            options: [
-                'filters' => $this->config->getFilters(),
-            ],
-        );
-
-        return $formBuilder->getForm();
-    }
-
-    private function buildPersonalizationForm(): FormInterface
-    {
-        $formBuilder = $this->config->getPersonalizationFormFactory()->createNamedBuilder(
-            name: $this->config->getPersonalizationParameterName(),
-            type: PersonalizationDataType::class,
-            options: [
-                'method' => 'POST',
-            ],
-        );
-
-        return $formBuilder->getForm();
-    }
-
-    private function buildExportForm(): FormInterface
-    {
-        $formBuilder = $this->config->getExportFormFactory()->createNamedBuilder(
-            name: $this->config->getExportParameterName(),
-            type: ExportDataType::class,
-            options: [
-                'method' => 'POST',
-                'exporters' => $this->config->getExporters(),
-                'default_filename' => $this->getConfig()->getName(),
-            ],
-        );
-
-        return $formBuilder->getForm();
     }
 
     private function initializePagination(): void

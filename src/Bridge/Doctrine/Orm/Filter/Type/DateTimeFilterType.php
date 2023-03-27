@@ -55,7 +55,7 @@ class DateTimeFilterType extends AbstractFilterType
             ]);
         });
 
-        $resolver->setDefault('active_filter_formatter', function (FilterData $data, array $options): mixed {
+        $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): mixed {
             $value = $data->getValue();
 
             if ($value instanceof \DateTimeInterface) {

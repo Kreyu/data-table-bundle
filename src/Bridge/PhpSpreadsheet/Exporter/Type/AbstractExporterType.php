@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractType;
-use Kreyu\Bundle\DataTableBundle\HeadersRowView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -45,31 +47,27 @@ abstract class AbstractExporterType extends BaseAbstractType
         $worksheet = $spreadsheet->getActiveSheet();
 
         if ($options['use_headers']) {
-            /** @var HeadersRowView $headersRow */
-            $headersRow = $view->vars['headers_row'];
+            /** @var HeaderRowView $headerRow */
+            $headerRow = $view->vars['header_row'];
 
-            $columns = array_filter($headersRow->vars['columns'], function (ColumnView $view) {
+            $headers = array_filter($headerRow->vars['columns'], function (ColumnHeaderView $view) {
                 return false !== $view->vars['export'];
             });
 
             $this->appendRow(
                 $worksheet,
-                array_map(function (ColumnView $column) {
-                    return $column->vars['export']['label'];
-                }, $columns),
+                array_map(fn (ColumnHeaderView $view) => $view->vars['export']['label'], $headers),
             );
         }
 
-        foreach ($view->vars['values_rows'] as $valuesRow) {
-            $columns = array_filter($valuesRow->vars['columns'], function (ColumnView $view) {
+        foreach ($view->vars['value_rows'] as $valueRow) {
+            $values = array_filter($valueRow->vars['columns'], function (ColumnValueView $view) {
                 return false !== $view->vars['export'];
             });
 
             $this->appendRow(
                 $worksheet,
-                array_map(function (ColumnView $column) {
-                    return $column->vars['export']['value'];
-                }, $columns),
+                array_map(fn (ColumnValueView $view) => $view->vars['export']['value'], $values),
             );
         }
 

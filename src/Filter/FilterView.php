@@ -16,4 +16,21 @@ class FilterView
         public ?DataTableView $parent = null,
     ) {
     }
+
+    public function getFormName(): string
+    {
+        return $this->vars['form_name'];
+    }
+
+    public function getFormOptions(): array
+    {
+        return [
+            'label' => $this->vars['label'],
+            'translation_domain' => $this->vars['translation_domain'],
+            'field_type' => $this->vars['field_type'],
+            'field_options' => $this->vars['field_options'],
+            'operator_type' => $this->vars['operator_type'],
+            'operator_options' => $this->vars['operator_options'],
+        ];
+    }
 }

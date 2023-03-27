@@ -35,11 +35,15 @@ interface DataTableInterface
 
     public function getPagination(): PaginationInterface;
 
-    public function getFiltrationForm(): FormInterface;
+    public function getSortingData(): ?SortingData;
 
-    public function getPersonalizationForm(): FormInterface;
+    public function getPaginationData(): ?PaginationData;
 
-    public function getExportForm(): FormInterface;
+    public function getFiltrationData(): ?FiltrationData;
+
+    public function getPersonalizationData(): ?PersonalizationData;
+
+    public function getExportData(): ?ExportData;
 
     public function createView(): DataTableView;
 }

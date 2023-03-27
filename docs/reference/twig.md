@@ -38,13 +38,13 @@ Renders the HTML of the data table.
 
 Renders the HTML of the data table action bar, which includes filtration, exporting and personalization features.
 
-### `data_table_headers_row(headers_row_view, variables)`
+### `data_table_header_row(header_row_view, variables)`
 
-Renders the headers row of the data table.
+Renders the header row of the data table.
 
-### `data_table_values_row(values_row_view, variables)`
+### `data_table_value_row(value_row_view, variables)`
 
-Renders the values row of the data table.
+Renders the value row of the data table.
 
 ### `data_table_column_label(column_view, variables)`
 
@@ -107,8 +107,8 @@ The following variables are common to every data table type.
 | `filtration_form`                | Holds an instance of the filtration form view.                                                                                         |
 | `personalization_form`           | Holds an instance of the personalization form view.                                                                                    |
 | `export_form`                    | Holds an instance of the export form view.                                                                                             |
-| `headers_row`                    | Holds an instance of the headers row view.                                                                                             |
-| `values_rows`                    | List of value rows views.                                                                                                              |
+| `header_row`                     | Holds an instance of the header row view.                                                                                              |
+| `value_rows`                     | Holds a collection of the value rows views.                                                                                            |
 | `pagination`                     | Holds an instance of the pagination view.                                                                                              |
 | `has_active_filters`             | Contains information whether the data table has at least one filter active.                                                            |
 | `label_translation_domain`       | Contains a translation domain used to translate column & filter labels, unless specified manually on the column or filter              |

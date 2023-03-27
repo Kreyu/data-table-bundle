@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
@@ -38,8 +40,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
-
-        $dataTable->getExportForm()->handleRequest($request);
+        $this->export($dataTable, $request);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
@@ -94,16 +95,32 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $data = array_intersect_key(
-            $request->request->all($dataTable->getConfig()->getPersonalizationParameterName()),
-            ['columns' => true],
-        );
+        $parameterName = $dataTable->getConfig()->getPersonalizationParameterName();
+
+        $data = array_intersect_key($request->request->all($parameterName), ['columns' => true]);
 
         if (empty($data)) {
             return;
         }
 
         $dataTable->personalize(PersonalizationData::fromArray($data));
+    }
+
+    private function export(DataTableInterface $dataTable, Request $request): void
+    {
+        $parameterName = $dataTable->getConfig()->getExportParameterName();
+
+        $data = $request->request->all($parameterName);
+
+        if (empty($data)) {
+            return;
+        }
+
+        if (null !== $data['exporter'] ?? null) {
+            $data['exporter'] = $dataTable->getConfig()->getExporter($data['exporter']);
+        }
+
+        $dataTable->export(ExportData::fromArray($data));
     }
 
     private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed

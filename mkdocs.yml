@@ -37,6 +37,7 @@ nav:
       - 'Usage': 'getting-started/usage.md'
     - 'Philosophy':
       - 'Understanding the Types API': 'philosophy/understanding-types-api.md'
+      - 'Understanding the Views API': 'philosophy/understanding-views-api.md'
   - 'Reference':
     - 'Columns':
       - 'reference/columns/index.md'

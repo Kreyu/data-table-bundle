@@ -34,12 +34,12 @@ The type-specific options are defined in the `configureOptions()` method, using 
 ### Type inheritance
 
 Similar to the form types, the type inheritance should be handled using the `getParent()` method.
-For example, while a `NumericColumnType` technically extends the `TextColumnType`, it should **NOT** extend its class:
+For example, while a `PhoneColumnType` technically extends the `TextColumnType`, it should **NOT** extend its class:
 
 !!! failure "Do NOT use PHP class inheritance!"
 
     ```php
-    class NumericColumnType extends TextColumnType
+    class PhoneColumnType extends TextColumnType
     {
     }
     ```
@@ -49,7 +49,7 @@ Instead, it should return the FQCN of the parent type in the `getParent()` metho
 !!! success "Extend abstract type and use `getParent()` method instead!"
 
     ```php
-    class NumericColumnType implements AbstractColumnType
+    class PhoneColumnType implements AbstractColumnType
     {
         public function getParent(): string
         {
@@ -59,7 +59,7 @@ Instead, it should return the FQCN of the parent type in the `getParent()` metho
     ```
 
 The difference is about the extensions - considering the example above, while using the PHP inheritance, 
-a column type extensions that extend the `TextColumnType` won't be applied to the `NumericColumnType`.
+a column type extensions that extend the `TextColumnType` won't be applied to the `PhoneColumnType`.
 
 ## Type extension definition
 
@@ -79,18 +79,18 @@ which already implements the interface and provides some utilities.
 ### Type extension targets
 
 Each type extension class defines a list of types that it extends inside its static `getExtendedTypes()` method.
-For example, if you wish to create an extension that extends a `NumericColumnType`, consider following configuration:
+For example, if you wish to create an extension that extends a `PhoneColumnType`, consider following configuration:
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Column\Type\NumericColumnType;
+use App\DataTable\Column\Type\PhoneColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtension;
 
-class NumericColumnTypeExtension extends AbstractColumnTypeExtension
+class PhoneColumnTypeExtension extends AbstractColumnTypeExtension
 {
     public static function getExtendedTypes(): iterable
     {
-        return [NumericColumnType::class];
-    } 
+        return [PhoneColumnType::class];
+    }
 }
 ```
 

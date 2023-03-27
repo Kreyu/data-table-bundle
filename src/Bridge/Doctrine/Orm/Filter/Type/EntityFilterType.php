@@ -54,7 +54,7 @@ class EntityFilterType extends AbstractFilterType
             ]);
         });
 
-        $resolver->setDefault('active_filter_formatter', function (FilterData $data, array $options): mixed {
+        $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): mixed {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
             $choiceLabel = $options['field_options']['choice_label'];

@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\HeadersRowView;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
+use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
-use Kreyu\Bundle\DataTableBundle\ValuesRowView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,99 +28,144 @@ final class DataTableType implements DataTableTypeInterface
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->setPersonalizationEnabled($options['personalization_enabled'])
-            ->setPersonalizationPersistenceEnabled($options['personalization_persistence_enabled'])
-            ->setPersonalizationPersistenceAdapter($options['personalization_persistence_adapter'])
-            ->setPersonalizationPersistenceSubject($options['personalization_persistence_subject'])
-            ->setPersonalizationFormFactory($options['personalization_form_factory'])
-            ->setFiltrationEnabled($options['filtration_enabled'])
-            ->setFiltrationPersistenceEnabled($options['filtration_persistence_enabled'])
-            ->setFiltrationPersistenceAdapter($options['filtration_persistence_adapter'])
-            ->setFiltrationPersistenceSubject($options['filtration_persistence_subject'])
-            ->setFiltrationFormFactory($options['filtration_form_factory'])
-            ->setSortingEnabled($options['sorting_enabled'])
-            ->setSortingPersistenceEnabled($options['sorting_persistence_enabled'])
-            ->setSortingPersistenceAdapter($options['sorting_persistence_adapter'])
-            ->setSortingPersistenceSubject($options['sorting_persistence_subject'])
-            ->setPaginationEnabled($options['pagination_enabled'])
-            ->setPaginationPersistenceEnabled($options['pagination_persistence_enabled'])
-            ->setPaginationPersistenceAdapter($options['pagination_persistence_adapter'])
-            ->setPaginationPersistenceSubject($options['pagination_persistence_subject'])
-            ->setExportingEnabled($options['exporting_enabled'])
-            ->setRequestHandler($options['request_handler'])
-        ;
+        $setters = [
+            'column_factory' => $builder->setColumnFactory(...),
+            'filter_factory' => $builder->setFilterFactory(...),
+            'action_factory' => $builder->setActionFactory(...),
+            'exporter_factory' => $builder->setExporterFactory(...),
+            'personalization_enabled' => $builder->setPersonalizationEnabled(...),
+            'personalization_persistence_enabled' => $builder->setPersonalizationPersistenceEnabled(...),
+            'personalization_persistence_adapter' => $builder->setPersonalizationPersistenceAdapter(...),
+            'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubject(...),
+            'personalization_form_factory' => $builder->setPersonalizationFormFactory(...),
+            'filtration_enabled' => $builder->setFiltrationEnabled(...),
+            'filtration_persistence_enabled' => $builder->setFiltrationPersistenceEnabled(...),
+            'filtration_persistence_adapter' => $builder->setFiltrationPersistenceAdapter(...),
+            'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubject(...),
+            'filtration_form_factory' => $builder->setFiltrationFormFactory(...),
+            'sorting_enabled' => $builder->setSortingEnabled(...),
+            'sorting_persistence_enabled' => $builder->setSortingPersistenceEnabled(...),
+            'sorting_persistence_adapter' => $builder->setSortingPersistenceAdapter(...),
+            'sorting_persistence_subject' => $builder->setSortingPersistenceSubject(...),
+            'pagination_enabled' => $builder->setPaginationEnabled(...),
+            'pagination_persistence_enabled' => $builder->setPaginationPersistenceEnabled(...),
+            'pagination_persistence_adapter' => $builder->setPaginationPersistenceAdapter(...),
+            'pagination_persistence_subject' => $builder->setPaginationPersistenceSubject(...),
+            'exporting_enabled' => $builder->setExportingEnabled(...),
+            'exporting_form_factory' => $builder->setExportFormFactory(...),
+            'request_handler' => $builder->setRequestHandler(...),
+        ];
+
+        foreach ($setters as $option => $setter) {
+            if (null !== $value = $options[$option]) {
+                $setter($value);
+            }
+        }
+    }
+
+    private function createHeaderRowView(DataTableView $view, DataTableInterface $dataTable): HeaderRowView
+    {
+        $headerRowView = new HeaderRowView($view);
+        $headerRowView->vars['row'] = $headerRowView;
+
+        foreach ($dataTable->getConfig()->getColumns() as $column) {
+            $headerRowView->children[$column->getName()] = $column->createHeaderView($headerRowView);
+        }
+
+        return $headerRowView;
+    }
+
+    public function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        $valueRowsViews = [];
+
+        foreach ($dataTable->getPagination()->getItems() as $index => $data) {
+            $valueRowView = new ValueRowView($view, $index, $data);
+            $valueRowView->vars['row'] = $valueRowView;
+
+            foreach ($dataTable->getConfig()->getColumns() as $column) {
+                $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
+            }
+
+            $valueRowsViews[] = $valueRowView;
+        }
+
+        return $valueRowsViews;
     }
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $view->vars += [
+        $visibleColumns = $this->getVisibleColumns($dataTable);
+
+        $view->vars = array_replace($view->vars, [
             'name' => $dataTable->getConfig()->getName(),
-            'columns' => $this->getVisibleColumns($dataTable),
             'exporters' => $dataTable->getConfig()->getExporters(),
-            'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
-            'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
-            'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
+            'column_count' => count($visibleColumns),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
+            'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
+            'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
             'exporting_enabled' => $dataTable->getConfig()->isExportingEnabled(),
+            'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
             'page_parameter_name' => $dataTable->getConfig()->getPageParameterName(),
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
-            'filtration_form' => $dataTable->getFiltrationForm()->createView(),
-            'export_form' => $dataTable->getExportForm()->createView(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
-            'label_translation_domain' => $options['label_translation_domain'] ?? $dataTable->getConfig()->getName(),
-            'values_rows' => [],
-        ];
+            'filtration_data' => $dataTable->getFiltrationData(),
+            'translation_domain' => $options['translation_domain'],
+        ]);
+
+        $view->vars['header_row'] = $headerRow = $this->createHeaderRowView($view, $dataTable);
+        $view->vars['value_rows'] = $this->createValueRowsViews($view, $dataTable);
 
         $view->vars['actions'] = array_map(
             fn (ActionInterface $action) => $action->createView($view),
             $dataTable->getConfig()->getActions(),
         );
 
-        $view->vars['filters'] = array_map(
+        $view->vars['filters'] = $filters = array_map(
             fn (FilterInterface $filter) => $filter->createView($view),
             $dataTable->getConfig()->getFilters(),
         );
 
-        $view->vars['filtration_form'] = $this->getFiltrationFormView($view, $dataTable);
-        $view->vars['personalization_form'] = $this->getPersonalizationFormView($view, $dataTable);
-
-        foreach ($dataTable->getPagination()->getItems() as $rowIndex => $item) {
-            $view->vars['values_rows'][] = new ValuesRowView($view, $rowIndex, $item);
-        }
+        $view->vars['filtration_form'] = $this->createFiltrationFormView($filters, $dataTable);
+        $view->vars['export_form'] = $this->createExportFormView($dataTable);
+        $view->vars['personalization_form'] = $this->createPersonalizationFormView($headerRow->children, $dataTable);
 
         $view->vars['pagination'] = new PaginationView($view, $dataTable->getPagination());
-        $view->vars['headers_row'] = new HeadersRowView($view);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label_translation_domain' => null,
-            'personalization_enabled' => false,
-            'personalization_persistence_enabled' => false,
-            'personalization_persistence_adapter' => null,
-            'personalization_persistence_subject' => null,
-            'personalization_form_factory' => null,
-            'filtration_enabled' => false,
-            'filtration_persistence_enabled' => false,
+            'translation_domain' => null,
+            'column_factory' => null,
+            'action_factory' => null,
+            'request_handler' => null,
+            'sorting_enabled' => null,
+            'sorting_persistence_enabled' => null,
+            'sorting_persistence_adapter' => null,
+            'sorting_persistence_subject' => null,
+            'pagination_enabled' => null,
+            'pagination_persistence_enabled' => null,
+            'pagination_persistence_adapter' => null,
+            'pagination_persistence_subject' => null,
+            'filtration_enabled' => null,
+            'filtration_persistence_enabled' => null,
             'filtration_persistence_adapter' => null,
             'filtration_persistence_subject' => null,
             'filtration_form_factory' => null,
-            'sorting_enabled' => false,
-            'sorting_persistence_enabled' => false,
-            'sorting_persistence_adapter' => null,
-            'sorting_persistence_subject' => null,
-            'pagination_enabled' => false,
-            'pagination_persistence_enabled' => false,
-            'pagination_persistence_adapter' => null,
-            'pagination_persistence_subject' => null,
-            'exporting_enabled' => false,
-            'request_handler' => null,
+            'filter_factory' => null,
+            'personalization_enabled' => null,
+            'personalization_persistence_enabled' => null,
+            'personalization_persistence_adapter' => null,
+            'personalization_persistence_subject' => null,
+            'personalization_form_factory' => null,
+            'exporting_enabled' => null,
+            'exporting_form_factory' => null,
+            'exporter_factory' => null,
         ]);
     }
 
@@ -127,59 +179,80 @@ final class DataTableType implements DataTableTypeInterface
         return null;
     }
 
+    /**
+     * @return array<ColumnInterface>
+     */
     private function getVisibleColumns(DataTableInterface $dataTable): array
     {
         $columns = $dataTable->getConfig()->getColumns();
+        $personalizationData = $dataTable->getPersonalizationData();
 
-        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            $personalizationData = $dataTable->getPersonalizationForm()->getData();
-
-            if ($personalizationData instanceof PersonalizationData) {
-                $columns = $personalizationData->compute($columns);
-            }
+        if ($dataTable->getConfig()->isPersonalizationEnabled() && null !== $personalizationData) {
+            return $personalizationData->compute($columns);
         }
 
         return $columns;
     }
 
-    private function getPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
+    /**
+     * @param array<FilterView> $filters
+     */
+    private function createFiltrationFormView(array $filters, DataTableInterface $dataTable): FormView
     {
-        $formView = $dataTable->getPersonalizationForm()->createView();
+        $formFactory = $dataTable->getConfig()->getFiltrationFormFactory();
 
-        foreach ($formView->children['columns']->children as $index => $child) {
-            /** @var PersonalizationColumnData $personalizationColumnData */
-            $personalizationColumnData = $child->vars['value'];
+        $formBuilder = $formFactory->createNamedBuilder(
+            name: $dataTable->getConfig()->getFiltrationParameterName(),
+            type: FiltrationDataType::class,
+            options: [
+                'filters' => $filters,
+            ],
+        );
 
-            try {
-                $column = $dataTable->getConfig()->getColumn($personalizationColumnData->getName());
-            } catch (\InvalidArgumentException) {
-                // The column does not exist in the data table, therefore it shouldn't exist in personalization.
-                // This is useful in case a personalization data is persisted, and some column is deleted,
-                // which would throw an error instead of handling it gracefully.
-                unset($formView->children['columns']->children[$index]);
-                continue;
-            }
+        $form = $formBuilder->getForm();
+        $form->setData($dataTable->getFiltrationData());
 
-            $child->vars['column'] = $column->createView($view);
-        }
-
-        return $formView;
+        return $form->createView();
     }
 
-    private function getFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
+    /**
+     * @param array<ColumnHeaderView> $columns
+     */
+    private function createPersonalizationFormView(array $columns, DataTableInterface $dataTable): FormView
     {
-        $formView = $dataTable->getFiltrationForm()->createView();
+        $formFactory = $dataTable->getConfig()->getPersonalizationFormFactory();
 
-        foreach ($formView->children as $child) {
-            try {
-                $filter = $dataTable->getConfig()->getFilter($child->vars['name']);
-            } catch (\InvalidArgumentException) {
-                continue;
-            }
+        $formBuilder = $formFactory->createNamedBuilder(
+            name: $dataTable->getConfig()->getPersonalizationParameterName(),
+            type: PersonalizationDataType::class,
+            options: [
+                'columns' => $columns,
+            ],
+        );
 
-            $child->vars['filter'] = $filter->createView($view);
-        }
+        $form = $formBuilder->getForm();
+        $form->setData($dataTable->getPersonalizationData());
 
-        return $formView;
+        return $form->createView();
+    }
+
+    private function createExportFormView(DataTableInterface $dataTable): FormView
+    {
+        $formFactory = $dataTable->getConfig()->getExportFormFactory();
+
+        $formBuilder = $formFactory->createNamedBuilder(
+            name: $dataTable->getConfig()->getExportParameterName(),
+            type: ExportDataType::class,
+            options: [
+                'method' => 'POST',
+                'exporters' => $dataTable->getConfig()->getExporters(),
+                'default_filename' => $dataTable->getConfig()->getName(),
+            ],
+        );
+
+        $form = $formBuilder->getForm();
+        $form->setData($dataTable->getExportData());
+
+        return $form->createView();
     }
 }

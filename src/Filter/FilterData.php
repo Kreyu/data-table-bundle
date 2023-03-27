@@ -47,9 +47,19 @@ class FilterData
         return $this->operator;
     }
 
+    public function setOperator(mixed $operator): void
+    {
+        $this->operator = $operator;
+    }
+
     public function getValue(): mixed
     {
         return $this->value;
+    }
+
+    public function setValue(mixed $value): void
+    {
+        $this->value = $value;
     }
 
     public function hasValue(): bool

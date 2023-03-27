@@ -24,14 +24,26 @@ final class FilterType implements FilterTypeInterface
     {
         $resolver = clone $filter->getType()->getOptionsResolver();
 
-        $resolver
-            ->setDefaults([
-                'name' => $filter->getName(),
-                'label' => StringUtil::camelToSentence($filter->getName()),
-                'translation_domain' => $view->parent->vars['label_translation_domain'],
-                'query_path' => $filter->getName(),
-            ])
-        ;
+        $data = $filter->getData();
+        $value = null;
+
+        if ($data && $data->hasValue()) {
+            $value = $data->getValue();
+
+            if ($options['active_filter_formatter']) {
+                $value = $options['active_filter_formatter']($data, $filter, $options);
+            }
+        }
+
+        $resolver->setDefaults([
+            'name' => $filter->getName(),
+            'form_name' => $filter->getFormName(),
+            'label' => StringUtil::camelToSentence($filter->getName()),
+            'translation_domain' => $view->parent->vars['translation_domain'],
+            'query_path' => $filter->getName(),
+            'data' => $data,
+            'value' => $value,
+        ]);
 
         $options = $resolver->resolve(array_filter($options));
 

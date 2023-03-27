@@ -6,10 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
 class Column implements ColumnInterface
 {
-    private mixed $data = null;
+    private mixed $rowIndex = null;
+    private mixed $rowData = null;
 
     public function __construct(
         private string $name,
@@ -33,22 +36,56 @@ class Column implements ColumnInterface
         return $this->options;
     }
 
-    public function getData(): mixed
+    public function getRowIndex(): mixed
     {
-        return $this->data;
+        return $this->rowIndex;
     }
 
-    public function setData(mixed $data): void
+    public function setRowIndex(mixed $rowIndex): void
     {
-        $this->data = $data;
+        $this->rowIndex = $rowIndex;
     }
 
-    public function createView(DataTableView $parent = null): ColumnView
+    public function getRowData(): mixed
     {
-        $view = $this->type->createView($this, $parent);
+        return $this->rowData;
+    }
 
-        $this->type->buildView($view, $this, $this->options);
+    public function setRowData(mixed $rowData): void
+    {
+        $this->rowData = $rowData;
+    }
+
+    public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView
+    {
+        $view = $this->type->createHeaderView($this, $parent);
+
+        $this->type->buildHeaderView($view, $this, $this->options);
 
         return $view;
+    }
+
+    public function createValueView(ValueRowView $parent = null): ColumnValueView
+    {
+        $view = $this->type->createValueView($this, $parent);
+
+        $this->type->buildValueView($view, $this, $this->options);
+
+        return $view;
+    }
+
+    public function getBlockPrefixes(): array
+    {
+        $type = $this->getType();
+
+        $blockPrefixes = [
+            $type->getBlockPrefix(),
+        ];
+
+        while (null !== $type->getParent()) {
+            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
+        }
+
+        return $blockPrefixes;
     }
 }

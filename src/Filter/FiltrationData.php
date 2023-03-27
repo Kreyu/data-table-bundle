@@ -52,14 +52,14 @@ class FiltrationData
         );
     }
 
-    public function getFilters(): array
-    {
-        return $this->filters;
-    }
-
-    public function getFilter(string $name): ?FilterData
+    public function getFilterData(string $name): ?FilterData
     {
         return $this->filters[$name] ?? null;
+    }
+
+    public function setFilterData(string $name, FilterData $data): void
+    {
+        $this->filters[$name] = $data;
     }
 
     public function hasActiveFilters(): bool

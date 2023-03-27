@@ -4,29 +4,89 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatableMessage;
-use function Symfony\Component\String\u;
 
 final class ColumnType implements ColumnTypeInterface
 {
-    public const DEFAULT_BLOCK_PREFIX = 'kreyu_data_table_column_';
-
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
-        // Put the data table view as the option.
-        // Thanks to that, it can be accessed in the templates if needed.
-        $options['data_table'] = $view->parent;
+        if (true === $sort = $options['sort']) {
+            $sort = $column->getName();
+        }
 
-        $options = array_merge($options, $this->resolveDefaultOptions($view, $column, $options));
+        $view->vars = array_replace($view->vars, [
+            'column' => $view,
+            'row' => $view->parent,
+            'data_table' => $view->parent->parent,
+            'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
+            'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
+            'translation_parameters' => $options['header_translation_parameters'],
+            'translation_domain' => $options['header_translation_domain'] ?? $view->parent->vars['translation_domain'] ?? null,
+            'attr' => $options['header_attr'],
+            'sort' => $sort,
+            'export' => false,
+        ]);
 
-        $view->vars = array_merge($view->vars, $options);
+        if (true === $export = $options['export']) {
+            $export = [];
+        }
+
+        if (false !== $export) {
+            $export = array_merge([
+                'label' => $export['label'] ?? $view->vars['label'],
+                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'] ?? null,
+            ], $export);
+        }
+
+        $view->vars['export'] = $export;
+    }
+
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        $rowData = $view->parent->data;
+
+        $normData = $this->getNormDataFromRowData($rowData, $column, $options);
+        $viewData = $this->getViewDataFromNormData($normData, $column, $options);
+
+        $view->data = $normData;
+        $view->value = $viewData;
+
+        $view->vars = array_replace($view->vars, [
+            'row' => $view->parent,
+            'data_table' => $view->parent->parent,
+            'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
+            'data' => $normData,
+            'value' => $viewData,
+            'translation_domain' => $options['value_translation_domain'] ?? $view->parent->vars['translation_domain'] ?? null,
+            'translation_parameters' => $options['value_translation_parameters'] ?? [],
+            'attr' => $options['value_attr'],
+        ]);
+
+        if (true === $export = $options['export']) {
+            $export = [];
+        }
+
+        if (false !== $export) {
+            $normData = $this->getNormDataFromRowData($rowData, $column, $export);
+            $viewData = $this->getViewDataFromNormData($normData, $column, $export);
+
+            $export = array_merge([
+                'data' => $normData,
+                'value' => $viewData,
+                'label' => $export['label'] ?? $view->vars['label'],
+                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'],
+            ], $export);
+        }
+
+        $view->vars['export'] = $export;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -34,14 +94,17 @@ final class ColumnType implements ColumnTypeInterface
         $resolver
             ->setDefaults([
                 'label' => null,
+                'label_translation_domain' => null,
                 'label_translation_parameters' => [],
-                'translation_domain' => null,
+                'header_translation_domain' => null,
+                'header_translation_parameters' => [],
+                'value_translation_domain' => false,
+                'value_translation_parameters' => [],
                 'block_name' => null,
                 'block_prefix' => null,
                 'sort' => false,
-                'export' => true,
+                'export' => false,
                 'formatter' => null,
-                'non_resolvable_options' => [],
                 'property_path' => null,
                 'property_accessor' => PropertyAccess::createPropertyAccessor(),
                 'getter' => null,
@@ -49,19 +112,39 @@ final class ColumnType implements ColumnTypeInterface
                 'value_attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_parameters', ['array', \Closure::class])
-            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('label_translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('label_translation_parameters', ['null', 'array'])
+            ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
+            ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('value_translation_parameters', ['array'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('export', ['bool', 'array'])
-            ->setAllowedTypes('formatter', ['null', \Closure::class])
-            ->setAllowedTypes('non_resolvable_options', ['string[]'])
+            ->setAllowedTypes('formatter', ['null', 'callable'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
-            ->setAllowedTypes('getter', ['null', \Closure::class])
+            ->setAllowedTypes('getter', ['null', 'callable'])
             ->setAllowedTypes('header_attr', ['array'])
             ->setAllowedTypes('value_attr', ['array'])
+            ->setInfo('label', 'A label displayed on the column header.')
+            ->setInfo('label_translation_domain', 'Translation domain used to translate the column label.')
+            ->setInfo('label_translation_parameters', 'Parameters used within the column label translation.')
+            ->setInfo('header_translation_domain', 'Translation domain used to translate the column header.')
+            ->setInfo('header_translation_parameters', 'Parameters used within the column header translation.')
+            ->setInfo('value_translation_domain', 'Translation domain used to translate the column value.')
+            ->setInfo('value_translation_parameters', 'Parameters used within the column value translation.')
+            ->setInfo('block_name', 'Name of the block that renders the column.')
+            ->setInfo('block_prefix', 'A custom prefix of the block name that renders the column.')
+            ->setInfo('sort', 'Determines whether the column can be sorted (and optionally on what path).')
+            ->setInfo('export', 'Determines whether the column can be exported (and optionally with custom options).')
+            ->setInfo('formatter', 'A formatter used to format the column norm data to the view data.')
+            ->setInfo('property_path', 'Property path used to retrieve the column norm data from the row data.')
+            ->setInfo('property_accessor', 'An instance of property accessor used to retrieve column norm data from the row data.')
+            ->setInfo('getter', 'A callable data accessor used to retrieve column norm data from the row data manually, instead of property accessor.')
+            ->setInfo('header_attr', 'An array of attributes (e.g. HTML attributes) passed to the header view.')
+            ->setInfo('value_attr', 'An array of attributes (e.g. HTML attributes) passed to the column value view.')
         ;
     }
 
@@ -76,140 +159,71 @@ final class ColumnType implements ColumnTypeInterface
     }
 
     /**
-     * Resolve the callable options, by calling each one, passing as the arguments
-     * the column value, an instance of the column object, and a whole options array.
-     */
-    private function resolveCallableOptions(array $resolvableOptions, ColumnInterface $column, array $options): array
-    {
-        foreach ($resolvableOptions as $key => $option) {
-            if (is_array($option)) {
-                $option = $this->resolveCallableOptions($option, $column, $options);
-            }
-
-            if ($option instanceof \Closure) {
-                $option = $option($options['value'], $options['data'], $column, $options);
-            }
-
-            $resolvableOptions[$key] = $option;
-        }
-
-        return $resolvableOptions;
-    }
-
-    /**
-     * Resolve default values of the options, based on the column view and column object.
-     * This is the place where, for example, the label can be defaulted to the column name.
-     */
-    private function resolveDefaultOptions(ColumnView $view, ColumnInterface $column, array $options): array
-    {
-        // Put the column data as the "data" option.
-        // This way, it can be referenced later if needed.
-        $options['data'] = $column->getData();
-
-        // If the label is not given, then it should be replaced with a column name.
-        // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
-        $options['label'] ??= StringUtil::camelToSentence($column->getName());
-
-        // If the translation domain is not given, then it should be inherited
-        // from the parent data table view "label_translation_domain" option.
-        $options['translation_domain'] ??= $view->parent->vars['label_translation_domain'] ?? false;
-
-        // If the property path is not given, then the column name should be used.
-        // Thanks to that, similar to "label" option, the boilerplate code is reduced.
-        $options['property_path'] ??= $column->getName();
-
-        // If the block prefix or name is not specified, then the values
-        // should be inherited from the column type.
-        $options['block_prefix'] ??= $column->getType()->getBlockPrefix();
-        $options['block_name'] ??= self::DEFAULT_BLOCK_PREFIX.$options['block_prefix'];
-
-        // Because by default, the sorting feature is disabled, the user can enable it
-        // by setting the "sort" option to either sort field path, or just a true.
-        // Setting the value to true means the column name should be used as the sort field path.
-        if (true === $options['sort']) {
-            $options['sort'] = $column->getName();
-        }
-
-        // Because the user can provide callable options, every single one of those
-        // should be called with resolved column value, whole column for reference and an array of options.
-        if (null !== $options['data']) {
-            // Resolve the "value" option.
-            $options['value'] = $this->resolveValueOption($column, $options);
-
-            // Because every callable option is resolved by default, a way to exclude
-            // some options from this process may be necessary - a "non_resolvable_option" option,
-            // just in case if the user actually expects the option to be a callable.
-            $resolvableOptions = array_diff_key($options, array_flip($options['non_resolvable_options']) + [
-                'formatter' => true,
-                'getter' => true,
-                'export' => true,
-            ]);
-
-            // Because "value" options are getting resolved earlier only if the column data is present,
-            // they have to get excluded from the latter resolving whatsoever.
-            unset($resolvableOptions['value']);
-
-            if (isset($resolvableOptions['export']['value'])) {
-                unset($resolvableOptions['export']['value']);
-            }
-
-            // Resolve the callable options, passing the value, column and options.
-            // Note: the options passed to the callables are not resolved yet!
-            $resolvedOptions = $this->resolveCallableOptions($resolvableOptions, $column, $options);
-
-            $options = array_merge($options, $resolvedOptions);
-        }
-
-        // The "export" option has to inherit options from the column.
-        if (false !== ($options['export'] ?? false)) {
-            // Exclude the "export" option, as it's irrelevant to the export options whatsoever.
-            $inheritedExportOptions = array_diff_key($options, ['export' => true]);
-
-            if (true === $options['export']) {
-                $options['export'] = $inheritedExportOptions;
-            }
-
-            // Provided export options should be filled with inherited column options.
-            // Merging it this way, allows user to override only some export options.
-            $inheritedExportOptions = array_merge($inheritedExportOptions, $options['export']);
-
-            $options['export'] = $this->resolveDefaultOptions($view, $column, $inheritedExportOptions);
-        }
-
-        // Apply the formatter at the end of the process.
-        if (null !== $options['data'] && is_callable($options['formatter'])) {
-            $options['value'] = $options['formatter']($options['value']);
-        }
-
-        return $options;
-    }
-
-    /**
-     * Resolve the "value" option, by either using "getter" option,
-     * a property accessor, or falling back to the unmodified column data.
+     * Retrieves the column norm data from the row data by either:
      *
-     * @param array{
-     *     getter: null|callable,
-     *     property_path: string,
-     *     property_accessor: PropertyAccessorInterface
-     * } $options
+     * - using the "getter" option;
+     * - using the property accessor with the "property_path" option;
+     * - falling back to the unmodified column data;
      */
-    private function resolveValueOption(ColumnInterface $column, array $options): mixed
+    private function getNormDataFromRowData(mixed $data, ColumnInterface $column, array $options): mixed
     {
-        $data = $column->getData();
+        if (null === $data) {
+            return null;
+        }
 
-        // Use getter to manually retrieve the value from the column data.
         if (is_callable($getter = $options['getter'])) {
             return $getter($data, $column, $options);
         }
 
-        // Use property accessor to retrieve the value from the column data on the configured property path.
-        // Note: property accessor only supports array and object values!
-        if (is_string($propertyPath = $options['property_path']) && (is_array($data) || is_object($data))) {
+        $propertyPath = $options['property_path'] ?? $column->getName();
+
+        if (is_string($propertyPath) && (is_array($data) || is_object($data))) {
             return $options['property_accessor']->getValue($data, $propertyPath);
         }
 
-        // Fallback to the unmodified column data.
         return $data;
+    }
+
+    /**
+     * Retrieves the column view data from the norm data by applying the formatter if given.
+     */
+    private function getViewDataFromNormData(mixed $data, ColumnInterface $column, array $options): mixed
+    {
+        if (null === $data) {
+            return null;
+        }
+
+        if (is_callable($formatter = $options['formatter'])) {
+            $data = $formatter($data, $column, $options);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Retrieves the column block prefixes, respecting the type hierarchy.
+     *
+     * For example, take a look at the NumberColumnType. It is based on the TextColumnType,
+     * which is based on the ColumnType, therefore its block prefixes are: ["number", "text", "column"].
+     *
+     * @return array<string>
+     */
+    private function getColumnBlockPrefixes(ColumnInterface $column, array $options): array
+    {
+        $type = $column->getType();
+
+        $blockPrefixes = [
+            $type->getBlockPrefix(),
+        ];
+
+        while (null !== $type->getParent()) {
+            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
+        }
+
+        if ($blockPrefix = $options['block_prefix']) {
+            array_unshift($blockPrefixes, $blockPrefix);
+        }
+
+        return array_unique($blockPrefixes);
     }
 }

@@ -251,13 +251,15 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this->type;
     }
 
-    public function setType(ResolvedDataTableTypeInterface $type): void
+    public function setType(ResolvedDataTableTypeInterface $type): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
 
         $this->type = $type;
+
+        return $this;
     }
 
     public function getQuery(): ?ProxyQueryInterface

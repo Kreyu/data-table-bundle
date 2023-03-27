@@ -30,15 +30,15 @@ final class ActionType implements ActionTypeInterface
         $resolver
             ->setDefaults([
                 'label' => null,
-                'label_translation_parameters' => [],
                 'translation_domain' => null,
+                'translation_parameters' => [],
                 'block_name' => null,
                 'block_prefix' => null,
                 'attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_parameters', ['array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('translation_parameters', ['array'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('attr', ['array'])

@@ -237,6 +237,8 @@ class DataTable implements DataTableInterface
 
     public function getPersonalizationData(): ?PersonalizationData
     {
+        $this->personalizationData?->appendMissingColumns($this->getConfig()->getColumns());
+
         return $this->personalizationData;
     }
 

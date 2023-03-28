@@ -22,9 +22,8 @@ class ActionsColumnType extends AbstractColumnType
 
         foreach ($options['actions'] as $name => $actionOptions) {
             $action = $this->actionFactory->create($name, $actionOptions['type'], $actionOptions['type_options']);
-            $action->setData($column->getRowData());
 
-            $actions[$name] = $action->createView();
+            $actions[$name] = $action->createView($view);
         }
 
         $view->vars['actions'] = $actions;

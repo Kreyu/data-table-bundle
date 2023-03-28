@@ -124,5 +124,9 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
 
+    public function setHeaderRowAttributes(array $headerRowAttributes): static;
+
+    public function setValueRowAttributes(array $valueRowAttributes): static;
+
     public function getDataTableConfig(): DataTableConfigInterface;
 }

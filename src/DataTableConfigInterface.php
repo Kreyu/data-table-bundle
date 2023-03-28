@@ -130,6 +130,10 @@ interface DataTableConfigInterface
 
     public function getRequestHandler(): ?RequestHandlerInterface;
 
+    public function getHeaderRowAttributes(): array;
+
+    public function getValueRowAttributes(): array;
+
     public function getPageParameterName(): string;
 
     public function getPerPageParameterName(): string;

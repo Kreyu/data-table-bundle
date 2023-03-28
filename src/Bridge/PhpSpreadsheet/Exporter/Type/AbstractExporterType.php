@@ -50,7 +50,7 @@ abstract class AbstractExporterType extends BaseAbstractType
             /** @var HeaderRowView $headerRow */
             $headerRow = $view->vars['header_row'];
 
-            $headers = array_filter($headerRow->vars['columns'], function (ColumnHeaderView $view) {
+            $headers = array_filter($headerRow->children, function (ColumnHeaderView $view) {
                 return false !== $view->vars['export'];
             });
 
@@ -61,7 +61,7 @@ abstract class AbstractExporterType extends BaseAbstractType
         }
 
         foreach ($view->vars['value_rows'] as $valueRow) {
-            $values = array_filter($valueRow->vars['columns'], function (ColumnValueView $view) {
+            $values = array_filter($valueRow->children, function (ColumnValueView $view) {
                 return false !== $view->vars['export'];
             });
 

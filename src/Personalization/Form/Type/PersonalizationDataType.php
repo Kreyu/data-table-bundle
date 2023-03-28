@@ -27,7 +27,6 @@ class PersonalizationDataType extends AbstractType
         foreach ($view['columns'] as $name => $columnView) {
             if (!array_key_exists($name, $options['columns'])) {
                 unset($view['columns'][$name]);
-                $form->remove($name);
                 continue;
             }
 

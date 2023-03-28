@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block table_head_row %}
-    <tr>{{ data_table_header_row(header_row) }}</tr>
+    {{ data_table_header_row(header_row) }}
 {% endblock %}
 
 {% block table_body %}
@@ -61,13 +61,13 @@
 
 {% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr>{{ data_table_value_row(value_row) }}</tr>
+        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
     {% endfor %}
 {% endblock %}
 
 {% block table_body_row_no_results %}
-    <tr {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %} colspan="{{ column_count }}">
-        {{ 'No results'|trans({}, 'KreyuDataTable') }}
+    <tr>
+        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{ 'No results'|trans({}, 'KreyuDataTable') }}</td>
     </tr>
 {% endblock %}
 
@@ -76,7 +76,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_header_row %}
-    <tr>
+    <tr {% with { attr: row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
         {% for column_header in row %}
             {{- data_table_column_header(column_header) -}}
         {% endfor %}
@@ -100,11 +100,15 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_header %}
-    <th {{- block('attributes') -}}>{{ block(block_name, theme) }}</th>
+    {{ block(block_name, theme) }}
 {% endblock %}
 
 {% block kreyu_data_table_column_value %}
     {{ block(block_name, theme) }}
+{% endblock %}
+
+{% block kreyu_data_table_action %}
+    {{- block(block_name, theme) -}}
 {% endblock %}
 
 {% block kreyu_data_table_pagination %}
@@ -150,11 +154,9 @@
         {{ form_start(form) }}
             <table>
                 <tbody>
-                    {% for child in form.children %}
+                    {% for child in form %}
                         <tr>
-                            <td>
-                                {{ form_row(child) }}
-                            </td>
+                            <td>{{ form_row(child) }}</td>
                         </tr>
                     {% endfor %}
 
@@ -171,47 +173,49 @@
 
 {# Column type header templates #}
 
+{% block column_header %}
+    <th {{ block('attributes') }}>
+        {% if data_table.vars.sorting_enabled and sort %}
+            {% set query_parameters = app.request.query.all() %}
+
+            {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
+
+            {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
+            {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
+
+            {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
+
+            {% set attr = {
+                href: path(app.request.get('_route'), app.request.query.all|merge({
+                    (sort_parameter_name ~ '[field]'): sort,
+                    (sort_parameter_name ~ '[direction]'): opposite_sort_direction
+                }))
+            }|merge(attr|default({})) %}
+
+            <a {% with { attr: label_attr|default({})|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+                {{- block('column_header_label', theme, _context) -}}
+
+                {% if sort == current_sort_field %}
+                    {% if current_sort_direction == 'asc' %}
+                        {{ block('sort_arrow_asc', theme, _context) }}
+                    {% else %}
+                        {{ block('sort_arrow_desc', theme, _context) }}
+                    {% endif %}
+                {% else %}
+                    {{ block('sort_arrow_none', theme, _context) }}
+                {% endif %}
+            </a>
+        {% else %}
+            <span {% with { attr: label_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{- block('column_header_label', theme, _context) -}}</span>
+        {% endif %}
+    </th>
+{% endblock %}
+
 {% block column_header_label %}
     {% if translation_domain is not same as false %}
         <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
     {% else %}
         <span>{{- label -}}</span>
-    {% endif %}
-{% endblock %}
-
-{% block column_header %}
-    {% if data_table.vars.sorting_enabled and sort %}
-        {% set query_parameters = app.request.query.all() %}
-
-        {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
-
-        {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
-        {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
-
-        {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
-
-        {% set attr = {
-            href: path(app.request.get('_route'), app.request.query.all|merge({
-                (sort_parameter_name ~ '[field]'): sort,
-                (sort_parameter_name ~ '[direction]'): opposite_sort_direction
-            }))
-        }|merge(attr|default({})) %}
-
-        <a {{- block('attributes') -}}>
-            {{- block('column_header_label', theme, _context) -}}
-
-            {% if sort == current_sort_field %}
-                {% if current_sort_direction == 'asc' %}
-                    {{ block('sort_arrow_asc', theme, _context) }}
-                {% else %}
-                    {{ block('sort_arrow_desc', theme, _context) }}
-                {% endif %}
-            {% else %}
-                {{ block('sort_arrow_none', theme, _context) }}
-            {% endif %}
-        </a>
-    {% else %}
-        <span {{- block('attributes') -}}>{{- block('column_header_label', theme, _context) -}}</span>
     {% endif %}
 {% endblock %}
 
@@ -286,45 +290,30 @@
     {{ form_widget(form) }}
 {% endblock %}
 
-{% block kreyu_data_table_column_actions_single %}
-    {{ data_table_action(action) }}
+{# Action type templates #}
+
+{% block action_value %}
+    {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 
-{% block kreyu_data_table_action %}
-    {% if block(block_name, theme) is defined %}
-        {{- block(block_name, theme) -}}
-    {% endif %}
-{% endblock %}
-
-{% block kreyu_data_table_action_link %}
-    {% set attr = { href, target }|merge(attr|default({})) %}
-
-    <a {{- block('attributes') -}}>
-        {{- label|trans(translation_parameters, translation_domain) -}}
-        {% if display_icon %}{{ icon|default('⤷') }}{% endif %}
-    </a>
-{% endblock %}
-
-{% block kreyu_data_table_action_button %}
+{% block action_link_value %}
     <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {% if icon_attr %}<i {% with { attr: icon_attr } %}{{- block('attributes') -}}{% endwith %}></i>{% endif %}
-        {{- label|trans(translation_parameters, translation_domain) -}}
+        {{- block('action_value') -}}
     </a>
 {% endblock %}
 
-{% block kreyu_data_table_action_form %}
-    {% set non_standard_method = false %}
+{% block action_button_value %}
+    <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+        {{- block('action_value') -}}
+    </a>
+{% endblock %}
 
-    {% if method|upper not in ['GET', 'POST'] %}
-        {% set non_standard_method = method %}
-        {% set method = 'POST' %}
-    {% endif %}
+{% block action_form_value %}
+    <form {% with { attr: { action, method: html_friendly_method }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+        <input type="hidden" name="_method" value="{{ method }}"/>
 
-    <form {% with { attr: { action, method }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {% if non_standard_method %}<input type="hidden" name="_method" value="{{ non_standard_method }}"/>{% endif %}
         <button {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
-            {% if icon_attr %}<i {% with { attr: icon_attr } %}{{- block('attributes') -}}{% endwith %}></i>{% endif %}
-            {{- label|trans(translation_parameters, translation_domain) -}}
+            {{- block('action_value') -}}
         </button>
     </form>
 {% endblock %}

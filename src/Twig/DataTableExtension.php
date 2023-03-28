@@ -150,7 +150,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_column_header',
-            context: $this->getDecoratedColumnViewContext($environment, $view, $variables, 'header'),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'header'),
         );
     }
 
@@ -162,7 +162,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_column_value',
-            context: $this->getDecoratedColumnViewContext($environment, $view, $variables, 'value'),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'value'),
         );
     }
 
@@ -174,7 +174,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_action',
-            context: array_merge($view->vars, $variables),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'value'),
         );
     }
 
@@ -269,13 +269,13 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    private function getDecoratedColumnViewContext(Environment $environment, ColumnHeaderView|ColumnValueView $view, array $variables, string $suffix): array
+    private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array
     {
         $context = array_merge($view->vars, $variables);
-        $context['block_name'] = 'column_' . $suffix;
+        $context['block_name'] = $prefix . '_' . $suffix;
 
         foreach ($view->vars['block_prefixes'] as $blockPrefix) {
-            $blockName = 'column_' . $blockPrefix . '_' . $suffix;
+            $blockName = $prefix . '_' . $blockPrefix . '_' . $suffix;
 
             foreach ($this->themes as $theme) {
                 $wrapper = $environment->load($theme);

@@ -60,6 +60,18 @@ class PersonalizationData
     }
 
     /**
+     * @param array<ColumnInterface> $columns
+     */
+    public function appendMissingColumns(array $columns, bool $visible = false): void
+    {
+        foreach ($columns as $column) {
+            if (null === $this->getColumn($column)) {
+                $this->appendColumn($column, $visible);
+            }
+        }
+    }
+
+    /**
      * Computes given set of {@see ColumnInterface}, ordering it and excluding hidden ones.
      *
      * @param array<ColumnInterface> $columns
@@ -144,5 +156,22 @@ class PersonalizationData
         }
 
         return $this->columns[$column] ?? null;
+    }
+
+    private function appendColumn(string|ColumnInterface $column, bool $visible): void
+    {
+        $columnsOrders = array_map(fn (PersonalizationColumnData $column) => $column->getOrder(), $this->columns);
+
+        $columnOrder = 0;
+
+        if (!empty($columnsOrders)) {
+            $columnOrder = max($columnsOrders) + 1;
+        }
+
+        $this->columns[$column->getName()] = PersonalizationColumnData::fromColumn(
+            column: $column,
+            order: $columnOrder,
+            visible: $visible,
+        );
     }
 }

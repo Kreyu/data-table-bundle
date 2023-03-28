@@ -11,9 +11,6 @@ use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
 class Column implements ColumnInterface
 {
-    private mixed $rowIndex = null;
-    private mixed $rowData = null;
-
     public function __construct(
         private string $name,
         private ResolvedColumnTypeInterface $type,
@@ -36,26 +33,6 @@ class Column implements ColumnInterface
         return $this->options;
     }
 
-    public function getRowIndex(): mixed
-    {
-        return $this->rowIndex;
-    }
-
-    public function setRowIndex(mixed $rowIndex): void
-    {
-        $this->rowIndex = $rowIndex;
-    }
-
-    public function getRowData(): mixed
-    {
-        return $this->rowData;
-    }
-
-    public function setRowData(mixed $rowData): void
-    {
-        $this->rowData = $rowData;
-    }
-
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView
     {
         $view = $this->type->createHeaderView($this, $parent);
@@ -72,20 +49,5 @@ class Column implements ColumnInterface
         $this->type->buildValueView($view, $this, $this->options);
 
         return $view;
-    }
-
-    public function getBlockPrefixes(): array
-    {
-        $type = $this->getType();
-
-        $blockPrefixes = [
-            $type->getBlockPrefix(),
-        ];
-
-        while (null !== $type->getParent()) {
-            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
-        }
-
-        return $blockPrefixes;
     }
 }

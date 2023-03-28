@@ -6,23 +6,29 @@ namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
 final class ActionType implements ActionTypeInterface
 {
-    public const DEFAULT_BLOCK_PREFIX = 'kreyu_data_table_action_';
-
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        // Put the data table view as the option.
-        // Thanks to that, it can be accessed in the templates if needed.
-        $options['data_table'] = $view->parent;
+        if ($view->parent instanceof DataTableView) {
+            $dataTable = $view->parent;
+        } else {
+            $dataTable = $view->parent->parent->parent;
+        }
 
-        $options = array_merge($options, $this->resolveDefaultOptions($view, $action, $options));
-
-        $view->vars = array_merge($view->vars, $options);
+        $view->vars = array_replace($view->vars, [
+            'data_table' => $dataTable,
+            'block_prefixes' => $this->getActionBlockPrefixes($action, $options),
+            'label' => $options['label'] ?? StringUtil::camelToSentence($action->getName()),
+            'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
+            'translation_parameters' => $options['translation_parameters'],
+            'attr' => $options['attr'],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -32,14 +38,12 @@ final class ActionType implements ActionTypeInterface
                 'label' => null,
                 'translation_domain' => null,
                 'translation_parameters' => [],
-                'block_name' => null,
                 'block_prefix' => null,
                 'attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableMessage::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('translation_parameters', ['array'])
-            ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('attr', ['array'])
         ;
@@ -56,59 +60,29 @@ final class ActionType implements ActionTypeInterface
     }
 
     /**
-     * Resolve default values of the options, based on the action view and action object.
-     * This is the place where, for example, the label can be defaulted to the action name.
+     * Retrieves the action block prefixes, respecting the type hierarchy.
+     *
+     * For example, take a look at the ButtonActionType. It is based on the ActionType,
+     * therefore its block prefixes are: ["button", "action"].
+     *
+     * @return array<string>
      */
-    private function resolveDefaultOptions(ActionView $view, ActionInterface $action, array $options): array
+    private function getActionBlockPrefixes(ActionInterface $action, array $options): array
     {
-        // Put the action data as the "data" option.
-        // This way, it can be referenced later if needed.
-        $options['data'] = $action->getData();
+        $type = $action->getType();
 
-        // If the label is not given, then it should be replaced with an action name.
-        // Thanks to that, the boilerplate code is reduced, and the labels work as expected.
-        $options['label'] ??= StringUtil::camelToSentence($action->getName());
+        $blockPrefixes = [
+            $type->getBlockPrefix(),
+        ];
 
-        // If the translation domain is not given, then it should be inherited
-        // from the parent data table view "label_translation_domain" option.
-        $options['translation_domain'] ??= $view->parent->vars['label_translation_domain'] ?? false;
-
-        // If the block prefix or name is not specified, then the values
-        // should be inherited from the action type.
-        $options['block_prefix'] ??= $action->getType()->getBlockPrefix();
-        $options['block_name'] ??= self::DEFAULT_BLOCK_PREFIX.$options['block_prefix'];
-
-        // Because the user can provide callable options, every single one of those
-        // should be called with resolved action value, whole action for reference and an array of options.
-        if (null !== $options['data']) {
-            // Resolve the callable options, passing the value, action and options.
-            // Note: the options passed to the callables are not resolved yet!
-            $resolvedOptions = $this->resolveCallableOptions($options, $action);
-
-            $options = array_merge($options, $resolvedOptions);
+        while (null !== $type->getParent()) {
+            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
         }
 
-        return $options;
-    }
-
-    /**
-     * Resolve the callable options, by calling each one, passing as the arguments
-     * the action data, an instance of the action object, and a whole options array.
-     */
-    private function resolveCallableOptions(array $options, ActionInterface $action): array
-    {
-        foreach ($options as $key => $option) {
-            if (is_array($option)) {
-                $option = $this->resolveCallableOptions($option, $action);
-            }
-
-            if ($option instanceof \Closure) {
-                $option = $option($action->getData(), $action, $options);
-            }
-
-            $options[$key] = $option;
+        if ($blockPrefix = $options['block_prefix']) {
+            array_unshift($blockPrefixes, $blockPrefix);
         }
 
-        return $options;
+        return array_unique($blockPrefixes);
     }
 }

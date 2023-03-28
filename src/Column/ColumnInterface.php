@@ -17,10 +17,6 @@ interface ColumnInterface
 
     public function getOptions(): array;
 
-    public function getRowData(): mixed;
-
-    public function setRowData(mixed $rowData): void;
-
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
 
     public function createValueView(ValueRowView $parent = null): ColumnValueView;

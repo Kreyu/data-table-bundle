@@ -9,7 +9,9 @@ use Traversable;
 
 class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    public array $vars = [];
+    public array $vars = [
+        'attr' => [],
+    ];
 
     /**
      * @var array<ColumnHeaderView>

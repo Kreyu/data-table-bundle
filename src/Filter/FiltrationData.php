@@ -52,6 +52,11 @@ class FiltrationData
         );
     }
 
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
     public function getFilterData(string $name): ?FilterData
     {
         return $this->filters[$name] ?? null;

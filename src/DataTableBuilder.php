@@ -219,6 +219,16 @@ class DataTableBuilder implements DataTableBuilderInterface
     private null|RequestHandlerInterface $requestHandler = null;
 
     /**
+     * Represents HTML attributes rendered on header row.
+     */
+    private array $headerRowAttributes = [];
+
+    /**
+     * Represents HTML attributes rendered on each value row.
+     */
+    private array $valueRowAttributes = [];
+
+    /**
      * Determines whether the builder is locked, therefore no setters can be called.
      */
     private bool $locked = false;
@@ -882,6 +892,38 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    public function getHeaderRowAttributes(): array
+    {
+        return $this->headerRowAttributes;
+    }
+
+    public function setHeaderRowAttributes(array $headerRowAttributes): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->headerRowAttributes = $headerRowAttributes;
+
+        return $this;
+    }
+
+    public function getValueRowAttributes(): array
+    {
+        return $this->valueRowAttributes;
+    }
+
+    public function setValueRowAttributes(array $valueRowAttributes): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->valueRowAttributes = $valueRowAttributes;
 
         return $this;
     }

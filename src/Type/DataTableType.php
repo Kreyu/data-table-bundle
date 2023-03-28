@@ -63,44 +63,19 @@ final class DataTableType implements DataTableTypeInterface
         }
     }
 
-    private function createHeaderRowView(DataTableView $view, DataTableInterface $dataTable): HeaderRowView
-    {
-        $headerRowView = new HeaderRowView($view);
-        $headerRowView->vars['row'] = $headerRowView;
-
-        foreach ($dataTable->getConfig()->getColumns() as $column) {
-            $headerRowView->children[$column->getName()] = $column->createHeaderView($headerRowView);
-        }
-
-        return $headerRowView;
-    }
-
-    public function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable): array
-    {
-        $valueRowsViews = [];
-
-        foreach ($dataTable->getPagination()->getItems() as $index => $data) {
-            $valueRowView = new ValueRowView($view, $index, $data);
-            $valueRowView->vars['row'] = $valueRowView;
-
-            foreach ($dataTable->getConfig()->getColumns() as $column) {
-                $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
-            }
-
-            $valueRowsViews[] = $valueRowView;
-        }
-
-        return $valueRowsViews;
-    }
-
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $visibleColumns = $this->getVisibleColumns($dataTable);
+        $columns = $visibleColumns = $dataTable->getConfig()->getColumns();
+
+        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
+            if ($personalizationData = $dataTable->getPersonalizationData()) {
+                $visibleColumns = $personalizationData->compute($columns);
+            }
+        }
 
         $view->vars = array_replace($view->vars, [
             'name' => $dataTable->getConfig()->getName(),
             'exporters' => $dataTable->getConfig()->getExporters(),
-            'column_count' => count($visibleColumns),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
@@ -117,24 +92,46 @@ final class DataTableType implements DataTableTypeInterface
             'translation_domain' => $options['translation_domain'],
         ]);
 
-        $view->vars['header_row'] = $headerRow = $this->createHeaderRowView($view, $dataTable);
-        $view->vars['value_rows'] = $this->createValueRowsViews($view, $dataTable);
+        $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
+        $view->nonPersonalizedHeaderRow = $this->createHeaderRowView($view, $dataTable, $columns);
+        $view->valueRows = $this->createValueRowsViews($view, $dataTable, $visibleColumns);
+        $view->pagination = $this->createPaginationView($view, $dataTable);
+        $view->filters = $this->createFilterViews($view, $dataTable);
+        $view->actions = $this->createActionViews($view, $dataTable);
 
-        $view->vars['actions'] = array_map(
+        $view->vars = array_replace($view->vars, [
+            'header_row' => $view->headerRow,
+            'value_rows' => $view->valueRows,
+            'pagination' => $view->pagination,
+            'filters' => $view->filters,
+            'actions' => $view->actions,
+            'column_count' => count($view->headerRow),
+        ]);
+
+        $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
+        $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
+        $view->vars['personalization_form'] = $this->createPersonalizationFormView($view, $dataTable);
+    }
+
+    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
+    {
+        return new PaginationView($view, $dataTable->getPagination());
+    }
+
+    private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        return array_map(
             fn (ActionInterface $action) => $action->createView($view),
             $dataTable->getConfig()->getActions(),
         );
+    }
 
-        $view->vars['filters'] = $filters = array_map(
+    private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        return array_map(
             fn (FilterInterface $filter) => $filter->createView($view),
             $dataTable->getConfig()->getFilters(),
         );
-
-        $view->vars['filtration_form'] = $this->createFiltrationFormView($filters, $dataTable);
-        $view->vars['export_form'] = $this->createExportFormView($dataTable);
-        $view->vars['personalization_form'] = $this->createPersonalizationFormView($headerRow->children, $dataTable);
-
-        $view->vars['pagination'] = new PaginationView($view, $dataTable->getPagination());
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -180,24 +177,56 @@ final class DataTableType implements DataTableTypeInterface
     }
 
     /**
-     * @return array<ColumnInterface>
+     * @param array<ColumnInterface> $columns
      */
-    private function getVisibleColumns(DataTableInterface $dataTable): array
+    private function createHeaderRowView(DataTableView $view, DataTableInterface $dataTable, array $columns): HeaderRowView
     {
-        $columns = $dataTable->getConfig()->getColumns();
-        $personalizationData = $dataTable->getPersonalizationData();
+        $headerRowView = new HeaderRowView($view);
+        $headerRowView->vars['row'] = $headerRowView;
 
-        if ($dataTable->getConfig()->isPersonalizationEnabled() && null !== $personalizationData) {
-            return $personalizationData->compute($columns);
+        foreach ($dataTable->getConfig()->getHeaderRowAttributes() as $key => $value) {
+            $headerRowView->vars['attr'][$key] = $value;
         }
 
-        return $columns;
+        foreach ($columns as $column) {
+            $headerRowView->children[$column->getName()] = $column->createHeaderView($headerRowView);
+        }
+
+        return $headerRowView;
     }
 
     /**
-     * @param array<FilterView> $filters
+     * @param array<ColumnInterface> $columns
      */
-    private function createFiltrationFormView(array $filters, DataTableInterface $dataTable): FormView
+    private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): array
+    {
+        $valueRowsViews = [];
+
+        foreach ($dataTable->getPagination()->getItems() as $index => $data) {
+            $valueRowView = new ValueRowView($view, $index, $data);
+            $valueRowView->vars['row'] = $valueRowView;
+
+            foreach ($dataTable->getConfig()->getValueRowAttributes() as $key => $value) {
+                if (is_callable($value)) {
+                    $value = $value($data, $dataTable);
+                }
+
+                $valueRowView->vars['attr'][$key] = $value;
+            }
+
+            $valueRowView->vars['attr']['data-index'] = $index;
+
+            foreach ($columns as $column) {
+                $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
+            }
+
+            $valueRowsViews[] = $valueRowView;
+        }
+
+        return $valueRowsViews;
+    }
+
+    private function createFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
         $formFactory = $dataTable->getConfig()->getFiltrationFormFactory();
 
@@ -205,7 +234,7 @@ final class DataTableType implements DataTableTypeInterface
             name: $dataTable->getConfig()->getFiltrationParameterName(),
             type: FiltrationDataType::class,
             options: [
-                'filters' => $filters,
+                'filters' => $view->filters,
             ],
         );
 
@@ -215,10 +244,7 @@ final class DataTableType implements DataTableTypeInterface
         return $form->createView();
     }
 
-    /**
-     * @param array<ColumnHeaderView> $columns
-     */
-    private function createPersonalizationFormView(array $columns, DataTableInterface $dataTable): FormView
+    private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
         $formFactory = $dataTable->getConfig()->getPersonalizationFormFactory();
 
@@ -226,7 +252,7 @@ final class DataTableType implements DataTableTypeInterface
             name: $dataTable->getConfig()->getPersonalizationParameterName(),
             type: PersonalizationDataType::class,
             options: [
-                'columns' => $columns,
+                'columns' => $view->nonPersonalizedHeaderRow->children,
             ],
         );
 
@@ -236,7 +262,7 @@ final class DataTableType implements DataTableTypeInterface
         return $form->createView();
     }
 
-    private function createExportFormView(DataTableInterface $dataTable): FormView
+    private function createExportFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
         $formFactory = $dataTable->getConfig()->getExportFormFactory();
 

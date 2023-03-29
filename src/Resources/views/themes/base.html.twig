@@ -174,28 +174,32 @@
 {# Column type header templates #}
 
 {% block column_header %}
-    <th {{ block('attributes') }}>
-        {% if data_table.vars.sorting_enabled and sort %}
-            {% set query_parameters = app.request.query.all() %}
+    {% set label_attr = label_attr|default({}) %}
 
-            {% set sort_parameter_name = data_table.vars.sort_parameter_name %}
+    {% if data_table.vars.sorting_enabled and sort_field %}
+        {% set current_sort_field = sorting_field_data.name|default(null) %}
+        {% set current_sort_direction = sorting_field_data.direction|default(null) %}
 
-            {% set current_sort_field = query_parameters[sort_parameter_name]['field']|default(null) %}
-            {% set current_sort_direction = query_parameters[sort_parameter_name]['direction']|default(null) %}
+        {% set is_active_sorting = sort_field == current_sort_field %}
 
-            {% set opposite_sort_direction = current_sort_direction == 'desc' ? 'asc' : 'desc' %}
+        {% if is_active_sorting %}
+            {% set attr = attr|merge(active_attr|default({})) %}
+        {% else %}
+            {% set attr = attr|merge(inactive_attr|default({})) %}
+        {% endif %}
 
-            {% set attr = {
+        <th {{ block('attributes') }}>
+            {% set label_attr = {
                 href: path(app.request.get('_route'), app.request.query.all|merge({
-                    (sort_parameter_name ~ '[field]'): sort,
-                    (sort_parameter_name ~ '[direction]'): opposite_sort_direction
+                    (sort_parameter_name ~ '[field]'): sort_field,
+                    (sort_parameter_name ~ '[direction]'): current_sort_direction|lower == 'desc' ? 'asc' : 'desc'
                 }))
-            }|merge(attr|default({})) %}
+            }|merge(label_attr) %}
 
-            <a {% with { attr: label_attr|default({})|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+            <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
 
-                {% if sort == current_sort_field %}
+                {% if is_active_sorting %}
                     {% if current_sort_direction == 'asc' %}
                         {{ block('sort_arrow_asc', theme, _context) }}
                     {% else %}
@@ -205,10 +209,14 @@
                     {{ block('sort_arrow_none', theme, _context) }}
                 {% endif %}
             </a>
-        {% else %}
-            <span {% with { attr: label_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{- block('column_header_label', theme, _context) -}}</span>
-        {% endif %}
-    </th>
+        </th>
+    {% else %}
+        <th {{ block('attributes') }}>
+            <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
+                {{- block('column_header_label', theme, _context) -}}
+            </span>
+        </th>
+    {% endif %}
 {% endblock %}
 
 {% block column_header_label %}

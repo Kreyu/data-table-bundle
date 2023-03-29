@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationColumnDataType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
@@ -14,21 +15,28 @@ class PersonalizationData
     /**
      * @var array<PersonalizationColumnData>
      */
-    private array $columns;
+    private array $columns = [];
 
-    /**
-     * @param array<PersonalizationColumnData> $columns
-     */
-    public function __construct(
-        array $columns = [],
-    ) {
+    public function __construct(array $columns = [])
+    {
         foreach ($columns as $column) {
-            if (!$column instanceof PersonalizationColumnData) {
-                throw new UnexpectedTypeException($column, PersonalizationColumnData::class);
-            }
-
-            $this->columns[str_replace('.', '__', $column->getName())] = $column;
+            $this->addColumn($column);
         }
+    }
+
+    public function getColumns(): array
+    {
+        return $this->columns;
+    }
+
+    public function addColumn(PersonalizationColumnData $column): void
+    {
+        $this->columns[$column->getName()] = $column;
+    }
+
+    public function removeColumn(PersonalizationColumnData $column): void
+    {
+        unset($this->columns[$column->getName()]);
     }
 
     public static function fromArray(array $data): static
@@ -95,14 +103,6 @@ class PersonalizationData
         });
 
         return $columns;
-    }
-
-    /**
-     * @return array<PersonalizationColumnData>
-     */
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 
     public function getColumnOrder(string|ColumnInterface $column): int

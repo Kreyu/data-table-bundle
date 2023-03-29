@@ -39,16 +39,16 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
         return $this->typeExtensions;
     }
 
-    public function createView(FilterInterface $filter, DataTableView $parent = null): FilterView
+    public function createView(FilterInterface $filter, FilterData $data, DataTableView $parent): FilterView
     {
-        return new FilterView($parent);
+        return new FilterView($parent, $data);
     }
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
     {
-        $this->parent?->buildView($view, $filter, $options);
+        $this->parent?->buildView($view, $filter, $data, $options);
 
-        $this->innerType->buildView($view, $filter, $options);
+        $this->innerType->buildView($view, $filter, $data, $options);
 
         foreach ($this->typeExtensions as $extension) {
             $extension->buildView($view, $filter, $options);

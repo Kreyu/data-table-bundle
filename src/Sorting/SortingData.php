@@ -45,4 +45,9 @@ class SortingData
     {
         return $this->fields;
     }
+
+    public function getFieldData(string $field): ?SortingFieldData
+    {
+        return $this->fields[$field] ?? null;
+    }
 }

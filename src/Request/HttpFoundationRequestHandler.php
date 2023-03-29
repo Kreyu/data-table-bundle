@@ -47,11 +47,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     {
         $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
 
-        $data = FiltrationData::fromArray(
-            $this->extractQueryParameter($request, "[$filtrationParameterName]", []),
-        );
-
-        if ($data->isEmpty()) {
+        if (null === $data = $this->extractQueryParameter($request, "[$filtrationParameterName]")) {
             return;
         }
 
@@ -79,13 +75,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
-        $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
+        $page = $this->extractQueryParameter($request, "[$pageParameterName]");
+        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]") ?? PaginationInterface::DEFAULT_PER_PAGE;
 
-        $defaultPage = $defaultPaginationData?->getPage() ?? PaginationInterface::DEFAULT_PAGE;
-        $defaultPerPage = $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
-
-        $page = $this->extractQueryParameter($request, "[$pageParameterName]", $defaultPage);
-        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", $defaultPerPage);
+        if (null === $page) {
+            return;
+        }
 
         $dataTable->paginate(PaginationData::fromArray([
             'page' => $page,
@@ -95,15 +90,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $parameterName = $dataTable->getConfig()->getPersonalizationParameterName();
+        $form = $dataTable->createPersonalizationFormBuilder()->getForm();
+        $form->handleRequest($request);
 
-        $data = array_intersect_key($request->request->all($parameterName), ['columns' => true]);
-
-        if (empty($data)) {
-            return;
+        if ($form->isSubmitted()) {
+            $dataTable->personalize($form->getData());
         }
-
-        $dataTable->personalize(PersonalizationData::fromArray($data));
     }
 
     private function export(DataTableInterface $dataTable, Request $request): void

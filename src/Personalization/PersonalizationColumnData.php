@@ -10,12 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnData
 {
-    public function __construct(
-        private string $name,
-        private int $order,
-        private bool $visible,
-    ) {
-    }
+    public string $name;
+    public int $order;
+    public bool $visible;
 
     public static function fromArray(array $data): static
     {
@@ -40,20 +37,22 @@ class PersonalizationColumnData
 
         $data = $resolver->resolve($data);
 
-        return new static(
-            name: $data['name'],
-            order: $data['order'],
-            visible: $data['visible'],
-        );
+        $self = new static();
+        $self->name = $data['name'];
+        $self->order = $data['order'];
+        $self->visible = $data['visible'];
+
+        return $self;
     }
 
     public static function fromColumn(ColumnInterface $column, int $order, bool $visible = true): static
     {
-        return new static(
-            name: $column->getName(),
-            order: $order,
-            visible: $visible,
-        );
+        $self = new static();
+        $self->name = $column->getName();
+        $self->order = $order;
+        $self->visible = $visible;
+
+        return $self;
     }
 
     public function getName(): string

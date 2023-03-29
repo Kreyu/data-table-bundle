@@ -106,7 +106,7 @@ interface DataTableConfigInterface
 
     public function getFiltrationFormFactory(): ?FormFactoryInterface;
 
-    public function getDefaultFiltrationData(): ?FiltrationData;
+    public function getDefaultFiltrationData(): array;
 
     public function isSortingEnabled(): bool;
 

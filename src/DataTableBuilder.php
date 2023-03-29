@@ -161,7 +161,7 @@ class DataTableBuilder implements DataTableBuilderInterface
     /**
      * Default filtration data, which is applied to the data table if no data is given by the user.
      */
-    private null|FiltrationData $defaultFiltrationData = null;
+    private array $defaultFiltrationData = [];
 
     /**
      * Determines whether the data table sorting feature is enabled.
@@ -704,12 +704,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
-    public function getDefaultFiltrationData(): ?FiltrationData
+    public function getDefaultFiltrationData(): array
     {
         return $this->defaultFiltrationData;
     }
 
-    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
+    public function setDefaultFiltrationData(array $defaultFiltrationData): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();

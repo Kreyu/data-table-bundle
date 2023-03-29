@@ -23,9 +23,9 @@ interface ResolvedFilterTypeInterface
      */
     public function getTypeExtensions(): array;
 
-    public function createView(FilterInterface $filter, DataTableView $parent = null): FilterView;
+    public function createView(FilterInterface $filter, FilterData $data, DataTableView $parent): FilterView;
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void;
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void;
 
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 

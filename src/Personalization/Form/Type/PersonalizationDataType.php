@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,22 +22,25 @@ class PersonalizationDataType extends AbstractType
     {
         $builder->add('columns', CollectionType::class, [
             'entry_type' => PersonalizationColumnDataType::class,
+            'allow_add' => true,
         ]);
     }
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        foreach ($view['columns'] as $name => $columnView) {
-            if (!array_key_exists($name, $options['columns'])) {
-                unset($view['columns'][$name]);
-                continue;
-            }
+        /** @var DataTableView $dataTable */
+        if (null === $dataTable = $options['data_table']) {
+            throw new \LogicException('Unable to create personalization form view without the data table view.');
+        }
 
-            $columnHeaderView = $options['columns'][$name];
+        foreach ($view['columns'] as $name => $columnFormView) {
+            $columnView = $dataTable->nonPersonalizedHeaderRow[$name];
 
-            $columnView->vars['label'] = $columnHeaderView->vars['label'];
-            $columnView->vars['translation_domain'] = $columnHeaderView->vars['translation_domain'];
-            $columnView->vars['translation_parameters'] = $columnHeaderView->vars['translation_parameters'];
+            $columnFormView->vars = array_replace($columnFormView->vars, [
+                'label' => $columnView->vars['label'],
+                'translation_domain' => $columnView->vars['translation_domain'],
+                'translation_parameters' => $columnView->vars['translation_parameters'],
+            ]);
         }
 
         usort($view['columns']->children, function (FormView $columnA, FormView $columnB) {
@@ -47,9 +53,9 @@ class PersonalizationDataType extends AbstractType
         $resolver
             ->setDefaults([
                 'data_class' => PersonalizationData::class,
+                'data_table' => null,
             ])
-            ->setRequired('columns')
-            ->setAllowedTypes('columns', ColumnHeaderView::class . '[]')
+            ->setAllowedTypes('data_table', ['null', DataTableView::class])
         ;
     }
 

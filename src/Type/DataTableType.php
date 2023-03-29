@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
@@ -89,6 +90,7 @@ final class DataTableType implements DataTableTypeInterface
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
+            'sorting_data' => $dataTable->getSortingData(),
             'translation_domain' => $options['translation_domain'],
         ]);
 
@@ -106,11 +108,10 @@ final class DataTableType implements DataTableTypeInterface
             'filters' => $view->filters,
             'actions' => $view->actions,
             'column_count' => count($view->headerRow),
+            'filtration_form' => $this->createFiltrationFormView($view, $dataTable),
+            'export_form' => $this->createExportFormView($view, $dataTable),
+            'personalization_form' => $this->createPersonalizationFormView($view, $dataTable),
         ]);
-
-        $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
-        $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
-        $view->vars['personalization_form'] = $this->createPersonalizationFormView($view, $dataTable);
     }
 
     private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
@@ -128,10 +129,17 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
     {
-        return array_map(
-            fn (FilterInterface $filter) => $filter->createView($view),
-            $dataTable->getConfig()->getFilters(),
-        );
+        $filters = [];
+
+        $filtrationData = $dataTable->getFiltrationData();
+
+        foreach ($dataTable->getConfig()->getFilters() as $filter) {
+            $data = $filtrationData?->getFilterData($filter->getName()) ?? new FilterData();
+
+            $filters[$filter->getName()] = $filter->createView($data, $view);
+        }
+
+        return $filters;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -228,17 +236,7 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $formFactory = $dataTable->getConfig()->getFiltrationFormFactory();
-
-        $formBuilder = $formFactory->createNamedBuilder(
-            name: $dataTable->getConfig()->getFiltrationParameterName(),
-            type: FiltrationDataType::class,
-            options: [
-                'filters' => $view->filters,
-            ],
-        );
-
-        $form = $formBuilder->getForm();
+        $form = $dataTable->createFiltrationFormBuilder($view)->getForm();
         $form->setData($dataTable->getFiltrationData());
 
         return $form->createView();
@@ -246,17 +244,7 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $formFactory = $dataTable->getConfig()->getPersonalizationFormFactory();
-
-        $formBuilder = $formFactory->createNamedBuilder(
-            name: $dataTable->getConfig()->getPersonalizationParameterName(),
-            type: PersonalizationDataType::class,
-            options: [
-                'columns' => $view->nonPersonalizedHeaderRow->children,
-            ],
-        );
-
-        $form = $formBuilder->getForm();
+        $form = $dataTable->createPersonalizationFormBuilder($view)->getForm();
         $form->setData($dataTable->getPersonalizationData());
 
         return $form->createView();

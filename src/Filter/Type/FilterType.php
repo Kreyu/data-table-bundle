@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Type;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
@@ -20,19 +21,14 @@ final class FilterType implements FilterTypeInterface
     {
     }
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
     {
         $resolver = clone $filter->getType()->getOptionsResolver();
 
-        $data = $filter->getData();
-        $value = null;
+        $value = $data;
 
-        if ($data && $data->hasValue()) {
-            $value = $data->getValue();
-
-            if ($options['active_filter_formatter']) {
-                $value = $options['active_filter_formatter']($data, $filter, $options);
-            }
+        if ($value->hasValue() && $formatter = $options['active_filter_formatter']) {
+            $value = $formatter($data, $filter, $options);
         }
 
         $resolver->setDefaults([

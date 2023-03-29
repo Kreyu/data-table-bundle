@@ -30,8 +30,10 @@ final class ColumnType implements ColumnTypeInterface
             'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
             'translation_parameters' => $options['header_translation_parameters'],
             'translation_domain' => $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
+            'sort_parameter_name' => $view->parent->parent->vars['sort_parameter_name'],
+            'sorting_field_data' => $view->parent->parent->vars['sorting_data']?->getFieldData($column->getName()),
             'attr' => $options['header_attr'],
-            'sort' => $sort,
+            'sort_field' => $sort,
             'export' => false,
         ]);
 

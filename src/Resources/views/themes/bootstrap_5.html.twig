@@ -12,7 +12,10 @@
 {% endblock %}
 
 {% block column_header %}
-    {% with { label_attr: { class: 'text-decoration-none text-reset d-block w-100 h-100' }|merge(attr) } %}
+    {% with {
+        active_attr: { class: 'border-bottom border-primary text-primary' },
+        label_attr: { class: 'text-decoration-none text-reset d-block w-100 h-100 py-1' },
+    } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

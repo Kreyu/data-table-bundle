@@ -10,23 +10,11 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class Filter implements FilterInterface
 {
-    private ?FilterData $data = null;
-
     public function __construct(
         private string $name,
         private ResolvedFilterTypeInterface $type,
         private array $options = [],
     ) {
-    }
-
-    public function getData(): ?FilterData
-    {
-        return $this->data;
-    }
-
-    public function setData(?FilterData $data): void
-    {
-        $this->data = $data;
     }
 
     public function apply(ProxyQueryInterface $query, FilterData $data): void
@@ -47,13 +35,10 @@ class Filter implements FilterInterface
     public function getFormOptions(): array
     {
         return [
-            'label' => $this->getOption('label'),
-            'translation_domain' => $this->getOption('translation_domain'),
             'field_type' => $this->getOption('field_type'),
             'field_options' => $this->getOption('field_options'),
             'operator_type' => $this->getOption('operator_type'),
             'operator_options' => $this->getOption('operator_options'),
-            'active_filter_formatter' => $this->getOption('active_filter_formatter'),
         ];
     }
 
@@ -77,11 +62,11 @@ class Filter implements FilterInterface
         return $this->options[$name];
     }
 
-    public function createView(DataTableView $parent = null): FilterView
+    public function createView(FilterData $data, DataTableView $parent): FilterView
     {
-        $view = $this->type->createView($this, $parent);
+        $view = $this->type->createView($this, $data, $parent);
 
-        $this->type->buildView($view, $this, $this->options);
+        $this->type->buildView($view, $this, $data, $this->options);
 
         return $view;
     }

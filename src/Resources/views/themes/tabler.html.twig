@@ -3,6 +3,13 @@
 {# Tabler Theme #}
 {# @see https://tabler.io/ #}
 
+{% block table %}
+    <div class="table-responsive">
+        {% with { table_attr: { class: 'table card-table table-vcenter text-nowrap datatable' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
 
 {% block action_filter %}
     {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
@@ -60,7 +67,7 @@
 {% endblock %}
 
 {% block sort_arrow_none %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-selector" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M8 9l4 -4l4 4"></path>
         <path d="M16 15l-4 4l-4 -4"></path>
@@ -68,39 +75,27 @@
 {% endblock %}
 
 {% block sort_arrow_asc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-up" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M6 15l6 -6l6 6"></path>
     </svg>
 {% endblock %}
 
 {% block sort_arrow_desc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-down" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M6 9l6 6l6 -6"></path>
     </svg>
 {% endblock %}
 
-{% block kreyu_data_table_column_boolean %}
-    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green' : 'bg-red') } } %}
+{% block column_boolean_value %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green-lt' : 'bg-red-lt') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
 
 {% block table_body_row_no_results %}
     {% with { table_body_row_no_results_attr: { class: 'text-muted text-center' } } %}
-        {{ parent() }}
-    {% endwith %}
-{% endblock %}
-
-{% block kreyu_data_table_action_button %}
-    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(attr) } %}
-        {{ parent() }}
-    {% endwith %}
-{% endblock %}
-
-{% block kreyu_data_table_action_form %}
-    {% with { button_attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(button_attr) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

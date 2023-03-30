@@ -309,23 +309,25 @@
 
 {% block action_link_value %}
     <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {{- block('action_value') -}}
+        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
 {% block action_button_value %}
     <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {{- block('action_value') -}}
+        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
 {% block action_form_value %}
-    <form {% with { attr: { action, method: html_friendly_method }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+    <form id="{{ form_id }}" {% with { attr: { action, method: html_friendly_method }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
         <input type="hidden" name="_method" value="{{ method }}"/>
 
-        <button {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
-            {{- block('action_value') -}}
-        </button>
+        {% set button_tag = button_tag|default('button') %}
+
+        <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
+            {{- block('action_value', theme, _context) -}}
+        </{{ button_tag }}>
     </form>
 {% endblock %}
 

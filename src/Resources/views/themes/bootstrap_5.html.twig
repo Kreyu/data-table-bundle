@@ -480,9 +480,15 @@
                                         </div>
                                         <div class="col">
                                             {% block action_confirmation_modal_confirm_button %}
-                                                <a href="{{ confirmation.href }}" class="btn btn-{{ modal_status_color_class }} w-100">
+                                                {% set confirm_button_tag = confirm_button_tag|default('a') %}
+                                                {% set confirm_button_attr = {
+                                                    href: confirmation.href,
+                                                    class: 'w-100 btn btn-' ~ modal_status_color_class
+                                                }|merge(confirm_button_attr|default({})) %}
+
+                                                <{{ confirm_button_tag }} {% with { attr: confirm_button_attr } %}{{ block('attributes') }}{% endwith %}>
                                                     {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
-                                                </a>
+                                                </{{ confirm_button_tag }}>
                                             {% endblock %}
                                         </div>
                                     </div>
@@ -496,10 +502,27 @@
     </div>
 {% endblock %}
 
-{% block action_link_value %}
-    {% with { attr: { class: 'text-decoration-none' }|merge(attr) } %}
+{% block action_value %}
+    <div class="d-inline-block" {{ block('attributes') }}>
         {{ parent() }}
-    {% endwith %}
+    </div>
+{% endblock %}
+
+{% block action_link_value %}
+    {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') } %}
+
+    {% if confirmation %}
+        {% set attr = {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#' ~ confirmation.identifier,
+        }|merge(attr|default({})) %}
+
+        {% with { attr: action_confirmation_modal_attr|default({}) } %}
+            {{ block('action_confirmation_modal') }}
+        {% endwith %}
+    {% endif %}
+
+    {{ parent() }}
 {% endblock %}
 
 {% block action_button_value %}
@@ -513,16 +536,37 @@
             'data-bs-target': '#' ~ confirmation.identifier,
         }|merge(attr) %}
 
-        {{ block('action_confirmation_modal') }}
+        {% with { attr: {} } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
     {{ parent() }}
 {% endblock %}
 
 {% block action_form_value %}
-    {% with { attr: { class: 'd-inline-block' }|merge(attr), button_attr: { class: 'btn btn-primary' }|merge(button_attr) } %}
+    {% set attr = { class: 'd-inline-block' }|merge(attr) %}
+
+    {% set button_attr = {
+        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '')
+    }|merge(button_attr) %}
+
+    {% if confirmation %}
+        {% with {
+            button_tag: 'a',
+            button_attr: {
+                'type': 'button',
+                'data-bs-toggle': 'modal',
+                'data-bs-target': '#' ~ confirmation.identifier,
+            }|merge(button_attr)
+        } %}
+            {{ parent() }}
+        {% endwith %}
+
+        {% with { confirm_button_tag: 'button', confirm_button_attr: { type: 'submit', form: form_id } } %}
+            {{ block('action_confirmation_modal') }}
+        {% endwith %}
+    {% else %}
         {{ parent() }}
-    {% endwith %}
+    {% endif %}
 {% endblock %}
 
 {% block sort_arrow_none %}

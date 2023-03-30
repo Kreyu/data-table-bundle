@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormActionType extends AbstractActionType
@@ -34,6 +35,7 @@ class FormActionType extends AbstractActionType
             'html_friendly_method' => $htmlFriendlyMethod,
             'action' => $options['action'],
             'button_attr' => $options['button_attr'],
+            'form_id' => $this->getFormId($view, $action),
         ]);
     }
 
@@ -49,5 +51,19 @@ class FormActionType extends AbstractActionType
             ->setAllowedTypes('action', ['string', 'callable'])
             ->setAllowedTypes('button_attr', ['array', 'callable'])
         ;
+    }
+
+    private function getFormId(ActionView $view, ActionInterface $action): string
+    {
+        /** @var DataTableView $dataTable */
+        $dataTable = $view->vars['data_table'];
+
+        $formId = $dataTable->vars['name'].'-action-'.$action->getName().'-form';
+
+        if ($view->parent instanceof ColumnValueView) {
+            $formId .= '-'.$view->parent->parent->index;
+        }
+
+        return $formId;
     }
 }

@@ -187,6 +187,7 @@
                             {{ form_row(child) }}
                         </div>
                     {% endfor %}
+
                     <div class="col-12 col-md-6 col-lg-3">
                         <div class="col-form-label">&nbsp;</div>
                         <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
@@ -439,6 +440,62 @@
     <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
+{% block action_confirmation_modal %}
+    {% set modal_status_color_class = {
+        'info': 'primary',
+        'warning': 'warning',
+        'danger': 'danger',
+    }[confirmation.type] %}
+
+    <div class="modal modal-blur fade" id="{{ confirmation.identifier }}" tabindex="-1" style="display: none;" aria-hidden="true">
+        {% block action_confirmation_modal_dialog %}
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                {% block action_confirmation_modal_content %}
+                    <div class="modal-content">
+                        {% block action_confirmation_modal_status %}
+                            <div class="modal-status bg-{{ modal_status_color_class }}"></div>
+                        {% endblock %}
+                        {% block action_confirmation_modal_header %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
+                                </h5>
+                            </div>
+                        {% endblock %}
+                        {% block action_confirmation_modal_body %}
+                            <div class="modal-body py-4">
+                                {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
+                            </div>
+                        {% endblock %}
+                        {% block action_confirmation_modal_footer %}
+                            <div class="modal-footer">
+                                <div class="w-100">
+                                    <div class="row">
+                                        <div class="col">
+                                            {% block action_confirmation_modal_cancel_button %}
+                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                                    {{ confirmation.label_cancel|trans({}, confirmation.translation_domain) }}
+                                                </a>
+                                            {% endblock %}
+                                        </div>
+                                        <div class="col">
+                                            {% block action_confirmation_modal_confirm_button %}
+                                                <a href="{{ confirmation.href }}" class="btn btn-{{ modal_status_color_class }} w-100">
+                                                    {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
+                                                </a>
+                                            {% endblock %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}
+
 {% block action_link_value %}
     {% with { attr: { class: 'text-decoration-none' }|merge(attr) } %}
         {{ parent() }}
@@ -446,9 +503,20 @@
 {% endblock %}
 
 {% block action_button_value %}
-    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '') }|merge(attr) } %}
-        {{ parent() }}
-    {% endwith %}
+    {% set attr = {
+        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '')
+    }|merge(attr) %}
+
+    {% if confirmation %}
+        {% set attr = {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#' ~ confirmation.identifier,
+        }|merge(attr) %}
+
+        {{ block('action_confirmation_modal') }}
+    {% endif %}
+
+    {{ parent() }}
 {% endblock %}
 
 {% block action_form_value %}

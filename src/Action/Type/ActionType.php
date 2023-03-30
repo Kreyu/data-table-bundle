@@ -32,6 +32,7 @@ final class ActionType implements ActionTypeInterface
                 'block_prefix',
                 'attr',
                 'icon_attr',
+                'confirmation',
             ];
 
             foreach ($callableOptions as $optionName) {
@@ -41,14 +42,30 @@ final class ActionType implements ActionTypeInterface
             }
         }
 
+        if (false !== $confirmation = $options['confirmation']) {
+            if (true === $confirmation) {
+                $confirmation = [];
+            }
+
+            $confirmation = $this->getConfirmationOptionsResolver()->resolve($confirmation);
+            $confirmation['translation_domain'] ??= $options['translation_domain'];
+            $confirmation['identifier'] = $dataTable->vars['name'].'-action-confirmation-'.$action->getName();
+
+            if ($view->parent instanceof ColumnValueView) {
+                $confirmation['identifier'] .= '-'.$view->parent->parent->index;
+            }
+        }
+
         $view->vars = array_replace($view->vars, [
             'data_table' => $dataTable,
+            'name' => $action->getName(),
             'block_prefixes' => $this->getActionBlockPrefixes($action, $options),
             'label' => $options['label'] ?? StringUtil::camelToSentence($action->getName()),
             'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
             'translation_parameters' => $options['translation_parameters'],
             'attr' => $options['attr'],
             'icon_attr' => $options['icon_attr'],
+            'confirmation' => $confirmation,
         ]);
     }
 
@@ -62,6 +79,7 @@ final class ActionType implements ActionTypeInterface
                 'block_prefix' => null,
                 'attr' => [],
                 'icon_attr' => [],
+                'confirmation' => false,
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableMessage::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', 'callable'])
@@ -69,6 +87,7 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedTypes('block_prefix', ['null', 'string', 'callable'])
             ->setAllowedTypes('attr', ['array', 'callable'])
             ->setAllowedTypes('icon_attr', ['array', 'callable'])
+            ->setAllowedTypes('confirmation', ['bool', 'array', 'callable'])
         ;
     }
 
@@ -107,5 +126,28 @@ final class ActionType implements ActionTypeInterface
         }
 
         return array_unique($blockPrefixes);
+    }
+
+    private function getConfirmationOptionsResolver(): OptionsResolver
+    {
+        return (new OptionsResolver)
+            ->setDefaults([
+                'translation_domain' => 'KreyuDataTable',
+                'label_title' => 'Action confirmation',
+                'label_description' => 'Are you sure you want to execute this action?',
+                'label_confirm' => 'Confirm',
+                'label_cancel' => 'Cancel',
+                'type' => 'danger',
+                'href' => null,
+            ])
+            ->setAllowedTypes('translation_domain', ['null', 'string'])
+            ->setAllowedTypes('label_title', ['null', 'string'])
+            ->setAllowedTypes('label_description', ['null', 'string'])
+            ->setAllowedTypes('label_confirm', ['null', 'string'])
+            ->setAllowedTypes('label_cancel', ['null', 'string'])
+            ->setAllowedTypes('type', ['null', 'string'])
+            ->setAllowedTypes('href', ['null', 'string'])
+            ->setAllowedValues('type', ['info', 'warning', 'danger'])
+        ;
     }
 }

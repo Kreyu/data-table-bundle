@@ -45,6 +45,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function filter(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isFiltrationEnabled()) {
+            return;
+        }
+
         $form = $dataTable->createFiltrationFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -55,6 +59,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function sort(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isSortingEnabled()) {
+            return;
+        }
+
         $parameterName = $dataTable->getConfig()->getSortParameterName();
 
         $sortField = $this->extractQueryParameter($request, "[$parameterName][field]");
@@ -71,6 +79,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function paginate(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isPaginationEnabled()) {
+            return;
+        }
+
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
@@ -86,6 +98,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isPersonalizationEnabled()) {
+            return;
+        }
+
         $form = $dataTable->createPersonalizationFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -96,6 +112,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function export(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isExportingEnabled()) {
+            return;
+        }
+
         $form = $dataTable->createExportFormBuilder()->getForm();
         $form->handleRequest($request);
 

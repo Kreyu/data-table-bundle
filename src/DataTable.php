@@ -170,9 +170,7 @@ class DataTable implements DataTableInterface
             $dataTable->personalize(PersonalizationData::fromDataTable($this));
         }
 
-        $filename = $data->filename ?? $this->getConfig()->getName();
-
-        return $data->exporter->export($dataTable->createView(), $filename);
+        return $data->exporter->export($dataTable->createView(), $data->filename);
     }
 
     public function getPagination(): PaginationInterface

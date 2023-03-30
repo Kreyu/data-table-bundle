@@ -81,7 +81,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        $dataTable->paginate(new PaginationData($page, $perPage));
+        $dataTable->paginate(new PaginationData((int) $page, (int) $perPage));
     }
 
     private function personalize(DataTableInterface $dataTable, Request $request): void

@@ -108,10 +108,19 @@ final class DataTableType implements DataTableTypeInterface
             'filters' => $view->filters,
             'actions' => $view->actions,
             'column_count' => count($view->headerRow),
-            'filtration_form' => $this->createFiltrationFormView($view, $dataTable),
-            'export_form' => $this->createExportFormView($view, $dataTable),
-            'personalization_form' => $this->createPersonalizationFormView($view, $dataTable),
         ]);
+
+        if ($dataTable->getConfig()->isFiltrationEnabled()) {
+            $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
+        }
+
+        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
+            $view->vars['personalization_form'] = $this->createPersonalizationFormView($view, $dataTable);
+        }
+
+        if ($dataTable->getConfig()->isExportingEnabled()) {
+            $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
+        }
     }
 
     private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView

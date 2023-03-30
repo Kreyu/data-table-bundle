@@ -26,7 +26,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 {
     public function setName(string $name): static;
 
-    public function setType(ResolvedDataTableTypeInterface $type): void;
+    public function setType(ResolvedDataTableTypeInterface $type): static;
 
     public function setOptions(array $options): static;
 
@@ -123,6 +123,10 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static;
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
+
+    public function setHeaderRowAttributes(array $headerRowAttributes): static;
+
+    public function setValueRowAttributes(array $valueRowAttributes): static;
 
     public function getDataTableConfig(): DataTableConfigInterface;
 }

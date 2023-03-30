@@ -136,13 +136,17 @@ class QuantityColumnType extends AbstractColumnType
 
 These are the most important methods that a column type class can define:
 
-`buildView()`
+`buildHeaderView()`
 
-:   It sets any extra variables you'll need when rendering the column in a template.
+:   It sets any extra variables you'll need when rendering the column header in a template.
+
+`buildValueView()`
+
+:   It sets any extra variables you'll need when rendering the column value in a template.
 
 `configureOptions()`
 
-:   It defines the options configurable when using the column type, which are also the options that can be used in `buildView()` method.
+:   It defines the options configurable when using the column type, which are also the options that can be used in `buildHeaderView()` and `buildValueView()` methods.
     Options are inherited from parent types and parent type extensions, but you can create any custom option you need.
 
 `getParent()`
@@ -277,7 +281,7 @@ You can also pass your own variables, which can be based on the options defined 
 namespace App\DataTable\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -289,7 +293,7 @@ class QuantityColumnType extends AbstractColumnType
     {
     }
     
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {    
         // pass the custom options directly to the template
         $view->vars['decimals'] = $options['decimals'];
@@ -311,14 +315,14 @@ class QuantityColumnType extends AbstractColumnType
 }
 ```
 
-The variables added in `buildView()` are available in the column type template as any other regular Twig variable:
+The variables added in `buildValueView()` are available in the column type template as any other regular Twig variable:
 
 {% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
-{% block data_table_quantity %}
+{% block kreyu_data_table_column_quantity %}
     {% if converted_value is not null %}
         {{- converted_value|number_format(decimals, decimal_separator, thousands_separator) -}}
     {% endif %}

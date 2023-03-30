@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,8 +18,9 @@ class PersonalizationColumnDataType extends AbstractType
         $builder
             ->add('name', HiddenType::class)
             ->add('order', HiddenType::class)
-            ->add('visible', HiddenType::class)
-        ;
+            ->add('visible', HiddenType::class, [
+                'empty_data' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

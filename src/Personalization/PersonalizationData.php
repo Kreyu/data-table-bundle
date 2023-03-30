@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationColumnDataType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
@@ -14,21 +15,28 @@ class PersonalizationData
     /**
      * @var array<PersonalizationColumnData>
      */
-    private array $columns;
+    private array $columns = [];
 
-    /**
-     * @param array<PersonalizationColumnData> $columns
-     */
-    public function __construct(
-        array $columns = [],
-    ) {
+    public function __construct(array $columns = [])
+    {
         foreach ($columns as $column) {
-            if (!$column instanceof PersonalizationColumnData) {
-                throw new UnexpectedTypeException($column, PersonalizationColumnData::class);
-            }
-
-            $this->columns[str_replace('.', '__', $column->getName())] = $column;
+            $this->addColumn($column);
         }
+    }
+
+    public function getColumns(): array
+    {
+        return $this->columns;
+    }
+
+    public function addColumn(PersonalizationColumnData $column): void
+    {
+        $this->columns[$column->getName()] = $column;
+    }
+
+    public function removeColumn(PersonalizationColumnData $column): void
+    {
+        unset($this->columns[$column->getName()]);
     }
 
     public static function fromArray(array $data): static
@@ -60,6 +68,18 @@ class PersonalizationData
     }
 
     /**
+     * @param array<ColumnInterface> $columns
+     */
+    public function appendMissingColumns(array $columns, bool $visible = false): void
+    {
+        foreach ($columns as $column) {
+            if (null === $this->getColumn($column)) {
+                $this->appendColumn($column, $visible);
+            }
+        }
+    }
+
+    /**
      * Computes given set of {@see ColumnInterface}, ordering it and excluding hidden ones.
      *
      * @param array<ColumnInterface> $columns
@@ -83,14 +103,6 @@ class PersonalizationData
         });
 
         return $columns;
-    }
-
-    /**
-     * @return array<PersonalizationColumnData>
-     */
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 
     public function getColumnOrder(string|ColumnInterface $column): int
@@ -144,5 +156,28 @@ class PersonalizationData
         }
 
         return $this->columns[$column] ?? null;
+    }
+
+    private function appendColumn(string|ColumnInterface $column, bool $visible): void
+    {
+        $columnsOrders = array_map(
+            fn (PersonalizationColumnData $column) => $column->getOrder(),
+            array_filter(
+                $this->columns,
+                fn (PersonalizationColumnData $columnData) => $columnData->isVisible() === $visible,
+            )
+        );
+
+        $columnOrder = 0;
+
+        if (!empty($columnsOrders)) {
+            $columnOrder = max($columnsOrders) + 1;
+        }
+
+        $this->columns[$column->getName()] = PersonalizationColumnData::fromColumn(
+            column: $column,
+            order: $columnOrder,
+            visible: $visible,
+        );
     }
 }

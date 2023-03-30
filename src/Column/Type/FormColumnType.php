@@ -13,9 +13,10 @@ class FormColumnType extends AbstractColumnType
 {
     public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
     {
-        if (null === $view->vars['form_child_path']) {
-            $view->vars['form_child_path'] = $column->getName();
-        }
+        $view->vars = array_replace($view->vars, [
+            'form' => $options['form'],
+            'form_child_path' => $options['form_child_path'] ?? $column->getName(),
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -25,6 +26,8 @@ class FormColumnType extends AbstractColumnType
             ->setDefault('form_child_path', null)
             ->setAllowedTypes('form', FormInterface::class)
             ->setAllowedTypes('form_child_path', ['null', 'bool', 'string'])
+            ->setInfo('form', 'An instance of the form which wraps the data table.')
+            ->setInfo('form_child_path', 'A path to the child form of each collection field.')
         ;
     }
 }

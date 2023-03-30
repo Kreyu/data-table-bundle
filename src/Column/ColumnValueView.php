@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
-use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
-class ColumnView
+class ColumnValueView
 {
     public array $vars = [
         'attr' => [],
     ];
 
-    public array $children = [];
+    public mixed $data;
+    public mixed $value;
 
     public function __construct(
-        public ?DataTableView $parent = null,
+        public ValueRowView $parent,
     ) {
     }
 }

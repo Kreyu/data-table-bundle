@@ -21,5 +21,5 @@ interface FilterInterface
 
     public function getOption(string $name): mixed;
 
-    public function createView(DataTableView $parent = null): FilterView;
+    public function createView(FilterData $data, DataTableView $parent): FilterView;
 }

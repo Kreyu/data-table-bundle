@@ -9,44 +9,62 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationType;
+use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
 class DataTable implements DataTableInterface
 {
     /**
-     * Lazy-loaded form used to apply filtration criteria to the data table.
+     * The sorting data currently applied to the data table.
      */
-    private null|FormInterface $filtrationForm = null;
+    private ?SortingData $sortingData = null;
 
     /**
-     * Lazy-loaded form used to apply personalization criteria to the data table.
+     * The pagination data currently applied to the data table.
      */
-    private null|FormInterface $personalizationForm = null;
+    private ?PaginationData $paginationData = null;
 
     /**
-     * Lazy-loaded form used to apply export criteria to the export feature.
+     * The filtration data currently applied to the data table.
      */
-    private null|FormInterface $exportForm = null;
+    private ?FiltrationData $filtrationData = null;
 
     /**
-     * Lazy-loaded pagination used to retrieve results.
+     * The personalization data currently applied to the data table.
      */
-    private null|PaginationInterface $pagination = null;
+    private ?PersonalizationData $personalizationData = null;
+
+    /**
+     * The export data currently applied to the data table.
+     */
+    private ?ExportData $exportData = null;
+
+    /**
+     * The pagination used to retrieve the current page results.
+     */
+    private ?PaginationInterface $pagination = null;
+
+    /**
+     * The copy of a query used to retrieve the data, without any filters applied.
+     */
+    private ProxyQueryInterface $nonFilteredQuery;
 
     public function __construct(
         private ProxyQueryInterface $query,
         private DataTableConfigInterface $config,
     ) {
-        $this->initializeSorting();
-        $this->initializePagination();
-        $this->initializePersonalization();
+        $this->nonFilteredQuery = clone $this->query;
+
+        $this->initialize();
     }
 
     public function getConfig(): DataTableConfigInterface
@@ -62,19 +80,15 @@ class DataTable implements DataTableInterface
 
         $this->query->paginate($data);
 
+        $this->nonFilteredQuery = $this->query;
+
+        $this->paginationData = $data;
+
         if ($this->config->isPaginationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getPaginationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
-            }
-
-            $persistenceAdapter->write($this, $persistenceSubject, $data);
+            $this->setPersistenceData('pagination', $data);
         }
 
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
     public function sort(SortingData $data): void
@@ -85,19 +99,15 @@ class DataTable implements DataTableInterface
 
         $this->query->sort($data);
 
+        $this->nonFilteredQuery = $this->query;
+
+        $this->sortingData = $data;
+
         if ($this->config->isSortingPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getSortingPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
-            }
-
-            $persistenceAdapter->write($this, $persistenceSubject, $data);
+            $this->setPersistenceData('sorting', $data);
         }
 
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
     public function filter(FiltrationData $data): void
@@ -106,30 +116,23 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $form = $this->getFiltrationForm();
-        $form->submit($data->toArray());
+        $this->query = clone $this->nonFilteredQuery;
 
         foreach ($this->config->getFilters() as $filter) {
-            $filterData = $data->getFilter($filter->getName());
+            $filterData = $data->getFilterData($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
             }
         }
 
+        $this->filtrationData = $data;
+
         if ($this->config->isFiltrationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getFiltrationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
-            }
-
-            $persistenceAdapter->write($this, $persistenceSubject, $data);
+            $this->setPersistenceData('filtration', $data);
         }
 
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
     public function personalize(PersonalizationData $data): void
@@ -138,66 +141,36 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $this->getPersonalizationForm()->setData($data);
-
         if ($this->config->isPersonalizationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getPersonalizationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
-            }
-
-            $persistenceAdapter->write($this, $persistenceSubject, $data);
+            $this->setPersistenceData('personalization', $data);
         }
+
+        $this->personalizationData = $data;
     }
 
-    public function isExporting(): bool
-    {
-        return $this->getExportForm()->isSubmitted();
-    }
-
-    public function export(ExportData $exportData = null): ExportFile
+    public function export(ExportData $data = null): ExportFile
     {
         if (!$this->config->isExportingEnabled()) {
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
-        /* @var ExportData $exportData */
-        $exportData ??= $this->getExportForm()->getData();
-
-        if (null === $exportData) {
+        if (null === $data ??= $this->exportData) {
             throw new \RuntimeException('Unable to export the data table without an export data. Explicitly pass the export data as the first argument of the "export()" method.');
         }
 
+        $this->exportData = $data;
+
         $dataTable = clone $this;
 
-        if (ExportStrategy::INCLUDE_ALL === $exportData->strategy) {
+        if (ExportStrategy::INCLUDE_ALL === $data->strategy) {
             $dataTable->paginate(new PaginationData(perPage: null));
         }
 
-        if (!$exportData->includePersonalization) {
+        if (!$data->includePersonalization) {
             $dataTable->personalize(PersonalizationData::fromDataTable($this));
         }
 
-        $filename = $exportData->filename ?? $this->getConfig()->getName();
-
-        return $exportData->exporter->export($dataTable->createView(), $filename);
-    }
-
-    public function hasActiveFilters(): bool
-    {
-        return (bool) $this->getFiltrationForm()->getData()?->hasActiveFilters();
-    }
-
-    public function handleRequest(mixed $request): void
-    {
-        if (null === $requestHandler = $this->config->getRequestHandler()) {
-            throw new \RuntimeException(sprintf('%s cannot be used on data tables without configured request handler.', __METHOD__));
-        }
-
-        $requestHandler->handle($this, $request);
+        return $data->exporter->export($dataTable->createView(), $data->filename);
     }
 
     public function getPagination(): PaginationInterface
@@ -205,29 +178,112 @@ class DataTable implements DataTableInterface
         return $this->pagination ??= $this->query->getPagination();
     }
 
-    public function getFiltrationForm(): FormInterface
+    public function getSortingData(): SortingData
     {
-        return $this->filtrationForm ??= $this->buildFiltrationForm();
+        return $this->sortingData;
     }
 
-    public function getPersonalizationForm(): FormInterface
+    public function getPaginationData(): PaginationData
     {
-        return $this->personalizationForm ??= $this->buildPersonalizationForm();
+        return $this->paginationData;
     }
 
-    public function getExportForm(): FormInterface
+    public function getFiltrationData(): FiltrationData
     {
-        return $this->exportForm ??= $this->buildExportForm();
+        return $this->filtrationData;
+    }
+
+    public function getPersonalizationData(): PersonalizationData
+    {
+        return $this->personalizationData;
+    }
+
+    public function getExportData(): ?ExportData
+    {
+        return $this->exportData;
+    }
+
+    public function createFiltrationFormBuilder(DataTableView $view = null): FormBuilderInterface
+    {
+        if (!$this->config->isFiltrationEnabled()) {
+            throw new \RuntimeException('The data table has filtration feature disabled.');
+        }
+
+        if (null === $this->config->getFiltrationFormFactory()) {
+            throw new \RuntimeException('The data table has no configured filtration form factory.');
+        }
+
+        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+            name: $this->getConfig()->getFiltrationParameterName(),
+            type: FiltrationDataType::class,
+            options: [
+                'data_table' => $this,
+                'data_table_view' => $view,
+            ],
+        );
+    }
+
+    public function createPersonalizationFormBuilder(DataTableView $view = null): FormBuilderInterface
+    {
+        if (!$this->config->isPersonalizationEnabled()) {
+            throw new \RuntimeException('The data table has personalization feature disabled.');
+        }
+
+        if (null === $this->config->getPersonalizationFormFactory()) {
+            throw new \RuntimeException('The data table has no configured personalization form factory.');
+        }
+
+        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+            name: $this->getConfig()->getPersonalizationParameterName(),
+            type: PersonalizationDataType::class,
+            options: [
+                'data_table_view' => $view,
+            ],
+        );
+    }
+
+    public function createExportFormBuilder(): FormBuilderInterface
+    {
+        if (!$this->config->isExportingEnabled()) {
+            throw new \RuntimeException('The data table has export feature disabled.');
+        }
+
+        if (null === $this->config->getExportFormFactory()) {
+            throw new \RuntimeException('The data table has no configured export form factory.');
+        }
+
+        return $this->config->getExportFormFactory()->createNamedBuilder(
+            name: $this->getConfig()->getExportParameterName(),
+            type: ExportDataType::class,
+            options: [
+                'exporters' => $this->config->getExporters(),
+            ],
+        );
+    }
+
+    public function isExporting(): bool
+    {
+        return null !== $this->exportData;
+    }
+
+    public function hasActiveFilters(): bool
+    {
+        return (bool) $this->filtrationData?->hasActiveFilters();
+    }
+
+    public function handleRequest(mixed $request): void
+    {
+        if (null === $requestHandler = $this->config->getRequestHandler()) {
+            throw new \RuntimeException('The "handleRequest" method cannot be used on data tables without configured request handler.');
+        }
+
+        $requestHandler->handle($this, $request);
     }
 
     public function createView(): DataTableView
     {
         if (empty($this->config->getColumns())) {
             throw new \LogicException('The data table has no configured columns.');
-        }
-
-        if (!$this->getFiltrationForm()->isSubmitted()) {
-            $this->initializeFiltration();
         }
 
         $type = $this->config->getType();
@@ -240,143 +296,163 @@ class DataTable implements DataTableInterface
         return $view;
     }
 
-    private function buildFiltrationForm(): FormInterface
+    private function initialize(): void
     {
-        $formBuilder = $this->config->getFiltrationFormFactory()->createNamedBuilder(
-            name: $this->config->getFiltrationParameterName(),
-            type: FiltrationType::class,
-            options: [
-                'filters' => $this->config->getFilters(),
-            ],
-        );
+        if ($paginationData = $this->getInitialPaginationData()) {
+            $this->paginate($paginationData);
+        }
 
-        return $formBuilder->getForm();
+        if ($sortingData = $this->getInitialSortingData()) {
+            $this->sort($sortingData);
+        }
+
+        if ($filtrationData = $this->getInitialFiltrationData()) {
+            $this->filter($filtrationData);
+        }
+
+        if ($personalizationData = $this->getInitialPersonalizationData()) {
+            $this->personalize($personalizationData);
+        }
     }
 
-    private function buildPersonalizationForm(): FormInterface
-    {
-        $formBuilder = $this->config->getPersonalizationFormFactory()->createNamedBuilder(
-            name: $this->config->getPersonalizationParameterName(),
-            type: PersonalizationDataType::class,
-            options: [
-                'method' => 'POST',
-            ],
-        );
-
-        return $formBuilder->getForm();
-    }
-
-    private function buildExportForm(): FormInterface
-    {
-        $formBuilder = $this->config->getExportFormFactory()->createNamedBuilder(
-            name: $this->config->getExportParameterName(),
-            type: ExportDataType::class,
-            options: [
-                'method' => 'POST',
-                'exporters' => $this->config->getExporters(),
-                'default_filename' => $this->getConfig()->getName(),
-            ],
-        );
-
-        return $formBuilder->getForm();
-    }
-
-    private function initializePagination(): void
+    private function getInitialPaginationData(): ?PaginationData
     {
         if (!$this->config->isPaginationEnabled()) {
-            return;
+            return null;
         }
-
-        $data = $this->config->getDefaultPaginationData() ?? new PaginationData(PaginationInterface::DEFAULT_PAGE, PaginationInterface::DEFAULT_PER_PAGE);
 
         if ($this->config->isPaginationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getPaginationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getPaginationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use pagination persistence, but does not have a subject.');
-            }
-
-            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
+            $data ??= $this->getPersistenceData('pagination');
         }
 
-        $this->paginate($data);
+        $data ??= $this->config->getDefaultPaginationData();
+
+        $data ??= new PaginationData();
+
+        return $data;
     }
 
-    private function initializeSorting(): void
+    private function getInitialSortingData(): ?SortingData
     {
         if (!$this->config->isSortingEnabled()) {
-            return;
+            return null;
         }
-
-        $data = $this->config->getDefaultSortingData() ?? new SortingData();
 
         if ($this->config->isSortingPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getSortingPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getSortingPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use sorting persistence, but does not have a subject.');
-            }
-
-            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
+            $data ??= $this->getPersistenceData('sorting');
         }
 
-        $this->sort($data);
+        $data ??= $this->config->getDefaultSortingData();
+
+        $data ??= new SortingData();
+
+        return $data;
     }
 
-    private function initializeFiltration(): void
+    private function getInitialFiltrationData(): ?FiltrationData
     {
         if (!$this->config->isFiltrationEnabled()) {
-            return;
+            return null;
         }
-
-        $data = $this->config->getDefaultFiltrationData();
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getFiltrationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getFiltrationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use filtration persistence, but does not have a subject.');
-            }
-
-            $data = $persistenceAdapter->read($this, $persistenceSubject, $data);
+            $data ??= $this->getPersistenceData('filtration');
         }
 
-        if (null !== $data) {
-            $this->filter($data);
-        }
+        $data ??= $this->config->getDefaultFiltrationData();
+
+        $data ??= FiltrationData::fromDataTable($this);
+
+        $data->appendMissingFilters($this->getConfig()->getFilters());
+
+        return $data;
     }
 
-    private function initializePersonalization(): void
+    private function getInitialPersonalizationData(): ?PersonalizationData
     {
         if (!$this->config->isPersonalizationEnabled()) {
-            return;
+            return null;
         }
-
-        $personalizationData = $this->config->getDefaultPersonalizationData() ?? PersonalizationData::fromDataTable($this);
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
-            if (null === $persistenceAdapter = $this->config->getPersonalizationPersistenceAdapter()) {
-                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have an adapter.');
-            }
-
-            if (null === $persistenceSubject = $this->config->getPersonalizationPersistenceSubject()) {
-                throw new \RuntimeException('The data table is configured to use personalization persistence, but does not have a subject.');
-            }
-
-            $personalizationData = $persistenceAdapter->read($this, $persistenceSubject, $personalizationData);
+            $data ??= $this->getPersistenceData('personalization');
         }
 
-        $this->personalize($personalizationData);
+        $data ??= $this->config->getDefaultPersonalizationData();
+
+        $data ??= PersonalizationData::fromDataTable($this);
+
+        $data->appendMissingColumns($this->getConfig()->getColumns());
+
+        return $data;
     }
 
-    private function resetPagination(): void
+    private function isPersistenceEnabled(string $context): bool
     {
-        $this->pagination = null;
+        return match ($context) {
+            'sorting' => $this->config->isSortingPersistenceEnabled(),
+            'pagination' => $this->config->isPaginationPersistenceEnabled(),
+            'filtration' => $this->config->isFiltrationPersistenceEnabled(),
+            'personalization' => $this->config->isPersonalizationPersistenceEnabled(),
+            default => throw new \RuntimeException('Given persistence context is not supported.'),
+        };
+    }
+
+    private function getPersistenceData(string $context): mixed
+    {
+        if (!$this->isPersistenceEnabled($context)) {
+            throw new \RuntimeException(sprintf('The data table has %s persistence disabled.', $context));
+        }
+
+        $persistenceAdapter = $this->getPersistenceAdapter($context);
+        $persistenceSubject = $this->getPersistenceSubject($context);
+
+        return $persistenceAdapter->read($this, $persistenceSubject);
+    }
+
+    private function setPersistenceData(string $context, mixed $data): void
+    {
+        if (!$this->isPersistenceEnabled($context)) {
+            throw new \RuntimeException(sprintf('The data table has %s persistence disabled.', $context));
+        }
+
+        $persistenceAdapter = $this->getPersistenceAdapter($context);
+        $persistenceSubject = $this->getPersistenceSubject($context);
+
+        $persistenceAdapter->write($this, $persistenceSubject, $data);
+    }
+
+    private function getPersistenceAdapter(string $context): PersistenceAdapterInterface
+    {
+        $adapter = match ($context) {
+            'sorting' => $this->config->getSortingPersistenceAdapter(),
+            'pagination' => $this->config->getPaginationPersistenceAdapter(),
+            'filtration' => $this->config->getFiltrationPersistenceAdapter(),
+            'personalization' => $this->config->getPersonalizationPersistenceAdapter(),
+            default => throw new \RuntimeException('Given persistence context is not supported.'),
+        };
+
+        if (null === $adapter) {
+            throw new \RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have an adapter.', $context));
+        }
+
+        return $adapter;
+    }
+
+    private function getPersistenceSubject(string $context): PersistenceSubjectInterface
+    {
+        $subject = match ($context) {
+            'sorting' => $this->config->getSortingPersistenceSubject(),
+            'pagination' => $this->config->getPaginationPersistenceSubject(),
+            'filtration' => $this->config->getFiltrationPersistenceSubject(),
+            'personalization' => $this->config->getPersonalizationPersistenceSubject(),
+            default => throw new \RuntimeException('Given persistence context is not supported.'),
+        };
+
+        if (null === $subject) {
+            throw new \RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have a subject.', $context));
+        }
+
+        return $subject;
     }
 }

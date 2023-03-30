@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractColumnType implements ColumnTypeInterface
 {
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
+    {
+    }
+
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
     }
 

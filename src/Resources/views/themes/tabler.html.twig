@@ -3,98 +3,71 @@
 {# Tabler Theme #}
 {# @see https://tabler.io/ #}
 
-{% block stylesheets %}
-    {{ parent() }}
-
-    <style>
-        svg.sort-arrow {
-            width: 16px;
-            height: 16px;
-        }
-    </style>
+{% block table %}
+    <div class="table-responsive">
+        {% with { table_attr: { class: 'table table-hover card-table table-vcenter text-nowrap datatable' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
 {% endblock %}
 
 {% block action_filter %}
-    <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="collapse" data-bs-target="#{{ filtration_form.vars.id ~ '__collapse' }}" aria-expanded="false" aria-controls="{{ filtration_form.vars.id ~ '__collapse' }}">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
-        </svg>
-    </button>
+    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_filter_icon %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
+    </svg>
 {% endblock %}
 
 {% block action_export %}
-    <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="modal" data-bs-target="#{{ export_form.vars.name }}">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
-            <path d="M8 11h8v7h-8z"></path>
-            <path d="M8 15h8"></path>
-            <path d="M11 11v7"></path>
-        </svg>
-    </button>
+    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_export_icon %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+        <path d="M8 11h8v7h-8z"></path>
+        <path d="M8 15h8"></path>
+        <path d="M11 11v7"></path>
+    </svg>
 {% endblock %}
 
 {% block action_personalize %}
-    <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="modal" data-bs-target="#{{ personalization_form.vars.name }}">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
-            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-        </svg>
-    </button>
+    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
 
-{% block filter_clear_all_button %}
-    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
-
-    <a class="btn btn-icon btn-outline-danger mb-1"
-       href="{{- filter_clear_all_url(filtration_parameter_name, filters)|trim -}}"
-       data-toggle="tooltip"
-       data-placement="bottom"
-       title="{{ 'Clear all filters'|trans({}, 'KreyuDataTable') }}"
-    >
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M4 7l16 0"></path>
-            <path d="M10 11l0 6"></path>
-            <path d="M14 11l0 6"></path>
-            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-        </svg>
-    </a>
+{% block action_personalize_icon %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
+        <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+    </svg>
 {% endblock %}
 
-{% block filter_clear_button %}
-    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
-
-    <a class="btn btn-outline-dark px-2 mb-1"
-       href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
-       data-toggle="tooltip"
-       data-placement="bottom"
-       title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
-    >
-        <div class="d-flex flex-column align-items-center">
-            <span class="mx-1">
-                <span class="strong">
-                    {{ filter.vars.label|trans({}, filter.vars.translation_domain) }}
-                </span>
-
-                {% if filter.vars.operator_options.visible %}
-                    <span class="text-muted">({{ field.vars.data.operator.name|trans({}, 'KreyuDataTable') }})</span>
-                {% endif %}
-            </span>
-        </div>
-
-        <span class="">{{ field.vars.value|trans({}, filter.vars.translation_domain) }}</span>
-
-        <span class="mx-2" aria-hidden="true">&times;</span>
-    </a>
+{% block filter_clear_all_button_icon %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M4 7l16 0"></path>
+        <path d="M10 11l0 6"></path>
+        <path d="M14 11l0 6"></path>
+        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+    </svg>
 {% endblock %}
 
 {% block sort_arrow_none %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-selector" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M8 9l4 -4l4 4"></path>
         <path d="M16 15l-4 4l-4 -4"></path>
@@ -102,21 +75,21 @@
 {% endblock %}
 
 {% block sort_arrow_asc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-up" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M6 15l6 -6l6 6"></path>
     </svg>
 {% endblock %}
 
 {% block sort_arrow_desc %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-down" width="40" height="40" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M6 9l6 6l6 -6"></path>
     </svg>
 {% endblock %}
 
-{% block kreyu_data_table_column_boolean %}
-    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green' : 'bg-red') } } %}
+{% block column_boolean_value %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green-lt' : 'bg-red-lt') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -127,14 +100,18 @@
     {% endwith %}
 {% endblock %}
 
-{% block kreyu_data_table_action_button %}
-    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(attr) } %}
-        {{ parent() }}
-    {% endwith %}
-{% endblock %}
+{% block action_confirmation_modal_header %}{% endblock %}
 
-{% block kreyu_data_table_action_form %}
-    {% with { button_attr: { class: 'btn btn-primary' ~ (icon_attr and not label ? ' btn-icon') }|merge(button_attr) } %}
-        {{ parent() }}
-    {% endwith %}
+{% block action_confirmation_modal_body %}
+    <div class="modal-body text-center py-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-{{ modal_status_color_class }} icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M12 9v2m0 4v.01"></path>
+            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
+        </svg>
+        <h3>{{ confirmation.label_title|trans({}, confirmation.translation_domain) }}</h3>
+        <div class="text-muted">
+            {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
+        </div>
+    </div>
 {% endblock %}

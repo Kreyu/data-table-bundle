@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Extension\Core;
 
-use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectNotFoundException;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeExtension
 {
@@ -18,50 +18,35 @@ class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeEx
     ) {
     }
 
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $builder
-            ->setColumnFactory($this->defaults['column_factory'])
-            ->setActionFactory($this->defaults['action_factory'])
-            ->setRequestHandler($this->defaults['request_handler'])
-        ;
-
-        $builder
-            ->setSortingEnabled($this->defaults['sorting']['enabled'])
-            ->setSortingPersistenceEnabled($this->defaults['sorting']['persistence_enabled'])
-            ->setSortingPersistenceAdapter($this->defaults['sorting']['persistence_adapter'])
-            ->setSortingPersistenceSubject($this->getPersistenceSubject($this->defaults['sorting']['persistence_subject_provider']))
-        ;
-
-        $builder
-            ->setPaginationEnabled($this->defaults['pagination']['enabled'])
-            ->setPaginationPersistenceEnabled($this->defaults['pagination']['persistence_enabled'])
-            ->setPaginationPersistenceAdapter($this->defaults['pagination']['persistence_adapter'])
-            ->setPaginationPersistenceSubject($this->getPersistenceSubject($this->defaults['pagination']['persistence_subject_provider']))
-        ;
-
-        $builder
-            ->setFiltrationEnabled($this->defaults['filtration']['enabled'])
-            ->setFiltrationPersistenceEnabled($this->defaults['filtration']['persistence_enabled'])
-            ->setFiltrationPersistenceAdapter($this->defaults['filtration']['persistence_adapter'])
-            ->setFiltrationPersistenceSubject($this->getPersistenceSubject($this->defaults['filtration']['persistence_subject_provider']))
-            ->setFiltrationFormFactory($this->defaults['filtration']['form_factory'])
-            ->setFilterFactory($this->defaults['filtration']['filter_factory'])
-        ;
-
-        $builder
-            ->setPersonalizationEnabled($this->defaults['personalization']['enabled'])
-            ->setPersonalizationPersistenceEnabled($this->defaults['personalization']['persistence_enabled'])
-            ->setPersonalizationPersistenceAdapter($this->defaults['personalization']['persistence_adapter'])
-            ->setPersonalizationPersistenceSubject($this->getPersistenceSubject($this->defaults['personalization']['persistence_subject_provider']))
-            ->setPersonalizationFormFactory($this->defaults['personalization']['form_factory'])
-        ;
-
-        $builder
-            ->setExportingEnabled($this->defaults['exporting']['enabled'])
-            ->setExportFormFactory($this->defaults['exporting']['form_factory'])
-            ->setExporterFactory($this->defaults['exporting']['exporter_factory'])
-        ;
+        $resolver->setDefaults([
+            'column_factory' => $this->defaults['column_factory'],
+            'action_factory' => $this->defaults['action_factory'],
+            'request_handler' => $this->defaults['request_handler'],
+            'sorting_enabled' => $this->defaults['sorting']['enabled'],
+            'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'],
+            'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'],
+            'sorting_persistence_subject' => $this->getPersistenceSubject($this->defaults['sorting']['persistence_subject_provider']),
+            'pagination_enabled' => $this->defaults['pagination']['enabled'],
+            'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'],
+            'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'],
+            'pagination_persistence_subject' => $this->getPersistenceSubject($this->defaults['pagination']['persistence_subject_provider']),
+            'filtration_enabled' => $this->defaults['filtration']['enabled'],
+            'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'],
+            'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'],
+            'filtration_persistence_subject' => $this->getPersistenceSubject($this->defaults['filtration']['persistence_subject_provider']),
+            'filtration_form_factory' => $this->defaults['filtration']['form_factory'],
+            'filter_factory' => $this->defaults['filtration']['filter_factory'],
+            'personalization_enabled' => $this->defaults['personalization']['enabled'],
+            'personalization_persistence_enabled' => $this->defaults['personalization']['persistence_enabled'],
+            'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'],
+            'personalization_persistence_subject' => $this->getPersistenceSubject($this->defaults['personalization']['persistence_subject_provider']),
+            'personalization_form_factory' => $this->defaults['personalization']['form_factory'],
+            'exporting_enabled' => $this->defaults['exporting']['enabled'],
+            'exporting_form_factory' => $this->defaults['exporting']['form_factory'],
+            'exporter_factory' => $this->defaults['exporting']['exporter_factory'],
+        ]);
     }
 
     public static function getExtendedTypes(): iterable

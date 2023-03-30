@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
 interface ColumnInterface
 {
@@ -15,9 +17,7 @@ interface ColumnInterface
 
     public function getOptions(): array;
 
-    public function getData(): mixed;
+    public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
 
-    public function setData(mixed $data): void;
-
-    public function createView(DataTableView $parent = null): ColumnView;
+    public function createValueView(ValueRowView $parent = null): ColumnValueView;
 }

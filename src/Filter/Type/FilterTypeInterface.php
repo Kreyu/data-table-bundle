@@ -20,7 +20,7 @@ interface FilterTypeInterface
      */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void;
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void;
 
     public function configureOptions(OptionsResolver $resolver): void;
 

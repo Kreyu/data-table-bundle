@@ -21,10 +21,10 @@ class SortingFieldData
             ->setRequired('name')
             ->setDefault('direction', 'asc')
             ->setAllowedTypes('name', 'string')
-            ->setAllowedValues('direction', ['asc', 'desc'])
+            ->setAllowedValues('direction', [null, 'asc', 'desc'])
             ->setNormalizer('direction', function (Options $options, mixed $value) {
                 if (null === $value) {
-                    return null;
+                    return 'asc';
                 }
 
                 return strtolower((string) $value);

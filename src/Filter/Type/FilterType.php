@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Type;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
@@ -20,18 +21,25 @@ final class FilterType implements FilterTypeInterface
     {
     }
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
     {
         $resolver = clone $filter->getType()->getOptionsResolver();
 
-        $resolver
-            ->setDefaults([
-                'name' => $filter->getName(),
-                'label' => StringUtil::camelToSentence($filter->getName()),
-                'translation_domain' => $view->parent->vars['label_translation_domain'],
-                'query_path' => $filter->getName(),
-            ])
-        ;
+        $value = $data;
+
+        if ($value->hasValue() && $formatter = $options['active_filter_formatter']) {
+            $value = $formatter($data, $filter, $options);
+        }
+
+        $resolver->setDefaults([
+            'name' => $filter->getName(),
+            'form_name' => $filter->getFormName(),
+            'label' => StringUtil::camelToSentence($filter->getName()),
+            'translation_domain' => $view->parent->vars['translation_domain'],
+            'query_path' => $filter->getName(),
+            'data' => $data,
+            'value' => $value,
+        ]);
 
         $options = $resolver->resolve(array_filter($options));
 

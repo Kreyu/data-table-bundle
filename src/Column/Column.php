@@ -6,11 +6,11 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
 class Column implements ColumnInterface
 {
-    private mixed $data = null;
-
     public function __construct(
         private string $name,
         private ResolvedColumnTypeInterface $type,
@@ -33,21 +33,20 @@ class Column implements ColumnInterface
         return $this->options;
     }
 
-    public function getData(): mixed
+    public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView
     {
-        return $this->data;
+        $view = $this->type->createHeaderView($this, $parent);
+
+        $this->type->buildHeaderView($view, $this, $this->options);
+
+        return $view;
     }
 
-    public function setData(mixed $data): void
+    public function createValueView(ValueRowView $parent = null): ColumnValueView
     {
-        $this->data = $data;
-    }
+        $view = $this->type->createValueView($this, $parent);
 
-    public function createView(DataTableView $parent = null): ColumnView
-    {
-        $view = $this->type->createView($this, $parent);
-
-        $this->type->buildView($view, $this, $this->options);
+        $this->type->buildValueView($view, $this, $this->options);
 
         return $view;
     }

@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class FiltrationData
 {
     /**
-     * @param array<FilterData> $filters
+     * @var array<FilterData>
      */
-    public function __construct(
-        private array $filters = [],
-    ) {
+//    private array $filters = [];
+
+    public function __construct(private array $filters = [])
+    {
         foreach ($filters as $filter) {
             if (!$filter instanceof FilterData) {
                 throw new UnexpectedTypeException($filter, FilterData::class);
@@ -26,30 +28,29 @@ class FiltrationData
         $filters = [];
 
         foreach ($data as $key => $value) {
-            if ($value instanceof FilterData) {
-                $filters[$key] = $value;
-            } elseif (is_array($value)) {
-                if (!array_key_exists('value', $value)) {
-                    $value = ['value' => ''];
-                }
-
-                $filters[$key] = FilterData::fromArray($value);
-            } else {
-                $filters[$key] = FilterData::fromArray([
-                    'value' => $value,
-                ]);
+            if (!$value instanceof FilterData) {
+                $value = ['value' => $value];
             }
+
+            if (is_array($value)) {
+                $value = FilterData::fromArray($value);
+            }
+
+            $filters[$key] = $value;
         }
 
         return new static($filters);
     }
 
-    public function toArray(): array
+    public static function fromDataTable(DataTableInterface $dataTable): static
     {
-        return array_map(
-            fn (FilterData $filter) => $filter->toArray(),
-            $this->filters,
-        );
+        $filters = [];
+
+        foreach ($dataTable->getConfig()->getFilters() as $filter) {
+            $filters[$filter->getName()] = new FilterData();
+        }
+
+        return new static($filters);
     }
 
     public function getFilters(): array
@@ -57,9 +58,34 @@ class FiltrationData
         return $this->filters;
     }
 
-    public function getFilter(string $name): ?FilterData
+    public function getFilterData(string|FilterInterface $filter): ?FilterData
     {
-        return $this->filters[$name] ?? null;
+        if ($filter instanceof FilterInterface) {
+            $filter = $filter->getName();
+        }
+
+        return $this->filters[$filter] ?? null;
+    }
+
+    public function setFilterData(string|FilterInterface $filter, FilterData $data): void
+    {
+        if ($filter instanceof FilterInterface) {
+            $filter = $filter->getName();
+        }
+
+        $this->filters[$filter] = $data;
+    }
+
+    /**
+     * @param array<FilterInterface> $filters
+     */
+    public function appendMissingFilters(array $filters, FilterData $data = new FilterData): void
+    {
+        foreach ($filters as $column) {
+            if (null === $this->getFilterData($column)) {
+                $this->setFilterData($column, $data);
+            }
+        }
     }
 
     public function hasActiveFilters(): bool

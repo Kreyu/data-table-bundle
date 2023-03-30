@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Action;
 
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 
 class Action implements ActionInterface
 {
-    private mixed $data = null;
-
     public function __construct(
         private string $name,
         private ResolvedActionTypeInterface $type,
@@ -33,17 +32,7 @@ class Action implements ActionInterface
         return $this->options;
     }
 
-    public function getData(): mixed
-    {
-        return $this->data;
-    }
-
-    public function setData(mixed $data): void
-    {
-        $this->data = $data;
-    }
-
-    public function createView(DataTableView $parent = null): ActionView
+    public function createView(DataTableView|ColumnValueView $parent): ActionView
     {
         $view = $this->type->createView($this, $parent);
 

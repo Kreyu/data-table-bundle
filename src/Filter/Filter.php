@@ -39,8 +39,6 @@ class Filter implements FilterInterface
             'field_options' => $this->getOption('field_options'),
             'operator_type' => $this->getOption('operator_type'),
             'operator_options' => $this->getOption('operator_options'),
-            'active_filter_formatter' => $this->getOption('active_filter_formatter'),
-            'label' => $this->getOption('label'),
         ];
     }
 
@@ -64,11 +62,11 @@ class Filter implements FilterInterface
         return $this->options[$name];
     }
 
-    public function createView(DataTableView $parent = null): FilterView
+    public function createView(FilterData $data, DataTableView $parent): FilterView
     {
-        $view = $this->type->createView($this, $parent);
+        $view = $this->type->createView($this, $data, $parent);
 
-        $this->type->buildView($view, $this, $this->options);
+        $this->type->buildView($view, $this, $data, $this->options);
 
         return $view;
     }

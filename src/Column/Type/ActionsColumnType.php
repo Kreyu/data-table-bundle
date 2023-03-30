@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ActionsColumnType extends AbstractColumnType
@@ -16,15 +16,14 @@ class ActionsColumnType extends AbstractColumnType
     ) {
     }
 
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         $actions = [];
 
         foreach ($options['actions'] as $name => $actionOptions) {
             $action = $this->actionFactory->create($name, $actionOptions['type'], $actionOptions['type_options']);
-            $action->setData($column->getData());
 
-            $actions[$name] = $action->createView($view->parent);
+            $actions[$name] = $action->createView($view);
         }
 
         $view->vars['actions'] = $actions;
@@ -46,10 +45,13 @@ class ActionsColumnType extends AbstractColumnType
                             'type_options' => [],
                         ])
                         ->setAllowedTypes('type', ['string'])
-                        ->setAllowedTypes('type_options', ['array', \Closure::class])
+                        ->setAllowedTypes('type_options', ['array', 'callable'])
+                        ->setInfo('type', 'A fully-qualified class name of the action type.')
+                        ->setInfo('type_options', 'An array of options passed to the action type.')
                     ;
                 },
             ])
+            ->setInfo('actions', 'An array of actions configuration, which contains of their type and options.')
         ;
     }
 }

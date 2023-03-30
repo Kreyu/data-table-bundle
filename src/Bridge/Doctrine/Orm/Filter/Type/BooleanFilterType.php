@@ -67,7 +67,7 @@ class BooleanFilterType extends AbstractFilterType
             ]);
         });
 
-        $resolver->setDefault('active_filter_formatter', function (FilterData $data, array $options): TranslatableMessage {
+        $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): TranslatableMessage {
             return t($data->getValue() ? 'Yes' : 'No', [], 'KreyuDataTable');
         });
     }

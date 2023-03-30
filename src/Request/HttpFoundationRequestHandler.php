@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
@@ -38,31 +40,33 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
-
-        $dataTable->getExportForm()->handleRequest($request);
+        $this->export($dataTable, $request);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
     {
-        $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
-
-        $data = FiltrationData::fromArray(
-            $this->extractQueryParameter($request, "[$filtrationParameterName]", []),
-        );
-
-        if ($data->isEmpty()) {
+        if (!$dataTable->getConfig()->isFiltrationEnabled()) {
             return;
         }
 
-        $dataTable->filter($data);
+        $form = $dataTable->createFiltrationFormBuilder()->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $dataTable->filter($form->getData());
+        }
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void
     {
-        $sortParameterName = $dataTable->getConfig()->getSortParameterName();
+        if (!$dataTable->getConfig()->isSortingEnabled()) {
+            return;
+        }
 
-        $sortField = $this->extractQueryParameter($request, "[$sortParameterName][field]");
-        $sortDirection = $this->extractQueryParameter($request, "[$sortParameterName][direction]");
+        $parameterName = $dataTable->getConfig()->getSortParameterName();
+
+        $sortField = $this->extractQueryParameter($request, "[$parameterName][field]");
+        $sortDirection = $this->extractQueryParameter($request, "[$parameterName][direction]");
 
         if (null === $sortField) {
             return;
@@ -75,39 +79,53 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function paginate(DataTableInterface $dataTable, Request $request): void
     {
+        if (!$dataTable->getConfig()->isPaginationEnabled()) {
+            return;
+        }
+
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
-        $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
+        $page = $this->extractQueryParameter($request, "[$pageParameterName]");
+        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]") ?? PaginationInterface::DEFAULT_PER_PAGE;
 
-        $defaultPage = $defaultPaginationData?->getPage() ?? PaginationInterface::DEFAULT_PAGE;
-        $defaultPerPage = $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
+        if (null === $page) {
+            return;
+        }
 
-        $page = $this->extractQueryParameter($request, "[$pageParameterName]", $defaultPage);
-        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]", $defaultPerPage);
-
-        $dataTable->paginate(PaginationData::fromArray([
-            'page' => $page,
-            'perPage' => $perPage,
-        ]));
+        $dataTable->paginate(new PaginationData((int) $page, (int) $perPage));
     }
 
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
-        $data = array_intersect_key(
-            $request->request->all($dataTable->getConfig()->getPersonalizationParameterName()),
-            ['columns' => true],
-        );
-
-        if (empty($data)) {
+        if (!$dataTable->getConfig()->isPersonalizationEnabled()) {
             return;
         }
 
-        $dataTable->personalize(PersonalizationData::fromArray($data));
+        $form = $dataTable->createPersonalizationFormBuilder()->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $dataTable->personalize($form->getData());
+        }
     }
 
-    private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed
+    private function export(DataTableInterface $dataTable, Request $request): void
     {
-        return $this->propertyAccessor->getValue($request->query->all(), $path) ?? $default;
+        if (!$dataTable->getConfig()->isExportingEnabled()) {
+            return;
+        }
+
+        $form = $dataTable->createExportFormBuilder()->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $dataTable->export($form->getData());
+        }
+    }
+
+    private function extractQueryParameter(Request $request, string $path): mixed
+    {
+        return $this->propertyAccessor->getValue($request->query->all(), $path);
     }
 }

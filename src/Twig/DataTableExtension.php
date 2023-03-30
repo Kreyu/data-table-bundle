@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Twig;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\HeadersRowView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
-use Kreyu\Bundle\DataTableBundle\ValuesRowView;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
@@ -32,8 +34,8 @@ class DataTableExtension extends AbstractExtension
             'data_table_form_aware' => $this->renderDataTableFormAware(...),
             'data_table_table' => $this->renderDataTableTable(...),
             'data_table_action_bar' => $this->renderDataTableActionBar(...),
-            'data_table_headers_row' => $this->renderHeadersRow(...),
-            'data_table_values_row' => $this->renderValuesRow(...),
+            'data_table_header_row' => $this->renderHeaderRow(...),
+            'data_table_value_row' => $this->renderValueRow(...),
             'data_table_column_label' => $this->renderColumnLabel(...),
             'data_table_column_header' => $this->renderColumnHeader(...),
             'data_table_column_value' => $this->renderColumnValue(...),
@@ -107,11 +109,11 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderHeadersRow(Environment $environment, HeadersRowView $view, array $variables = []): string
+    public function renderHeaderRow(Environment $environment, HeaderRowView $view, array $variables = []): string
     {
         return $this->renderBlock(
             environment: $environment,
-            blockName: 'kreyu_data_table_headers_row',
+            blockName: 'kreyu_data_table_header_row',
             context: array_merge($view->vars, $variables),
         );
     }
@@ -119,11 +121,11 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderValuesRow(Environment $environment, ValuesRowView $view, array $variables = []): string
+    public function renderValueRow(Environment $environment, ValueRowView $view, array $variables = []): string
     {
         return $this->renderBlock(
             environment: $environment,
-            blockName: 'kreyu_data_table_values_row',
+            blockName: 'kreyu_data_table_value_row',
             context: array_merge($view->vars, $variables),
         );
     }
@@ -131,7 +133,7 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderColumnLabel(Environment $environment, ColumnView $view, array $variables = []): string
+    public function renderColumnLabel(Environment $environment, ColumnHeaderView $view, array $variables = []): string
     {
         return $this->renderBlock(
             environment: $environment,
@@ -143,24 +145,24 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderColumnHeader(Environment $environment, ColumnView $view, array $variables = []): string
+    public function renderColumnHeader(Environment $environment, ColumnHeaderView $view, array $variables = []): string
     {
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_column_header',
-            context: array_merge($view->vars, $variables),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'header'),
         );
     }
 
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderColumnValue(Environment $environment, ColumnView $view, array $variables = []): string
+    public function renderColumnValue(Environment $environment, ColumnValueView $view, array $variables = []): string
     {
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_column_value',
-            context: array_merge($view->vars, $variables),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'value'),
         );
     }
 
@@ -172,7 +174,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             blockName: 'kreyu_data_table_action',
-            context: array_merge($view->vars, $variables),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'value'),
         );
     }
 
@@ -262,5 +264,31 @@ class DataTableExtension extends AbstractExtension
         }
 
         throw new RuntimeError(sprintf('Block "%s" does not exist on any of the configured data table themes', $blockName));
+    }
+
+    /**
+     * @throws TwigException|\Throwable
+     */
+    private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array
+    {
+        $context = array_merge($view->vars, $variables);
+        $context['block_name'] = $prefix . '_' . $suffix;
+
+        foreach ($view->vars['block_prefixes'] as $blockPrefix) {
+            $blockName = $prefix . '_' . $blockPrefix . '_' . $suffix;
+
+            foreach ($this->themes as $theme) {
+                $wrapper = $environment->load($theme);
+
+                if ($wrapper->hasBlock($blockName, $context)) {
+                    $context['theme'] = $theme;
+                    $context['block_name'] = $blockName;
+
+                    break 2;
+                }
+            }
+        }
+
+        return $context;
     }
 }

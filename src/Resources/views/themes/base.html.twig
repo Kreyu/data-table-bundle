@@ -300,7 +300,10 @@
 
 {# Action type templates #}
 
+{% block action_value_icon %}{% endblock %}
+
 {% block action_value %}
+    {% if icon_attr %}{{ block('action_value_icon', theme, _context) }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 

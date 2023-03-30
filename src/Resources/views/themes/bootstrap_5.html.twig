@@ -435,6 +435,10 @@
     </li>
 {% endblock %}
 
+{% block action_value_icon %}
+    <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
+{% endblock %}
+
 {% block action_link_value %}
     {% with { attr: { class: 'text-decoration-none' }|merge(attr) } %}
         {{ parent() }}
@@ -442,7 +446,7 @@
 {% endblock %}
 
 {% block action_button_value %}
-    {% with { attr: { class: 'btn btn-primary' }|merge(attr) } %}
+    {% with { attr: { class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '') }|merge(attr) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

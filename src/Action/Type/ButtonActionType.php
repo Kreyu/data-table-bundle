@@ -16,7 +16,7 @@ class ButtonActionType extends AbstractActionType
         if ($view->parent instanceof ColumnValueView) {
             $value = $view->parent->value;
 
-            foreach (['href', 'target'] as $optionName) {
+            foreach (['href', 'target', 'icon_attr'] as $optionName) {
                 if (is_callable($options[$optionName])) {
                     $options[$optionName] = $options[$optionName]($value);
                 }

@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,6 +22,25 @@ final class ActionType implements ActionTypeInterface
             $dataTable = $view->parent->parent->parent;
         }
 
+        if ($view->parent instanceof ColumnValueView) {
+            $value = $view->parent->value;
+
+            $callableOptions = [
+                'label',
+                'translation_domain',
+                'translation_parameters',
+                'block_prefix',
+                'attr',
+                'icon_attr',
+            ];
+
+            foreach ($callableOptions as $optionName) {
+                if (is_callable($options[$optionName])) {
+                    $options[$optionName] = $options[$optionName]($value);
+                }
+            }
+        }
+
         $view->vars = array_replace($view->vars, [
             'data_table' => $dataTable,
             'block_prefixes' => $this->getActionBlockPrefixes($action, $options),
@@ -28,6 +48,7 @@ final class ActionType implements ActionTypeInterface
             'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
             'translation_parameters' => $options['translation_parameters'],
             'attr' => $options['attr'],
+            'icon_attr' => $options['icon_attr'],
         ]);
     }
 
@@ -40,12 +61,14 @@ final class ActionType implements ActionTypeInterface
                 'translation_parameters' => [],
                 'block_prefix' => null,
                 'attr' => [],
+                'icon_attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableMessage::class])
-            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('translation_parameters', ['array'])
-            ->setAllowedTypes('block_prefix', ['null', 'string'])
-            ->setAllowedTypes('attr', ['array'])
+            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', 'callable'])
+            ->setAllowedTypes('translation_parameters', ['array', 'callable'])
+            ->setAllowedTypes('block_prefix', ['null', 'string', 'callable'])
+            ->setAllowedTypes('attr', ['array', 'callable'])
+            ->setAllowedTypes('icon_attr', ['array', 'callable'])
         ;
     }
 

@@ -30,7 +30,7 @@ class SortingData
                 $fields[$value->getName()] = $value;
             } elseif (is_array($value)) {
                 $fields[$key] = SortingFieldData::fromArray($value);
-            } elseif (is_string($key) && is_string($value)) {
+            } elseif (is_string($key)) {
                 $fields[$key] = SortingFieldData::fromArray([
                     'name' => $key,
                     'direction' => $value,

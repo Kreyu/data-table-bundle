@@ -158,6 +158,8 @@ class DataTable implements DataTableInterface
             throw new \RuntimeException('Unable to export the data table without an export data. Explicitly pass the export data as the first argument of the "export()" method.');
         }
 
+        $this->exportData = $data;
+
         $dataTable = clone $this;
 
         if (ExportStrategy::INCLUDE_ALL === $data->strategy) {
@@ -238,6 +240,25 @@ class DataTable implements DataTableInterface
             type: PersonalizationDataType::class,
             options: [
                 'data_table_view' => $view,
+            ],
+        );
+    }
+
+    public function createExportFormBuilder(): FormBuilderInterface
+    {
+        if (!$this->config->isExportingEnabled()) {
+            throw new \RuntimeException('The data table has export feature disabled.');
+        }
+
+        if (null === $this->config->getExportFormFactory()) {
+            throw new \RuntimeException('The data table has no configured export form factory.');
+        }
+
+        return $this->config->getExportFormFactory()->createNamedBuilder(
+            name: $this->getConfig()->getExportParameterName(),
+            type: ExportDataType::class,
+            options: [
+                'exporters' => $this->config->getExporters(),
             ],
         );
     }

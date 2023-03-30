@@ -55,10 +55,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function sort(DataTableInterface $dataTable, Request $request): void
     {
-        $sortParameterName = $dataTable->getConfig()->getSortParameterName();
+        $parameterName = $dataTable->getConfig()->getSortParameterName();
 
-        $sortField = $this->extractQueryParameter($request, "[$sortParameterName][field]");
-        $sortDirection = $this->extractQueryParameter($request, "[$sortParameterName][direction]");
+        $sortField = $this->extractQueryParameter($request, "[$parameterName][field]");
+        $sortDirection = $this->extractQueryParameter($request, "[$parameterName][direction]");
 
         if (null === $sortField) {
             return;
@@ -99,23 +99,16 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function export(DataTableInterface $dataTable, Request $request): void
     {
-        $parameterName = $dataTable->getConfig()->getExportParameterName();
+        $form = $dataTable->createExportFormBuilder()->getForm();
+        $form->handleRequest($request);
 
-        $data = $request->request->all($parameterName);
-
-        if (empty($data)) {
-            return;
+        if ($form->isSubmitted()) {
+            $dataTable->export($form->getData());
         }
-
-        if (null !== $data['exporter'] ?? null) {
-            $data['exporter'] = $dataTable->getConfig()->getExporter($data['exporter']);
-        }
-
-        $dataTable->export(ExportData::fromArray($data));
     }
 
-    private function extractQueryParameter(Request $request, string $path, mixed $default = null): mixed
+    private function extractQueryParameter(Request $request, string $path): mixed
     {
-        return $this->propertyAccessor->getValue($request->query->all(), $path) ?? $default;
+        return $this->propertyAccessor->getValue($request->query->all(), $path);
     }
 }

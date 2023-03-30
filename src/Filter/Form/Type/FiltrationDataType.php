@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
@@ -19,9 +20,11 @@ class FiltrationDataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /**
-         * @var FilterInterface $filter
+         * @var DataTableInterface $dataTable
          */
-        foreach ($options['filters'] as $filter) {
+        $dataTable = $options['data_table'];
+
+        foreach ($dataTable->getConfig()->getFilters() as $filter) {
             $builder->add($filter->getFormName(), FilterDataType::class, array_merge($filter->getFormOptions() + [
                 'getter' => function (FiltrationData $filtrationData, FormInterface $form) {
                     return $filtrationData->getFilterData($form->getName());
@@ -36,13 +39,15 @@ class FiltrationDataType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        /** @var DataTableView $dataTable */
-        if (null === $dataTable = $options['data_table']) {
+        /**
+         * @var DataTableView $dataTableView
+         */
+        if (null === $dataTableView = $options['data_table_view']) {
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
 
         foreach ($view as $name => $filterFormView) {
-            $filterView = $dataTable->filters[$name];
+            $filterView = $dataTableView->filters[$name];
 
             $filterFormView->vars = array_replace($filterFormView->vars, [
                 'label' => $filterView->vars['label'],
@@ -58,10 +63,12 @@ class FiltrationDataType extends AbstractType
                 'method' => 'GET',
                 'data_class' => FiltrationData::class,
                 'csrf_protection' => false,
-                'data_table' => null,
+                'data_table_view' => null,
                 'filters' => [],
             ])
-            ->setAllowedTypes('data_table', ['null', DataTableView::class])
+            ->setRequired('data_table')
+            ->setAllowedTypes('data_table', DataTableInterface::class)
+            ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
             ->setAllowedTypes('filters', FilterInterface::class . '[]')
         ;
     }

@@ -45,13 +45,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     private function filter(DataTableInterface $dataTable, Request $request): void
     {
-        $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
+        $form = $dataTable->createFiltrationFormBuilder()->getForm();
+        $form->handleRequest($request);
 
-        if (null === $data = $this->extractQueryParameter($request, "[$filtrationParameterName]")) {
-            return;
+        if ($form->isSubmitted()) {
+            $dataTable->filter($form->getData());
         }
-
-        $dataTable->filter($data);
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void

@@ -49,14 +49,22 @@ class DataTable implements DataTableInterface
     private ?ExportData $exportData = null;
 
     /**
-     * Lazy-loaded pagination used to retrieve the current page results.
+     * The pagination used to retrieve the current page results.
      */
-    private null|PaginationInterface $pagination = null;
+    private ?PaginationInterface $pagination = null;
+
+    /**
+     * The copy of a query used to retrieve the data, without any filters applied.
+     */
+    private ProxyQueryInterface $nonFilteredQuery;
 
     public function __construct(
         private ProxyQueryInterface $query,
         private DataTableConfigInterface $config,
     ) {
+        $this->nonFilteredQuery = clone $this->query;
+
+        $this->initialize();
     }
 
     public function getConfig(): DataTableConfigInterface
@@ -72,13 +80,15 @@ class DataTable implements DataTableInterface
 
         $this->query->paginate($data);
 
+        $this->nonFilteredQuery = $this->query;
+
+        $this->paginationData = $data;
+
         if ($this->config->isPaginationPersistenceEnabled()) {
             $this->setPersistenceData('pagination', $data);
         }
 
-        $this->paginationData = $data;
-
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
     public function sort(SortingData $data): void
@@ -89,27 +99,24 @@ class DataTable implements DataTableInterface
 
         $this->query->sort($data);
 
+        $this->nonFilteredQuery = $this->query;
+
+        $this->sortingData = $data;
+
         if ($this->config->isSortingPersistenceEnabled()) {
             $this->setPersistenceData('sorting', $data);
         }
 
-        $this->sortingData = $data;
-
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
-    public function filter(FiltrationData|array $data): void
+    public function filter(FiltrationData $data): void
     {
         if (!$this->config->isFiltrationEnabled()) {
             return;
         }
 
-        if (is_array($data)) {
-            $form = $this->createFiltrationFormBuilder()->getForm();
-            $form->submit($data);
-
-            $data = $form->getData();
-        }
+        $this->query = clone $this->nonFilteredQuery;
 
         foreach ($this->config->getFilters() as $filter) {
             $filterData = $data->getFilterData($filter->getName());
@@ -119,26 +126,19 @@ class DataTable implements DataTableInterface
             }
         }
 
+        $this->filtrationData = $data;
+
         if ($this->config->isFiltrationPersistenceEnabled()) {
             $this->setPersistenceData('filtration', $data);
         }
 
-        $this->filtrationData = $data;
-
-        $this->resetPagination();
+        $this->pagination = null;
     }
 
-    public function personalize(PersonalizationData|array $data): void
+    public function personalize(PersonalizationData $data): void
     {
         if (!$this->config->isPersonalizationEnabled()) {
             return;
-        }
-
-        if (is_array($data)) {
-            $form = $this->createPersonalizationFormBuilder()->getForm();
-            $form->submit($data);
-
-            $data = $form->getData();
         }
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
@@ -148,48 +148,29 @@ class DataTable implements DataTableInterface
         $this->personalizationData = $data;
     }
 
-    public function isExporting(): bool
-    {
-        return null !== $this->exportData;
-    }
-
-    public function export(ExportData $exportData = null): ExportFile
+    public function export(ExportData $data = null): ExportFile
     {
         if (!$this->config->isExportingEnabled()) {
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
-        if (null === $exportData ??= $this->exportData) {
+        if (null === $data ??= $this->exportData) {
             throw new \RuntimeException('Unable to export the data table without an export data. Explicitly pass the export data as the first argument of the "export()" method.');
         }
 
         $dataTable = clone $this;
 
-        if (ExportStrategy::INCLUDE_ALL === $exportData->strategy) {
+        if (ExportStrategy::INCLUDE_ALL === $data->strategy) {
             $dataTable->paginate(new PaginationData(perPage: null));
         }
 
-        if (!$exportData->includePersonalization) {
+        if (!$data->includePersonalization) {
             $dataTable->personalize(PersonalizationData::fromDataTable($this));
         }
 
-        $filename = $exportData->filename ?? $this->getConfig()->getName();
+        $filename = $data->filename ?? $this->getConfig()->getName();
 
-        return $exportData->exporter->export($dataTable->createView(), $filename);
-    }
-
-    public function hasActiveFilters(): bool
-    {
-        return (bool) $this->filtrationData?->hasActiveFilters();
-    }
-
-    public function handleRequest(mixed $request): void
-    {
-        if (null === $requestHandler = $this->config->getRequestHandler()) {
-            throw new \RuntimeException(sprintf('The "handleRequest cannot be used on data tables without configured request handler.', __METHOD__));
-        }
-
-        $requestHandler->handle($this, $request);
+        return $data->exporter->export($dataTable->createView(), $filename);
     }
 
     public function getPagination(): PaginationInterface
@@ -197,28 +178,23 @@ class DataTable implements DataTableInterface
         return $this->pagination ??= $this->query->getPagination();
     }
 
-    public function getSortingData(): ?SortingData
+    public function getSortingData(): SortingData
     {
         return $this->sortingData;
     }
 
-    public function getPaginationData(): ?PaginationData
+    public function getPaginationData(): PaginationData
     {
         return $this->paginationData;
     }
 
-    public function getFiltrationData(): ?FiltrationData
+    public function getFiltrationData(): FiltrationData
     {
-        // $this->filtrationData?->appendMissingFilters($this->getConfig()->getFilters());
-
         return $this->filtrationData;
     }
 
-    public function getPersonalizationData(): ?PersonalizationData
+    public function getPersonalizationData(): PersonalizationData
     {
-        $this->personalizationData ??= PersonalizationData::fromDataTable($this);
-        $this->personalizationData->appendMissingColumns($this->getConfig()->getColumns());
-
         return $this->personalizationData;
     }
 
@@ -241,8 +217,8 @@ class DataTable implements DataTableInterface
             name: $this->getConfig()->getFiltrationParameterName(),
             type: FiltrationDataType::class,
             options: [
-                'data_table' => $view,
-                'filters' => $this->config->getFilters(),
+                'data_table' => $this,
+                'data_table_view' => $view,
             ],
         );
     }
@@ -261,31 +237,34 @@ class DataTable implements DataTableInterface
             name: $this->getConfig()->getPersonalizationParameterName(),
             type: PersonalizationDataType::class,
             options: [
-                'data_table' => $view,
+                'data_table_view' => $view,
             ],
         );
+    }
+
+    public function isExporting(): bool
+    {
+        return null !== $this->exportData;
+    }
+
+    public function hasActiveFilters(): bool
+    {
+        return (bool) $this->filtrationData?->hasActiveFilters();
+    }
+
+    public function handleRequest(mixed $request): void
+    {
+        if (null === $requestHandler = $this->config->getRequestHandler()) {
+            throw new \RuntimeException('The "handleRequest" method cannot be used on data tables without configured request handler.');
+        }
+
+        $requestHandler->handle($this, $request);
     }
 
     public function createView(): DataTableView
     {
         if (empty($this->config->getColumns())) {
             throw new \LogicException('The data table has no configured columns.');
-        }
-
-        if (null === $this->paginationData) {
-            $this->paginate($this->getDefaultPaginationData());
-        }
-
-        if (null === $this->sortingData) {
-            $this->sort($this->getDefaultSortingData());
-        }
-
-        if (null === $this->filtrationData) {
-            $this->filter($this->getDefaultFiltrationData());
-        }
-
-        if (null === $this->personalizationData && $personalizationData = $this->getDefaultPersonalizationData()) {
-            $this->personalize($personalizationData);
         }
 
         $type = $this->config->getType();
@@ -298,67 +277,93 @@ class DataTable implements DataTableInterface
         return $view;
     }
 
-    private function getDefaultPaginationData(): ?PaginationData
+    private function initialize(): void
+    {
+        if ($paginationData = $this->getInitialPaginationData()) {
+            $this->paginate($paginationData);
+        }
+
+        if ($sortingData = $this->getInitialSortingData()) {
+            $this->sort($sortingData);
+        }
+
+        if ($filtrationData = $this->getInitialFiltrationData()) {
+            $this->filter($filtrationData);
+        }
+
+        if ($personalizationData = $this->getInitialPersonalizationData()) {
+            $this->personalize($personalizationData);
+        }
+    }
+
+    private function getInitialPaginationData(): ?PaginationData
     {
         if (!$this->config->isPaginationEnabled()) {
             return null;
         }
 
-        $data = $this->config->getDefaultPaginationData();
-
         if ($this->config->isPaginationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('pagination');
         }
 
-        $data ??= new PaginationData(
-            page: PaginationInterface::DEFAULT_PAGE,
-            perPage: PaginationInterface::DEFAULT_PER_PAGE,
-        );
+        $data ??= $this->config->getDefaultPaginationData();
+
+        $data ??= new PaginationData();
 
         return $data;
     }
 
-    private function getDefaultSortingData(): ?SortingData
+    private function getInitialSortingData(): ?SortingData
     {
         if (!$this->config->isSortingEnabled()) {
             return null;
         }
 
-        $data = $this->config->getDefaultSortingData();
-
         if ($this->config->isSortingPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('sorting');
         }
 
+        $data ??= $this->config->getDefaultSortingData();
+
+        $data ??= new SortingData();
+
         return $data;
     }
 
-    private function getDefaultFiltrationData()
+    private function getInitialFiltrationData(): ?FiltrationData
     {
         if (!$this->config->isFiltrationEnabled()) {
             return null;
         }
 
-        $data = $this->config->getDefaultFiltrationData();
-
         if ($this->config->isFiltrationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('filtration');
         }
 
+        $data ??= $this->config->getDefaultFiltrationData();
+
+        $data ??= FiltrationData::fromDataTable($this);
+
+        $data->appendMissingFilters($this->getConfig()->getFilters());
+
         return $data;
     }
 
-    private function getDefaultPersonalizationData(): ?PersonalizationData
+    private function getInitialPersonalizationData(): ?PersonalizationData
     {
         if (!$this->config->isPersonalizationEnabled()) {
             return null;
         }
 
-        $data = $this->config->getDefaultPersonalizationData();
-
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('personalization');
         }
+
+        $data ??= $this->config->getDefaultPersonalizationData();
+
+        $data ??= PersonalizationData::fromDataTable($this);
+
+        $data->appendMissingColumns($this->getConfig()->getColumns());
 
         return $data;
     }
@@ -430,10 +435,5 @@ class DataTable implements DataTableInterface
         }
 
         return $subject;
-    }
-
-    private function resetPagination(): void
-    {
-        $this->pagination = null;
     }
 }

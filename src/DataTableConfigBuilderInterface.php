@@ -100,7 +100,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
 
-    public function setDefaultFiltrationData(array $defaultFiltrationData): static;
+    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static;
 
     public function setSortingEnabled(bool $sortingEnabled): static;
 

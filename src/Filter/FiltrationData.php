@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class FiltrationData
 {
     /**
-     * @param array<FilterData> $filters
+     * @var array<FilterData>
      */
-    public function __construct(
-        private array $filters = [],
-    ) {
+//    private array $filters = [];
+
+    public function __construct(private array $filters = [])
+    {
         foreach ($filters as $filter) {
             if (!$filter instanceof FilterData) {
                 throw new UnexpectedTypeException($filter, FilterData::class);
@@ -35,6 +37,17 @@ class FiltrationData
             }
 
             $filters[$key] = $value;
+        }
+
+        return new static($filters);
+    }
+
+    public static function fromDataTable(DataTableInterface $dataTable): static
+    {
+        $filters = [];
+
+        foreach ($dataTable->getConfig()->getFilters() as $filter) {
+            $filters[$filter->getName()] = new FilterData();
         }
 
         return new static($filters);

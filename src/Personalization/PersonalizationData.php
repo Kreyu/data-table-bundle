@@ -160,7 +160,13 @@ class PersonalizationData
 
     private function appendColumn(string|ColumnInterface $column, bool $visible): void
     {
-        $columnsOrders = array_map(fn (PersonalizationColumnData $column) => $column->getOrder(), $this->columns);
+        $columnsOrders = array_map(
+            fn (PersonalizationColumnData $column) => $column->getOrder(),
+            array_filter(
+                $this->columns,
+                fn (PersonalizationColumnData $columnData) => $columnData->isVisible() === $visible,
+            )
+        );
 
         $columnOrder = 0;
 

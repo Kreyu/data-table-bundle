@@ -142,7 +142,7 @@
 {% block filter_clear_button %}
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
-    <a class="btn btn-outline-dark px-2"
+    <a class="btn px-2"
        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
        data-toggle="tooltip"
        data-placement="bottom"

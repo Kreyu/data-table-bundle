@@ -11,7 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 
 interface DataTableInterface
 {
@@ -25,25 +25,29 @@ interface DataTableInterface
 
     public function personalize(PersonalizationData $data): void;
 
-    public function export(ExportData $exportData = null): ExportFile;
+    public function export(ExportData $data = null): ExportFile;
+
+    public function getPagination(): PaginationInterface;
+
+    public function getSortingData(): SortingData;
+
+    public function getPaginationData(): PaginationData;
+
+    public function getFiltrationData(): FiltrationData;
+
+    public function getPersonalizationData(): PersonalizationData;
+
+    public function getExportData(): ?ExportData;
+
+    public function createFiltrationFormBuilder(DataTableView $view = null): FormBuilderInterface;
+
+    public function createPersonalizationFormBuilder(DataTableView $view = null): FormBuilderInterface;
 
     public function isExporting(): bool;
 
     public function hasActiveFilters(): bool;
 
     public function handleRequest(mixed $request): void;
-
-    public function getPagination(): PaginationInterface;
-
-    public function getSortingData(): ?SortingData;
-
-    public function getPaginationData(): ?PaginationData;
-
-    public function getFiltrationData(): ?FiltrationData;
-
-    public function getPersonalizationData(): ?PersonalizationData;
-
-    public function getExportData(): ?ExportData;
 
     public function createView(): DataTableView;
 }

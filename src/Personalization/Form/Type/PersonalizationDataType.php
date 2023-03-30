@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,13 +25,15 @@ class PersonalizationDataType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        /** @var DataTableView $dataTable */
-        if (null === $dataTable = $options['data_table']) {
+        /**
+         * @var DataTableView $dataTableView
+         */
+        if (null === $dataTableView = $options['data_table_view']) {
             throw new \LogicException('Unable to create personalization form view without the data table view.');
         }
 
         foreach ($view['columns'] as $name => $columnFormView) {
-            $columnView = $dataTable->nonPersonalizedHeaderRow[$name];
+            $columnView = $dataTableView->nonPersonalizedHeaderRow[$name];
 
             $columnFormView->vars = array_replace($columnFormView->vars, [
                 'label' => $columnView->vars['label'],
@@ -53,9 +52,9 @@ class PersonalizationDataType extends AbstractType
         $resolver
             ->setDefaults([
                 'data_class' => PersonalizationData::class,
-                'data_table' => null,
+                'data_table_view' => null,
             ])
-            ->setAllowedTypes('data_table', ['null', DataTableView::class])
+            ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
         ;
     }
 

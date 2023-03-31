@@ -23,27 +23,28 @@ final class FilterType implements FilterTypeInterface
 
     public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
     {
-        $resolver = clone $filter->getType()->getOptionsResolver();
-
         $value = $data;
 
         if ($value->hasValue() && $formatter = $options['active_filter_formatter']) {
             $value = $formatter($data, $filter, $options);
         }
 
-        $resolver->setDefaults([
-            'name' => $filter->getName(),
-            'form_name' => $filter->getFormName(),
-            'label' => StringUtil::camelToSentence($filter->getName()),
-            'translation_domain' => $view->parent->vars['translation_domain'],
-            'query_path' => $filter->getName(),
+        $view->vars = array_replace($view->vars, [
+            'name' => $options['name'] ?? $filter->getName(),
+            'form_name' => $options['form_name'] ?? $filter->getFormName(),
+            'label' => $options['label'] ?? StringUtil::camelToSentence($filter->getName()),
+            'label_translation_parameters' => $options['label_translation_parameters'],
+            'translation_domain' => $options['translation_domain'] ?? $view->parent->vars['translation_domain'],
+            'query_path' => $options['query_path'] ?? $filter->getName(),
+            'field_Type' => $options['field_type'],
+            'field_options' => $options['field_options'],
+            'operator_type' => $options['operator_type'],
+            'operator_options' => $options['operator_options'],
+            'auto_alias_resolving' => $options['auto_alias_resolving'],
+            'active_filter_formatter' => $options['active_filter_formatter'],
             'data' => $data,
             'value' => $value,
         ]);
-
-        $options = $resolver->resolve(array_filter($options));
-
-        $view->vars = $options;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -66,7 +67,7 @@ final class FilterType implements FilterTypeInterface
                     return $data->getValue();
                 },
             ])
-            ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'bool', 'string', TranslatableMessage::class])
             ->setAllowedTypes('query_path', ['null', 'string'])
             ->setAllowedTypes('field_type', ['string'])
             ->setAllowedTypes('field_options', ['array'])

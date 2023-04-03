@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -74,7 +74,7 @@ class FiltrationDataType extends AbstractType
                 continue;
             }
 
-            if ($filter->getType()->getInnerType() instanceof SearchFilterType) {
+            if ($filter->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
                 $searchField = $view[$child->getName()];
                 $searchField->vars['attr']['form'] = $view->vars['id'];
 

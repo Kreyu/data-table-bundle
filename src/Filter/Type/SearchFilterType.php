@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SearchFilterType extends AbstractFilterType
+class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInterface
 {
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {

@@ -10,10 +10,8 @@ use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 class FiltrationData
 {
     /**
-     * @var array<FilterData>
+     * @param array<FilterData> $filters
      */
-//    private array $filters = [];
-
     public function __construct(private array $filters = [])
     {
         foreach ($filters as $filter) {

@@ -11,12 +11,13 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FiltrationDataType extends AbstractType
+class FiltrationDataType extends AbstractType implements DataMapperInterface
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -36,6 +37,8 @@ class FiltrationDataType extends AbstractType
                 'empty_data' => new FilterData,
             ]));
         }
+
+        $builder->setDataMapper($this);
     }
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
@@ -102,5 +105,35 @@ class FiltrationDataType extends AbstractType
             ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
             ->setAllowedTypes('filters', FilterInterface::class . '[]')
         ;
+    }
+
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
+    {
+        if (null === $viewData) {
+            return;
+        }
+
+        $forms = iterator_to_array($forms);
+
+        foreach ($forms as $name => $form) {
+            $filterData = $viewData->getFilterData($name);
+
+            if ($filterData && $filterData->hasValue()) {
+                $form->setData($filterData);
+            }
+        }
+    }
+
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
+    {
+        if (null === $viewData) {
+            $viewData = new FiltrationData();
+        }
+
+        $forms = iterator_to_array($forms);
+
+        foreach ($forms as $name => $form) {
+            $viewData->setFilterData($name, $form->getData());
+        }
     }
 }

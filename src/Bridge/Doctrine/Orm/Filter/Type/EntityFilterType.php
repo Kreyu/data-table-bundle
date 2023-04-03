@@ -21,7 +21,7 @@ class EntityFilterType extends AbstractFilterType
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
         $operator = $data->getOperator() ?? Operator::EQUALS;
-        $value = (array) $data->getValue();
+        $value = $data->getValue();
 
         try {
             $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);

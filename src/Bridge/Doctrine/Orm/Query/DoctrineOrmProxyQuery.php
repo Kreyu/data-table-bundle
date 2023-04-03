@@ -44,6 +44,11 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $this->queryBuilder = clone $this->queryBuilder;
     }
 
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
+
     public function sort(SortingData $sortingData): void
     {
         $rootAlias = current($this->queryBuilder->getRootAliases());

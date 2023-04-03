@@ -16,6 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Persistence\CachePersistenceAdapter;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -62,6 +63,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.filter.type.filter', FilterType::class)
+        ->tag('kreyu_data_table.filter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.filter.type.search', SearchFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 

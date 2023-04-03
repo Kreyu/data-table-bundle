@@ -35,6 +35,7 @@ The `HeaderRowView` represents a row of headers. It contains two additional prop
 :   Holds collection of `ColumnHeaderView` instances, so you can use it to render row columns.
     Instead of accessing the `children` property, you can iterate on the `HeaderRowView` directly:
     
+    {% raw %}
     ```twig
     {% for row in header_rows %}
         {% for column in row %}
@@ -42,7 +43,7 @@ The `HeaderRowView` represents a row of headers. It contains two additional prop
         {% endfor %}
     {% endfor %}
     ```
-
+    {% endraw %}
 
 ## `ValueRowView`
 
@@ -56,7 +57,8 @@ The `ValueRowView` represents a row of data. It contains five additional propert
 
 :   Holds collection of `ColumnValueView` instances, so you can use it to render row columns.
     Instead of accessing the `children` property, you can iterate on the `ValueRowView` directly:
-    
+
+    {% raw %}
     ```twig
     {% for row in value_rows %}
         {% for column in row %}
@@ -64,26 +66,31 @@ The `ValueRowView` represents a row of data. It contains five additional propert
         {% endfor %}
     {% endfor %}
     ```
+    {% endraw %}
 
 `index`
 
 :   Holds the index of a current row, so you can use it to render a row number:
-    
+
+    {% raw %}
     ```twig
     {% for row in value_rows %}
         {{ row.index }}
     {% endfor %}
     ```
+    {% endraw %}
 
 `data`
 
 :   Holds the data of a current row, so you can use it to access the data of a row:
-    
+
+    {% raw %}
     ```twig
     {% for row in value_rows %}
         {{ row.data.id }}
     {% endfor %}
     ```
+    {% endraw %}
 
 `origin`
 

@@ -25,6 +25,10 @@
 {% endblock %}
 
 {% block action_bar_end %}
+    {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
+        {{ block('action_search') }}
+    {% endif %}
+    
     {% for action in actions %}
         {{ data_table_action(action) }}
     {% endfor %}
@@ -42,6 +46,16 @@
         {{ block('action_personalize') }}
         {{ block('personalization_modal') }}
     {% endif %}
+{% endblock %}
+
+{% block action_search %}
+    {% form_theme filtration_form with [_self, 'bootstrap_5_layout.html.twig'] %}
+
+    <div class="d-inline-block">
+        {% for child in filtration_form.vars.search_fields %}
+            {{ form_widget(child.value, { attr: { form: filtration_form.vars.id } }) }}
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% block action_filter %}

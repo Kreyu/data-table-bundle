@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -40,11 +41,20 @@ class FiltrationDataType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         /**
+         * @var DataTableInterface $dataTable
+         */
+        $dataTable = $options['data_table'];
+
+        /**
          * @var DataTableView $dataTableView
          */
-        if (null === $dataTableView = $options['data_table_view']) {
+        $dataTableView = $options['data_table_view'];
+
+        if (null === $dataTableView) {
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
+
+        $view->vars['attr']['id'] = $view->vars['id'];
 
         foreach ($view as $name => $filterFormView) {
             $filterView = $dataTableView->filters[$name];
@@ -54,6 +64,27 @@ class FiltrationDataType extends AbstractType
                 'translation_domain' => $filterView->vars['translation_domain'],
             ]);
         }
+
+        $searchFields = [];
+
+        foreach ($form as $child) {
+            try {
+                $filter = $dataTable->getConfig()->getFilter($child->getName());
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+
+            if ($filter->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
+                $searchField = $view[$child->getName()];
+                $searchField->vars['attr']['form'] = $view->vars['id'];
+
+                $searchFields[] = $searchField;
+
+                unset($view[$child->getName()]);
+            }
+        }
+
+        $view->vars['search_fields'] = $searchFields;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

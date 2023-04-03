@@ -40,7 +40,10 @@ class EntityFilterType extends AbstractFilterType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('field_type', EntityFormType::class);
+        $resolver->setDefaults([
+            'field_type' => EntityFormType::class,
+            'choice_label' => null,
+        ]);
 
         $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
             $resolver->setDefaults([
@@ -55,12 +58,10 @@ class EntityFilterType extends AbstractFilterType
         });
 
         $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): mixed {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
-            $choiceLabel = $options['field_options']['choice_label'];
+            $choiceLabel = $options['choice_label'];
 
             if (is_string($choiceLabel)) {
-                return $propertyAccessor->getValue($data->getValue(), $choiceLabel);
+                return (PropertyAccess::createPropertyAccessor())->getValue($data->getValue(), $choiceLabel);
             }
 
             if (is_callable($choiceLabel)) {

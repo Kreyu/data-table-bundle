@@ -130,7 +130,7 @@ final class ActionType implements ActionTypeInterface
 
     private function getConfirmationOptionsResolver(): OptionsResolver
     {
-        return (new OptionsResolver)
+        return (new OptionsResolver())
             ->setDefaults([
                 'translation_domain' => 'KreyuDataTable',
                 'label_title' => 'Action confirmation',

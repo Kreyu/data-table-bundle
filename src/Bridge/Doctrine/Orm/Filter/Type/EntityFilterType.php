@@ -61,7 +61,7 @@ class EntityFilterType extends AbstractFilterType
             $choiceLabel = $options['choice_label'];
 
             if (is_string($choiceLabel)) {
-                return (PropertyAccess::createPropertyAccessor())->getValue($data->getValue(), $choiceLabel);
+                return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
             }
 
             if (is_callable($choiceLabel)) {

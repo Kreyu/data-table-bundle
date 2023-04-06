@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Traversable;
 
 class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -27,7 +26,7 @@ class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
     ) {
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->children);
     }

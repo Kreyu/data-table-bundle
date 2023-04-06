@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Twig;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
@@ -272,10 +271,10 @@ class DataTableExtension extends AbstractExtension
     private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array
     {
         $context = array_merge($view->vars, $variables);
-        $context['block_name'] = $prefix . '_' . $suffix;
+        $context['block_name'] = $prefix.'_'.$suffix;
 
         foreach ($view->vars['block_prefixes'] as $blockPrefix) {
-            $blockName = $prefix . '_' . $blockPrefix . '_' . $suffix;
+            $blockName = $prefix.'_'.$blockPrefix.'_'.$suffix;
 
             foreach ($this->themes as $theme) {
                 $wrapper = $environment->load($theme);

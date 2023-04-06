@@ -16,7 +16,7 @@ class ExportData
 
     public static function fromArray(array $data): static
     {
-        $resolver = (new OptionsResolver)
+        $resolver = (new OptionsResolver())
             ->setRequired('exporter')
             ->setDefaults([
                 'filename' => 'export',

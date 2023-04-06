@@ -21,9 +21,6 @@ class DataTableView
      */
     public array $valueRows = [];
 
-    /**
-     * @var PaginationView
-     */
     public PaginationView $pagination;
 
     /**

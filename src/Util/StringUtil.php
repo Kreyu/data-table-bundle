@@ -37,8 +37,8 @@ class StringUtil
     {
         return ucfirst(strtolower(preg_replace_callback(
             '/(([A-Z]{1}))/',
-            function ($matches) {return " " .$matches[0];},
-            $string
+            function ($matches) {return ' '.$matches[0]; },
+            $string,
         )));
     }
 }

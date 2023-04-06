@@ -34,7 +34,7 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
                 'setter' => function (FiltrationData $filtrationData, FilterData $filterData, FormInterface $form) {
                     $filtrationData->setFilterData($form->getName(), $filterData);
                 },
-                'empty_data' => new FilterData,
+                'empty_data' => new FilterData(),
             ]));
         }
 
@@ -103,7 +103,7 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
             ->setRequired('data_table')
             ->setAllowedTypes('data_table', DataTableInterface::class)
             ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
-            ->setAllowedTypes('filters', FilterInterface::class . '[]')
+            ->setAllowedTypes('filters', FilterInterface::class.'[]')
         ;
     }
 

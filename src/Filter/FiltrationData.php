@@ -25,7 +25,7 @@ class FiltrationData
 
     /**
      * Creates a new instance of filtration data from an array.
-     * The array keys are the filter names, and values can be either:
+     * The array keys are the filter names, and values can be either:.
      *
      * - an instance of {@see FilterData}
      * - an array of filter data
@@ -119,7 +119,7 @@ class FiltrationData
     /**
      * @param array<FilterInterface> $filters
      */
-    public function appendMissingFilters(array $filters, FilterData $data = new FilterData): void
+    public function appendMissingFilters(array $filters, FilterData $data = new FilterData()): void
     {
         foreach ($filters as $column) {
             if (null === $this->getFilterData($column)) {

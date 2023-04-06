@@ -25,7 +25,7 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
                 'operator_options' => [
                     'visible' => false,
                     'choices' => [],
-                ]
+                ],
             ])
             ->setRequired('handler')
             ->setAllowedTypes('handler', 'callable')

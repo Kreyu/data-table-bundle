@@ -7,8 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationColumnDataType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
 {
@@ -49,9 +47,6 @@ class PersonalizationData
      * Creates a new instance from a {@see DataTableInterface}.
      * The columns are be added in order they are defined in the data table.
      * Every column is marked as "visible" by default.
-     *
-     * @param  DataTableInterface $dataTable
-     * @return static
      */
     public static function fromDataTable(DataTableInterface $dataTable): static
     {
@@ -205,7 +200,7 @@ class PersonalizationData
             array_filter(
                 $this->columns,
                 fn (PersonalizationColumnData $columnData) => $columnData->isVisible() === $visible,
-            )
+            ),
         );
 
         $columnOrder = 0;

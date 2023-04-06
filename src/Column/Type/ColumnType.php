@@ -161,7 +161,7 @@ final class ColumnType implements ColumnTypeInterface
     }
 
     /**
-     * Retrieves the column norm data from the row data by either:
+     * Retrieves the column norm data from the row data by either:.
      *
      * - using the "getter" option;
      * - using the property accessor with the "property_path" option;

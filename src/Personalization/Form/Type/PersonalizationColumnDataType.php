@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

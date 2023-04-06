@@ -261,7 +261,6 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
 {% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
-{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
 {% block column_quantity_value %}
     {# ... #}
@@ -280,7 +279,6 @@ If you wish to override the header part of the type, you can create a Twig block
 {% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
-{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
 {% block column_quantity_header %}
     {# ... #}
@@ -316,11 +314,11 @@ class QuantityColumnType extends AbstractColumnType
         
         // create an additional variable named "converted_value" that will hold the value after the conversion
         $view->vars['converted_value'] = $view->vars['value'] ?? null;
-        
+            
         if (null !== $view->vars['converted_value']) {
             // use some implementation of unit converter to do the heavy work
             $view->vars['converted_value'] = $this->unitConverter
-                ->convert($value)
+                ->convert($view->vars['converted_value'])
                 ->from($options['unit_from'])
                 ->to($options['unit_to'])
             ;

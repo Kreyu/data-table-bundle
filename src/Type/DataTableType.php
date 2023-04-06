@@ -5,22 +5,14 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
-use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
-use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
-use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
-use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -123,34 +115,6 @@ final class DataTableType implements DataTableTypeInterface
         }
     }
 
-    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
-    {
-        return new PaginationView($view, $dataTable->getPagination());
-    }
-
-    private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
-    {
-        return array_map(
-            fn (ActionInterface $action) => $action->createView($view),
-            $dataTable->getConfig()->getActions(),
-        );
-    }
-
-    private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
-    {
-        $filters = [];
-
-        $filtrationData = $dataTable->getFiltrationData();
-
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $data = $filtrationData?->getFilterData($filter->getName()) ?? new FilterData();
-
-            $filters[$filter->getName()] = $filter->createView($data, $view);
-        }
-
-        return $filters;
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -191,6 +155,34 @@ final class DataTableType implements DataTableTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
+    {
+        return new PaginationView($view, $dataTable->getPagination());
+    }
+
+    private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        return array_map(
+            fn (ActionInterface $action) => $action->createView($view),
+            $dataTable->getConfig()->getActions(),
+        );
+    }
+
+    private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        $filters = [];
+
+        $filtrationData = $dataTable->getFiltrationData();
+
+        foreach ($dataTable->getConfig()->getFilters() as $filter) {
+            $data = $filtrationData?->getFilterData($filter->getName()) ?? new FilterData();
+
+            $filters[$filter->getName()] = $filter->createView($data, $view);
+        }
+
+        return $filters;
     }
 
     /**

@@ -45,7 +45,7 @@ class PersonalizationColumnData
         return $self;
     }
 
-    public static function fromColumn(ColumnInterface $column, int $order, bool $visible = true): static
+    public static function fromColumn(ColumnInterface $column, int $order = 0, bool $visible = true): static
     {
         $self = new static();
         $self->name = $column->getName();

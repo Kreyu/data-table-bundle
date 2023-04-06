@@ -118,13 +118,20 @@ class DataTable implements DataTableInterface
 
         $this->query = clone $this->nonFilteredQuery;
 
-        foreach ($this->config->getFilters() as $filter) {
+        $filters = $this->config->getFilters();
+
+        foreach ($filters as $filter) {
             $filterData = $data->getFilterData($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
                 $filter->apply($this->query, $filterData);
             }
         }
+
+        $filters = $this->config->getFilters();
+
+        $data->appendMissingFilters($filters);
+        $data->removeRedundantFilters($filters);
 
         $this->filtrationData = $data;
 
@@ -140,6 +147,11 @@ class DataTable implements DataTableInterface
         if (!$this->config->isPersonalizationEnabled()) {
             return;
         }
+
+        $columns = $this->config->getColumns();
+
+        $data->addMissingColumns($columns);
+        $data->removeRedundantColumns($columns);
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             $this->setPersistenceData('personalization', $data);
@@ -268,7 +280,7 @@ class DataTable implements DataTableInterface
 
     public function hasActiveFilters(): bool
     {
-        return (bool) $this->filtrationData?->hasActiveFilters();
+        return $this->filtrationData->hasActiveFilters();
     }
 
     public function handleRequest(mixed $request): void
@@ -381,8 +393,6 @@ class DataTable implements DataTableInterface
         $data ??= $this->config->getDefaultPersonalizationData();
 
         $data ??= PersonalizationData::fromDataTable($this);
-
-        $data->appendMissingColumns($this->getConfig()->getColumns());
 
         return $data;
     }

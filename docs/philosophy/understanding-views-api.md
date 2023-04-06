@@ -55,6 +55,7 @@ DataTableView
 
 ## Reference
 
+
 ### Header row
 
 The `HeaderRowView` represents a row of headers. It contains two additional properties:
@@ -62,6 +63,8 @@ The `HeaderRowView` represents a row of headers. It contains two additional prop
 !!! Note
 
     If the personalization is enabled, only the columns marked as visible are included in the header row.
+    Because of that, the `nonPersonalizedHeaderRow` property is also available, which represents a row of headers
+    with **all defined columns**, regardless of the visibility applied by the personalization.
 
 `parent`
 
@@ -82,10 +85,6 @@ The `HeaderRowView` represents a row of headers. It contains two additional prop
     ```
     {% endraw %}
 
-### Non personalized header row
-
-With similar logic to the regular header row, the `nonPersonalizedHeaderRowView` represents a row of headers
-with **all defined columns**, regardless of the visibility applied by the personalization.
 
 ### Value row
 

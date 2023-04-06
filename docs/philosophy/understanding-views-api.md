@@ -24,7 +24,7 @@ DataTableView
 │   ├── headerRow.children.1 (ColumnHeaderView)
 │   └── headerRow.children.2 (ColumnHeaderView)
 │
-├── non_personalizaed_header_row (HeaderRowView)
+├── nonPersonalizedHeaderRow (HeaderRowView)
 │   ├── nonPersonalizedHeaderRow.children.0 (ColumnHeaderView)
 │   ├── nonPersonalizedHeaderRow.children.1 (ColumnHeaderView)
 │   └── nonPersonalizedHeaderRow.children.2 (ColumnHeaderView)
@@ -59,6 +59,10 @@ DataTableView
 
 The `HeaderRowView` represents a row of headers. It contains two additional properties:
 
+!!! Note
+
+    If the personalization is enabled, only the columns marked as visible are included in the header row.
+
 `parent`
 
 :   Holds a reference to a `DataTableView`, which represents the whole data table.
@@ -78,6 +82,10 @@ The `HeaderRowView` represents a row of headers. It contains two additional prop
     ```
     {% endraw %}
 
+### Non personalized header row
+
+With similar logic to the regular header row, the `nonPersonalizedHeaderRowView` represents a row of headers
+with **all defined columns**, regardless of the visibility applied by the personalization.
 
 ### Value row
 

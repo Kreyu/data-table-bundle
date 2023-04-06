@@ -236,11 +236,13 @@ However, for some types you may prefer to create a custom template in order to c
 
 First, create a new Twig template anywhere in the application to store the fragments used to render the types:
 
+{% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
 
 {# ... here you will add the Twig code ... #}
 ```
+{% endraw %}
 
 Then, update the [theme configuration option](../../reference/configuration.md#themes) to use this new template:
 
@@ -261,15 +263,30 @@ The template contents depend on which HTML, CSS and JavaScript frameworks and li
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
-{% block kreyu_data_table_column_quantity %}
+{% block column_quantity_value %}
     {# ... #}
 {% endblock %}
 ```
 {% endraw %}
 
-Every block is prefixed with `kreyu_data_table_column_` by default.
-Last part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityColumnType` -> `quantity`).
+Every block is prefixed with `column_`.
+The identifying part of the Twig block name (e.g. `quantity`) comes from the class name (`QuantityColumnType` -> `quantity`).
 This can be controlled by overriding the `getBlockPrefix()` method in `QuantityColumnType`.
+The second part of the Twig block name (e.g. `_value`) defines which part of the column is being rendered.
+
+Columns are rendered in two parts: header and value.
+If you wish to override the header part of the type, you can create a Twig block named `column_quantity_header`:
+
+{% raw %}
+```twig
+{# templates/data_table/theme.html.twig #}
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
+
+{% block column_quantity_header %}
+    {# ... #}
+{% endblock %}
+```
+{% endraw %}
 
 ## Passing variables to the type template
 
@@ -283,9 +300,6 @@ namespace App\DataTable\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class QuantityColumnType extends AbstractColumnType
 {
@@ -315,17 +329,50 @@ class QuantityColumnType extends AbstractColumnType
 }
 ```
 
-The variables added in `buildValueView()` are available in the column type template as any other regular Twig variable:
+The variables added in `buildValueView()` are available in the column type value template as any other regular Twig variable:
 
 {% raw %}
 ```twig
 {# templates/data_table/theme.html.twig #}
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
-{% block kreyu_data_table_column_quantity %}
+{% block column_quantity_value %}
     {% if converted_value is not null %}
         {{- converted_value|number_format(decimals, decimal_separator, thousands_separator) -}}
     {% endif %}
+{% endblock %}
+```
+{% endraw %}
+
+You can also pass variables to the header template from the column type configuration:
+
+```php
+// src/DataTable/Column/Type/QuantityColumnType.php
+namespace App\DataTable\Column\Type;
+
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
+
+class QuantityColumnType extends AbstractColumnType
+{
+    public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
+    {    
+        // pass the custom options directly to the template
+        $view->vars['unit'] = $options['unit_to'];
+    }
+}
+```
+
+Similar to `buildValueView()`, the variables added in `buildHeaderView()` are available in the column type header template as any other regular Twig variable:
+
+{% raw %}
+```twig
+{# templates/data_table/theme.html.twig #}
+{% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
+
+{% block column_quantity_header %}
+    {{- block('column_header') -}} ({{ unit }})
 {% endblock %}
 ```
 {% endraw %}

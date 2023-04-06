@@ -28,6 +28,9 @@ final class FilterType implements FilterTypeInterface
             $value = $formatter($data, $filter, $options);
         }
 
+        $view->data = $data;
+        $view->value = $value;
+
         $view->vars = array_replace($view->vars, [
             'name' => $options['name'] ?? $filter->getName(),
             'form_name' => $options['form_name'] ?? $filter->getFormName(),
@@ -41,8 +44,8 @@ final class FilterType implements FilterTypeInterface
             'operator_options' => $options['operator_options'],
             'auto_alias_resolving' => $options['auto_alias_resolving'],
             'active_filter_formatter' => $options['active_filter_formatter'],
-            'data' => $data,
-            'value' => $value,
+            'data' => $view->data,
+            'value' => $view->value,
         ]);
     }
 

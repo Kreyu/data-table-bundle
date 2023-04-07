@@ -10,13 +10,22 @@ use Psr\Cache\InvalidArgumentException;
 use function Symfony\Component\String\u;
 
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CachePersistenceAdapter implements PersistenceAdapterInterface
 {
+    public const TAG_PREFIX = 'kreyu_data_table_persistence_';
+
     public function __construct(
         private CacheInterface $cache,
         private string $prefix,
     ) {
+    }
+
+    public static function getTagName(PersistenceSubjectInterface $subject): string
+    {
+        return self::TAG_PREFIX.$subject->getDataTablePersistenceIdentifier();
     }
 
     /**
@@ -27,7 +36,8 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
         $cacheKey = $this->getCacheKey($dataTable, $subject);
 
         $this->cache->delete($cacheKey);
-        $this->cache->get($cacheKey, fn () => $data);
+
+        $this->getCacheValue($cacheKey, $this->getTagName($subject), $data);
     }
 
     /**
@@ -37,7 +47,7 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
     {
         $cacheKey = $this->getCacheKey($dataTable, $subject);
 
-        return $this->cache->get($cacheKey, fn () => $default);
+        return $this->getCacheValue($cacheKey, $this->getTagName($subject), $default);
     }
 
     private function getCacheKey(DataTableInterface $dataTable, PersistenceSubjectInterface $subject): string
@@ -49,5 +59,16 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
         ];
 
         return u(implode('_', array_filter($parts)))->snake()->toString();
+    }
+
+    private function getCacheValue(string $key, string $tag, mixed $default = null): mixed
+    {
+        return $this->cache->get($key, function (ItemInterface $item) use ($tag, $default) {
+            if ($this->cache instanceof TagAwareCacheInterface) {
+                $item->tag($tag);
+            }
+
+            return $default;
+        });
     }
 }

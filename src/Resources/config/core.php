@@ -8,6 +8,8 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Maker\MakeDataTable;
+use Kreyu\Bundle\DataTableBundle\Persistence\CachePersistenceClearer;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceClearerInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Query\ChainProxyQueryFactory;
@@ -79,6 +81,13 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.proxy_query.factory.doctrine_orm', DoctrineOrmProxyQueryFactory::class)
         ->tag('kreyu_data_table.proxy_query.factory')
+    ;
+
+    $services
+        ->set('kreyu_data_table.persistence.clearer.cache', CachePersistenceClearer::class)
+        ->tag('kreyu_data_table.persistence.clearer')
+        ->args([service('kreyu_data_table.persistence.cache.default')])
+        ->alias(PersistenceClearerInterface::class, 'kreyu_data_table.persistence.clearer.cache')
     ;
 
     $services

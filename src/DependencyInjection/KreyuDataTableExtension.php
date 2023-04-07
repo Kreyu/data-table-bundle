@@ -115,6 +115,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
                     'pools' => [
                         'kreyu_data_table.persistence.cache.default' => [
                             'adapter' => 'cache.adapter.filesystem',
+                            'tags' => true,
                         ],
                     ],
                 ],

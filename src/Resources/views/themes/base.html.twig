@@ -254,7 +254,13 @@
 {% endblock %}
 
 {% block column_date_time_value %}
-    {% with { value: value ? value|date(format) : value } %}
+    {% with { value: value ? value|date(format, timezone) : value } %}
+        {{- block('column_text_value') -}}
+    {% endwith %}
+{% endblock %}
+
+{% block column_date_period_value %}
+    {% with { value: value ? value.start|date(format) ~ separator ~ value.end|date(format) : value } %}
         {{- block('column_text_value') -}}
     {% endwith %}
 {% endblock %}

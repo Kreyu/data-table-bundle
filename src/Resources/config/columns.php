@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
@@ -92,7 +93,12 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.datetime', DateTimeColumnType::class)
+        ->set('kreyu_data_table.column.type.date_time', DateTimeColumnType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.date_period', DatePeriodColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

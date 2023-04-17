@@ -45,15 +45,21 @@ class BooleanFilterType extends AbstractFilterType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('field_type', Form\CheckboxType::class);
+        $resolver->setDefault('field_type', Form\ChoiceType::class);
 
         $resolver->setNormalizer('field_options', function (Options $options, mixed $value) {
-            if (!is_a($options['field_type'], Form\CheckboxType::class, true)) {
+            if (!is_a($options['field_type'], Form\ChoiceType::class, true)) {
                 return $value;
             }
 
             return $value + [
-                'false_values' => [''],
+                'choices' => [
+                    'yes' => true,
+                    'no' => false,
+                ],
+                'choice_label' => function (bool $choice, string $key) {
+                    return t(ucfirst($key), [], 'KreyuDataTable');
+                },
             ];
         });
 

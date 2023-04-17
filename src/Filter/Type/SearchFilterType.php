@@ -22,13 +22,15 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
         $resolver
             ->setDefaults([
                 'field_type' => SearchType::class,
+                'field_options' => [
+                    'attr' => [
+                        'placeholder' => 'Search...',
+                    ],
+                ],
                 'label' => false,
                 'operator_options' => [
                     'visible' => false,
                     'choices' => [],
-                ],
-                'attr' => [
-                    'placeholder' => 'Search...',
                 ],
             ])
             ->setRequired('handler')

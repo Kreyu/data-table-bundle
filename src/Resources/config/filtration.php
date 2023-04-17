@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\BooleanFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateRangeFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
@@ -92,12 +93,17 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
+        ->set('kreyu_data_table.filter.type.doctrine_orm_date', DateFilterType::class)
+        ->tag('kreyu_data_table.filter.type')
+    ;
+
+    $services
         ->set('kreyu_data_table.filter.type.doctrine_orm_datetime', DateTimeFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_date', DateFilterType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_date_range', DateRangeFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 

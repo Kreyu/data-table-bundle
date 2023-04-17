@@ -171,6 +171,11 @@
     {% endif %}
 {% endblock %}
 
+{% block kreyu_data_table_date_range_row %}
+    {{ form_widget(form.from) }}
+    {{ form_widget(form.to) }}
+{% endblock %}
+
 {# Column type header templates #}
 
 {% block column_header %}

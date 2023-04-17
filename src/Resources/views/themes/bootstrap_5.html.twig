@@ -20,38 +20,64 @@
     {% endwith %}
 {% endblock %}
 
-{% block action_bar_start %}
-    {{ block('active_filters') }}
-{% endblock %}
+{% block action_bar %}
+    {% set display_filter_action = filtration_enabled and filters|length > 0 %}
+    {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
-{% block action_bar_end %}
-    {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
-        {{ block('action_search') }}
-    {% endif %}
-    
-    {% for action in actions %}
-        {{ data_table_action(action) }}
-    {% endfor %}
+    {% if has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
+        <div class="row mx-2 mt-3 mb-2">
+            <div class="d-flex flex-wrap justify-content-end">
+                {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
+                    <div class="me-1 mb-1">
+                        {{ block('action_search') }}
+                    </div>
+                {% endif %}
 
-    {% if display_filter_action %}
-        {{ block('action_filter') }}
+                {% for action in actions %}
+                    <div class="ms-1 mb-1">
+                        {{ data_table_action(action) }}
+                    </div>
+                {% endfor %}
+
+                {% if display_filter_action %}
+                    <div class="ms-1 mb-1">
+                        {{ block('action_filter') }}
+                    </div>
+                {% endif %}
+
+                {% if display_export_action %}
+                    <div class="ms-1 mb-1">
+                        {{ block('action_export') }}
+                        {{ block('export_modal') }}
+                    </div>
+                {% endif %}
+
+                {% if personalization_enabled %}
+                    <div class="ms-1 mb-1">
+                        {{ block('action_personalize') }}
+                        {{ block('personalization_modal') }}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if filtration_enabled %}
+                {{ data_table_filters_form(filtration_form) }}
+            {% endif %}
+
+            {% if has_active_filters %}
+                <div class="hr my-2 mx-2"></div>
+                <div class="mt-2">{{ block('active_filters') }}</div>
+            {% endif %}
+        </div>
     {% endif %}
 
-    {% if display_export_action %}
-        {{ block('action_export') }}
-        {{ block('export_modal') }}
-    {% endif %}
-
-    {% if personalization_enabled %}
-        {{ block('action_personalize') }}
-        {{ block('personalization_modal') }}
-    {% endif %}
+    <div class="clearfix"></div>
 {% endblock %}
 
 {% block action_search %}
     {% form_theme filtration_form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
-    <div class="d-inline-block">
+    <div class="d-inline-block w-auto">
         {% for child in filtration_form.vars.search_fields %}
             {{ form_widget(child.value, { attr: { form: filtration_form.vars.id } }) }}
         {% endfor %}
@@ -112,24 +138,6 @@
     </svg>
 {% endblock %}
 
-{% block action_bar %}
-    {% set display_filter_action = filtration_enabled and filters|length > 0 %}
-    {% set display_export_action = exporting_enabled and exporters|length > 0 %}
-
-    {% if has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
-        <div class="d-flex justify-content-between p-2 m-2">
-            <div>{{ block('action_bar_start') }}</div>
-            <div>{{ block('action_bar_end') }}</div>
-        </div>
-    {% endif %}
-
-    {% if filtration_enabled %}
-        {{ data_table_filters_form(filtration_form) }}
-    {% endif %}
-
-    <div class="clearfix"></div>
-{% endblock %}
-
 {% block filter_clear_button_icon '&times;' %}
 
 {% block filter_clear_all_button_icon %}
@@ -143,7 +151,7 @@
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
     {% set attr = {
-        'class': 'btn btn-icon btn-outline-danger',
+        'class': 'btn btn-icon btn-outline-danger mb-2',
         'href': filter_clear_all_url(filtration_parameter_name, filters)|trim,
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
@@ -156,7 +164,7 @@
 {% block filter_clear_button %}
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
-    <a class="btn px-2"
+    <a class="btn px-2 mb-2"
        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
        data-toggle="tooltip"
        data-placement="bottom"
@@ -193,20 +201,20 @@
     {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
     {% if form.count > 0 %}
-        <div class="collapse px-2 pb-2 mx-2 mb-2" id="{{ form.vars.id ~ '__collapse' }}">
+        <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
             {{ form_start(form) }}
-                <div class="row">
-                    {% for child in form %}
-                        <div class="col-12 col-md-6 col-lg-3">
-                            {{ form_row(child) }}
-                        </div>
-                    {% endfor %}
-
+            <div class="row my-3">
+                {% for child in form %}
                     <div class="col-12 col-md-6 col-lg-3">
-                        <div class="col-form-label">&nbsp;</div>
-                        <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
+                        {{ form_row(child) }}
                     </div>
+                {% endfor %}
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="col-form-label">&nbsp;</div>
+                    <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
                 </div>
+            </div>
             {{ form_end(form) }}
         </div>
     {% endif %}
@@ -217,17 +225,17 @@
 
     <div data-controller="kreyu--data-table-bundle--personalization">
         {{ form_start(form) }}
-            {% if form._token is defined %}
-                {{ form_row(form._token) }}
-            {% endif %}
+        {% if form._token is defined %}
+            {{ form_row(form._token) }}
+        {% endif %}
 
-            {{ block('personalization_form_help') }}
+        {{ block('personalization_form_help') }}
 
-            <div class="row my-3">
-                {{ block('personalization_form_columns') }}
-            </div>
+        <div class="row my-3">
+            {{ block('personalization_form_columns') }}
+        </div>
 
-            {{ block('personalization_form_submit') }}
+        {{ block('personalization_form_submit') }}
         {{ form_end(form) }}
     </div>
 {% endblock %}
@@ -461,58 +469,58 @@
         'danger': 'danger',
     }[confirmation.type] %}
 
-    <div class="modal modal-blur fade" id="{{ confirmation.identifier }}" tabindex="-1" style="display: none;" aria-hidden="true">
-        {% block action_confirmation_modal_dialog %}
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                {% block action_confirmation_modal_content %}
-                    <div class="modal-content">
-                        {% block action_confirmation_modal_status %}
-                            <div class="modal-status bg-{{ modal_status_color_class }}"></div>
-                        {% endblock %}
-                        {% block action_confirmation_modal_header %}
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
-                                </h5>
+<div class="modal modal-blur fade" id="{{ confirmation.identifier }}" tabindex="-1" style="display: none;" aria-hidden="true">
+    {% block action_confirmation_modal_dialog %}
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        {% block action_confirmation_modal_content %}
+            <div class="modal-content">
+            {% block action_confirmation_modal_status %}
+                <div class="modal-status bg-{{ modal_status_color_class }}"></div>
+            {% endblock %}
+            {% block action_confirmation_modal_header %}
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
+                    </h5>
+                </div>
+            {% endblock %}
+            {% block action_confirmation_modal_body %}
+                <div class="modal-body py-4">
+                    {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
+                </div>
+            {% endblock %}
+            {% block action_confirmation_modal_footer %}
+                <div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                {% block action_confirmation_modal_cancel_button %}
+                                    <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                        {{ confirmation.label_cancel|trans({}, confirmation.translation_domain) }}
+                                    </a>
+                                {% endblock %}
                             </div>
-                        {% endblock %}
-                        {% block action_confirmation_modal_body %}
-                            <div class="modal-body py-4">
-                                {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
-                            </div>
-                        {% endblock %}
-                        {% block action_confirmation_modal_footer %}
-                            <div class="modal-footer">
-                                <div class="w-100">
-                                    <div class="row">
-                                        <div class="col">
-                                            {% block action_confirmation_modal_cancel_button %}
-                                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
-                                                    {{ confirmation.label_cancel|trans({}, confirmation.translation_domain) }}
-                                                </a>
-                                            {% endblock %}
-                                        </div>
-                                        <div class="col">
-                                            {% block action_confirmation_modal_confirm_button %}
-                                                {% set confirm_button_tag = confirm_button_tag|default('a') %}
-                                                {% set confirm_button_attr = {
-                                                    href: confirmation.href,
-                                                    class: 'w-100 btn btn-' ~ modal_status_color_class
-                                                }|merge(confirm_button_attr|default({})) %}
+                            <div class="col">
+                                {% block action_confirmation_modal_confirm_button %}
+                                {% set confirm_button_tag = confirm_button_tag|default('a') %}
+                                {% set confirm_button_attr = {
+                                    href: confirmation.href,
+                                    class: 'w-100 btn btn-' ~ modal_status_color_class
+                                }|merge(confirm_button_attr|default({})) %}
 
-                                                <{{ confirm_button_tag }} {% with { attr: confirm_button_attr } %}{{ block('attributes') }}{% endwith %}>
-                                                    {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
-                                                </{{ confirm_button_tag }}>
-                                            {% endblock %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endblock %}
+                                <{{ confirm_button_tag }} {% with { attr: confirm_button_attr } %}{{ block('attributes') }}{% endwith %}>
+                                {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
+                            </{{ confirm_button_tag }}>
+                            {% endblock %}
+                        </div>
                     </div>
-                {% endblock %}
+                </div>
+                </div>
+            {% endblock %}
             </div>
         {% endblock %}
+        </div>
+    {% endblock %}
     </div>
 {% endblock %}
 
@@ -599,4 +607,12 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
     </svg>
+{% endblock %}
+
+{% block kreyu_data_table_date_range_row %}
+    <div class="input-group">
+        {{ form_widget(form.from) }}
+        <span class="input-group-text">-</span>
+        {{ form_widget(form.to) }}
+    </div>
 {% endblock %}

@@ -14,6 +14,10 @@ ENDS_WITH: ends with
 Yes: Yes
 No: No
 
+# Date range filter type
+Before %date%: before %date%
+After %date%: after %date%
+
 # Personalization
 Personalization: Personalization
 Drag items between columns to show/hide relevant data in the list or change their order: Drag items between columns to show/hide relevant data in the list or change their order

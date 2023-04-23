@@ -1,0 +1,126 @@
+{% block kreyu_data_table_pagination %}
+    {% if total_item_count > 0 %}
+        {{ block('pagination_widget', theme) }}
+    {% endif %}
+{% endblock %}
+
+{% block pagination_widget %}
+    {{ block('pagination_counters', theme) }}
+    {{ block('pagination_controls', theme) }}
+{% endblock %}
+
+{% block pagination_controls %}
+    {%- if has_previous_page -%}
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): 1 })) } %}
+            {{ block('pagination_first', theme) }}
+        {% endwith %}
+
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })) } %}
+            {{ block('pagination_previous', theme) }}
+        {% endwith %}
+    {%- else -%}
+        {{ block('pagination_first_disabled', theme) }}
+        {{ block('pagination_previous_disabled', theme) }}
+    {%- endif -%}
+
+    {% for page_number in range(first_visible_page_number, last_visible_page_number) %}
+        {% if page_number == current_page_number %}
+            {{ block('pagination_page_active', theme) }}
+        {% else %}
+            {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) } %}
+                {{ block('pagination_page', theme) }}
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+
+    {%- if has_next_page -%}
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })) } %}
+            {{ block('pagination_next', theme) }}
+        {% endwith %}
+
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_count })) } %}
+            {{ block('pagination_last', theme) }}
+        {% endwith %}
+    {%- else -%}
+        {{ block('pagination_next_disabled', theme) }}
+        {{ block('pagination_last_disabled', theme) }}
+    {%- endif -%}
+{% endblock %}
+
+{% block pagination_counters %}
+    <span {{- block('attributes') -}}>
+        {{- block('pagination_counters_message', theme) -}}
+    </span>
+{% endblock %}
+
+{% block pagination_counters_message %}
+    {{- 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
+        '%current_page_first_item_index%': current_page_first_item_index,
+        '%current_page_last_item_index%': current_page_last_item_index,
+        '%total_item_count%': total_item_count
+    }, 'KreyuDataTable') -}}
+{% endblock %}
+
+{% block pagination_page %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_page_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_page_active %}
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_page_message') }}
+    </span>
+{% endblock %}
+
+{% block pagination_page_message page_number %}
+
+{% block pagination_first %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_first_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_first_disabled %}
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_first_message') }}
+    </span>
+{% endblock %}
+
+{% block pagination_first_message '«' %}
+
+{% block pagination_previous %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_previous_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_previous_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_previous_message') }}</span>
+{% endblock %}
+
+{% block pagination_previous_message '‹' %}
+
+{% block pagination_last %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_last_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_last_message') }}</span>
+{% endblock %}
+
+{% block pagination_last_message '»' %}
+
+{% block pagination_next %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_next_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_next_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_next_message') }}</span>
+{% endblock %}
+
+{% block pagination_next_message '›' %}

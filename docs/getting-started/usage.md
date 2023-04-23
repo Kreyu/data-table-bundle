@@ -27,7 +27,7 @@ Later, the builder created the actual data table object used to render and proce
 
 ## Creating data tables in controllers
 
-If your controller uses the [DataTableControllerTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableControllerTrait.php), use the `createDataTableBuilder()` helper:
+If your controller uses the [DataTableAwareTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableAwareTrait.php), use the `createDataTableBuilder()` helper:
 
 ```php
 // src/Controller/ProductController.php
@@ -36,14 +36,14 @@ namespace App\Controller;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableControllerTrait;
+    use DataTableAwareTrait;
     
     public function index(ProductRepository $repository): Response
     {
@@ -97,7 +97,7 @@ class ProductDataTableType extends AbstractDataTableType
     Install the [MakerBundle](https://symfony.com/bundles/SymfonyMakerBundle/current/index.html) in your project to generate data table classes using the `make:data-table` command.
 
 The data table class contains all the directions needed to create the product data table.
-In controllers using the [DataTableControllerTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableControllerTrait.php), use the `createDataTable()` helper
+In controllers using the [DataTableAwareTrait](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableAwareTrait.php), use the `createDataTable()` helper
 (otherwise, use the `create()` method of the `kreyu_data_table.factory` service):
 
 ```php
@@ -106,14 +106,14 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableControllerTrait;
+    use DataTableAwareTrait;
     
     public function index(Request $request, ProductRepository $repository): Response
     {
@@ -138,14 +138,14 @@ use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableControllerTrait;
+    use DataTableAwareTrait;
     
     public function index(Request $request, ProductRepository $repository): Response
     {
@@ -207,14 +207,14 @@ use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableControllerTrait;
+    use DataTableAwareTrait;
     
     public function index(Request $request, ProductRepository $repository): Response
     {
@@ -265,14 +265,14 @@ use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
-use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableControllerTrait;
+    use DataTableAwareTrait;
     
     public function index(Request $request, ProductRepository $repository): Response
     {

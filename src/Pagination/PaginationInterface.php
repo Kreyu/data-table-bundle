@@ -13,6 +13,8 @@ interface PaginationInterface
 
     public function getCurrentPageNumber(): int;
 
+    public function getCurrentPageItemCount(): int;
+
     public function getTotalItemCount(): int;
 
     public function getItemNumberPerPage(): ?int;
@@ -22,4 +24,12 @@ interface PaginationInterface
     public function hasPreviousPage(): bool;
 
     public function hasNextPage(): bool;
+
+    public function getFirstVisiblePageNumber(): int;
+
+    public function getLastVisiblePageNumber(): int;
+
+    public function getCurrentPageFirstItemIndex(): int;
+
+    public function getCurrentPageLastItemIndex(): int;
 }

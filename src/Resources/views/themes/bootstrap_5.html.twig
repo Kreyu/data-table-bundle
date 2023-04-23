@@ -25,39 +25,51 @@
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
     {% if has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
-        <div class="row mx-2 mt-3 mb-2">
-            <div class="d-flex flex-wrap justify-content-end">
-                {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
-                    <div class="me-1 mb-1">
-                        {{ block('action_search') }}
-                    </div>
-                {% endif %}
+        <div class="row m-2 p-1">
+            <div class="d-flex flex-wrap gap-1 align-items-center">
+                <div class="h2 m-0">
+                    {% if translation_domain is not same as false %}
+                        {{ title|trans(title_translation_parameters, translation_domain) }}
+                    {% else %}
+                        {{ title }}
+                    {% endif %}
+                </div>
 
-                {% for action in actions %}
-                    <div class="ms-1 mb-1">
-                        {{ data_table_action(action) }}
-                    </div>
-                {% endfor %}
+                <div class="d-flex col"></div>
 
-                {% if display_filter_action %}
-                    <div class="ms-1 mb-1">
-                        {{ block('action_filter') }}
-                    </div>
-                {% endif %}
+                <div class="d-flex flex-wrap gap-1">
+                    {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
+                        <div>
+                            {{ block('action_search') }}
+                        </div>
+                    {% endif %}
 
-                {% if display_export_action %}
-                    <div class="ms-1 mb-1">
-                        {{ block('action_export') }}
-                        {{ block('export_modal') }}
-                    </div>
-                {% endif %}
+                    {% for action in actions %}
+                        <div>
+                            {{ data_table_action(action) }}
+                        </div>
+                    {% endfor %}
 
-                {% if personalization_enabled %}
-                    <div class="ms-1 mb-1">
-                        {{ block('action_personalize') }}
-                        {{ block('personalization_modal') }}
-                    </div>
-                {% endif %}
+                    {% if display_filter_action %}
+                        <div>
+                            {{ block('action_filter') }}
+                        </div>
+                    {% endif %}
+
+                    {% if display_export_action %}
+                        <div>
+                            {{ block('action_export') }}
+                            {{ block('export_modal') }}
+                        </div>
+                    {% endif %}
+
+                    {% if personalization_enabled %}
+                        <div>
+                            {{ block('action_personalize') }}
+                            {{ block('personalization_modal') }}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
             {% if filtration_enabled %}
@@ -65,8 +77,11 @@
             {% endif %}
 
             {% if has_active_filters %}
-                <div class="hr my-2 mx-2"></div>
-                <div class="mt-2">{{ block('active_filters') }}</div>
+                <div class="my-1">
+                    <div class="hr my-2"></div>
+                </div>
+
+                <div>{{ block('active_filters') }}</div>
             {% endif %}
         </div>
     {% endif %}
@@ -151,7 +166,7 @@
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
 
     {% set attr = {
-        'class': 'btn btn-icon btn-outline-danger mb-2',
+        'class': 'btn btn-icon btn-outline-danger',
         'href': filter_clear_all_url(filtration_parameter_name, filters)|trim,
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
@@ -164,7 +179,7 @@
 {% block filter_clear_button %}
     {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
 
-    <a class="btn px-2 mb-2"
+    <a class="btn px-2"
        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
        data-toggle="tooltip"
        data-placement="bottom"
@@ -184,7 +199,7 @@
 {% endblock %}
 
 {% block active_filters %}
-    <div>
+    <div class="d-flex flex-wrap gap-1">
         {% if has_active_filters %}
             {{ block('filter_clear_all_button') }}
         {% endif %}
@@ -197,28 +212,42 @@
     </div>
 {% endblock %}
 
+{# Filtration #}
+
 {% block kreyu_data_table_filters_form %}
-    {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
-
-    {% if form.count > 0 %}
-        <div class="collapse" id="{{ form.vars.id ~ '__collapse' }}">
-            {{ form_start(form) }}
-            <div class="row my-3">
-                {% for child in form %}
-                    <div class="col-12 col-md-6 col-lg-3">
-                        {{ form_row(child) }}
-                    </div>
-                {% endfor %}
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="col-form-label">&nbsp;</div>
-                    <button class="btn btn-primary">{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
-                </div>
-            </div>
-            {{ form_end(form) }}
-        </div>
-    {% endif %}
+    {% with { form_themes: [_self, 'bootstrap_5_layout.html.twig'] } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
+
+{% block filtration_widget %}
+    {% with { attr: { class: 'collapse', id: form.vars.id ~ '__collapse' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filtration_form_content %}
+    {% with { attr: { class: 'row mt-2' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filtration_form_row %}
+    {% with { attr: { class: 'col-12 col-md-6 col-lg-3' }, form_themes: [_self, 'bootstrap_5_layout.html.twig'] } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filtration_form_submit %}
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="col-form-label">&nbsp;</div>
+        {% with { attr: { class: 'btn btn-primary' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{# Personalization #}
 
 {% block kreyu_data_table_personalization_form %}
     {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
@@ -384,43 +413,101 @@
     </div>
 {% endblock %}
 
-{% block kreyu_data_table_pagination %}
-    {% if page_count > 1 %}
-        {% set current_page = app.request.query.get(page_parameter_name) %}
-
-        <div>
-            <ul class="pagination m-0 ms-auto w-100 d-flex justify-content-center p-2">
-                <li class="page-item {% if not has_previous_page %}disabled{% endif %}">
-                    <a class="page-link"
-                       href="{{ has_previous_page ? path(
-                           app.request.get('_route'),
-                           app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })
-                       ) : '#' }}">
-                        ‹
-                    </a>
-                </li>
-
-                {% for page_number in 1..page_count %}
-                    <li class="page-item {% if current_page_number == page_number %}active{% endif %}">
-                        <a class="page-link"
-                           href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) }}">
-                            {{ page_number }}
-                        </a>
-                    </li>
-                {% endfor %}
-
-                <li class="page-item {% if not has_next_page %}disabled{% endif %}">
-                    <a class="page-link"
-                       href="{{ has_next_page ? path(
-                           app.request.get('_route'),
-                           app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })
-                       ) : '#' }}">
-                        ›
-                    </a>
-                </li>
-            </ul>
+{% block pagination_widget %}
+    <div class="card-footer">
+        <div class="pagination d-flex gap-3 flex-wrap justify-content-center align-items-center">
+            {{ parent() }}
+            <div class="d-flex col"></div>
         </div>
-    {% endif %}
+    </div>
+{% endblock %}
+
+{% block pagination_counters %}
+    <div class="d-flex col">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_controls %}
+    <div class="d-flex">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_page %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_page_active %}
+    <div class="page-item active">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_first %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_first_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_previous %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_previous_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_last %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_next %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_next_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
 {% endblock %}
 
 {% block kreyu_data_table_filter_data_row %}

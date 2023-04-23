@@ -4,24 +4,67 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Type;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 
 final class DataTableType implements DataTableTypeInterface
 {
+    public const DEFAULT_OPTIONS = [
+        'title' => null,
+        'title_translation_parameters' => [],
+        'translation_domain' => null,
+        'column_factory' => null,
+        'action_factory' => null,
+        'request_handler' => null,
+        'sorting_enabled' => null,
+        'sorting_persistence_enabled' => null,
+        'sorting_persistence_adapter' => null,
+        'sorting_persistence_subject' => null,
+        'pagination_enabled' => null,
+        'pagination_persistence_enabled' => null,
+        'pagination_persistence_adapter' => null,
+        'pagination_persistence_subject' => null,
+        'filtration_enabled' => null,
+        'filtration_persistence_enabled' => null,
+        'filtration_persistence_adapter' => null,
+        'filtration_persistence_subject' => null,
+        'filtration_form_factory' => null,
+        'filter_factory' => null,
+        'personalization_enabled' => null,
+        'personalization_persistence_enabled' => null,
+        'personalization_persistence_adapter' => null,
+        'personalization_persistence_subject' => null,
+        'personalization_form_factory' => null,
+        'exporting_enabled' => null,
+        'exporting_form_factory' => null,
+        'exporter_factory' => null,
+    ];
+
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $setters = [
+            'title' => $builder->setTitle(...),
+            'title_translation_parameters' => $builder->setTitleTranslationParameters(...),
+            'translation_domain' => $builder->setTranslationDomain(...),
             'column_factory' => $builder->setColumnFactory(...),
             'filter_factory' => $builder->setFilterFactory(...),
             'action_factory' => $builder->setActionFactory(...),
@@ -68,6 +111,9 @@ final class DataTableType implements DataTableTypeInterface
 
         $view->vars = array_replace($view->vars, [
             'name' => $dataTable->getConfig()->getName(),
+            'title' => $dataTable->getConfig()->getTitle(),
+            'title_translation_parameters' => $dataTable->getConfig()->getTitleTranslationParameters(),
+            'translation_domain' => $dataTable->getConfig()->getTranslationDomain(),
             'exporters' => $dataTable->getConfig()->getExporters(),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
@@ -83,7 +129,6 @@ final class DataTableType implements DataTableTypeInterface
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
-            'translation_domain' => $options['translation_domain'],
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -117,34 +162,37 @@ final class DataTableType implements DataTableTypeInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'translation_domain' => null,
-            'column_factory' => null,
-            'action_factory' => null,
-            'request_handler' => null,
-            'sorting_enabled' => null,
-            'sorting_persistence_enabled' => null,
-            'sorting_persistence_adapter' => null,
-            'sorting_persistence_subject' => null,
-            'pagination_enabled' => null,
-            'pagination_persistence_enabled' => null,
-            'pagination_persistence_adapter' => null,
-            'pagination_persistence_subject' => null,
-            'filtration_enabled' => null,
-            'filtration_persistence_enabled' => null,
-            'filtration_persistence_adapter' => null,
-            'filtration_persistence_subject' => null,
-            'filtration_form_factory' => null,
-            'filter_factory' => null,
-            'personalization_enabled' => null,
-            'personalization_persistence_enabled' => null,
-            'personalization_persistence_adapter' => null,
-            'personalization_persistence_subject' => null,
-            'personalization_form_factory' => null,
-            'exporting_enabled' => null,
-            'exporting_form_factory' => null,
-            'exporter_factory' => null,
-        ]);
+        $resolver
+            ->setDefaults(self::DEFAULT_OPTIONS)
+            ->setAllowedTypes('title', ['null', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('title_translation_parameters', 'array')
+            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('column_factory', ['null', ColumnFactoryInterface::class])
+            ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])
+            ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
+            ->setAllowedTypes('sorting_enabled', ['null', 'bool'])
+            ->setAllowedTypes('sorting_persistence_enabled', ['null', 'bool'])
+            ->setAllowedTypes('sorting_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('sorting_persistence_subject', ['null', PersistenceSubjectInterface::class])
+            ->setAllowedTypes('pagination_enabled', ['null', 'bool'])
+            ->setAllowedTypes('pagination_persistence_enabled', ['null', 'bool'])
+            ->setAllowedTypes('pagination_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('pagination_persistence_subject', ['null', PersistenceSubjectInterface::class])
+            ->setAllowedTypes('filtration_enabled', ['null', 'bool'])
+            ->setAllowedTypes('filtration_persistence_enabled', ['null', 'bool'])
+            ->setAllowedTypes('filtration_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('filtration_persistence_subject', ['null', PersistenceSubjectInterface::class])
+            ->setAllowedTypes('filtration_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('filter_factory', ['null', FilterFactoryInterface::class])
+            ->setAllowedTypes('personalization_enabled', ['null', 'bool'])
+            ->setAllowedTypes('personalization_persistence_enabled', ['null', 'bool'])
+            ->setAllowedTypes('personalization_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('personalization_persistence_subject', ['null', PersistenceSubjectInterface::class])
+            ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('exporting_enabled', ['null', 'bool'])
+            ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('exporter_factory', ['null', ExporterFactoryInterface::class])
+        ;
     }
 
     public function getName(): string

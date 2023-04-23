@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FiltrationDataType extends AbstractType implements DataMapperInterface
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /**
          * @var DataTableInterface $dataTable
@@ -57,7 +57,9 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
 
-        $view->vars['attr']['id'] = $view->vars['id'];
+        $view->vars['attr']['id'] = $id = $view->vars['id'];
+
+        $this->applyFormAttributeRecursively($view, $id);
 
         foreach ($view as $name => $filterFormView) {
             $filterView = $dataTableView->filters[$name];
@@ -134,6 +136,15 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
 
         foreach ($forms as $name => $form) {
             $viewData->setFilterData($name, $form->getData());
+        }
+    }
+
+    private function applyFormAttributeRecursively(FormView $view, string $id): void
+    {
+        $view->vars['attr']['form'] = $id;
+
+        foreach ($view->children as $child) {
+            $this->applyFormAttributeRecursively($child, $id);
         }
     }
 }

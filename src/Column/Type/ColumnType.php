@@ -22,7 +22,10 @@ final class ColumnType implements ColumnTypeInterface
             $sort = $column->getName();
         }
 
+        $sortColumnData = $view->parent->parent->vars['sorting_data']?->getColumn($column->getName());
+
         $view->vars = array_replace($view->vars, [
+            'name' => $column->getName(),
             'column' => $view,
             'row' => $view->parent,
             'data_table' => $view->parent->parent,
@@ -31,9 +34,10 @@ final class ColumnType implements ColumnTypeInterface
             'translation_parameters' => $options['header_translation_parameters'],
             'translation_domain' => $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
             'sort_parameter_name' => $view->parent->parent->vars['sort_parameter_name'],
-            'sorting_field_data' => $view->parent->parent->vars['sorting_data']?->getFieldData($column->getName()),
             'attr' => $options['header_attr'],
+            'sorted' => null !== $sortColumnData,
             'sort_field' => $sort,
+            'sort_direction' => $sortColumnData?->getDirection(),
             'export' => false,
         ]);
 
@@ -96,8 +100,6 @@ final class ColumnType implements ColumnTypeInterface
         $resolver
             ->setDefaults([
                 'label' => null,
-                'label_translation_domain' => null,
-                'label_translation_parameters' => [],
                 'header_translation_domain' => null,
                 'header_translation_parameters' => [],
                 'value_translation_domain' => false,
@@ -114,8 +116,6 @@ final class ColumnType implements ColumnTypeInterface
                 'value_attr' => [],
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('label_translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('label_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
@@ -130,9 +130,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('getter', ['null', 'callable'])
             ->setAllowedTypes('header_attr', ['array'])
             ->setAllowedTypes('value_attr', ['array'])
-            ->setInfo('label', 'A label displayed on the column header.')
-            ->setInfo('label_translation_domain', 'Translation domain used to translate the column label.')
-            ->setInfo('label_translation_parameters', 'Parameters used within the column label translation.')
+            ->setInfo('label', 'A user-friendly label that describes a column.')
             ->setInfo('header_translation_domain', 'Translation domain used to translate the column header.')
             ->setInfo('header_translation_parameters', 'Parameters used within the column header translation.')
             ->setInfo('value_translation_domain', 'Translation domain used to translate the column value.')

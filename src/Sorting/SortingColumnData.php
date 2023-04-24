@@ -7,7 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Sorting;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SortingFieldData
+class SortingColumnData
 {
     public function __construct(
         private string $name,
@@ -15,7 +15,7 @@ class SortingFieldData
     ) {
     }
 
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         ($resolver = new OptionsResolver())
             ->setRequired('name')
@@ -33,7 +33,7 @@ class SortingFieldData
 
         $data = $resolver->resolve($data);
 
-        return new static($data['name'], $data['direction']);
+        return new self($data['name'], $data['direction']);
     }
 
     public function getName(): string

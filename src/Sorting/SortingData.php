@@ -4,50 +4,64 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 
 class SortingData
 {
     /**
-     * @param array<SortingFieldData> $fields
+     * @var array<SortingColumnData>
      */
-    public function __construct(
-        private array $fields = [],
-    ) {
-        foreach ($fields as $field) {
-            if (!$field instanceof SortingFieldData) {
-                throw new UnexpectedTypeException($field, SortingFieldData::class);
-            }
+    private array $columns = [];
+
+    public function __construct(array $columns = [])
+    {
+        foreach ($columns as $column) {
+            $this->addColumn($column);
         }
     }
 
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         $fields = [];
 
         foreach ($data as $key => $value) {
-            if ($value instanceof SortingFieldData) {
+            if ($value instanceof SortingColumnData) {
                 $fields[$value->getName()] = $value;
             } elseif (is_array($value)) {
-                $fields[$key] = SortingFieldData::fromArray($value);
+                $fields[$key] = SortingColumnData::fromArray($value);
             } elseif (is_string($key)) {
-                $fields[$key] = SortingFieldData::fromArray([
+                $fields[$key] = SortingColumnData::fromArray([
                     'name' => $key,
                     'direction' => $value,
                 ]);
             }
         }
 
-        return new static($fields);
+        return new self($fields);
     }
 
-    public function getFields(): array
+    public function getColumns(): array
     {
-        return $this->fields;
+        return $this->columns;
     }
 
-    public function getFieldData(string $field): ?SortingFieldData
+    public function getColumn(string|ColumnInterface $column): ?SortingColumnData
     {
-        return $this->fields[$field] ?? null;
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return $this->columns[$column] ?? null;
+    }
+
+    public function addColumn(SortingColumnData $column): void
+    {
+        $this->columns[$column->getName()] = $column;
+    }
+
+    public function removeColumn(PersonalizationColumnData $column): void
+    {
+        unset($this->columns[$column->getName()]);
     }
 }

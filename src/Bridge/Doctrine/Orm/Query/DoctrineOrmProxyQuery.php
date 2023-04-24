@@ -13,6 +13,7 @@ use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 /**
@@ -51,7 +52,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->queryBuilder;
     }
 
-    public function sort(SortingData $sortingData): void
+    public function sort(string $field, Direction $direction = Direction::ASC): void
     {
         $rootAlias = current($this->queryBuilder->getRootAliases());
 
@@ -59,15 +60,11 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
             throw new \RuntimeException('There are no root aliases defined in the query.');
         }
 
-        foreach ($sortingData->getFields() as $field) {
-            $fieldName = $field->getName();
-
-            if ($rootAlias && !str_contains($fieldName, '.')) {
-                $fieldName = $rootAlias.'.'.$fieldName;
-            }
-
-            $this->queryBuilder->orderBy($fieldName, $field->getDirection());
+        if ($rootAlias && !str_contains($field, '.')) {
+            $field = $rootAlias.'.'.$field;
         }
+
+        $this->queryBuilder->orderBy($field, $direction->value);
     }
 
     public function paginate(PaginationData $paginationData): void

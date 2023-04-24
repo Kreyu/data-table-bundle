@@ -301,27 +301,25 @@
         {% set current_sort_field = sorting_field_data.name|default(null) %}
         {% set current_sort_direction = sorting_field_data.direction|default(null) %}
 
-        {% set is_active_sorting = sort_field == current_sort_field %}
+        {% set active_attr = active_attr|default({}) %}
+        {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% if is_active_sorting %}
-            {% set attr = attr|merge(active_attr|default({})) %}
-        {% else %}
-            {% set attr = attr|merge(inactive_attr|default({})) %}
-        {% endif %}
+        {% set attr = attr|default({}) %}
+        {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
 
         <th {{ block('attributes') }}>
-            {% set label_attr = {
-                href: path(app.request.get('_route'), app.request.query.all|merge({
-                    (sort_parameter_name ~ '[field]'): sort_field,
-                    (sort_parameter_name ~ '[direction]'): current_sort_direction|lower == 'desc' ? 'asc' : 'desc'
-                }))
-            }|merge(label_attr) %}
+            {% set query_params = app.request.query.all %}
+            {% set query_params = query_params|merge({ (sort_parameter_name): {
+                (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
+            } }) %}
+
+            {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
 
-                {% if is_active_sorting %}
-                    {% if current_sort_direction == 'asc' %}
+                {% if sorted %}
+                    {% if sort_direction == 'asc' %}
                         {{ block('sort_arrow_asc', theme, _context) }}
                     {% else %}
                         {{ block('sort_arrow_desc', theme, _context) }}

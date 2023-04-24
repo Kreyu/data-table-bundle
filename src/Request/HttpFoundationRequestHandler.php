@@ -61,16 +61,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
         $parameterName = $dataTable->getConfig()->getSortParameterName();
 
-        $sortField = $this->extractQueryParameter($request, "[$parameterName][field]");
-        $sortDirection = $this->extractQueryParameter($request, "[$parameterName][direction]");
+        $sortingData = $this->extractQueryParameter($request, "[$parameterName]");
 
-        if (null === $sortField) {
+        if (empty($sortingData)) {
             return;
         }
 
-        $dataTable->sort(SortingData::fromArray([
-            $sortField => $sortDirection,
-        ]));
+        $dataTable->sort(SortingData::fromArray($sortingData));
     }
 
     private function paginate(DataTableInterface $dataTable, Request $request): void

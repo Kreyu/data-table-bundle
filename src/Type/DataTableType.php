@@ -165,7 +165,7 @@ final class DataTableType implements DataTableTypeInterface
         $resolver
             ->setDefaults(self::DEFAULT_OPTIONS)
             ->setAllowedTypes('title', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('title_translation_parameters', 'array')
+            ->setAllowedTypes('title_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('column_factory', ['null', ColumnFactoryInterface::class])
             ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])

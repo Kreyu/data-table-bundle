@@ -334,7 +334,7 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getTitleTranslationParameters(): array
     {
-        return [];
+        return $this->titleTranslationParameters;
     }
 
     public function setTitleTranslationParameters(array $titleTranslationParameters): static

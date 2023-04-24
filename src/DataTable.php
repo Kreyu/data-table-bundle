@@ -100,7 +100,7 @@ class DataTable implements DataTableInterface
         foreach ($data->getColumns() as $columnSortingData) {
             $column = $this->config->getColumn($columnSortingData->getName());
 
-            $sortField = $column['sort'];
+            $sortField = $column->getOptions()['sort'];
 
             if ($sortField === true) {
                 $sortField = $column->getName();

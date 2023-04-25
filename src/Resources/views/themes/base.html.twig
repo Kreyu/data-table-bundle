@@ -6,7 +6,10 @@
     <turbo-frame id="kreyu_data_table_{{ name }}">
         {{ block('action_bar') }}
         {{ block('table') }}
-        {{ block('pagination') }}
+
+        {% if pagination_enabled %}
+            {{ data_table_pagination(pagination) }}
+        {% endif %}
     </turbo-frame>
 {% endblock %}
 
@@ -18,7 +21,9 @@
             {{ block('table') }}
         {{ form_end(form, { render_rest: false }) }}
 
-        {{ block('pagination') }}
+        {% if pagination_enabled %}
+            {{ data_table_pagination(pagination) }}
+        {% endif %}
     </turbo-frame>
 {% endblock %}
 
@@ -111,64 +116,175 @@
     {{- block(block_name, theme) -}}
 {% endblock %}
 
+{# Pagination #}
+
 {% block kreyu_data_table_pagination %}
-    {% set current_page = app.request.query.get(page_parameter_name) %}
-
     {% if page_count > 1 %}
-        <ul {{- block('attributes') -}}>
-            <li>
-                <a href="{{ has_previous_page ? path(
-                    app.request.get('_route'),
-                    app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })
-                ) : '#' }}">
-                    ‹
-                </a>
-            </li>
-
-            {% for page_number in 1..page_count %}
-                <li>
-                    <a href="{{ path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) }}">
-                        {% if current_page_number == page_number %}
-                            <u>{{ page_number }}</u>
-                        {% else %}
-                            {{ page_number }}
-                        {% endif %}
-                    </a>
-                </li>
-            {% endfor %}
-
-            <li>
-                <a href="{{ has_next_page ? path(
-                    app.request.get('_route'),
-                    app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })
-                ) : '#' }}">
-                    ›
-                </a>
-            </li>
-        </ul>
+        {{ block('pagination_widget', theme) }}
     {% endif %}
 {% endblock %}
 
-{% block kreyu_data_table_filters_form %}
-    {% if form.count > 0 %}
-        {{ form_start(form) }}
-            <table>
-                <tbody>
-                    {% for child in form %}
-                        <tr>
-                            <td>{{ form_row(child) }}</td>
-                        </tr>
-                    {% endfor %}
+{% block pagination_widget %}
+    {{ block('pagination_counters', theme) }}
+    {{ block('pagination_controls', theme) }}
+{% endblock %}
 
-                    <tr>
-                        <td colspan="2">
-                            <button>{{ 'Filter'|trans({}, 'KreyuDataTable') }}</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        {{ form_end(form) }}
+{% block pagination_controls %}
+    {%- if has_previous_page -%}
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): 1 })) } %}
+            {{ block('pagination_first', theme) }}
+        {% endwith %}
+
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })) } %}
+            {{ block('pagination_previous', theme) }}
+        {% endwith %}
+    {%- else -%}
+        {{ block('pagination_first_disabled', theme) }}
+        {{ block('pagination_previous_disabled', theme) }}
+    {%- endif -%}
+
+    {% for page_number in range(first_visible_page_number, last_visible_page_number) %}
+        {% if page_number == current_page_number %}
+            {{ block('pagination_page_active', theme) }}
+        {% else %}
+            {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) } %}
+                {{ block('pagination_page', theme) }}
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+
+    {%- if has_next_page -%}
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })) } %}
+            {{ block('pagination_next', theme) }}
+        {% endwith %}
+
+        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_count })) } %}
+            {{ block('pagination_last', theme) }}
+        {% endwith %}
+    {%- else -%}
+        {{ block('pagination_next_disabled', theme) }}
+        {{ block('pagination_last_disabled', theme) }}
+    {%- endif -%}
+{% endblock %}
+
+{% block pagination_counters %}
+    <span {{- block('attributes') -}}>
+        {{- block('pagination_counters_message', theme) -}}
+    </span>
+{% endblock %}
+
+{% block pagination_counters_message %}
+    {{- 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
+        '%current_page_first_item_index%': current_page_first_item_index,
+        '%current_page_last_item_index%': current_page_last_item_index,
+        '%total_item_count%': total_item_count
+    }, 'KreyuDataTable') -}}
+{% endblock %}
+
+{% block pagination_page %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_page_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_page_active %}
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_page_message', theme) }}
+    </span>
+{% endblock %}
+
+{% block pagination_page_message page_number %}
+
+{% block pagination_first %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_first_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_first_disabled %}
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_first_message', theme) }}
+    </span>
+{% endblock %}
+
+{% block pagination_first_message '«' %}
+
+{% block pagination_previous %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_previous_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_previous_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_previous_message', theme) }}</span>
+{% endblock %}
+
+{% block pagination_previous_message '‹' %}
+
+{% block pagination_last %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_last_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_last_message', theme) }}</span>
+{% endblock %}
+
+{% block pagination_last_message '»' %}
+
+{% block pagination_next %}
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ block('pagination_next_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_next_disabled %}
+    <span {{ block('attributes') }}>{{ block('pagination_next_message', theme) }}</span>
+{% endblock %}
+
+{% block pagination_next_message '›' %}
+
+{# Filtration #}
+
+{% block kreyu_data_table_filters_form %}
+    {% form_theme form with form_themes|default([_self]) %}
+
+    {{ form_start(form, { attr: { 'data-turbo-action': 'advance' } }) }}
+        {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
+    {{ form_end(form, { render_rest: false }) }}
+
+    {% if form.count > 0 %}
+        {{ block('filtration_widget', theme) }}
     {% endif %}
+{% endblock %}
+
+{% block filtration_widget %}
+    <div {{ block('attributes') }}>{{ block('filtration_form', theme) }}</div>
+{% endblock %}
+
+{% block filtration_form %}
+    {{ block('filtration_form_content', theme) }}
+{% endblock %}
+
+{% block filtration_form_content %}
+    <div {{ block('attributes') }}>
+        {% for child in form %}
+            {{ block('filtration_form_row', theme) }}
+        {% endfor %}
+
+        {{ block('filtration_form_submit', theme) }}
+    </div>
+{% endblock %}
+
+{% block filtration_form_row %}
+    <div {{ block('attributes') }}>{{ form_row(child) }}</div>
+{% endblock %}
+
+{% block filtration_form_submit %}
+    <button {% with { attr: attr|default({})|merge({ form: form.vars.id, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ 'Filter'|trans({}, 'KreyuDataTable') }}
+    </button>
 {% endblock %}
 
 {% block kreyu_data_table_date_range_row %}
@@ -185,27 +301,25 @@
         {% set current_sort_field = sorting_field_data.name|default(null) %}
         {% set current_sort_direction = sorting_field_data.direction|default(null) %}
 
-        {% set is_active_sorting = sort_field == current_sort_field %}
+        {% set active_attr = active_attr|default({}) %}
+        {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% if is_active_sorting %}
-            {% set attr = attr|merge(active_attr|default({})) %}
-        {% else %}
-            {% set attr = attr|merge(inactive_attr|default({})) %}
-        {% endif %}
+        {% set attr = attr|default({}) %}
+        {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
 
         <th {{ block('attributes') }}>
-            {% set label_attr = {
-                href: path(app.request.get('_route'), app.request.query.all|merge({
-                    (sort_parameter_name ~ '[field]'): sort_field,
-                    (sort_parameter_name ~ '[direction]'): current_sort_direction|lower == 'desc' ? 'asc' : 'desc'
-                }))
-            }|merge(label_attr) %}
+            {% set query_params = app.request.query.all %}
+            {% set query_params = query_params|merge({ (sort_parameter_name): {
+                (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
+            } }) %}
+
+            {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
 
-                {% if is_active_sorting %}
-                    {% if current_sort_direction == 'asc' %}
+                {% if sorted %}
+                    {% if sort_direction == 'asc' %}
                         {{ block('sort_arrow_asc', theme, _context) }}
                     {% else %}
                         {{ block('sort_arrow_desc', theme, _context) }}
@@ -349,5 +463,5 @@
 {% block sort_arrow_desc %}↓{% endblock %}
 
 {% block attributes %}
-    {% for key, value in attr|default([]) %}{{ key }}="{{ value }}"{% endfor %}
+    {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
 {% endblock %}

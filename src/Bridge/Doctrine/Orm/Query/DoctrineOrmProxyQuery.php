@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 /**
@@ -49,19 +52,19 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->queryBuilder;
     }
 
-    public function sort(SortingData $sortingData): void
+    public function sort(string $field, Direction $direction = Direction::ASC): void
     {
         $rootAlias = current($this->queryBuilder->getRootAliases());
 
-        foreach ($sortingData->getFields() as $field) {
-            $fieldName = $field->getName();
-
-            if ($rootAlias && !str_contains($fieldName, '.')) {
-                $fieldName = $rootAlias.'.'.$fieldName;
-            }
-
-            $this->queryBuilder->orderBy($fieldName, $field->getDirection());
+        if (false === $rootAlias) {
+            throw new \RuntimeException('There are no root aliases defined in the query.');
         }
+
+        if ($rootAlias && !str_contains($field, '.')) {
+            $field = $rootAlias.'.'.$field;
+        }
+
+        $this->queryBuilder->orderBy($field, $direction->value);
     }
 
     public function paginate(PaginationData $paginationData): void
@@ -77,10 +80,46 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
      */
     public function getPagination(): PaginationInterface
     {
+        $paginator = $this->createPaginator();
+
+        try {
+            return new Pagination(
+                items: $paginator->getIterator(),
+                currentPageNumber: $this->getCurrentPageNumber(),
+                totalItemCount: $paginator->count(),
+                itemNumberPerPage: $this->queryBuilder->getMaxResults(),
+            );
+        } catch (CurrentPageOutOfRangeException) {
+            $this->queryBuilder->setFirstResult(null);
+        }
+
+        return $this->getPagination();
+    }
+
+    public function getUniqueParameterId(): int
+    {
+        return $this->uniqueParameterId++;
+    }
+
+    public function setHint(string $name, mixed $value): void
+    {
+        $this->hints[$name] = $value;
+    }
+
+    private function getCurrentPageNumber(): int
+    {
+        $firstResult = $this->queryBuilder->getFirstResult();
+        $maxResults = $this->queryBuilder->getMaxResults() ?? 1;
+
+        return (int) ($firstResult / $maxResults) + 1;
+    }
+
+    private function createPaginator(): Paginator
+    {
         $rootEntity = current($this->queryBuilder->getRootEntities());
 
         if (false === $rootEntity) {
-            throw new \RuntimeException('There are not root entities defined in the query.');
+            throw new \RuntimeException('There are no root entities defined in the query.');
         }
 
         $identifierFieldNames = $this->queryBuilder
@@ -101,31 +140,6 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
             $query->setHint($name, $value);
         }
 
-        $paginator = new Paginator($query, $hasSingleIdentifierName && $hasJoins);
-
-        return new Pagination(
-            items: $paginator->getIterator(),
-            currentPageNumber: $this->getCurrentPageNumber(),
-            totalItemCount: $paginator->count(),
-            itemNumberPerPage: $this->queryBuilder->getMaxResults(),
-        );
-    }
-
-    public function getUniqueParameterId(): int
-    {
-        return $this->uniqueParameterId++;
-    }
-
-    public function setHint(string $name, mixed $value): void
-    {
-        $this->hints[$name] = $value;
-    }
-
-    private function getCurrentPageNumber(): int
-    {
-        $firstResult = $this->queryBuilder->getFirstResult();
-        $maxResults = $this->queryBuilder->getMaxResults() ?? 1;
-
-        return (int) ($firstResult / $maxResults) + 1;
+        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
     }
 }

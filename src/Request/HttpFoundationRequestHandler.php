@@ -61,16 +61,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
         $parameterName = $dataTable->getConfig()->getSortParameterName();
 
-        $sortField = $this->extractQueryParameter($request, "[$parameterName][field]");
-        $sortDirection = $this->extractQueryParameter($request, "[$parameterName][direction]");
+        $sortingData = $this->extractQueryParameter($request, "[$parameterName]");
 
-        if (null === $sortField) {
+        if (empty($sortingData)) {
             return;
         }
 
-        $dataTable->sort(SortingData::fromArray([
-            $sortField => $sortDirection,
-        ]));
+        $dataTable->sort(SortingData::fromArray($sortingData));
     }
 
     private function paginate(DataTableInterface $dataTable, Request $request): void
@@ -79,11 +76,15 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
+        $defaultPaginationData = $dataTable->getConfig()->getDefaultPaginationData();
+
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
         $page = $this->extractQueryParameter($request, "[$pageParameterName]");
-        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]") ?? PaginationInterface::DEFAULT_PER_PAGE;
+        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]");
+
+        $perPage ??= $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
 
         if (null === $page) {
             return;

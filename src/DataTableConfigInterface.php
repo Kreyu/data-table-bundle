@@ -17,6 +17,7 @@ use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 interface DataTableConfigInterface
 {
@@ -39,6 +40,12 @@ interface DataTableConfigInterface
     public function getType(): ResolvedDataTableTypeInterface;
 
     public function getOptions(): array;
+
+    public function getTitle(): null|string|TranslatableMessage;
+
+    public function getTitleTranslationParameters(): array;
+
+    public function getTranslationDomain(): null|bool|string;
 
     /**
      * @return array<ColumnInterface>

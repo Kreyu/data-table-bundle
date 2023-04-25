@@ -24,6 +24,9 @@ Drag items between columns to show/hide relevant data in the list or change thei
 Visible columns: Widoczne kolumny
 Hidden columns: Ukryte kolumny
 
+# Pagination
+Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Wyniki %current_page_first_item_index% - %current_page_last_item_index% z %total_item_count%
+
 # Export
 Export: Eksport
 Filename: Nazwa pliku

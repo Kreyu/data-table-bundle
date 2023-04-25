@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -21,7 +22,7 @@ trait DataTableControllerTrait
     /**
      * @param class-string<DataTableTypeInterface> $type
      */
-    protected function createDataTable(string $type, mixed $query = null, array $options = []): DataTableInterface
+    protected function createDataTable(string $type, mixed $query = null, #[ArrayShape(DataTableType::DEFAULT_OPTIONS)] array $options = []): DataTableInterface
     {
         if (null === $this->dataTableFactory) {
             throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
@@ -33,7 +34,7 @@ trait DataTableControllerTrait
     /**
      * @param class-string<DataTableTypeInterface> $type
      */
-    protected function createNamedDataTable(string $name, string $type, mixed $query = null, array $options = []): DataTableInterface
+    protected function createNamedDataTable(string $name, string $type, mixed $query = null, #[ArrayShape(DataTableType::DEFAULT_OPTIONS)] array $options = []): DataTableInterface
     {
         if (null === $this->dataTableFactory) {
             throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
@@ -42,7 +43,7 @@ trait DataTableControllerTrait
         return $this->dataTableFactory->createNamed($name, $type, $query, $options);
     }
 
-    protected function createDataTableBuilder(mixed $query = null, array $options = []): DataTableBuilderInterface
+    protected function createDataTableBuilder(mixed $query = null, #[ArrayShape(DataTableType::DEFAULT_OPTIONS)] array $options = []): DataTableBuilderInterface
     {
         if (null === $this->dataTableFactory) {
             throw new \LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));

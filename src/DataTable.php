@@ -17,6 +17,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -96,7 +97,21 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $this->query->sort($data);
+        foreach ($data->getColumns() as $columnSortingData) {
+            $column = $this->config->getColumn($columnSortingData->getName());
+
+            $sortField = $column->getOptions()['sort'];
+
+            if ($sortField === false) {
+                continue;
+            }
+
+            if ($sortField === true) {
+                $sortField = $column->getName();
+            }
+
+            $this->query->sort($sortField, Direction::from($columnSortingData->getDirection()));
+        }
 
         $this->nonFilteredQuery = $this->query;
 
@@ -332,6 +347,8 @@ class DataTable implements DataTableInterface
             return null;
         }
 
+        $data = null;
+
         if ($this->config->isPaginationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('pagination');
         }
@@ -349,6 +366,8 @@ class DataTable implements DataTableInterface
             return null;
         }
 
+        $data = null;
+
         if ($this->config->isSortingPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('sorting');
         }
@@ -365,6 +384,8 @@ class DataTable implements DataTableInterface
         if (!$this->config->isFiltrationEnabled()) {
             return null;
         }
+
+        $data = null;
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('filtration');
@@ -384,6 +405,8 @@ class DataTable implements DataTableInterface
         if (!$this->config->isPersonalizationEnabled()) {
             return null;
         }
+
+        $data = null;
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('personalization');

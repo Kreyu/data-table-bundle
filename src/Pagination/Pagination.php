@@ -6,12 +6,20 @@ namespace Kreyu\Bundle\DataTableBundle\Pagination;
 
 class Pagination implements PaginationInterface
 {
+    public const SIDE_PAGE_LIMIT = 3;
+
+    /**
+     * @throws CurrentPageOutOfRangeException
+     */
     public function __construct(
         private iterable $items,
         private int $currentPageNumber,
         private int $totalItemCount,
         private ?int $itemNumberPerPage = null,
     ) {
+        if ($totalItemCount > 0 && $this->isCurrentPageNumberOutOfRange()) {
+            throw new CurrentPageOutOfRangeException();
+        }
     }
 
     public function getItems(): iterable
@@ -22,6 +30,15 @@ class Pagination implements PaginationInterface
     public function getCurrentPageNumber(): int
     {
         return $this->currentPageNumber;
+    }
+
+    public function getCurrentPageItemCount(): int
+    {
+        if ($this->items instanceof \Traversable) {
+            return iterator_count($this->items);
+        }
+
+        return count((array) $this->items);
     }
 
     public function getTotalItemCount(): int
@@ -51,5 +68,33 @@ class Pagination implements PaginationInterface
     public function hasNextPage(): bool
     {
         return $this->currentPageNumber < $this->getPageCount();
+    }
+
+    public function getFirstVisiblePageNumber(): int
+    {
+        $leftSideAddition = max(self::SIDE_PAGE_LIMIT - ($this->getPageCount() - $this->getCurrentPageNumber()), 0);
+
+        return max($this->getCurrentPageNumber() - self::SIDE_PAGE_LIMIT - $leftSideAddition, 1);
+    }
+
+    public function getLastVisiblePageNumber(): int
+    {
+        return min($this->getFirstVisiblePageNumber() + (self::SIDE_PAGE_LIMIT * 2), $this->getPageCount());
+    }
+
+    public function getCurrentPageFirstItemIndex(): int
+    {
+        return $this->itemNumberPerPage * ($this->currentPageNumber - 1) + 1;
+    }
+
+    public function getCurrentPageLastItemIndex(): int
+    {
+        return $this->getCurrentPageFirstItemIndex() + $this->getCurrentPageItemCount() - 1;
+    }
+
+    private function isCurrentPageNumberOutOfRange(): bool
+    {
+        return $this->currentPageNumber < 1
+            || $this->currentPageNumber > $this->getPageCount();
     }
 }

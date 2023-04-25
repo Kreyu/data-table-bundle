@@ -22,6 +22,7 @@ use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class DataTableBuilder implements DataTableBuilderInterface
 {
@@ -44,6 +45,21 @@ class DataTableBuilder implements DataTableBuilderInterface
      * Stores an array of options, used to configure a builder behavior.
      */
     private array $options;
+
+    /**
+     * User-friendly title used to describe a data table.
+     */
+    private null|string|TranslatableMessage $title = null;
+
+    /**
+     * Stores an array of parameters used in translation of the user-friendly title.
+     */
+    private array $titleTranslationParameters = [];
+
+    /**
+     * Domain name used in the translation of the data table elements.
+     */
+    private null|false|string $translationDomain = null;
 
     /**
      * Stores an array of columns, used to display the data table to the user.
@@ -300,6 +316,42 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->options = $options;
+
+        return $this;
+    }
+
+    public function getTitle(): null|string|TranslatableMessage
+    {
+        return $this->title;
+    }
+
+    public function setTitle(null|string|TranslatableMessage $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getTitleTranslationParameters(): array
+    {
+        return $this->titleTranslationParameters;
+    }
+
+    public function setTitleTranslationParameters(array $titleTranslationParameters): static
+    {
+        $this->titleTranslationParameters = $titleTranslationParameters;
+
+        return $this;
+    }
+
+    public function getTranslationDomain(): null|bool|string
+    {
+        return $this->translationDomain;
+    }
+
+    public function setTranslationDomain(null|bool|string $translationDomain): static
+    {
+        $this->translationDomain = $translationDomain;
 
         return $this;
     }

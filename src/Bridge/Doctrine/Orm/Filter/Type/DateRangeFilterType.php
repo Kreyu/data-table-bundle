@@ -29,20 +29,26 @@ class DateRangeFilterType extends AbstractFilterType
 
         $criteria = $query->expr()->andX();
 
-        if (null !== $value['from']) {
+        if (null !== $dateFrom = $value['from']) {
             $parameterNameFrom = $parameterName.'_from';
+
+            $dateFrom = \DateTime::createFromInterface($dateFrom);
+            $dateFrom->setTime(0, 0);
 
             $criteria->add($query->expr()->gte($queryPath, ":$parameterNameFrom"));
 
-            $query->setParameter($parameterNameFrom, $value['from']);
+            $query->setParameter($parameterNameFrom, $dateFrom);
         }
 
-        if (null !== $value['to']) {
+        if (null !== $valueTo = $value['to']) {
             $parameterNameTo = $parameterName.'_to';
 
-            $criteria->add($query->expr()->lte($queryPath, ":$parameterNameTo"));
+            $valueTo = \DateTime::createFromInterface($valueTo)->modify('+1 day');
+            $valueTo->setTime(0, 0);
 
-            $query->setParameter($parameterNameTo, $value['to']);
+            $criteria->add($query->expr()->lt($queryPath, ":$parameterNameTo"));
+
+            $query->setParameter($parameterNameTo, $valueTo);
         }
 
         $query->andWhere($criteria);

@@ -102,6 +102,10 @@ class DataTable implements DataTableInterface
 
             $sortField = $column->getOptions()['sort'];
 
+            if ($sortField === false) {
+                continue;
+            }
+
             if ($sortField === true) {
                 $sortField = $column->getName();
             }
@@ -343,6 +347,8 @@ class DataTable implements DataTableInterface
             return null;
         }
 
+        $data = null;
+
         if ($this->config->isPaginationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('pagination');
         }
@@ -360,6 +366,8 @@ class DataTable implements DataTableInterface
             return null;
         }
 
+        $data = null;
+
         if ($this->config->isSortingPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('sorting');
         }
@@ -376,6 +384,8 @@ class DataTable implements DataTableInterface
         if (!$this->config->isFiltrationEnabled()) {
             return null;
         }
+
+        $data = null;
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('filtration');
@@ -395,6 +405,8 @@ class DataTable implements DataTableInterface
         if (!$this->config->isPersonalizationEnabled()) {
             return null;
         }
+
+        $data = null;
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
             $data ??= $this->getPersistenceData('personalization');

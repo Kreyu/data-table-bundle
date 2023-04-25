@@ -49,14 +49,14 @@ namespace App\Controller;
 
 use App\DataTable\Type\ProductType;
 use App\Repository\ProductRepository;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends AbstractController
 {
-    use DataTableFactoryAwareTrait;
+    use DataTableControllerTrait;
     
     public function index(Request $request, ProductRepository $repository): Response
     {

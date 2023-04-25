@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-trait DataTableFactoryAwareTrait
+trait DataTableControllerTrait
 {
     private null|DataTableFactoryInterface $dataTableFactory = null;
 

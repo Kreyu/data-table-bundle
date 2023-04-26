@@ -1,5 +1,5 @@
 The <info>%command.name%</info> command generates a new data table class.
 
-<info>php %command.full_name% AwesomeProjectType</info>
+<info>php %command.full_name% ProjectDataTableType</info>
 
 If the argument is missing, the command will ask for the data table class name interactively.

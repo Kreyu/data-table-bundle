@@ -16,6 +16,7 @@ use Symfony\Bundle\MakerBundle\Util\UseStatementGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MakeDataTable extends AbstractMaker
 {
@@ -32,7 +33,7 @@ class MakeDataTable extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->addArgument('data-table-class', InputArgument::OPTIONAL, sprintf('Choose a name for your data table class (e.g. <fg=yellow>%sType</>)', Str::asClassName(Str::getRandomTerm())))
+            ->addArgument('data-table-class', InputArgument::OPTIONAL, sprintf('Choose a name for your data table class (e.g. <fg=yellow>%sDataTableType</>)', Str::asClassName(Str::getRandomTerm())))
             ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeDataTable.txt'))
         ;
     }
@@ -42,12 +43,13 @@ class MakeDataTable extends AbstractMaker
         $dataTableClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('data-table-class'),
             'DataTable\\Type\\',
-            'Type',
+            'DataTableType',
         );
 
         $useStatements = new UseStatementGenerator([
             AbstractDataTableType::class,
             DataTableBuilderInterface::class,
+            OptionsResolver::class,
         ]);
 
         $generator->generateClass(

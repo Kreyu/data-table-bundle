@@ -64,7 +64,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
             $field = $rootAlias.'.'.$field;
         }
 
-        $this->queryBuilder->orderBy($field, $direction->value);
+        $this->queryBuilder->addOrderBy($field, $direction->value);
     }
 
     public function paginate(PaginationData $paginationData): void

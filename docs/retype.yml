@@ -1,0 +1,11 @@
+# Documentation powered by Retype
+# https://retype.com/
+
+input: .
+output: .retype
+url: # Add your website address here
+branding:
+  title: DataTable Bundle
+  label: Docs
+footer:
+  copyright: "&copy; Copyright {{ year }}. All rights reserved."

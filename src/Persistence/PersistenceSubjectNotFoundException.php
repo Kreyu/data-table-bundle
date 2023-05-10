@@ -11,8 +11,8 @@ class PersistenceSubjectNotFoundException extends \Exception
         parent::__construct($message);
     }
 
-    public static function createForProvider(PersistenceSubjectProviderInterface $provider): static
+    public static function createForProvider(PersistenceSubjectProviderInterface $provider): self
     {
-        return new static(sprintf('Persistence subject not found by the "%s"', get_class($provider)));
+        return new self(sprintf('Persistence subject not found by the "%s"', get_class($provider)));
     }
 }

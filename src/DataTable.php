@@ -350,7 +350,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isPaginationPersistenceEnabled()) {
-            $data ??= $this->getPersistenceData('pagination');
+            $data = $this->getPersistenceData('pagination');
         }
 
         $data ??= $this->config->getDefaultPaginationData();
@@ -369,7 +369,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isSortingPersistenceEnabled()) {
-            $data ??= $this->getPersistenceData('sorting');
+            $data = $this->getPersistenceData('sorting');
         }
 
         $data ??= $this->config->getDefaultSortingData();
@@ -388,7 +388,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
-            $data ??= $this->getPersistenceData('filtration');
+            $data = $this->getPersistenceData('filtration');
         }
 
         $data ??= $this->config->getDefaultFiltrationData();
@@ -409,7 +409,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
-            $data ??= $this->getPersistenceData('personalization');
+            $data = $this->getPersistenceData('personalization');
         }
 
         $data ??= $this->config->getDefaultPersonalizationData();

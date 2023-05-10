@@ -97,6 +97,7 @@ class DateFilterType extends AbstractFilterType
             throw new \InvalidArgumentException(sprintf('Unable to convert data of type "%s" to DateTime object.', get_debug_type($value)));
         }
 
+        $dateTime = \DateTime::createFromInterface($dateTime);
         $dateTime->setTime(0, 0);
 
         return $dateTime;

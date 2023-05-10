@@ -14,7 +14,10 @@ class PersonalizationColumnData
     public int $order;
     public bool $visible;
 
-    public static function fromArray(array $data): static
+    /**
+     * @param array{name: string, order: int, visible: bool} $data
+     */
+    public static function fromArray(array $data): self
     {
         ($resolver = new OptionsResolver())
             ->setRequired('name')
@@ -37,7 +40,7 @@ class PersonalizationColumnData
 
         $data = $resolver->resolve($data);
 
-        $self = new static();
+        $self = new self();
         $self->name = $data['name'];
         $self->order = $data['order'];
         $self->visible = $data['visible'];
@@ -45,9 +48,9 @@ class PersonalizationColumnData
         return $self;
     }
 
-    public static function fromColumn(ColumnInterface $column, int $order = 0, bool $visible = true): static
+    public static function fromColumn(ColumnInterface $column, int $order = 0, bool $visible = true): self
     {
-        $self = new static();
+        $self = new self();
         $self->name = $column->getName();
         $self->order = $order;
         $self->visible = $visible;

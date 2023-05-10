@@ -43,6 +43,8 @@ interface DataTableInterface
 
     public function createPersonalizationFormBuilder(DataTableView $view = null): FormBuilderInterface;
 
+    public function createExportFormBuilder(): FormBuilderInterface;
+
     public function isExporting(): bool;
 
     public function hasActiveFilters(): bool;

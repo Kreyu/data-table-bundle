@@ -11,8 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface DataTableTypeInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
 
     public function configureOptions(OptionsResolver $resolver): void;

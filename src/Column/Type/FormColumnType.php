@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormColumnType extends AbstractColumnType
 {
-    public function buildView(ColumnView $view, ColumnInterface $column, array $options): void
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         $view->vars = array_replace($view->vars, [
             'form' => $options['form'],

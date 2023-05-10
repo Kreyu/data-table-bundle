@@ -15,6 +15,9 @@ class PersonalizationData
      */
     private array $columns = [];
 
+    /**
+     * @param array<PersonalizationColumnData> $columns
+     */
     public function __construct(array $columns = [])
     {
         foreach ($columns as $column) {
@@ -23,9 +26,9 @@ class PersonalizationData
     }
 
     /**
-     * Creates a new instance of personalization data from an array.
+     * @param array<string, ColumnInterface>|array<string, array<string, mixed>> $data
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         $columns = [];
 
@@ -40,7 +43,7 @@ class PersonalizationData
             $columns[$key] = $value;
         }
 
-        return new static($columns);
+        return new self($columns);
     }
 
     /**
@@ -48,7 +51,7 @@ class PersonalizationData
      * The columns are be added in order they are defined in the data table.
      * Every column is marked as "visible" by default.
      */
-    public static function fromDataTable(DataTableInterface $dataTable): static
+    public static function fromDataTable(DataTableInterface $dataTable): self
     {
         $columns = [];
 
@@ -56,7 +59,7 @@ class PersonalizationData
             $columns[] = PersonalizationColumnData::fromColumn($column, $index);
         }
 
-        return new static($columns);
+        return new self($columns);
     }
 
     /**

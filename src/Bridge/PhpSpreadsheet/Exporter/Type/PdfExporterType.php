@@ -39,10 +39,11 @@ class PdfExporterType extends AbstractExporterType
 
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter
     {
-        $writer = match ($options['library']) {
+        $writer = match ($library = $options['library']) {
             'dompdf' => new Dompdf($spreadsheet),
             'mpdf' => new Mpdf($spreadsheet),
             'tcpdf' => new Tcpdf($spreadsheet),
+            default => throw new \LogicException(sprintf('Writer library "%s" is not supported', $library)),
         };
 
         $writer->setOrientation($options['orientation']);

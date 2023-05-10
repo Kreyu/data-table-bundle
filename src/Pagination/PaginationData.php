@@ -15,7 +15,10 @@ class PaginationData
     ) {
     }
 
-    public static function fromArray(array $data): static
+    /**
+     * @param array{page: int, perPage: int} $data
+     */
+    public static function fromArray(array $data): self
     {
         ($resolver = new OptionsResolver())
             ->setDefault('page', null)

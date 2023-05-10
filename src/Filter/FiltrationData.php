@@ -30,7 +30,7 @@ class FiltrationData
      * - an instance of {@see FilterData}
      * - an array of filter data
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         $filters = [];
 
@@ -46,14 +46,14 @@ class FiltrationData
             $filters[$key] = $value;
         }
 
-        return new static($filters);
+        return new self($filters);
     }
 
     /**
      * Creates a new instance from a {@see DataTableInterface}.
      * The filters are be initialized with empty values.
      */
-    public static function fromDataTable(DataTableInterface $dataTable): static
+    public static function fromDataTable(DataTableInterface $dataTable): self
     {
         $filters = [];
 
@@ -61,7 +61,7 @@ class FiltrationData
             $filters[$filter->getName()] = new FilterData();
         }
 
-        return new static($filters);
+        return new self($filters);
     }
 
     /**

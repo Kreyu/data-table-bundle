@@ -14,7 +14,7 @@ class ExportData
     public ExportStrategy $strategy;
     public bool $includePersonalization;
 
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         $resolver = (new OptionsResolver())
             ->setRequired('exporter')

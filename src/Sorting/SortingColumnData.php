@@ -15,6 +15,10 @@ class SortingColumnData
     ) {
     }
 
+    /**
+     * @param  array{name: string, direction: string} $data
+     * @return self
+     */
     public static function fromArray(array $data): self
     {
         ($resolver = new OptionsResolver())

@@ -25,12 +25,21 @@ interface ResolvedDataTableTypeInterface
      */
     public function getTypeExtensions(): array;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface;
 
     public function createView(DataTableInterface $dataTable): DataTableView;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
 
     public function getOptionsResolver(): OptionsResolver;

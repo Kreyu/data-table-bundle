@@ -24,7 +24,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     public function __construct(
         private DataTableTypeInterface $innerType,
         private array $typeExtensions = [],
-        private ?ResolvedDataTableType $parent = null,
+        private ?ResolvedDataTableTypeInterface $parent = null,
     ) {
     }
 

@@ -14,6 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedFilterType implements ResolvedFilterTypeInterface
 {
+    private OptionsResolver $optionsResolver;
+
     /**
      * @param array<FilterTypeExtensionInterface> $typeExtensions
      */

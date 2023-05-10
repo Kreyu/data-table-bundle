@@ -25,10 +25,9 @@ class PersonalizationDataType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        /**
-         * @var DataTableView $dataTableView
-         */
-        if (null === $dataTableView = $options['data_table_view']) {
+        $dataTableView = $options['data_table_view'];
+
+        if (!$dataTableView instanceof DataTableView) {
             throw new \LogicException('Unable to create personalization form view without the data table view.');
         }
 

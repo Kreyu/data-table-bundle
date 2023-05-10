@@ -21,6 +21,9 @@ use Twig\TwigFunction;
 
 class DataTableExtension extends AbstractExtension
 {
+    /**
+     * @param array<string> $themes
+     */
     public function __construct(
         private array $themes,
     ) {
@@ -58,6 +61,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderDataTable(Environment $environment, DataTableView $view, array $variables = []): string
@@ -70,6 +74,8 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $dataTableVariables
+     * @param  array<string, mixed> $formVariables
      * @throws TwigException|\Throwable
      */
     public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
@@ -82,6 +88,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderDataTableTable(Environment $environment, DataTableView $view, array $variables = []): string
@@ -94,6 +101,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderDataTableActionBar(Environment $environment, DataTableView $view, array $variables = []): string
@@ -106,6 +114,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderHeaderRow(Environment $environment, HeaderRowView $view, array $variables = []): string
@@ -118,6 +127,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderValueRow(Environment $environment, ValueRowView $view, array $variables = []): string
@@ -130,6 +140,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderColumnLabel(Environment $environment, ColumnHeaderView $view, array $variables = []): string
@@ -142,6 +153,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderColumnHeader(Environment $environment, ColumnHeaderView $view, array $variables = []): string
@@ -154,6 +166,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderColumnValue(Environment $environment, ColumnValueView $view, array $variables = []): string
@@ -166,6 +179,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderAction(Environment $environment, ActionView $view, array $variables = []): string
@@ -178,6 +192,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
      * @throws TwigException|\Throwable
      */
     public function renderPagination(Environment $environment, DataTableView|PaginationView $view, array $variables = []): string
@@ -248,6 +263,7 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $context
      * @throws TwigException|\Throwable
      */
     private function renderBlock(Environment $environment, string $blockName, array $context = []): string
@@ -266,6 +282,8 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param  array<string, mixed> $variables
+     * @return array<string, mixed>
      * @throws TwigException|\Throwable
      */
     private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array

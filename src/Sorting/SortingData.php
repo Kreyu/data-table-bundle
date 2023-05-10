@@ -14,6 +14,9 @@ class SortingData
      */
     private array $columns = [];
 
+    /**
+     * @param array<SortingColumnData> $columns
+     */
     public function __construct(array $columns = [])
     {
         foreach ($columns as $column) {
@@ -41,6 +44,9 @@ class SortingData
         return new self($fields);
     }
 
+    /**
+     * @return array<SortingColumnData>
+     */
     public function getColumns(): array
     {
         return $this->columns;

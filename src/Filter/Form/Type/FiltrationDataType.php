@@ -48,12 +48,9 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
          */
         $dataTable = $options['data_table'];
 
-        /**
-         * @var DataTableView $dataTableView
-         */
         $dataTableView = $options['data_table_view'];
 
-        if (null === $dataTableView) {
+        if (!$dataTableView instanceof DataTableView) {
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
 

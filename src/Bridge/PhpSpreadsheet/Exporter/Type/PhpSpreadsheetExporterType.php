@@ -21,7 +21,7 @@ final class PhpSpreadsheetExporterType implements ExporterTypeInterface
     public function configureOptions(OptionsResolver $resolver): void
     {
         if (!class_exists(Spreadsheet::class)) {
-            throw new \LogicException(sprintf('Trying to use exporter that requires PhpSpreadsheet which is not installed. Try running "composer require phpoffice/phpspreadsheet".', static::class));
+            throw new \LogicException('Trying to use exporter that requires PhpSpreadsheet which is not installed. Try running "composer require phpoffice/phpspreadsheet".');
         }
 
         $resolver

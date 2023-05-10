@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
@@ -15,6 +16,8 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -104,9 +107,7 @@ final class DataTableType implements DataTableTypeInterface
         $columns = $visibleColumns = $dataTable->getConfig()->getColumns();
 
         if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            if ($personalizationData = $dataTable->getPersonalizationData()) {
-                $visibleColumns = $personalizationData->compute($columns);
-            }
+            $visibleColumns = $dataTable->getPersonalizationData()->compute($columns);
         }
 
         $view->vars = array_replace($view->vars, [
@@ -210,6 +211,9 @@ final class DataTableType implements DataTableTypeInterface
         return new PaginationView($view, $dataTable->getPagination());
     }
 
+    /**
+     * @return array<ActionView>
+     */
     private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
     {
         return array_map(
@@ -218,14 +222,15 @@ final class DataTableType implements DataTableTypeInterface
         );
     }
 
+    /**
+     * @return array<FilterView>
+     */
     private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
     {
         $filters = [];
 
-        $filtrationData = $dataTable->getFiltrationData();
-
         foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $data = $filtrationData?->getFilterData($filter->getName()) ?? new FilterData();
+            $data = $dataTable->getFiltrationData()->getFilterData($filter->getName()) ?? new FilterData();
 
             $filters[$filter->getName()] = $filter->createView($data, $view);
         }
@@ -253,7 +258,8 @@ final class DataTableType implements DataTableTypeInterface
     }
 
     /**
-     * @param array<ColumnInterface> $columns
+     * @param  array<ColumnInterface> $columns
+     * @return array<ValueRowView>
      */
     private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): array
     {

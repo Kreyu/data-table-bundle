@@ -37,7 +37,7 @@ class MakeDataTable extends AbstractMaker
         ;
     }
 
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
+    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $dataTableClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('data-table-class'),

@@ -6,5 +6,5 @@ namespace Kreyu\Bundle\DataTableBundle\Persistence;
 
 interface PersistenceSubjectInterface
 {
-    public function getDataTablePersistenceIdentifier();
+    public function getDataTablePersistenceIdentifier(): string;
 }

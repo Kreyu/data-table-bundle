@@ -2,7 +2,7 @@
 order: f
 ---
 
-# Enabling global search
+# Global search
 
 ![Search filter input with the Tabler theme](./../static/global_search.png)--
 
@@ -82,5 +82,3 @@ class ProductDataTableType extends AbstractDataTableType
 !!!
 **Tip**: Move the search handler logic into repository to reduce the type class complexity.
 !!!
-
-Now that the data table has full filtration and search capabilities, let's focus on something that may be really important in some use cases — [exporting the data](exporting-the-data.md).

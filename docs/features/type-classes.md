@@ -1,6 +1,12 @@
-# Understanding type classes
+---
+order: j
+---
 
-Multiple parts of the bundle, such as columns, filters etc. are described using the type classes. The type classes are similar to the [form types](https://symfony.com/doc/current/reference/forms/types.html), tailored for the usage with the data tables.
+# Type classes
+
+Multiple parts of the bundle, such as columns, filters etc. are described using the type classes.
+Their purpose and method of definition is very similar to the [Symfony Form Types](https://symfony.com/doc/current/reference/forms/types.html),
+which means knowing how these work really helps in understanding most of the bundle.
 
 Following parts of the bundle are defined using the type classes:
 
@@ -10,7 +16,7 @@ Following parts of the bundle are defined using the type classes:
 * actions
 * exporters
 
-## Defining the type
+## Creating custom type classes
 
 The type classes work as a blueprint that defines a configuration how its feature should work. They implement their own, feature-specific interface. 
 However, it is better to extend from the abstract classes, which already implement the interface and provide some utilities.
@@ -23,6 +29,16 @@ However, it is better to extend from the abstract classes, which already impleme
 | Actions     | [:icon-mark-github:&nbsp; ActionTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php)       |
 | Exporters   | [:icon-mark-github:&nbsp; ExporterTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterTypeInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterType.php) |
 
+The recommended namespaces to put the types are as follows:
+
+| Component   | Namespace                     |
+|-------------|-------------------------------|
+| Data tables | `App\DataTable\Type`          |
+| Columns     | `App\DataTable\Column\Type`   |
+| Filters     | `App\DataTable\Filter\Type`   |
+| Actions     | `App\DataTable\Action\Type`   |
+| Exporters   | `App\DataTable\Exporter\Type` |
+
 Every type in the bundle is registered as a [tagged service](https://symfony.com/doc/current/service_container/tags.html):
 
 | Component   | Type tag                         |
@@ -33,10 +49,15 @@ Every type in the bundle is registered as a [tagged service](https://symfony.com
 | Actions     | `kreyu_data_table.action.type`   |
 | Exporters   | `kreyu_data_table.exporter.type` |
 
+!!! Note
+Custom type classes are **automatically** registered as a service.
+!!!
 
-### Using the inheritance
+### Type inheritance
 
-For example, let's think of a column type that represents a phone number. In theory, it should extend the existing text column type, only adding a phone number oriented formatting. In practice, the type's class **should not** extend the text type class:
+For example, let's think of a column type that represents a phone number. 
+In theory, it should extend the existing text column type, only adding a phone number oriented formatting. 
+In practice, the type's class **should not** extend the text type class directly:
 
 !!!danger
 This is <span style="color:#e5413e;">invalid</span> - do **NOT** use PHP class inheritance!
@@ -72,10 +93,55 @@ class PhoneColumnType implements AbstractColumnType
 The difference is all about the extensions. Considering the example above, while using the PHP inheritance, 
 a [type extensions](#defining-the-type-extensions) defined for the text column type won't be applied to the phone column type.
 
-### Adding configuration options
+### Type configuration options
 
-Each type class contains its own set of options, that can be used to configure the type according to a specific need. 
-The options can be defined in the `configureOptions()` method by using the [OptionsResolver component](https://symfony.com/doc/current/components/options_resolver.html).
+Each type class contains its own set of options, that can be used to configure the type according to a specific need.
+Those options can be defined in any type class `configureOptions()` method, by using the [OptionsResolver component](https://symfony.com/doc/current/components/options_resolver.html):
+
+```php
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class UserColumnType extends AbstractColumnType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setDefault('user', null)
+            ->setAllowedTypes('user', ['null', UserInterface::class])
+        ;
+    }
+}
+```
+
+Additionally, options are inherited from the type specified in the `getParent()` method:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+// This class inherits options from ColumnType (which is base type)
+class UserColumnType extends AbstractColumnType
+{ 
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setDefault('user', null)
+            ->setAllowedTypes('user', ['null', UserInterface::class])
+        ;
+    }
+}
+
+// This class inherits options from ParentColumnType
+class AdminColumnType extends AbstractColumnType
+{
+    public function getParent(): string
+    {
+        return UserColumnType::class;
+    }
+}
+```
 
 ## Defining the type extensions
 
@@ -89,7 +155,7 @@ The type extensions allow to easily extend existing types. Those classes contain
 | Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Action/Type/ActionTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
 | Exporters   | [:icon-mark-github:&nbsp; ExporterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Exporter/Type/ExporterTypeInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterExtensionType.php) |
 
-### Configuring the types to extend
+### Setting the types to extend
 
 Each type extension class **have to** define a list of types that it extends, using the `getExtendedTypes()` method. 
 For example, if you wish to create an extension for a built-in text column type, consider following configuration:
@@ -132,7 +198,7 @@ For reference, a list of each feature base type class:
 | Actions     | [:icon-mark-github:&nbsp; ActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionType.php)       |
 | Exporters   | [:icon-mark-github:&nbsp; ExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterType.php) |
 
-### Configuring the order of extension loading
+### Setting the extension order
 
 Every type extension in the bundle is registered as a [tagged service](https://symfony.com/doc/current/service_container/tags.html):
 
@@ -160,10 +226,13 @@ services:
 In the example above, the `ExtensionB` will be applied before the `Extension A`, because it has higher priority.
 Without the priority specified, the extensions would be applied in the order they are registered.
 
-## The type resolving process
+## Resolving the types
 
-Because type classes support inheritance and extensions, they have to be **resolved** before usage.
-Each component that supports the type classes contains its resolved counterpart:
+Type classes support [inheritance](#type-inheritance) and [extensions](#defining-the-type-extensions),
+therefore they must be **resolved** before they can be used in the application. The resolved type classes 
+has direct access to an instance of the parent type (also resolved), as well as the extensions to apply.
+
+Each component that supports the type classes, contain its "resolved" counterpart:
 
 | Component   | Resolved type class                                                                                                                              |
 |-------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -173,8 +242,8 @@ Each component that supports the type classes contains its resolved counterpart:
 | Actions     | [:icon-mark-github:&nbsp; ResolvedActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ResolvedActionType.php)       |
 | Exporters   | [:icon-mark-github:&nbsp; ResolvedExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ResolvedExporterType.php) |
 
-Resolved type classes contain similar methods as a non-resolved types, and handle both inheritance & extensions. 
-For example, take a look at implementation of the resolved data table type's `buildDataTable()` method:
+Resolved type classes contain similar methods as a non-resolved types. 
+To understand how resolving process works, take a look at implementation of the resolved data table type's `buildDataTable()` method:
 
 ```php # vendor/kreyu/data-table-bundle/src/Type/ResolvedDataTableType.php
 public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
@@ -189,14 +258,40 @@ public function buildDataTable(DataTableBuilderInterface $builder, array $option
 }
 ```
 
-First, the type's parent method is called, followed by the type itself, then comes the extensions.
-This is why defining an order of extensions may be very important in some cases. 
+Breaking it down into smaller pieces, first, the type's parent method is called:
+
+```php #
+$this->parent?->buildDataTable($builder, $options);
+```
+
+The _parent_ is an instance of already resolved type. It is based on the FQCN provided in the `getParent()` method.
+
+Next comes the _inner type_ itself: 
+
+```php #
+$this->innerType->buildDataTable($builder, $options);
+```
+
+The _inner type_ is an instance of non-resolved type, provided with the FQCN when defining the data table.
+It is very important to understand, that this method is called **after** the parent one, but **before** any extension.
+
+Last but not least, there's the extensions:
+
+```php #
+foreach ($this->typeExtensions as $extension) {
+    $extension->buildDataTable($builder, $options);
+}
+```
+
+This is why [defining an order of extensions](#setting-the-extension-order) may be very important in some cases. 
 Same flow applies to every resolved type class and most of its methods in the bundle.
 
 ## Accessing the type registry
 
-The registry stores all the types and extensions registered in the system.
-Those classes can be used to retrieve a specific type or extension using their fully qualified class name.
+The registries are the classes that stores all the types and extensions registered in the system.
+Those classes are used to easily retrieve a [resolved types](#resolving-the-types), 
+while only requiring a fully qualified class name of the desired type. 
+
 Each component that supports the type classes contains its own registry:
 
 | Component   | Resolved type class                                                                                                                 |
@@ -206,3 +301,7 @@ Each component that supports the type classes contains its own registry:
 | Filters     | [:icon-mark-github:&nbsp; FilterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/FilterRegistry.php)       |
 | Actions     | [:icon-mark-github:&nbsp; ActionRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/ActionRegistry.php)       |
 | Exporters   | [:icon-mark-github:&nbsp; ExporterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php) |
+
+In reality, the purpose of the registry is to:
+- hold instances of the registered types and extensions; 
+- create [resolved types](#resolving-the-types) using the [&nbsp;:icon-mark-github:&nbsp; ResolvedTypeFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php);

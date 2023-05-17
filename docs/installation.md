@@ -1,3 +1,8 @@
+---
+icon: rocket
+order: 5
+---
+
 # Installation
 
 This bundle can be installed at any moment during a project’s lifecycle.
@@ -38,9 +43,7 @@ Add `@kreyu/data-table-bundle` dependency to your `package.json` file:
 }
 ```
 
-## Enable the Stimulus controllers
-
-Add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json` file: 
+Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json` file: 
 
 ```json # assets/controllers.json
 {
@@ -56,7 +59,7 @@ Add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json` fil
 
 ## Install front-end dependencies and rebuild
 
-Build process obviously depends on the configuration of your project. 
+The build process obviously depends on the configuration of your project. 
 
 +++ yarn
 ```shell

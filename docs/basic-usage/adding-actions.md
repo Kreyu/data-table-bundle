@@ -4,27 +4,24 @@ order: h
 
 # Adding actions
 
-What is a list of products without the ability of creating and editing the records.\
-Similar to data tables, columns and filters, actions are using the [Types API](../philosophy/understanding-the-types-api.md).
+What is a list of products without the ability of creating and editing the records?
+In this bundle, there are two kinds of actions:
 
-## One action, two ways to use it
+* [global action](#adding-global-actions), displayed above the data table - e.g. "Create new user";
+* [row action](#adding-row-actions), displayed on each row, e.g. "Edit", "Delete";
 
-In this bundle, there's two kinds of actions:
+Similar to data tables, columns and filters, actions are defined using the [type classes](../features/type-classes.md).
 
-* global action, displayed above the data table - e.g. "Create new user";
-* row action, displayed on each row, e.g. "Show", "Edit", "Delete";
+## Adding global actions
 
-## Adding global actions to the data table
+![Global action with the Tabler theme](../static/global_action.png)--
 
 Let's assume that the application has an `app_product_create` route for creating new products.\
-The user should be able to click a "Create new product" button above the products data table.
-
-<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption><p>Global action with the built-in Tabler theme</p></figcaption></figure>
+The user should be able to click a "Create new product" button above the data table.
 
 To add global action, use the builder's `addAction()` method:
 
-{% code title="src/DataTable/Type/ProductDataTableType.php" lineNumbers="true" %}
-```php
+```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
@@ -49,26 +46,30 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
-{% endcode %}
 
-First argument represents an action name. The second argument represents a fully qualified class name of an action type, which similarly to data table, column, filter and exporter type classes, works as a blueprint for an action - and describes how to render it.
+The builder's `addAction()` method accepts _three_ arguments:
 
-For reference, see [built-in action types](../reference/actions/types.md).
+- action name;
+- action type — with a fully qualified class name;
+- action options — defined by the action type, used to configure the action;
 
-## Adding row actions to the data table
+For reference, see [built-in action types](../components/actions/types.md).
 
-Let's assume that the application has routes for showing product details, editing and deleting the product. Those action cannot be global - because they are bound to each row, and in fact, to a specific product (the routes require product identifier).
+## Adding row actions
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption><p>Row actions with the built-in Tabler theme</p></figcaption></figure>
+![Row actions with the built-in Tabler theme](../static/row_actions.png)--
 
-To handle this type of actions, there's a built-in action column type, which allows using the same action type classes as in their global definition.
+Let's assume that the application has routes for showing product details, editing and deleting the product. 
+Those actions cannot be global because they are bound to each row, and in fact, to a specific product (the routes require product identifier).
 
-Since there are no `addAction()` method anymore, the column type accepts
+To handle this type of actions, there's a [built-in action column type](../components/columns/types/actions.md), which allows using the same action type classes as in their global definition.
 
-The action names are passed as the `actions` option array keys. Additionally, this type requires a `type` option, which specifies the fully qualified class name of the action type - same thing as the second argument of the builder's `addAction()` method. The column type options are passed using the `type_options` option:
+Since there are no `addAction()` method, the actions are defined in [the options](../features/type-classes.md#type-configuration-options).
+The action names are passed as the [actions](../components/columns/types/actions.md) option array keys. Each entry requires:
+- a `type` option — same as the `addAction()` second argument;
+- a `type_options` option — same as the `addAction()` third argument;
 
-{% code title="src/DataTable/Type/ProductDataTableType.php" lineNumbers="true" %}
-```php
+```php # src/DataTable/Type/ProductDataTableType.php
 use App\Entity\Product;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
@@ -106,12 +107,11 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
-{% endcode %}
 
-There's one thing missing... a delete action! But let's say it is different, because it requires a _POST request_ to delete a product. For this case, the built-in form action type will handle it:
+There's one thing missing... a delete action! But let's say it is different because it requires a _POST request_ to delete a product. 
+In this case, the built-in form action type will handle it:
 
-{% code title="src/DataTable/Type/ProductDataTableType.php" lineNumbers="true" %}
-```php
+```php # src/DataTable/Type/ProductDataTableType.php
 use App\Entity\Product;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
@@ -154,19 +154,19 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
-{% endcode %}
 
 Now everything works fine - clicking on the delete actions sends a POST request, because the action is wrapped in a form configured to use the POST method.
 
 ## Enabling action confirmation
 
-Clicking on the delete action immediately removes the products - in some cases it may be fine, but dangerous actions should be confirmable by the user.
+Clicking on the delete action immediately removes the products — in some cases it may be fine, but dangerous actions should be confirmable by the user.
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>Action confirmation modal with the built-in Tabler theme</p></figcaption></figure>
+![Action confirmation modal with the Tabler theme](../static/action_confirmation_modal.png)
 
 By default, actions are **not** confirmable, because their `confirmation` option equals `false`. To change that, set the option to `true`:
 
-<pre class="language-php" data-title="src/DataTable/Type/ProductDataTableType.php" data-line-numbers><code class="lang-php">use App\Entity\Product;
+```php # src/DataTable/Type/ProductDataTableType.php
+use App\Entity\Product;
 use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
@@ -187,14 +187,14 @@ class ProductDataTableType extends AbstractDataTableType
                         'type' => FormActionType::class,
                         'type_options' => [
                             // Other action type options defined before...
-<strong>                            'confirmation' => true,
-</strong>                        ],
+                            'confirmation' => true,
+                        ],
                     ],
                 ],
             ])
         ;
     }
 }
-</code></pre>
+```
 
-Now that the data table seems to be complete, let's focus on something really special - [a personalization](../usage/personalization.md), where the user can decide which columns are visible, or even their order!
+Now that the data table seems to be complete, let's focus on something really special — [a personalization](../basic-usage/personalization.md), where the user can decide which columns are visible, or even their order!

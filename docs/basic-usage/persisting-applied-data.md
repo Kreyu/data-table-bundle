@@ -10,27 +10,25 @@ Let's focus on persisting the applied personalization data first.&#x20;
 
 ## Prerequisites
 
-For a basic usage, we're assuming that the persistence data will be saved to a **cache**, and are saved individually per **user**. Therefore, make sure the Symfony Cache and Security components are is installed and enabled. The bundle will automatically use them for the persistence after enabling it. This topic can be quite hard to fully understand how it works at first glance, especially after using the default "magic" configuration - for extended explanation see [the persistence reference](../reference/persistence.md).
+For a basic usage, we're assuming that the persistence data will be saved to a **cache**, and are saved individually per **user**. 
+Therefore, make sure the [Symfony Cache](https://symfony.com/doc/current/components/cache.html) and [Security](https://symfony.com/doc/current/security.html) components are installed and enabled. 
+The bundle will automatically use them for persistence.
 
 ## Enabling the persistence feature
 
-The persistence feature is disabled for each data table by default. There's multiple way to configure the persistence feature, but let's do it globally. Navigate to the package configuration file (or create one if it doesn't exist) and change it like so:
+The personalization [persistence feature](../features/persistence.md) is disabled for each data table by default.
+There are multiple ways to configure the persistence feature, but let's do it globally. 
+Navigate to the package configuration file (or create one if it doesn't exist) and change it like so:
 
-{% tabs %}
-{% tab title="YAML" %}
-{% code title="config/packages/kreyu_data_table.yaml" lineNumbers="true" %}
-```yaml
++++ YAML
+```yaml # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
   defaults:
     personalization:
       persistence_enabled: true
 ```
-{% endcode %}
-{% endtab %}
-
-{% tab title="PHP" %}
-{% code title="" lineNumbers="true" %}
-```php
++++ PHP
+```php # config/packages/kreyu_data_table.php
 use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
@@ -38,65 +36,13 @@ return static function (KreyuDataTableConfig $config) {
     $defaults->personalization()->persistenceEnabled(true);
 };
 ```
-{% endcode %}
-{% endtab %}
-{% endtabs %}
++++
 
-This configures the default option for the each data table type - which can be changed inside the data table type, inside the `configureOptions()` method:
+Assuming that the user is authenticated, apply the personalization data again, refresh the page... the applied personalization is still there!
 
-{% code title="src/DataTable/Type/ProductDataTableType.php" lineNumbers="true" %}
-```php
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+This basic example barely scratches the surface of the [persistence feature](../features/persistence.md). 
+You can also persist applied pagination (e.g. current page), sorting, filters, 
+use different adapters (to, for example, save the data to the database, instead of cache), 
+or even use different subject providers (to, for example, not rely on authenticated user, but on the request IP).
 
-class ProductDataTableType extends AbstractDataTableType
-{
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'personalization_persistence_enabled' => true,
-        ]);
-    }
-}
-```
-{% endcode %}
-
-This, on the other hand, configures the default option for the specific data table type - which can be changed when creating the data table itself:
-
-{% code title="src/Controller/ProductController.php" lineNumbers="true" %}
-```php
-use App\DataTable\Type\ProductDataTableType;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-class ProductController extends AbstractController
-{
-    use DataTableFactoryAwareTrait;
-    
-    public function index()
-    {
-        $dataTable = $this->createDataTable(
-            type: ProductDataTableType::class, 
-            query: $query,
-            options: [
-                'personalization_persistence_enabled' => true,
-            ],
-        );
-    }
-}
-```
-{% endcode %}
-
-Assuming that the user is authenticated, apply the personalization data again, refresh the page and... the applied personalization is still there!
-
-The same configuration applies to the rest of the features supporting the persistence:
-
-* pagination (using the `pagination_persistence_*` options)
-* filtration (using the `filtration_persistence_*` options)
-* sorting (using the `sorting_persistence_*` options)
-
-This basic example barely scratches the surface of the persistence feature. Is is possible to use different adapters (to, for example, save the data to database instead of cache), or different subject providers (to, for example, not rely on authenticated user, but on the request IP).&#x20;
-
-For extended explanation see [the persistence reference](../reference/persistence.md).
-
-There's still one thing to walk through - let's [translate the data table to multiple languages](../usage/internationalization.md).
+There's still one thing to walk through — let's [translate the data table to multiple languages](../basic-usage/internationalization.md).

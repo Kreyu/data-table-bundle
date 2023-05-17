@@ -11,8 +11,7 @@ To create a data table, either:
 
 For the sake of simplicity, the documentation uses the trait method:
 
-{% code title="src/Controller/ProductController.php" lineNumbers="true" %}
-```php
+```php # src/Controller/ProductController.php
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -21,7 +20,6 @@ class ProductController extends AbstractController
     use DataTableFactoryAwareTrait;
 }
 ```
-{% endcode %}
 
 The trait gives access to three helper methods:
 
@@ -66,14 +64,12 @@ class ProductController extends AbstractController
 
 Running the code will result in an error:
 
-```
-The data table has no proxy query. You must provide it using either the data table factory or the builder "setQuery()" method.
-```
+> The data table has no proxy query. You must provide it using either the data table factory or the builder "setQuery()" method.
 
-This is because we haven't passed anything the data table can work on.  
+This is because we haven't passed anything the data table can work on.
 Since we are using Doctrine ORM, the query builder should be passed as the "query" argument:
 
-```php # src/Controller/ProductController.php
+```php #14 src/Controller/ProductController.php
 use App\DataTable\Type\ProductDataTableType;
 use App\Repository\ProductRepository;
 use Kreyu\Bundle\DataTableBundle\DataTableControllerTrait;
@@ -95,8 +91,6 @@ class ProductController extends AbstractController
 
 Running the code again will result in yet another error:
 
-```markup
-The data table has no configured columns. You must provide them using the builder "addColumn()" method.
-```
+> The data table has no configured columns. You must provide them using the builder "addColumn()" method.
 
 The message is self-explanatory - the data table has no configured columns - it is time to [add some of those](adding-columns).

@@ -38,7 +38,7 @@ Setting the option to `false` disables property accessor.
 
 ```php #
 $builder
-    ->addColumn('category', TextType::class, [
+    ->addColumn('category', TextColumnType::class, [
         'property_path' => 'category.name',
     ])
 ;
@@ -54,7 +54,7 @@ This disables the usage of the [PropertyAccessor](https://symfony.com/doc/curren
 
 ```php #
 $builder
-    ->addColumn('category', TextType::class, [
+    ->addColumn('category', TextColumnType::class, [
         'getter' => fn (Product $product) => $product->getCategory(),
     ])
 ;
@@ -129,7 +129,7 @@ Setting this option to `false` excludes the column from the exports.
 
 If you want to add extra attributes to an HTML column header representation (`<th>`) you can use the attr option.
 It's an associative array with HTML attributes as keys.
-This can be useful when you need to set a custom class for some column:
+This can be useful when you need to set a custom class for a column:
 
 ```php #
 $builder
@@ -148,7 +148,7 @@ $builder
 
 If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
 It's an associative array with HTML attributes as keys.
-This can be useful when you need to set a custom class for some column:
+This can be useful when you need to set a custom class for a column:
 
 ```php #
 $builder

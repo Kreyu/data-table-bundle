@@ -14,7 +14,7 @@ By default, columns **are not** sortable. To make a column sortable, use its `so
 
 For more information, consider reading:
 
-- [Basic Usage > Adding columns > Binding request to the data table](basic-usage/adding-columns.md#making-the-columns-sortable)
+- [Basic Usage > Adding columns > Making the columns sortable](basic-usage/adding-columns.md#making-the-columns-sortable)
 - [Features > Sorting > Making the columns sortable](features/sorting.md#making-the-columns-sortable)
 
 ## Data table features are refreshing the page but not working

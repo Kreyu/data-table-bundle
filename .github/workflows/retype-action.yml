@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - retype-docs
 jobs:
   publish:
     name: Publish to retype branch

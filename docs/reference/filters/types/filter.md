@@ -1,6 +1,6 @@
 ---
 label: Filter
-visibility: hidden
+order: z
 ---
 
 # Filter type

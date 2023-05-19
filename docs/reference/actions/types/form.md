@@ -1,6 +1,5 @@
 ---
 label: Form
-visibility: hidden
 order: c
 ---
 

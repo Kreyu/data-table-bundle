@@ -1,6 +1,5 @@
 ---
 label: Text
-visibility: hidden
 order: a
 ---
 

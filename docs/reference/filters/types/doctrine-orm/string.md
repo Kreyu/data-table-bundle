@@ -1,6 +1,5 @@
 ---
 label: String
-visibility: hidden
 order: a
 ---
 

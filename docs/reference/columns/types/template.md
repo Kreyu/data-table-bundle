@@ -1,6 +1,5 @@
 ---
 label: Template
-visibility: hidden
 order: i
 ---
 

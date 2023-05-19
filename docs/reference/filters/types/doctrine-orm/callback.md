@@ -1,6 +1,5 @@
 ---
 label: Callback
-visibility: hidden
 order: g
 ---
 

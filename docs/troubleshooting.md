@@ -7,6 +7,20 @@ order: 2
 
 This section covers common problems and how to fix them.
 
+## Pagination is enabled but its controls are not visible
+
+By default, every data table has pagination feature _enabled_.
+However, if you don't see the pagination controls, make sure your data table has enough records!
+
+With default pagination data, every page contains 25 records.
+Built-in themes display pagination controls only when the data table contains more than one page.
+Also, remember that you can [change the default pagination data](features/pagination.md#configuring-default-pagination), reducing the per-page limit.
+
+For more information, consider reading:
+
+- [Features > Pagination > Toggling the feature](features/pagination.md#toggling-the-feature)
+- [Features > Pagination > Configuring the default pagination](features/pagination.md#configuring-default-pagination)
+
 ## Sorting is enabled but columns are not sortable
 
 Enabling the sorting feature for the data table does not mean that any column will be sortable by itself.
@@ -27,7 +41,7 @@ If, for example, a data table is rendered properly, but:
 
 refreshes the page but does nothing else, make sure you handled the request using the `handleRequest()` method:
 
-```php #4,13 src/Controller/ProductController.php
+```php #13 src/Controller/ProductController.php
 use App\DataTable\Type\ProductDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,7 +64,11 @@ For more information, consider reading:
 - [Basic Usage > Rendering the table > Binding request to the data table](basic-usage/rendering-the-table.md#binding-request-to-the-data-table)
 - [Features > Request handlers](features/request-handlers.md)
 
-## The N+1 problem
+## The N+1 problems
+
+This section covers common issues with N+1 queries when working with Doctrine ORM.  
+
+### The N+1 problem with relation columns
 
 When using Doctrine ORM, if your data table contains columns with data from relationship:
 
@@ -120,6 +138,15 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
+
+!!!warning Warning
+Forcing a partial load comes at a price because it changes the entity behavior.
+For example, not specifying all used associations in the query's `SELECT` will end up in an error.
+!!!
+
+For more information, consider reading:
+
+- [[Stack Overflow] Doctrine2 one-to-one relation auto loads on query](https://stackoverflow.com/questions/12362901/doctrine2-one-to-one-relation-auto-loads-on-query/22253783#22253783)
 
 ## Persistence "cache tag contains reserved characters" error
 

@@ -7,7 +7,7 @@ label: Available types
 The following exporter types are natively available in the bundle:
 
 - PhpSpreadsheet exporters
-    - [Csv](types/doctrine-orm/php-spreadsheet/csv.md)
+    - [Csv](types/php-spreadsheet/csv.md)
     - [Xls](types/php-spreadsheet/xls.md)
     - [Xlsx](types/php-spreadsheet/xlsx.md)
     - [Html](types/php-spreadsheet/html.md)

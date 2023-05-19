@@ -1,6 +1,5 @@
 ---
 label: Button
-visibility: hidden
 order: b
 ---
 

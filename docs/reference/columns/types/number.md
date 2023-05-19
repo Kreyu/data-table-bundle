@@ -1,6 +1,5 @@
 ---
 label: Number
-visibility: hidden
 order: b
 ---
 

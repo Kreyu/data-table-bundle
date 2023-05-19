@@ -1,7 +1,6 @@
 ---
 label: Action
-visibility: hidden
-order: d
+order: z
 ---
 
 # Action type

@@ -4,8 +4,7 @@ order: e
 
 # Exporting
 
-The data tables can be _exported_, with use of the [exporters](../reference/exporters/types.md),
-defined using the [type classes](../features/type-classes.md).
+The data tables can be _exported_, with use of the [exporters](../reference/exporters/types.md).
 
 ![Export modal with the Tabler theme](./../static/export_modal.png)
 

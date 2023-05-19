@@ -1,6 +1,5 @@
 ---
 label: DatePeriod
-visibility: hidden
 order: f
 ---
 

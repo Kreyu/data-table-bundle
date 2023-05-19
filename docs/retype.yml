@@ -7,6 +7,10 @@ url: # Add your website address here
 branding:
   title: DataTableBundle
   label: Docs
+links:
+  - text: GitHub
+    link: https://github.com/Kreyu/data-table-bundle
+    icon: mark-github
 edit:
   repo: https://github.com/Kreyu/data-table-bundle/edit/
   base: /docs

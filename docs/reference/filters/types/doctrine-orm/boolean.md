@@ -1,6 +1,5 @@
 ---
 label: Boolean
-visibility: hidden
 order: c
 ---
 

@@ -1,6 +1,5 @@
 ---
 label: Date
-visibility: hidden
 order: d
 ---
 

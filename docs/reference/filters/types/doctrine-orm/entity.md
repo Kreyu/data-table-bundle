@@ -1,6 +1,5 @@
 ---
 label: Entity
-visibility: hidden
 order: f
 ---
 

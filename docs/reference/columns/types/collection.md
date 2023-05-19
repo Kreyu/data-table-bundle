@@ -1,6 +1,5 @@
 ---
 label: Collection
-visibility: hidden
 order: g
 ---
 

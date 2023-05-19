@@ -1,6 +1,5 @@
 ---
 label: Actions
-visibility: hidden
 order: j
 ---
 

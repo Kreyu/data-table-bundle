@@ -1,6 +1,5 @@
 ---
 label: Link
-visibility: hidden
 order: b
 ---
 

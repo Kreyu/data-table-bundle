@@ -1,7 +1,18 @@
-# ColumnType
+---
+label: Column
+order: z
+---
 
-The [:material-github: ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php) represents a base column, used as a parent for every other type in the bundle.
+# Column type
+
+The `ColumnType` represents a base column, used as a parent for every other column type in the bundle.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | none
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
-{% include-markdown "_column_options.md" heading-offset=2 %}
+{{ include '_column_options' }}

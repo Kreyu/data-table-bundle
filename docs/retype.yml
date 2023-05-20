@@ -1,0 +1,20 @@
+# Documentation powered by Retype
+# https://retype.com/
+
+input: .
+output: .retype
+url: # Add your website address here
+branding:
+  title: DataTableBundle
+  label: Docs
+links:
+  - text: GitHub
+    link: https://github.com/Kreyu/data-table-bundle
+    icon: mark-github
+edit:
+  repo: https://github.com/Kreyu/data-table-bundle/edit/
+  base: /docs
+meta:
+  title: " - DataTableBundle"
+footer:
+  copyright: "&copy; Copyright {{ year }}. All rights reserved."

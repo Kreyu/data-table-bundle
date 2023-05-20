@@ -1,16 +1,26 @@
-# BooleanFilterType
+---
+label: Boolean
+order: c
+---
 
-The [BooleanFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/BooleanFilterType.php) represents a filter that operates on boolean values.
+# Boolean filter type
 
-## Supported operators
+The `BooleanFilterType` represents a filter that operates on boolean values.
 
-- `Operator::EQUALS`
-- `Operator::NOT_EQUALS`
++---------------------+--------------------------------------------------------------+
+| Parent type         | [FilterType](../filter)
++---------------------+--------------------------------------------------------------+
+| Class               | [:icon-mark-github: BooleanFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/BooleanFilterType.php)
++---------------------+--------------------------------------------------------------+
+| Form Type           | [ChoiceType](https://symfony.com/doc/current/reference/forms/types/choice.html)
++---------------------+--------------------------------------------------------------+
+| Supported operators | EQUALS, NOT_EQUALS
++---------------------+--------------------------------------------------------------+
 
 ## Options
 
-This filter has no additional options.
+This filter type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

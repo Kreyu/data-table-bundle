@@ -1,20 +1,26 @@
-# NumericFilterType
+---
+label: Numeric
+order: b
+---
 
-The [NumericFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/NumericFilterType.php) represents a filter that operates on numeric values.
+# Numeric filter type
 
-## Supported operators
+The `NumericFilterType` represents a filter that operates on numeric values.
 
-- `Operator::EQUALS`
-- `Operator::NOT_EQUALS`
-- `Operator::GREATER_THAN`
-- `Operator::GREATER_THAN_EQUALS`
-- `Operator::LESS_THAN`
-- `Operator::LESS_THEN_EQUALS`
++---------------------+--------------------------------------------------------------------------------------+
+| Parent type         | [FilterType](../filter)
++---------------------+--------------------------------------------------------------------------------------+
+| Class               | [:icon-mark-github: NumericFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/NumericFilterType.php)
++---------------------+--------------------------------------------------------------------------------------+
+| Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
++---------------------+--------------------------------------------------------------------------------------+
+| Supported operators | EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_EQUALS, LESS_THAN, LESS_THEN_EQUALS
++---------------------+--------------------------------------------------------------------------------------+
 
 ## Options
 
-This filter has no additional options.
+This filter type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

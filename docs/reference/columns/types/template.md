@@ -1,23 +1,32 @@
-# TemplateColumnType
+---
+label: Template
+order: i
+---
 
-The [:material-github: TemplateColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TemplateColumnType.php) represents a column with value displayed as a link.
+# Template column type
+
+The `TemplateColumnType` represents a column with value displayed as a Twig template.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [ColumnType](column)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: TemplateColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TemplateColumnType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
 ### `template_path`
 
-**type**: `string` or `\Closure`
+- **type**: `string` or `callable`
 
-Sets the path to the template that should be rendered.  
-Closure can be used to provide an option value based on a row value, which is passed as a first argument.
+Sets the path to the template that should be rendered.
 
 ### `template_vars`
 
-**type**: `string` or `\Closure` **default**: `'#'`
+- **type**: `string` or `callable`
 
-Sets the variables used within the template.  
-Closure can be used to provide an option value based on a row value, which is passed as a first argument.
+Sets the variables used within the template.
 
 ## Inherited options
 
-{% include-markdown "_column_options.md" heading-offset=2 %}
+{{ include '_column_options' }}

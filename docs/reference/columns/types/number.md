@@ -1,6 +1,17 @@
-# NumberColumnType
+---
+label: Number
+order: b
+---
 
-The [:material-github: NumberColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/NumberColumnType.php) column represents the numeric column, with value aligned to the right.
+# Number column type
+
+The `NumberColumnType` represents a column with value displayed as a number.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [ColumnType](column)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: NumberColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/NumberColumnType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
@@ -8,4 +19,4 @@ This column type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "_column_options.md" heading-offset=2 %}
+{{ include '_column_options' }}

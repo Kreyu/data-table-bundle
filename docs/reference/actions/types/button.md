@@ -1,52 +1,58 @@
-# ButtonActionType
+---
+label: Button
+order: b
+---
 
-The [:material-github: ButtonActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ButtonActionType.php) represents an action displayed as a button.
+# Button action type
+
+The `ButtonActionType` represents an action displayed as a button.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [LinkActionType](link.md)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: ButtonActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ButtonActionType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
 ### `href`
 
-**type**: `string` or `callable` **default**: `'#'`
+- **type**: `string` or `callable`
+- **default**: `'#'`
 
-Sets the value that will be used as a link `href` attribute (see [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href)).  
-Closure can be used to provide an option value based on a row value, which is passed as a first argument.
+A value used as an action link [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
 
-```php
+```php #
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
-    ->addAction('create', ButtonActionType::class, [
-        'href' => $this->urlGenerator->generate('category_create'),
+    ->addAction('back', ButtonActionType::class, [
+        'href' => $this->urlGenerator->generate('category_index'),
     ])
 ;
 ```
 
+!!! Note
+The action confirmation configuration inherits value of this option as its `href`.
+!!!
+
 ### `target`
 
-**type**: `string` or `callable` **default**: `'_self'`
+- **type**: `string` or `callable`
+- **default**: `'_self'`
 
-Sets the value that will be used as an anchor `target` attribute (see [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target)).  
-Closure can be used to provide an option value based on a row value, which is passed as a first argument.
+Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
 
-### `icon_attr`
-
-**type**: `array` **default**: `[]`
-
-If you want to add extra attributes to an HTML representation of the button's icon, you can use the icon_attr option.
-It's an associative array with HTML attributes as keys.
-
-```php
+```php #
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
-    ->addAction('remove', ButtonActionType::class, [
-        'icon_attr' => [
-            'class' => 'fa fa-trash',
-        ],
+    ->addAction('wiki', ButtonActionType::class, [
+        'target' => '_blank',
     ])
 ;
 ```
 
 ## Inherited options
 
-{% include-markdown "_action_options.md" heading-offset=2 %}
+{{ include '_action_options' }}

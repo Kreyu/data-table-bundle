@@ -1,22 +1,28 @@
-{% set option_field_type_default = 'Symfony\Bridge\Doctrine\Form\Type\EntityType' %}
+---
+label: Entity
+order: f
+---
 
-# EntityFilterType
+# Entity filter type
 
-The [EntityFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/EntityFilterType.php) represents a filter that operates on identifier values.
+The `EntityFilterType` represents a filter that operates on identifier values.
 
-Displayed as a selector, allows the user to select specific entity loaded from the database, to query by its identifier.
+Displayed as a selector, allows the user to select a specific entity loaded from the database, to query by its identifier.
 
-## Supported operators
-
-- `Operator::EQUALS`
-- `Operator::NOT_EQUALS`
-- `Operator::CONTAINS`
-- `Operator::NOT_CONTAINS`
++---------------------+--------------------------------------------------------------+
+| Parent type         | [FilterType](../../filter)
++---------------------+--------------------------------------------------------------+
+| Class               | [:icon-mark-github: EntityFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/EntityFilterType.php)
++---------------------+--------------------------------------------------------------+
+| Form Type           | [EntityType](https://symfony.com/doc/current/reference/forms/types/entity.html)
++---------------------+--------------------------------------------------------------+
+| Supported operators | EQUALS, NOT_EQUALS, CONTAINS, NOT_CONTAINS
++---------------------+--------------------------------------------------------------+
 
 ## Options
 
-This filter has no additional options.
+This filter type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

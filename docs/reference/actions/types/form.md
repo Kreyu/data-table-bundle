@@ -1,12 +1,24 @@
-# FormActionType
+---
+label: Form
+order: c
+---
 
-The [:material-github: FormActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/FormActionType.php) represents an action displayed as a button wrapped in form.
+# Form action type
+
+The `FormActionType` represents an action displayed as a button.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [ActionType](action.md)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: FormActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/FormActionType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
 ### `action`
 
-**type**: `string` or `callable` **default**: `'#'`
+- **type**: `string` or `callable` 
+- **default**: `'#'`
 
 Sets the value that will be used as a form's `action` attribute.
 
@@ -22,7 +34,8 @@ $builder
 
 ### `method`
 
-**type**: `string` or `callable` **default**: `'GET'`
+- **type**: `string` or `callable` 
+- **default**: `'GET'`
 
 Sets the value that will be used as a form's `method` attribute.
 
@@ -38,25 +51,18 @@ $builder
 
 ### `button_attr`
 
-**type**: `array` **default**: `[]`
+- **type**: `array` 
+- **default**: `[]`
 
-If you want to add extra attributes to an HTML representation of the form's submit button, you can use the button_attr option.
-It's an associative array with HTML attributes as keys. 
-
-### `icon_attr`
-
-**type**: `array` **default**: `[]`
-
-If you want to add extra attributes to an HTML representation of the button's icon, you can use the icon_attr option.
-It's an associative array with HTML attributes as keys.
+An array of attributes used to render the form submit button.
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
-    ->addAction('send', FormActionType::class, [
-        'icon_attr' => [
-            'class' => 'fa fa-envelope',
+    ->addAction('remove', ButtonActionType::class, [
+        'attr' => [
+            'class' => 'btn btn-danger',
         ],
     ])
 ;
@@ -64,4 +70,4 @@ $builder
 
 ## Inherited options
 
-{% include-markdown "_action_options.md" heading-offset=2 %}
+{{ include '_action_options' }}

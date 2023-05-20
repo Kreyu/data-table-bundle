@@ -1,104 +1,110 @@
-# `label`
+### `label`
 
-**type**: `string` or `Symfony\Component\Translation\TranslatableMessage` **default**: the label is "guessed" from the column name
+- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableMessage`
+- **default**: `null` - the label is "guessed" from the column name
 
 Sets the label that will be used when rendering the column header.
 
-# `label_translation_parameters`
+### `header_translation_domain`
 
-**type**: `array` **default**: `[]`
+- **type**: `false` or `string`
+- **default**: `'KreyuDataTable'`
 
-Sets the parameters used when translating the `label` option.
+Sets the translation domain used when translating the column header.  
+Setting the option to `false` disables its translation.
 
-# `translation_domain`
+### `header_translation_parameters`
 
-**type**: `false` or `string` **default**: the default `KreyuDataTable` is used
+- **type**: `array`
+- **default**: `[]`
 
-Sets the translation domain used when translating the column translatable values.  
-Setting the option to `false` disables translation for the column.
+Sets the parameters used when translating the column header.
 
-# `property_path`
+### `value_translation_domain`
 
-**type**: `null`, `false` or `string` **default**: `null` - the property path is "guessed" from the column name
+- **type**: `false` or `string`
+- **default**: inherited from the data table translation domain
+
+Sets the translation domain used when translating the column value.  
+Setting the option to `false` disables its translation.
+
+### `property_path`
+
+- **type**: `null`, `false` or `string`
+- **default**: `null` - the property path is "guessed" from the column name
 
 Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.  
-Setting the option to `false` disables property accessor (for situations, where you want to manually retrieve the value).
+Setting the option to `false` disables property accessor.
 
-# `getter`
-
-**type**: `null` or `callable` **default**: `null`
-
-When provided, this callable will be invoked to read the value from the underlying object that will be used within the column.
-This disables the usage of the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html), described in the [property_path](#propertypath) option.
-
-Value returned from given callable will be passed to every other callable option.
-
-```php
+```php #
 $builder
-    ->addColumn('seller', TextType::class, [
-        'getter' => fn (Product $product) => $product->getSeller()->getUser(), // Returns an instance of User
-        'formatter' => fn (User $user) => $user->getName(), // User returned in "getter" option is passed here
+    ->addColumn('category', TextColumnType::class, [
+        'property_path' => 'category.name',
     ])
 ;
 ```
 
-# `sort`
+### `getter`
 
-**type**: `bool` or `string` **default**: `false` - the sortable behavior is disabled
+- **type**: `null` or `callable`
+- **default**: `null`
+
+When provided, this callable will be invoked to read the value from the underlying object that will be used within the column.
+This disables the usage of the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html), described in the [property_path](#property_path) option.
+
+```php #
+$builder
+    ->addColumn('category', TextColumnType::class, [
+        'getter' => fn (Product $product) => $product->getCategory(),
+    ])
+;
+```
+
+### `sort`
+
+- **type**: `bool` or `string`
+- **default**: `false` - the sortable behavior is disabled
 
 Sets the sort field used by the sortable behavior.
 
 Setting the option to `true` enables column sorting and uses the column name as a sort field name.  
 Setting the option to `false` disables column sorting.
 
-# `block_name`
+### `block_prefix`
 
-**type**: `string` **default**: `kreyu_data_table_column_` + column type block prefix
-
-Allows you to add a custom block name to the ones used by default to render the column type.
-Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of the columns individually.
-
-By default, if column type class name is `TextType`, the block name option will equal `kreyu_data_table_column_text`.
-
-# `block_prefix`
-
-**type**: `string` **default**: column type block prefix
+- **type**: `string`
+- **default**: column type block prefix
 
 Allows you to add a custom block prefix and override the block name used to render the column type.
-Useful for example if you have multiple instances of the same column type, and you need to personalize the rendering of all of them without the need to create a new column type.
+Useful for example if you have multiple instances of the same column type, and you need to personalize 
+the rendering of some of them, without the need to create a new column type.
 
-# `formatter`
+### `formatter`
 
-**type**: `null` or `callable` **default**: `null`
+- **type**: `null` or `callable`
+- **default**: `null`
 
 Formats the value to the desired string.
 
-The value passed as the argument can come either from the `value` option,
-or the property accessor after the extraction using the `property_path` option.
-
-```php
+```php #
 $builder
-    ->addColumn('name', TextType::class, [
-        'formatter' => 'trim',    
-    ])
     ->addColumn('quantity', NumberColumnType::class, [
         'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
     ])
 ;
 ```
 
-# `export`
+### `export`
 
-**type**: `bool` or `array` **default**: `[]` with some exceptions on built-in types (e.g. [ActionsColumnType](./actions.md))
-
-Determines whether the column should be included in the exports.
+- **type**: `bool` or `array`
+- **default**: `[]`
 
 This option accepts an array of options available for the column type.
 It is used to differentiate options for regular rendering, and excel rendering.
 
 For example, if you wish to display quantity column with "Quantity" label, but export with a "Qty" header:
 
-```php
+```php #
 $builder
     ->addColumn('quantity', NumberColumnType::class, [
         'label' => 'Quantity',
@@ -116,49 +122,16 @@ Rest of the options are inherited from the column options.
 Setting this option to `true` automatically copies the column options as the export column options.  
 Setting this option to `false` excludes the column from the exports.
 
-# `non_resolvable_options`
+### `header_attr`
 
-**type**: `array` **default**: `[]`
-
-Because some column options can be an instance of `\Closure`, the bundle will automatically
-call them, passing column value, data, whole column object and array of options, as the closure arguments.
-
-This process is called "resolving", and the [formatter](#formatter) option is excluded from the process.
-Because it may be possible, that the user does **not** want to get an option resolved (not call the closure at all),
-it is possible to pass the option name to this array, to exclude it from the resolving process.
-
-For example:
-
-```php
-$builder
-    ->addColumn('id', CustomType::class, [
-        'uniqid' => fn (string $prefix) => uniqid($prefix),
-        'non_resolvable_options' => [
-            'uniqid',
-        ],
-    ])
-;
-```
-
-The `uniqid` option will be available in the column views as a callable. For example, in templates:
-
-{% raw %}
-```twig
-{% block kreyu_data_table_column_custom %}
-    {{ value }} ({{ uniqid('product_') }})
-{% endblock %}
-```
-{% endraw %}
-
-# `header_attr`
-
-**type**: `array` **default**: `[]`
+- **type**: `array`
+- **default**: `[]`
 
 If you want to add extra attributes to an HTML column header representation (`<th>`) you can use the attr option.
 It's an associative array with HTML attributes as keys.
-This can be useful when you need to set a custom class for some column:
+This can be useful when you need to set a custom class for a column:
 
-```php
+```php #
 $builder
     ->addColumn('quantity', NumberColumnType::class, [
         'header_attr' => [
@@ -168,15 +141,16 @@ $builder
 ;
 ```
 
-# `value_attr`
+### `value_attr`
 
-**type**: `array` **default**: `[]`
+- **type**: `array`
+- **default**: `[]`
 
 If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
 It's an associative array with HTML attributes as keys.
-This can be useful when you need to set a custom class for some column:
+This can be useful when you need to set a custom class for a column:
 
-```php
+```php #
 $builder
     ->addColumn('quantity', NumberColumnType::class, [
         'value_attr' => [

@@ -1,18 +1,26 @@
-# StringFilterType
+---
+label: String
+order: a
+---
 
-The [StringFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/StringFilterType.php) represents a filter that operates on string values.
+# String filter type
 
-## Supported operators
+The `StringFilterType` represents a filter that operates on string values.
 
-- `Operator::EQUALS`
-- `Operator::NOT_EQUALS`
-- `Operator::CONTAINS`
-- `Operator::NOT_CONTAINS`
++---------------------+--------------------------------------------------------------+
+| Parent type         | [FilterType](../filter)
++---------------------+--------------------------------------------------------------+
+| Class               | [:icon-mark-github: StringFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/StringFilterType.php)
++---------------------+--------------------------------------------------------------+
+| Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
++---------------------+--------------------------------------------------------------+
+| Supported operators | EQUALS, NOT_EQUALS, CONTAINS, NOT_CONTAINS
++---------------------+--------------------------------------------------------------+
 
 ## Options
 
-This filter has no additional options.
+This filter type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

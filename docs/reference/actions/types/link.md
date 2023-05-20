@@ -1,17 +1,28 @@
-# LinkActionType
+---
+label: Link
+order: b
+---
 
-The [:material-github: LinkActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/LinkActionType.php) represents an action displayed as a link.
-Uses [ActionType](./action.md) as parent. 
+# Link action type
+
+The `LinkActionType` represents an action displayed as a link.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [ActionType](action.md)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: LinkActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/LinkActionType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
 ### `href`
 
-**type**: `string` or `callable` **default**: `'#'`
+- **type**: `string` or `callable` 
+- **default**: `'#'`
 
-Sets the value that will be used as a link `href` attribute (see [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href)).  
+A value used as an action link [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
 
-```php
+```php #
 use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 
 $builder
@@ -21,19 +32,27 @@ $builder
 ;
 ```
 
+!!! Note
+The action confirmation configuration inherits value of this option as its `href`.
+!!!
+
 ### `target`
 
-**type**: `string` or `callable` **default**: `'_self'`
+- **type**: `string` or `callable` 
+- **default**: `'_self'`
 
-Sets the value that will be used as an anchor `target` attribute (see [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target)).  
-Closure can be used to provide an option value based on a row value, which is passed as a first argument.
+Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
 
-### `display_icon`
+```php #
+use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 
-**type**: `bool` **default**: `true`
-
-If this value is true, an icon will be visible next to the link label.
+$builder
+    ->addAction('wiki', LinkActionType::class, [
+        'target' => '_blank',
+    ])
+;
+```
 
 ## Inherited options
 
-{% include-markdown "_action_options.md" heading-offset=2 %}
+{{ include '_action_options' }}

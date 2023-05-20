@@ -1,21 +1,33 @@
-# ActionsColumnType
+---
+label: Actions
+order: j
+---
 
-The [:material-github: ActionsColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ActionsColumnType.php) represents a column with value displayed as a list of actions.
+# Actions column type
+
+The `ActionsColumnType` represents a column with value displayed as a Twig template.
+
++-------------+---------------------------------------------------------------------+
+| Parent type | [ColumnType](column)
++-------------+---------------------------------------------------------------------+
+| Class       | [:icon-mark-github: ActionsColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ActionsColumnType.php)
++-------------+---------------------------------------------------------------------+
 
 ## Options
 
 ### `actions`
 
-**type**: `array` **default**: `[]`
+- **array**: `array`
+- **default**: `[]`
 
 This option contains a list of actions. Each actions consists of two options:
 
-- `type` (**type**: `string`) - FQCN of the action type class;
+- `type` (**type**: `string`) - fully qualified class name of the action type;
 - `type_options` (**type**: `array`, **default**: `[]`) - options passed to the action type;
 
 Example usage:
 
-```php
+```php #
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 
@@ -25,7 +37,6 @@ $builder
             'show' => [
                 'type' => ButtonActionType::class,
                 'type_options' => [
-                    'label' => t('Details'),
                     'url' => function (Product $product): string {
                         return $this->urlGenerator->generate('category_show', [
                             'id' => $product->getId(),
@@ -40,4 +51,4 @@ $builder
 
 ## Inherited options
 
-{% include-markdown "_column_options.md" heading-offset=2 %}
+{{ include '_column_options' }}

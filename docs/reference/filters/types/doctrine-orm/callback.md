@@ -1,11 +1,23 @@
-# CallbackFilterType
+---
+label: Callback
+order: g
+---
 
-The [CallbackFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/CallbackFilterType.php) represents a filter 
-that allows manual application of complex conditions to the query. 
+# Callback filter type
 
-## Supported operators
+The `CallbackFilterType` represents a filter that operates on identifier values.
 
-Supports all operators, but it doesn't affect the actual query.
+Displayed as a selector, allows the user to select a specific entity loaded from the database, to query by its identifier.
+
++---------------------+--------------------------------------------------------------+
+| Parent type         | [FilterType](../../filter)
++---------------------+--------------------------------------------------------------+
+| Class               | [:icon-mark-github: CallbackFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CallbackFilterType.php)
++---------------------+--------------------------------------------------------------+
+| Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
++---------------------+--------------------------------------------------------------+
+| Supported operators | Supports all operators, but it doesn't affect the actual query.
++---------------------+--------------------------------------------------------------+
 
 ## Options
 
@@ -13,22 +25,20 @@ Supports all operators, but it doesn't affect the actual query.
 
 **type**: `callable`
 
-Sets a callable that operates on the query passed as a first argument:
+Sets callable that operates on the query passed as a first argument:
 
-```php
-use Kreyu\Bundle\DataTable\Bridge\Doctrine\Orm\Filter\CallbackFilter;
+```php #
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 $builder
-    ->addFilter('type', CallbackFilter::class, [
-        /** @var DoctrineOrmProxyQuery $query */
-        'callback' => function (ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void {
+    ->addFilter('type', CallbackFilterType::class, [
+        'callback' => function (DoctrineOrmProxyQuery $query, FilterData $data, FilterInterface $filter): void {
             $alias = current($query->getRootAliases());
-            
+
             // Remember to use parameters to prevent SQL Injection!
-            // To help with that, DoctrineOrmProxyQuery has special method "getUniqueParameterId",
+            // To help with that, DoctrineOrmProxyQuery has a special method "getUniqueParameterId",
             // that will generate a unique parameter name (inside its query context), handy!
             $parameter = $query->getUniqueParameterId(); 
             
@@ -36,12 +46,10 @@ $builder
                 ->andWhere($query->expr()->eq("$alias.type"), ":$parameter")
                 ->setParameter($parameter, $data->getValue())
             ;
-            
-            // ...
         } 
     ])
 ```
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

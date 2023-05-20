@@ -1,22 +1,26 @@
-{% set option_field_type_default = 'Symfony\Component\Form\Extension\Core\Type\DateType' %}
+---
+label: Date
+order: d
+---
 
-# DateFilterType
+# Date filter type
 
-The [DateFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/DateFilterType.php) represents a filter that operates on date values.
+The `DateFilterType` represents a filter that operates on date values.
 
-## Supported operators
-
-- `Operator::EQUALS`
-- `Operator::NOT_EQUALS`
-- `Operator::GREATER_THAN`
-- `Operator::GREATER_THAN_EQUALS`
-- `Operator::LESS_THAN`
-- `Operator::LESS_THAN_EQUALS`
++---------------------+--------------------------------------------------------------+
+| Parent type         | [FilterType](../../filter)
++---------------------+--------------------------------------------------------------+
+| Class               | [:icon-mark-github: DateFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/DateFilterType.php)
++---------------------+--------------------------------------------------------------+
+| Form Type           | [DateType](https://symfony.com/doc/current/reference/forms/types/date.html)
++---------------------+--------------------------------------------------------------+
+| Supported operators | EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_EQUALS, LESS_THAN, LESS_THAN_EQUALS
++---------------------+--------------------------------------------------------------+
 
 ## Options
 
-This filter has no additional options.
+This filter type has no additional options.
 
 ## Inherited options
 
-{% include-markdown "../_filter_options.md" heading-offset=2 %}
+{{ include '_filter_options' }}

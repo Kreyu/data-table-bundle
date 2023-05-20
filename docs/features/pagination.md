@@ -9,8 +9,7 @@ The data tables can be _paginated_, which is crucial when working with extensive
 ## Toggling the feature
 
 By default, the pagination feature is **enabled** for every data table.
-
-You can change this setting globally using the package configuration file, or use `pagination_enabled` option:
+This can be configured thanks to the `pagination_enabled` option:
 
 +++ Globally (YAML)
 ```yaml # config/packages/kreyu_data_table.yaml

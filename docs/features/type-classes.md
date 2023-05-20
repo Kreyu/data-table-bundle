@@ -6,7 +6,7 @@ order: j
 
 Multiple parts of the bundle, such as columns, filters etc. are described using the type classes.
 Their purpose and method of definition is very similar to the [Symfony Form Types](https://symfony.com/doc/current/reference/forms/types.html),
-which means knowing how these work really helps in understanding most of the bundle.
+which means knowing how these works really help in understanding most of the bundle.
 
 Following parts of the bundle are defined using the type classes:
 
@@ -98,17 +98,18 @@ a [type extensions](#defining-the-type-extensions) defined for the text column t
 Each type class contains its own set of options, that can be used to configure the type according to a specific need.
 Those options can be defined in any type class `configureOptions()` method, by using the [OptionsResolver component](https://symfony.com/doc/current/components/options_resolver.html):
 
-```php
+```php # src/DataTable/Column/Type/UserColumnType.php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserColumnType extends AbstractColumnType
+class UserDataTableType extends AbstractDataTableType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('user', null)
-            ->setAllowedTypes('user', ['null', UserInterface::class])
+            ->setDefault('display_role', false)
+            ->setAllowedTypes('display_role', 'bool')
         ;
     }
 }
@@ -116,29 +117,48 @@ class UserColumnType extends AbstractColumnType
 
 Additionally, options are inherited from the type specified in the `getParent()` method:
 
-```php
-use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
+```php # src/DataTable/Column/Type/AdminColumnType.php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-// This class inherits options from ColumnType (which is base type)
-class UserColumnType extends AbstractColumnType
-{ 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver
-            ->setDefault('user', null)
-            ->setAllowedTypes('user', ['null', UserInterface::class])
-        ;
-    }
-}
-
-// This class inherits options from ParentColumnType
-class AdminColumnType extends AbstractColumnType
+// This class inherits options from UserDataTableType, including "display_role"
+class AdminDataTableType extends AbstractDataTableType
 {
     public function getParent(): string
     {
-        return UserColumnType::class;
+        return UserDataTableType::class;
+    }
+}
+```
+
+Remember that values set in `configureOptions()` using the `->setDefault()` method are **defaults**.
+This means they **still** can be provided when creating, in this example, a data table:
+
+```php # src/Controller/UserController.php
+use App\DataTable\Type\UserDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class UserController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+
+    public function index()
+    {
+        // This data table option "display_role" equals "false",
+        // because it is not explicitly given, and falls back to default value. 
+        $dataTable = $this->createDataTable(UserDataTableType::class);
+        
+        // This data table option "display_role" equals "true". 
+        $dataTable = $this->createDataTable(UserDataTableType::class, options: [
+            'display_role' => true,
+        ]);
+        
+        // This data table option "display_role" equals "false",
+        // because it is not explicitly given, and falls back to default value,
+        // which is inherited from the parent type (in this case: UserDataTableType).
+        $dataTable = $this->createDataTable(AdminDataTableType::class);
     }
 }
 ```
@@ -173,7 +193,8 @@ class TextColumnTypeExtension extends AbstractColumnTypeExtension
 }
 ```
 
-To apply extension to _every type_ in the system, use the base type of each part of the bundle. For example, in case of the column types:
+To apply an extension to _every type_ in the system, use the base type of each part of the bundle. 
+For example, in case of the column types:
 
 ```php # src/DataTable/Column/Extension/ColumnTypeExtension.php
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;

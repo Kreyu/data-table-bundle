@@ -9,8 +9,7 @@ The data tables can be _filtered_, with use of the [filters](../reference/filter
 ## Toggling the feature
 
 By default, the filtration feature is **enabled** for every data table.
-
-You can change this setting globally using the package configuration file, or use `filtration_enabled` option:
+This can be configured with the `filtration_enabled` option:
 
 +++ Globally (YAML)
 ```yaml # config/packages/kreyu_data_table.yaml

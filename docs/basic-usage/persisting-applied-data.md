@@ -2,7 +2,7 @@
 order: j
 ---
 
-# Persisting applied data
+# Enabling persistence
 
 In complex applications, it can be very helpful to retain data such as applied personalization, filters, applied sorting or at least the currently displayed page. The bundle comes with the persistence feature, which can be freely configured for each feature individually.
 

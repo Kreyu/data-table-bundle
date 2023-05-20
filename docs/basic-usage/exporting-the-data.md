@@ -12,7 +12,7 @@ Similar to data tables and its columns and filters, exporters are defined using 
 ## Prerequisites
 
 The bundle comes with exporter types using the PhpSpreadsheet.
-This library is not included as a bundle dependency, therefore, you have to make sure it is installed:
+This library is not included as a bundle dependency, therefore, make sure it is installed:
 
 :::flex
 ```bash
@@ -56,9 +56,7 @@ To download an export file, use the `export()` method on the data table.
 
 If you're using data tables in controllers, use it in combination with `isExporting()` method:
 
-```php #17-19 src/Controller/ProductController.php
-namespace App\Controller;
-
+```php #15-17 src/Controller/ProductController.php
 use App\DataTable\Type\ProductDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

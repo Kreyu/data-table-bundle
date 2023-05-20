@@ -37,8 +37,6 @@ class ProductController extends AbstractController
 To create a request handler, create a class that implements [:icon-mark-github: RequestHandlerInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Request/RequestHandlerInterface.php):
 
 ```php # src/DataTable/Request/CustomRequestHandler.php
-namespace App\DataTable\Request;
-
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingField;

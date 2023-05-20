@@ -197,4 +197,4 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-Now that the data table seems to be complete, let's focus on something really special — [a personalization](../basic-usage/personalization.md), where the user can decide which columns are visible, or even their order!
+Now that the data table seems to be complete, let's focus on something really special — [a personalization](../basic-usage/enabling-persistence.md), where the user can decide which columns are visible, or even their order!

@@ -6,6 +6,15 @@ order: g
 
 This bundle provides persistence feature, ready to use with data table sorting, pagination, filtration and personalization.
 
+## Toggling the feature
+
+Persistence can be toggled per feature with its own configuration:
+
+- [Features > Pagination > Configuring the feature persistence](pagination.md#configuring-the-feature-persistence)
+- [Features > Sorting > Configuring the feature persistence](sorting.md#configuring-the-feature-persistence)
+- [Features > Filtering > Configuring the feature persistence](filtering.md#configuring-the-feature-persistence)
+- [Features > Personalization > Configuring the feature persistence](personalization.md#configuring-the-feature-persistence)
+
 ## Persistence adapters
 
 Adapters are classes that allow writing (to) and reading (from) the persistent data source.

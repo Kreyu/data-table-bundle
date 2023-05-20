@@ -2,7 +2,7 @@
 order: i
 ---
 
-# Personalization
+# Personalizing the table
 
 Although the product table shown in the examples is tiny, imagine that it actually contains dozens of other columns — making it quickly unreadable! 
 In addition, each user may prefer a different order of these columns. 

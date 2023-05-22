@@ -81,13 +81,15 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         if (false !== $export) {
+            $export = $column->getType()->getOptionsResolver()->resolve($export);
+
             $normData = $this->getNormDataFromRowData($rowData, $column, $export);
             $viewData = $this->getViewDataFromNormData($normData, $column, $export);
 
             $export = array_merge([
                 'data' => $normData,
                 'value' => $viewData,
-                'label' => $export['label'] ?? $view->vars['label'],
+                'label' => $export['label'] ?? null,
                 'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'],
             ], $export);
         }

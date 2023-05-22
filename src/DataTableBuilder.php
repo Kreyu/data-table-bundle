@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
@@ -118,6 +119,11 @@ class DataTableBuilder implements DataTableBuilderInterface
      * Form factory used to create an export form.
      */
     private null|FormFactoryInterface $exportFormFactory = null;
+
+    /**
+     * Default export data, which is applied to the data table if no data is given by the user.
+     */
+    private null|ExportData $defaultExportData = null;
 
     /**
      * Determines whether the data table personalization feature is enabled.
@@ -576,6 +582,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->exportFormFactory = $exportFormFactory;
+
+        return $this;
+    }
+
+    public function getDefaultExportData(): ?ExportData
+    {
+        return $this->defaultExportData;
+    }
+
+    public function setDefaultExportData(?ExportData $defaultExportData): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->defaultExportData = $defaultExportData;
 
         return $this;
     }

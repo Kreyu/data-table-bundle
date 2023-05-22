@@ -163,3 +163,94 @@ class ProductController extends AbstractController
 }
 ```
 
+## Exporting without user input
+
+To export the data table manually, without user input, use the `export()` method directly: 
+
+```php #13-14 src/Controller/ProductController.php
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+
+    public function index()
+    {
+        $dataTable = $this->createDataTable(ProductDataTableType::class);
+
+        // An instance of ExportFile, which extends the HttpFoundation File object
+        $file = $dataTable->export();
+        
+        // For example, save it manually:
+        $file->move(__DIR__);
+        
+        // Or return a BinaryFileResponse to download it in browser:   
+        return $this->file($file);
+    }
+}
+```
+
+If the data table has no specified exporters, this will result in an exception:
+
+> Unable to create export data from data table without exporters
+
+By default, the export will contain records from **all pages**.
+Also, if enabled, the personalization will be **included**.
+To change this behaviour, either configure the data table type's default export data:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $exporters = $builder->getExporters();
+        
+        $builder->setDefaultExportData(new ExportData(
+            filename: 'products',
+            exporter: $exporters[0],
+            strategy: ExportStrategy::INCLUDE_CURRENT_PAGE,
+            includePersonalization: false,
+        ));
+        
+        // or by creating the export data from an array:
+        $builder->setDefaultPersonalizationData(PersonalizationData::fromArray([
+            'filename' => 'products',
+            'exporter' => $exporters[0]
+            'strategy' => ExportStrategy::INCLUDE_CURRENT_PAGE,
+            'include_personalization' => false,
+        ]));
+    }
+}
+```
+
+or pass the export data directly to the `export()` method:
+
+```php #13-14,16 src/Controller/ProductController.php
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+
+    public function index()
+    {
+        $dataTable = $this->createDataTable(ProductDataTableType::class);
+
+        $exportData = ExportData::fromDataTable($dataTable);
+        $exportData->includePersonalization = false; 
+        
+        $file = $dataTable->export($exportData);
+        
+        // ...
+    }
+}
+```

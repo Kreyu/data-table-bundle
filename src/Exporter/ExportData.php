@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportData
 {
-    public string $filename;
-    public ExporterInterface $exporter;
-    public ExportStrategy $strategy;
-    public bool $includePersonalization;
+    public function __construct(
+        public string $filename,
+        public ExporterInterface $exporter,
+        public ExportStrategy $strategy = ExportStrategy::INCLUDE_ALL,
+        public bool $includePersonalization = true,
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
@@ -36,12 +40,25 @@ class ExportData
 
         $data = $resolver->resolve($data);
 
-        $exportData = new self();
-        $exportData->filename = $data['filename'];
-        $exportData->exporter = $data['exporter'];
-        $exportData->strategy = $data['strategy'];
-        $exportData->includePersonalization = $data['include_personalization'];
+        return new self(
+            $data['filename'],
+            $data['exporter'],
+            $data['strategy'],
+            $data['include_personalization'],
+        );
+    }
 
-        return $exportData;
+    public static function fromDataTable(DataTableInterface $dataTable): self
+    {
+        $exporters = $dataTable->getConfig()->getExporters();
+
+        if (empty($exporters)) {
+            throw new \LogicException('Unable to create export data from data table without exporters');
+        }
+
+        return new self(
+            $dataTable->getConfig()->getName(),
+            $exporters[array_key_first($exporters)],
+        );
     }
 }

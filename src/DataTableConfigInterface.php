@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
@@ -90,6 +91,8 @@ interface DataTableConfigInterface
     public function isExportingEnabled(): bool;
 
     public function getExportFormFactory(): ?FormFactoryInterface;
+
+    public function getDefaultExportData(): ?ExportData;
 
     public function isPersonalizationEnabled(): bool;
 

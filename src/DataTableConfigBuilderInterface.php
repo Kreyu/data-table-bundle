@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
@@ -84,6 +85,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setExportingEnabled(bool $exportingEnabled): static;
 
     public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static;
+
+    public function setDefaultExportData(?ExportData $defaultExportData): static;
 
     public function setPersonalizationEnabled(bool $personalizationEnabled): static;
 

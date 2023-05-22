@@ -17,13 +17,28 @@ The `ActionsColumnType` represents a column that contains row actions.
 
 ### `actions`
 
-- **array**: `array`
+- **type**: `array`
 - **default**: `[]`
 
-This option contains a list of actions. Each action consists of two options:
+This option contains a list of actions. Each action consists of _three_ options:
 
-- `type` (**type**: `string`) - fully qualified class name of the action type;
-- `type_options` (**type**: `array`, **default**: `[]`) - options passed to the action type;
+:::
+- `type`   
+  - **type**: `string`  
+  Fully qualified class name of the [action type](../../../reference/actions/types.md).
+:::
+:::
+- `type_options`
+  - **type**: `array`
+  - **default**: `[]`  
+  Options passed to the action type.
+::: 
+:::
+- `visible`   
+  - **type**: `bool`or `callable`
+  - **default**: `true`  
+    Determines whether the action should be visible.
+:::
 
 Example usage:
 
@@ -43,6 +58,9 @@ $builder
                         ]);
                     }),                
                 ],
+                'visible' => function (Product $product): bool {
+                    return $product->isActive();
+                }
             ],
         ],
     ])

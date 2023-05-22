@@ -21,6 +21,15 @@ class ActionsColumnType extends AbstractColumnType
         $actions = [];
 
         foreach ($options['actions'] as $name => $actionOptions) {
+            if (is_callable($visible = $actionOptions['visible'])) {
+                $visible = $visible($view->value);
+            }
+
+            if (!$visible) {
+                // The column should not be created in this case.
+                continue;
+            }
+
             $action = $this->actionFactory->create($name, $actionOptions['type'], $actionOptions['type_options']);
 
             $actions[$name] = $action->createView($view);
@@ -43,11 +52,14 @@ class ActionsColumnType extends AbstractColumnType
                         ])
                         ->setDefaults([
                             'type_options' => [],
+                            'visible' => true,
                         ])
                         ->setAllowedTypes('type', ['string'])
                         ->setAllowedTypes('type_options', ['array', 'callable'])
+                        ->setAllowedTypes('visible', ['bool', 'callable'])
                         ->setInfo('type', 'A fully-qualified class name of the action type.')
                         ->setInfo('type_options', 'An array of options passed to the action type.')
+                        ->setInfo('visible', 'Determines whether the action should be visible.')
                     ;
                 },
             ])

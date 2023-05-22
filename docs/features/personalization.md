@@ -186,7 +186,7 @@ class ProductController extends AbstractController
 
 The default personalization data can be overridden using the data table builder's `setDefaultPersonalizationData()` method:
 
-```php
+```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;

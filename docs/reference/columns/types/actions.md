@@ -5,7 +5,7 @@ order: j
 
 # Actions column type
 
-The `ActionsColumnType` represents a column with value displayed as a Twig template.
+The `ActionsColumnType` represents a column that contains row actions.
 
 +-------------+---------------------------------------------------------------------+
 | Parent type | [ColumnType](column)
@@ -20,7 +20,7 @@ The `ActionsColumnType` represents a column with value displayed as a Twig templ
 - **array**: `array`
 - **default**: `[]`
 
-This option contains a list of actions. Each actions consists of two options:
+This option contains a list of actions. Each action consists of two options:
 
 - `type` (**type**: `string`) - fully qualified class name of the action type;
 - `type_options` (**type**: `array`, **default**: `[]`) - options passed to the action type;

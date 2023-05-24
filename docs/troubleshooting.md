@@ -31,6 +31,16 @@ For more information, consider reading:
 - [Basic Usage > Adding columns > Making the columns sortable](basic-usage/adding-columns.md#making-the-columns-sortable)
 - [Features > Sorting > Making the columns sortable](features/sorting.md#making-the-columns-sortable)
 
+## Exporting is enabled but exported files are empty
+
+Enabling the exporting feature for the data table does not mean that any column will be exportable by itself.
+By default, columns **are not** sortable. To make a column exportable, use its `export` option.
+
+For more information, consider reading:
+
+- [Basic Usage > Adding exporters > Making the columns exportable](basic-usage/exporting-the-data.md#making-the-columns-exportable)
+- [Features > Exporting > Making the columns exportable](features/exporting.md#making-the-columns-exportable)
+
 ## Data table features are refreshing the page but not working
 
 If, for example, a data table is rendered properly, but:

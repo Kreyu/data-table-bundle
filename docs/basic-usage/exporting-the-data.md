@@ -20,6 +20,33 @@ $ composer require phpoffice/phpspreadsheet
 ```
 :::
 
+
+!!! Enabling the feature does not mean that any column will be exportable by itself.
+By default, columns **are not** exportable.
+!!!
+
+### Making the columns exportable
+
+To make any column exportable, use its `export` option:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addColumn('id', NumberColumnType::class, [
+                'export' => true,
+            ])
+        ;
+    }
+}
+```
+
 ## Adding exporters to the data table
 
 To add exporter, use the builder's `addExporter()` method:

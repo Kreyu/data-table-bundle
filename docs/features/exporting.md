@@ -261,7 +261,7 @@ class ProductDataTableType extends AbstractDataTableType
     {
         $exporters = $builder->getExporters();
 
-        $builder->setDefaultPersonalizationData(ExportData::fromArray([
+        $builder->setDefaultExportData(ExportData::fromArray([
             'filename' => 'products',
             'exporter' => $exporters[0],
             'strategy' => ExportStrategy::INCLUDE_CURRENT_PAGE,

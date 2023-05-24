@@ -180,9 +180,9 @@ class DataTable implements DataTableInterface
             throw new \RuntimeException('The data table requested to export has exporting feature disabled.');
         }
 
-        $this->exportData = $data;
+        $data ??= $this->exportData ?? $this->getConfig()->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
-        $data ??= $this->getConfig()->getDefaultExportData() ?? ExportData::fromDataTable($this);
+        $this->exportData = $data;
 
         $dataTable = clone $this;
 

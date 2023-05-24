@@ -17,7 +17,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
+use Kreyu\Bundle\DataTableBundle\Sorting\SortingColumnData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -97,7 +97,32 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $this->query->sort($data);
+        $sortingDataFiltered = new SortingData();
+
+        foreach ($data->getColumns() as $sortingColumnData) {
+            try {
+                $column = $this->getConfig()->getColumn($sortingColumnData->getName());
+            } catch (\Throwable) {
+                continue;
+            }
+
+            $sortField = $column->getOptions()['sort'];
+
+            if ($sortField === false) {
+                continue;
+            }
+
+            if ($sortField === true) {
+                $sortField = $column->getName();
+            }
+
+            $sortingDataFiltered->addColumn(SortingColumnData::fromArray([
+                'name' => $sortField,
+                'direction' => $sortingColumnData->getDirection(),
+            ]));
+        }
+
+        $this->query->sort($sortingDataFiltered);
 
         $this->nonFilteredQuery = $this->query;
 

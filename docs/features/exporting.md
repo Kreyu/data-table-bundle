@@ -260,18 +260,10 @@ class ProductDataTableType extends AbstractDataTableType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $exporters = $builder->getExporters();
-        
-        $builder->setDefaultExportData(new ExportData(
-            filename: 'products',
-            exporter: $exporters[0],
-            strategy: ExportStrategy::INCLUDE_CURRENT_PAGE,
-            includePersonalization: false,
-        ));
-        
-        // or by creating the export data from an array:
-        $builder->setDefaultPersonalizationData(PersonalizationData::fromArray([
+
+        $builder->setDefaultPersonalizationData(ExportData::fromArray([
             'filename' => 'products',
-            'exporter' => $exporters[0]
+            'exporter' => $exporters[0],
             'strategy' => ExportStrategy::INCLUDE_CURRENT_PAGE,
             'include_personalization' => false,
         ]));

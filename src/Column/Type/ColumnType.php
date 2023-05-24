@@ -46,7 +46,7 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         if (false !== $export) {
-            $export = array_merge([
+            $export = array_merge($options, [
                 'label' => $export['label'] ?? $view->vars['label'],
                 'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'] ?? null,
             ], $export);
@@ -81,6 +81,8 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         if (false !== $export) {
+            $export = array_merge($options, $export);
+
             $export = $column->getType()->getOptionsResolver()->resolve($export);
 
             $normData = $this->getNormDataFromRowData($rowData, $column, $export);

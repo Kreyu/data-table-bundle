@@ -10,13 +10,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportData
 {
-    public function __construct(
-        public string $filename,
-        public ExporterInterface $exporter,
-        public ExportStrategy $strategy = ExportStrategy::INCLUDE_ALL,
-        public bool $includePersonalization = true,
-    ) {
-    }
+    public string $filename;
+    public ExporterInterface $exporter;
+    public ExportStrategy $strategy = ExportStrategy::INCLUDE_ALL;
+    public bool $includePersonalization = true;
 
     public static function fromArray(array $data): self
     {
@@ -40,12 +37,13 @@ class ExportData
 
         $data = $resolver->resolve($data);
 
-        return new self(
-            $data['filename'],
-            $data['exporter'],
-            $data['strategy'],
-            $data['include_personalization'],
-        );
+        $self = new self();
+        $self->filename = $data['filename'];
+        $self->exporter = $data['exporter'];
+        $self->strategy = $data['strategy'];
+        $self->includePersonalization = $data['include_personalization'];
+
+        return $self;
     }
 
     public static function fromDataTable(DataTableInterface $dataTable): self
@@ -56,9 +54,10 @@ class ExportData
             throw new \LogicException('Unable to create export data from data table without exporters');
         }
 
-        return new self(
-            $dataTable->getConfig()->getName(),
-            $exporters[array_key_first($exporters)],
-        );
+        $self = new self();
+        $self->filename = $dataTable->getConfig()->getName();
+        $self->exporter = $exporters[array_key_first($exporters)];
+
+        return $self;
     }
 }

@@ -97,21 +97,7 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        foreach ($data->getColumns() as $columnSortingData) {
-            $column = $this->config->getColumn($columnSortingData->getName());
-
-            $sortField = $column->getOptions()['sort'];
-
-            if ($sortField === false) {
-                continue;
-            }
-
-            if ($sortField === true) {
-                $sortField = $column->getName();
-            }
-
-            $this->query->sort($sortField, Direction::from($columnSortingData->getDirection()));
-        }
+        $this->query->sort($data);
 
         $this->nonFilteredQuery = $this->query;
 

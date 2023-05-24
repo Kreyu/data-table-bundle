@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 
 class SortingData
 {
@@ -66,7 +65,7 @@ class SortingData
         $this->columns[$column->getName()] = $column;
     }
 
-    public function removeColumn(PersonalizationColumnData $column): void
+    public function removeColumn(SortingColumnData $column): void
     {
         unset($this->columns[$column->getName()]);
     }

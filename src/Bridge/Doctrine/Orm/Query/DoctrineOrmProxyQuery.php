@@ -52,7 +52,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->queryBuilder;
     }
 
-    public function sort(string $field, Direction $direction = Direction::ASC): void
+    public function sort(SortingData $sortingData): void
     {
         $rootAlias = current($this->queryBuilder->getRootAliases());
 
@@ -60,11 +60,17 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
             throw new \RuntimeException('There are no root aliases defined in the query.');
         }
 
-        if ($rootAlias && !str_contains($field, '.')) {
-            $field = $rootAlias.'.'.$field;
-        }
+        $this->queryBuilder->resetDQLPart('orderBy');
 
-        $this->queryBuilder->addOrderBy($field, $direction->value);
+        foreach ($sortingData->getColumns() as $column) {
+            $field = $column->getName();
+
+            if ($rootAlias && !str_contains($field, '.')) {
+                $field = $rootAlias.'.'.$field;
+            }
+
+            $this->queryBuilder->addOrderBy($field, $column->getDirection());
+        }
     }
 
     public function paginate(PaginationData $paginationData): void

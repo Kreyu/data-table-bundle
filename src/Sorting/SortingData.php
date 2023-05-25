@@ -18,8 +18,8 @@ class SortingData
      */
     public function __construct(array $columns = [])
     {
-        foreach ($columns as $column) {
-            $this->addColumn($column);
+        foreach ($columns as $name => $column) {
+            $this->addColumn($name, $column);
         }
     }
 
@@ -60,13 +60,13 @@ class SortingData
         return $this->columns[$column] ?? null;
     }
 
-    public function addColumn(SortingColumnData $column): void
+    public function addColumn(string $name, SortingColumnData $column): void
     {
-        $this->columns[$column->getName()] = $column;
+        $this->columns[$name] = $column;
     }
 
-    public function removeColumn(SortingColumnData $column): void
+    public function removeColumn(string $name): void
     {
-        unset($this->columns[$column->getName()]);
+        unset($this->columns[$name]);
     }
 }

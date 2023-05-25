@@ -116,7 +116,7 @@ class DataTable implements DataTableInterface
                 $sortField = $column->getName();
             }
 
-            $sortingDataFiltered->addColumn(SortingColumnData::fromArray([
+            $sortingDataFiltered->addColumn($column->getName(), SortingColumnData::fromArray([
                 'name' => $sortField,
                 'direction' => $sortingColumnData->getDirection(),
             ]));

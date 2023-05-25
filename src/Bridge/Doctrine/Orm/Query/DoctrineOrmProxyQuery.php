@@ -65,7 +65,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         foreach ($sortingData->getColumns() as $column) {
             $field = $column->getName();
 
-            if ($rootAlias && !str_contains($field, '.')) {
+            if ($rootAlias && !str_contains($field, '.') && !str_starts_with($field, '__')) {
                 $field = $rootAlias.'.'.$field;
             }
 

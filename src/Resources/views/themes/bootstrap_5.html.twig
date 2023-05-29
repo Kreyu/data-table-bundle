@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block action_bar %}
-    {% set display_filter_action = filtration_enabled and filters|length > 0 %}
+    {% set display_filter_action = filtration_enabled and filters|length > 0 and filtration_form.children|length > 0 %}
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
     {% if title or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            {% if filtration_enabled and filtration_form and filtration_form|length > 0 %}
+            {% if filtration_enabled and filtration_form and filters|length > 0 %}
                 {{ data_table_filters_form(filtration_form) }}
             {% endif %}
 

@@ -113,7 +113,7 @@ class DataTable implements DataTableInterface
             }
 
             if ($sortField === true) {
-                $sortField = $column->getName();
+                $sortField = $column->getOptions()['property_path'] ?? $column->getName();
             }
 
             $sortingDataFiltered->addColumn($column->getName(), SortingColumnData::fromArray([

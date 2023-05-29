@@ -1,7 +1,7 @@
 {% macro filter_clear_url(filtration_parameter_name, filter) %}
     {{ path(
         app.request.get('_route'),
-        app.request.query.all|merge({
+        app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({
             (filtration_parameter_name): app.request.query.all(filtration_parameter_name)|merge({
                 (filter.vars.name): {
                     value: ''
@@ -24,7 +24,7 @@
 
     {{ path(
         app.request.get('_route'),
-        app.request.query.all|merge({
+        app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({
             (filtration_parameter_name): query
         })
     ) }}

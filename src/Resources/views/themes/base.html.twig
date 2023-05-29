@@ -131,11 +131,11 @@
 
 {% block pagination_controls %}
     {%- if has_previous_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): 1 })) } %}
+        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): 1 })) } %}
             {{ block('pagination_first', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number - 1 })) } %}
+        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number - 1 })) } %}
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
@@ -147,18 +147,18 @@
         {% if page_number == current_page_number %}
             {{ block('pagination_page_active', theme) }}
         {% else %}
-            {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_number })) } %}
+            {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_number })) } %}
                 {{ block('pagination_page', theme) }}
             {% endwith %}
         {% endif %}
     {% endfor %}
 
     {%- if has_next_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): current_page_number + 1 })) } %}
+        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number + 1 })) } %}
             {{ block('pagination_next', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.query.all|merge({ (page_parameter_name): page_count })) } %}
+        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_count })) } %}
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}
@@ -312,6 +312,8 @@
             {% set query_params = query_params|merge({ (sort_parameter_name): {
                 (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
             } }) %}
+
+            {% set query_params = app.request.attributes.get('_route_params')|merge(query_params) %}
 
             {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
 

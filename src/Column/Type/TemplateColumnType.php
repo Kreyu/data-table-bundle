@@ -35,8 +35,8 @@ class TemplateColumnType extends AbstractColumnType
             ->setDefaults([
                 'template_vars' => [],
             ])
-            ->setAllowedTypes('template_path', ['string'])
-            ->setAllowedTypes('template_vars', ['array'])
+            ->setAllowedTypes('template_path', ['string', 'callable'])
+            ->setAllowedTypes('template_vars', ['array', 'callable'])
             ->setInfo('template_path', 'A path to the template that should be rendered.')
             ->setInfo('template_vars', 'An array of variables passed to the template.')
         ;

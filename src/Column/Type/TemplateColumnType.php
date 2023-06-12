@@ -16,7 +16,7 @@ class TemplateColumnType extends AbstractColumnType
             $templatePath = $templatePath($view->vars['data']);
         }
 
-        if (is_callable($templateVars = $options['target'])) {
+        if (is_callable($templateVars = $options['template_vars'])) {
             $templateVars = $templateVars($view->vars['data']);
         }
 

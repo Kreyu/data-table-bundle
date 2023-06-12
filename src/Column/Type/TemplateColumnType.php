@@ -12,9 +12,17 @@ class TemplateColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
+        if (is_callable($templatePath = $options['template_path'])) {
+            $templatePath = $templatePath($view->vars['data']);
+        }
+
+        if (is_callable($templateVars = $options['target'])) {
+            $templateVars = $templateVars($view->vars['data']);
+        }
+
         $view->vars = array_merge($view->vars, [
-            'template_path' => $options['template_path'],
-            'template_vars' => $options['template_vars'],
+            'template_path' => $templatePath,
+            'template_vars' => $templateVars,
         ]);
     }
 

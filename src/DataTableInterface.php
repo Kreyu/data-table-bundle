@@ -10,11 +10,13 @@ use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 
 interface DataTableInterface
 {
+    public function getQuery(): ProxyQueryInterface;
     public function getConfig(): DataTableConfigInterface;
 
     public function sort(SortingData $data): void;

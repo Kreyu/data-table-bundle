@@ -67,6 +67,11 @@ class DataTable implements DataTableInterface
         $this->initialize();
     }
 
+    public function getQuery(): ProxyQueryInterface
+    {
+        return $this->query;
+    }
+
     public function getConfig(): DataTableConfigInterface
     {
         return $this->config;

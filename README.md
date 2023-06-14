@@ -1,5 +1,8 @@
 # DataTableBundle
 
+> **Warning**: This bundle is still in early stages of development and is likely to change, or even change drastically.
+> Backwards compatibility is **NOT** guaranteed until the first stable release.
+
 [![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
 
 Streamlines the creation process of the data tables in Symfony applications.

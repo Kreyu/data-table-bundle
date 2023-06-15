@@ -229,6 +229,10 @@ final class DataTableType implements DataTableTypeInterface
     {
         $filters = [];
 
+        if (!$dataTable->getConfig()->isFiltrationEnabled()) {
+            return [];
+        }
+
         foreach ($dataTable->getConfig()->getFilters() as $filter) {
             $data = $dataTable->getFiltrationData()->getFilterData($filter->getName()) ?? new FilterData();
 

@@ -228,7 +228,7 @@ class DataTable implements DataTableInterface
         return $this->paginationData;
     }
 
-    public function getFiltrationData(): FiltrationData
+    public function getFiltrationData(): ?FiltrationData
     {
         return $this->filtrationData;
     }
@@ -308,7 +308,7 @@ class DataTable implements DataTableInterface
 
     public function hasActiveFilters(): bool
     {
-        return $this->filtrationData->hasActiveFilters();
+        return (bool) $this->filtrationData?->hasActiveFilters();
     }
 
     public function handleRequest(mixed $request): void

@@ -35,7 +35,7 @@ interface DataTableInterface
 
     public function getPaginationData(): PaginationData;
 
-    public function getFiltrationData(): FiltrationData;
+    public function getFiltrationData(): ?FiltrationData;
 
     public function getPersonalizationData(): PersonalizationData;
 

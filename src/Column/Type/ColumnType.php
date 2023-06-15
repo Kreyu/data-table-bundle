@@ -65,6 +65,10 @@ final class ColumnType implements ColumnTypeInterface
         $view->data = $normData;
         $view->value = $viewData;
 
+        if (is_callable($attr = $options['value_attr'])) {
+            $attr = $attr($normData, $rowData);
+        }
+
         $view->vars = array_replace($view->vars, [
             'row' => $view->parent,
             'data_table' => $view->parent->parent,
@@ -73,7 +77,7 @@ final class ColumnType implements ColumnTypeInterface
             'value' => $view->value,
             'translation_domain' => $options['value_translation_domain'] ?? $view->parent->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['value_translation_parameters'] ?? [],
-            'attr' => $options['value_attr'],
+            'attr' => $attr,
         ]);
 
         if (true === $export = $options['export']) {
@@ -133,7 +137,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('getter', ['null', 'callable'])
             ->setAllowedTypes('header_attr', ['array'])
-            ->setAllowedTypes('value_attr', ['array'])
+            ->setAllowedTypes('value_attr', ['array', 'callable'])
             ->setInfo('label', 'A user-friendly label that describes a column.')
             ->setInfo('header_translation_domain', 'Translation domain used to translate the column header.')
             ->setInfo('header_translation_parameters', 'Parameters used within the column header translation.')

@@ -143,7 +143,7 @@ $builder
 
 ### `value_attr`
 
-- **type**: `array`
+- **type**: `array` or `callable`
 - **default**: `[]`
 
 If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
@@ -159,3 +159,17 @@ $builder
     ])
 ;
 ```
+
+You can pass a `callable` to perform a dynamic attribute generation:
+
+```php #
+$builder
+    ->addColumn('quantity', NumberColumnType::class, [
+        'value_attr' => function (int $quantity, Product $product) {
+            return [
+                'class' => $quantity === 0 && !$product->isDisabled() ? 'text-danger' : '',
+            ],
+        },
+    ])
+;
+``` 

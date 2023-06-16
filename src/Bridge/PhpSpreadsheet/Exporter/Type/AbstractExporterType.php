@@ -80,15 +80,7 @@ abstract class AbstractExporterType extends BaseAbstractType
 
             $this->appendRow(
                 $worksheet,
-                array_map(function (ColumnValueView $view) {
-                    $value = $view->vars['export']['value'];
-
-                    if (is_bool($value)) {
-                        $value = (int) $value;
-                    }
-
-                    return $value;
-                }, $values),
+                array_map(fn (ColumnValueView $view) => $view->vars['export']['value'], $values),
             );
         }
 

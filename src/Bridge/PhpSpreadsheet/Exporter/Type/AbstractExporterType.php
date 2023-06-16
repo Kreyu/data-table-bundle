@@ -84,14 +84,7 @@ abstract class AbstractExporterType extends BaseAbstractType
                     $value = $view->vars['export']['value'];
 
                     if (is_bool($value)) {
-                        // Convert value to int, so later it can be converted to 0/1 string
                         $value = (int) $value;
-                    }
-
-                    $value = (string) $value;
-
-                    if ($this->translator && $translationDomain = $view->vars['export']['translation_domain'] ?? null) {
-                        $value = $this->translator->trans($value, [], $translationDomain);
                     }
 
                     return $value;

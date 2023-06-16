@@ -14,9 +14,15 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractExporterType extends BaseAbstractType
 {
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
+    }
+
     abstract protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter;
 
     /**
@@ -55,7 +61,15 @@ abstract class AbstractExporterType extends BaseAbstractType
 
             $this->appendRow(
                 $worksheet,
-                array_map(fn (ColumnHeaderView $view) => $view->vars['export']['label'], $headers),
+                array_map(function (ColumnHeaderView $view) {
+                    $label = $view->vars['export']['label'];
+
+                    if ($this->translator && $translationDomain = $view->vars['export']['translation_domain'] ?? null) {
+                        $label = $this->translator->trans($label, $view->vars['export']['translation_parameters'] ?? [], $translationDomain);
+                    }
+
+                    return $label;
+                }, $headers),
             );
         }
 
@@ -66,7 +80,22 @@ abstract class AbstractExporterType extends BaseAbstractType
 
             $this->appendRow(
                 $worksheet,
-                array_map(fn (ColumnValueView $view) => $view->vars['export']['value'], $values),
+                array_map(function (ColumnValueView $view) {
+                    $value = $view->vars['export']['value'];
+
+                    if (is_bool($value)) {
+                        // Convert value to int, so later it can be converted to 0/1 string
+                        $value = (int) $value;
+                    }
+
+                    $value = (string) $value;
+
+                    if ($this->translator && $translationDomain = $view->vars['export']['translation_domain'] ?? null) {
+                        $value = $this->translator->trans($value, [], $translationDomain);
+                    }
+
+                    return $value;
+                }, $values),
             );
         }
 

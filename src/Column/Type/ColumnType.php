@@ -48,6 +48,7 @@ final class ColumnType implements ColumnTypeInterface
         if (false !== $export) {
             $export = array_merge($options, [
                 'label' => $export['label'] ?? $view->vars['label'],
+                'translation_parameters' => $export['translation_parameters'] ?? $view->vars['translation_parameters'] ?? null,
                 'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'] ?? null,
             ], $export);
         }

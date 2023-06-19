@@ -6,7 +6,7 @@ label: Available types
 
 The following exporter types are natively available in the bundle:
 
-- PhpSpreadsheet exporters
+- [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet)
     - [Csv](types/php-spreadsheet/csv.md)
     - [Xls](types/php-spreadsheet/xls.md)
     - [Xlsx](types/php-spreadsheet/xlsx.md)

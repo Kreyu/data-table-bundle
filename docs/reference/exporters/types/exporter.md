@@ -1,5 +1,6 @@
 ---
 label: Exporter
+visibility: hidden
 ---
 
 # Exporter type

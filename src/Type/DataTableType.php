@@ -16,13 +16,13 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
@@ -134,7 +134,7 @@ final class DataTableType implements DataTableTypeInterface
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
         $view->nonPersonalizedHeaderRow = $this->createHeaderRowView($view, $dataTable, $columns);
-        $view->valueRows = $this->createValueRowsViews($view, $dataTable, $visibleColumns);
+        $view->valueRows = new RowIterator(fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns));
         $view->pagination = $this->createPaginationView($view, $dataTable);
         $view->filters = $this->createFilterViews($view, $dataTable);
         $view->actions = $this->createActionViews($view, $dataTable);
@@ -263,12 +263,10 @@ final class DataTableType implements DataTableTypeInterface
 
     /**
      * @param  array<ColumnInterface> $columns
-     * @return array<ValueRowView>
+     * @return iterable<ValueRowView>
      */
-    private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): array
+    private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        $valueRowsViews = [];
-
         foreach ($dataTable->getPagination()->getItems() as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);
             $valueRowView->vars['row'] = $valueRowView;
@@ -287,10 +285,10 @@ final class DataTableType implements DataTableTypeInterface
                 $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
             }
 
-            $valueRowsViews[] = $valueRowView;
+            yield $valueRowView;
         }
 
-        return $valueRowsViews;
+        yield from [];
     }
 
     private function createFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView

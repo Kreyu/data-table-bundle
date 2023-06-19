@@ -67,6 +67,11 @@ class DataTable implements DataTableInterface
         $this->initialize();
     }
 
+    public function __clone(): void
+    {
+        $this->config = clone $this->config;
+    }
+
     public function getQuery(): ProxyQueryInterface
     {
         return $this->query;
@@ -201,6 +206,12 @@ class DataTable implements DataTableInterface
         $this->exportData = $data;
 
         $dataTable = clone $this;
+
+        // TODO: This should be done in a better way...
+        if ($dataTable->config instanceof DataTableConfigBuilderInterface) {
+            $dataTable->config->setPaginationPersistenceEnabled(false);
+            $dataTable->config->setPersonalizationPersistenceEnabled(false);
+        }
 
         if (ExportStrategy::INCLUDE_ALL === $data->strategy) {
             $dataTable->paginate(new PaginationData(perPage: null));

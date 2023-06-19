@@ -262,6 +262,11 @@ class DataTableBuilder implements DataTableBuilderInterface
         $this->options = $options;
     }
 
+    public function __clone(): void
+    {
+        $this->query = clone $this->query;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -269,10 +274,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setName(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->name = $name;
 
         return $this;
@@ -285,10 +286,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setType(ResolvedDataTableTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->type = $type;
 
         return $this;
@@ -301,10 +298,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setQuery(?ProxyQueryInterface $query): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->query = $query;
 
         return $this;
@@ -317,10 +310,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setOptions(array $options): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->options = $options;
 
         return $this;
@@ -374,10 +363,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function addColumn(string $name, string $type, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
 
         return $this;
@@ -385,10 +370,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function removeColumn(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         unset($this->columns[$name]);
 
         return $this;
@@ -406,10 +387,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function addFilter(string $name, string $type, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filters[$name] = $this->getFilterFactory()->create($name, $type, $options);
 
         return $this;
@@ -417,10 +394,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function removeFilter(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         unset($this->filters[$name]);
 
         return $this;
@@ -438,10 +411,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function addAction(string $name, string $type, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->actions[$name] = $this->getActionFactory()->create($name, $type, $options);
 
         return $this;
@@ -449,10 +418,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function removeAction(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         unset($this->actions[$name]);
 
         return $this;
@@ -470,10 +435,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function addExporter(string $name, string $type, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->exporters[$name] = $this->getExporterFactory()->create($name, $type, $options);
 
         return $this;
@@ -481,10 +442,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function removeExporter(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         unset($this->exporters[$name]);
 
         return $this;
@@ -497,10 +454,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->columnFactory = $columnFactory;
 
         return $this;
@@ -513,10 +466,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filterFactory = $filterFactory;
 
         return $this;
@@ -529,10 +478,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setActionFactory(ActionFactoryInterface $actionFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->actionFactory = $actionFactory;
 
         return $this;
@@ -545,10 +490,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->exporterFactory = $exporterFactory;
 
         return $this;
@@ -561,10 +502,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExportingEnabled(bool $exportingEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->exportingEnabled = $exportingEnabled;
 
         return $this;
@@ -577,10 +514,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->exportFormFactory = $exportFormFactory;
 
         return $this;
@@ -593,10 +526,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setDefaultExportData(?ExportData $defaultExportData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->defaultExportData = $defaultExportData;
 
         return $this;
@@ -609,10 +538,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationEnabled(bool $personalizationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->personalizationEnabled = $personalizationEnabled;
 
         return $this;
@@ -625,10 +550,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationPersistenceEnabled(bool $personalizationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->personalizationPersistenceEnabled = $personalizationPersistenceEnabled;
 
         return $this;
@@ -641,10 +562,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->personalizationPersistenceAdapter = $personalizationPersistenceAdapter;
 
         return $this;
@@ -657,10 +574,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationPersistenceSubject(?PersistenceSubjectInterface $personalizationPersistenceSubject): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->personalizationPersistenceSubject = $personalizationPersistenceSubject;
 
         return $this;
@@ -673,10 +586,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->personalizationFormFactory = $personalizationFormFactory;
 
         return $this;
@@ -689,10 +598,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->defaultPersonalizationData = $defaultPersonalizationData;
 
         return $this;
@@ -705,10 +610,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationEnabled(bool $filtrationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filtrationEnabled = $filtrationEnabled;
 
         return $this;
@@ -721,10 +622,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationPersistenceEnabled(bool $filtrationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filtrationPersistenceEnabled = $filtrationPersistenceEnabled;
 
         return $this;
@@ -737,10 +634,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filtrationPersistenceAdapter = $filtrationPersistenceAdapter;
 
         return $this;
@@ -753,10 +646,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationPersistenceSubject(?PersistenceSubjectInterface $filtrationPersistenceSubject): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filtrationPersistenceSubject = $filtrationPersistenceSubject;
 
         return $this;
@@ -769,10 +658,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->filtrationFormFactory = $filtrationFormFactory;
 
         return $this;
@@ -785,10 +670,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->defaultFiltrationData = $defaultFiltrationData;
 
         return $this;
@@ -801,10 +682,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setSortingEnabled(bool $sortingEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->sortingEnabled = $sortingEnabled;
 
         return $this;
@@ -817,10 +694,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->sortingPersistenceEnabled = $sortingPersistenceEnabled;
 
         return $this;
@@ -833,10 +706,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->sortingPersistenceAdapter = $sortingPersistenceAdapter;
 
         return $this;
@@ -849,10 +718,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->sortingPersistenceSubject = $sortingPersistenceSubject;
 
         return $this;
@@ -865,10 +730,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setDefaultSortingData(?SortingData $defaultSortingData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->defaultSortingData = $defaultSortingData;
 
         return $this;
@@ -881,10 +742,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPaginationEnabled(bool $paginationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->paginationEnabled = $paginationEnabled;
 
         return $this;
@@ -897,10 +754,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPaginationPersistenceEnabled(bool $paginationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->paginationPersistenceEnabled = $paginationPersistenceEnabled;
 
         return $this;
@@ -913,10 +766,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->paginationPersistenceAdapter = $paginationPersistenceAdapter;
 
         return $this;
@@ -929,10 +778,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->paginationPersistenceSubject = $paginationPersistenceSubject;
 
         return $this;
@@ -945,10 +790,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->defaultPaginationData = $defaultPaginationData;
 
         return $this;
@@ -961,10 +802,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->requestHandler = $requestHandler;
 
         return $this;
@@ -977,10 +814,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setHeaderRowAttributes(array $headerRowAttributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->headerRowAttributes = $headerRowAttributes;
 
         return $this;
@@ -993,10 +826,6 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function setValueRowAttributes(array $valueRowAttributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         $this->valueRowAttributes = $valueRowAttributes;
 
         return $this;
@@ -1078,10 +907,5 @@ class DataTableBuilder implements DataTableBuilderInterface
     private function getParameterName(string $prefix): string
     {
         return implode('_', array_filter([$prefix, $this->name]));
-    }
-
-    private function createBuilderLockedException(): \BadMethodCallException
-    {
-        return new \BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
     }
 }

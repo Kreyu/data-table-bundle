@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type as OpenSpout;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\AbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvExporterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlExporterType;
@@ -50,13 +51,20 @@ return static function (ContainerConfigurator $configurator) {
         ->tag('kreyu_data_table.exporter.type')
     ;
 
-    /*
-        App\Repository\BaseDoctrineRepository:
-        abstract:  true
-        arguments: ['@doctrine.orm.entity_manager']
-        calls:
-            - setLogger: ['@logger']
-    */
+    $services
+        ->set('kreyu_data_table.exporter.type.open_spout.csv', OpenSpout\CsvExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.exporter.type.open_spout.xlsx', OpenSpout\XlsxExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.exporter.type.open_spout.ods', OpenSpout\OdsExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
+    ;
 
     $services
         ->set(AbstractExporterType::class)

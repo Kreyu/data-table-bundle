@@ -17,9 +17,9 @@ class DataTableView
     public HeaderRowView $nonPersonalizedHeaderRow;
 
     /**
-     * @var array<ValueRowView>
+     * @var iterable<ValueRowView>
      */
-    public array $valueRows = [];
+    public iterable $valueRows = [];
 
     public PaginationView $pagination;
 

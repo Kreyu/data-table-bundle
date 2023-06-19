@@ -52,17 +52,28 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
+        ->set('kreyu_data_table.exporter.type.open_spout.abstract', OpenSpout\AbstractExporterType::class)
+        ->abstract()
+        ->args([
+            service('translator')->nullOnInvalid(),
+        ])
+    ;
+
+    $services
         ->set('kreyu_data_table.exporter.type.open_spout.csv', OpenSpout\CsvExporterType::class)
+        ->parent('kreyu_data_table.exporter.type.open_spout.abstract')
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.open_spout.xlsx', OpenSpout\XlsxExporterType::class)
+        ->parent('kreyu_data_table.exporter.type.open_spout.abstract')
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.open_spout.ods', OpenSpout\OdsExporterType::class)
+        ->parent('kreyu_data_table.exporter.type.open_spout.abstract')
         ->tag('kreyu_data_table.exporter.type')
     ;
 

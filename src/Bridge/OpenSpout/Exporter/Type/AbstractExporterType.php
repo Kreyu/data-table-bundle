@@ -63,7 +63,7 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
 
             foreach ($valueRow->children as $child) {
                 if (false !== $child->vars['export']) {
-                    $values[] = $child->vars['value'];
+                    $values[] = $child->vars['export']['value'];
                 }
             }
 

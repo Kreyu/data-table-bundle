@@ -12,6 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class XlsxExporterType extends AbstractExporterType
 {
+    protected function getExtension(): string
+    {
+        return 'xlsx';
+    }
+
     protected function getWriter(array $options): WriterInterface
     {
         $writerOptions = new Options();

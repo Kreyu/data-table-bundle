@@ -11,6 +11,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CsvExporterType extends AbstractExporterType
 {
+    protected function getExtension(): string
+    {
+        return 'csv';
+    }
+
     protected function getWriter(array $options): WriterInterface
     {
         $writerOptions = new Options();

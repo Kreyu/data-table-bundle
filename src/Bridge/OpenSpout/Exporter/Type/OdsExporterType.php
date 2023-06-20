@@ -12,6 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OdsExporterType extends AbstractExporterType
 {
+    protected function getExtension(): string
+    {
+        return 'ods';
+    }
+
     protected function getWriter(array $options): WriterInterface
     {
         $writerOptions = new Options();

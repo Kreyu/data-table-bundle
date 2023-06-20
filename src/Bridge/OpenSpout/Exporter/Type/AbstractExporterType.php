@@ -72,7 +72,9 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
 
         $writer->close();
 
-        return new ExportFile($path, "$filename.csv");
+        $extension = $this->getExtension();
+
+        return new ExportFile($path, "$filename.$extension");
     }
 
     protected abstract function getExtension(): string;

@@ -97,11 +97,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         ;
 
         $container
-            ->getDefinition('kreyu_data_table.twig.data_table_extension')
-            ->setArgument('$themes', $config['themes'])
-        ;
-
-        $container
             ->getDefinition('kreyu_data_table.type_extension.default_configuration')
             ->setArgument('$defaults', $config['defaults'])
         ;

@@ -1,32 +1,9 @@
 # Configuration
 
-This bundle can be configured using the `config/packages/kreyu_data_table.yaml` file.
+This bundle can be configured using the:
 
-## Themes
-
-You can define which Twig theme to use with the data tables using the `themes` node.
-By default, the base theme is used. Because themes are built using [Twig blocks](https://twig.symfony.com/doc/3.x/tags/block.html),
-the bundle iterates through given themes, until it finds the desired block, using the first one it finds.
-
-For more information about theming, see [theming reference](theming.md).
-
-+++ YAML
-```yaml # config/packages/kreyu_data_table.yaml
-kreyu_data_table:
-  themes:
-    - '@KreyuDataTable/themes/base.html.twig'
-```
-+++ PHP
-```php # config/packages/kreyu_data_table.php
-use Symfony\Config\KreyuDataTableConfig;
-
-return static function (KreyuDataTableConfig $config) {
-    $config->themes([
-        '@KreyuDataTable/themes/base.html.twig',
-    ]);
-};
-```
-+++
+- `config/packages/kreyu_data_table.yaml` (when using YAML configuration);
+- `config/packages/kreyu_data_table.php` (when using PHP configuration);
 
 ## Data table builder defaults
 
@@ -45,6 +22,8 @@ The given values represent the default ones, unless specifically stated otherwis
 ```yaml # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
   defaults:
+    themes:
+      - '@KreyuDataTable/themes/base.html.twig'
     column_factory: kreyu_data_table.column.factory
     request_handler: kreyu_data_table.request_handler.http_foundation
     sorting:
@@ -93,6 +72,9 @@ return static function (KreyuDataTableConfig $config) {
     $defaults = $config->defaults();
 
     $defaults
+        ->themes([
+            '@KreyuDataTable/themes/base.html.twig'
+        ])
         ->columnFactory('kreyu_data_table.column.factory')
         ->requestHandler('kreyu_data_table.request_handler.http_foundation')
     ;

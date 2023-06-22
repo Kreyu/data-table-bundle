@@ -22,28 +22,69 @@ The default template provides minimal HTML required to properly display the data
 
 ## Selecting a theme
 
-To select a theme, provide which one to use in the bundle configuration file.
+To select a theme, use `themes` option.
+
 For example, in order to use the [Bootstrap 5](https://getbootstrap.com/docs/5.0/) theme:
 
-+++ YAML
++++ Globally (YAML)
 ```yaml # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-  themes:
-    - '@KreyuDataTable/themes/bootstrap_5.html.twig'
+  defaults:
+    themes:
+      - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
-+++ PHP
++++ Globally (PHP)
 ```php # config/packages/kreyu_data_table.php
 use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
-    $config->themes([
+    $config->defaults()->themes([
         '@KreyuDataTable/themes/bootstrap_5.html.twig',
     ]);
 };
 ```
-+++
++++ For data table type
+```php # src/DataTable/Type/ProductDataTable.php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-For more information, see ["themes" option configuration reference](../reference/configuration.md#themes).
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'themes' => [
+                '@KreyuDataTable/themes/bootstrap_5.html.twig',
+            ],
+        ]);
+    }
+}
+```
++++ For specific data table
+```php # src/Controller/ProductController.php
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'themes' => [
+                    '@KreyuDataTable/themes/bootstrap_5.html.twig',
+                ],
+            ],
+        );
+    }
+}
+```
++++
 
 ## Customizing existing theme
 
@@ -59,29 +100,70 @@ using the built-in themes as a fallback, for example:
 
 ```twig
 {# templates/data_table/theme.html.twig #}
-{% block kreyu_data_table_column_boolean %}
+{% block column_boolean_value %}
     {# ... #}
 {% endblock %}
 ```
 
-+++ YAML
++++ Globally (YAML)
 ```yaml # config/packages/kreyu_data_table.yaml
 kreyu_data_table:
-  themes:
-    - 'templates/data_table/theme.html.twig'
-    - '@KreyuDataTable/themes/bootstrap_5.html.twig'
+  defaults:
+    themes:
+      - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
-+++ PHP
++++ Globally (PHP)
 ```php # config/packages/kreyu_data_table.php
 use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
-    $config->themes([
+    $config->defaults()->themes([
         'templates/data_table/theme.html.twig',
         '@KreyuDataTable/themes/bootstrap_5.html.twig',
     ]);
 };
 ```
-+++
++++ For data table type
+```php # src/DataTable/Type/ProductDataTable.php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-For more information, see ["themes" option configuration reference](../reference/configuration.md#themes).
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'themes' => [
+                'templates/data_table/theme.html.twig',
+                '@KreyuDataTable/themes/bootstrap_5.html.twig',
+            ],
+        ]);
+    }
+}
+```
++++ For specific data table
+```php # src/Controller/ProductController.php
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'themes' => [
+                    'templates/data_table/theme.html.twig',
+                    '@KreyuDataTable/themes/bootstrap_5.html.twig',
+                ],
+            ],
+        );
+    }
+}
+```
++++

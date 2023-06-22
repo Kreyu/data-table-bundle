@@ -25,6 +25,7 @@ use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -32,6 +33,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 final class DataTableType implements DataTableTypeInterface
 {
     public const DEFAULT_OPTIONS = [
+        'themes' => null,
         'title' => null,
         'title_translation_parameters' => [],
         'translation_domain' => null,
@@ -65,6 +67,7 @@ final class DataTableType implements DataTableTypeInterface
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $setters = [
+            'themes' => $builder->setThemes(...),
             'title' => $builder->setTitle(...),
             'title_translation_parameters' => $builder->setTitleTranslationParameters(...),
             'translation_domain' => $builder->setTranslationDomain(...),
@@ -111,6 +114,7 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         $view->vars = array_replace($view->vars, [
+            'themes' => $dataTable->getConfig()->getThemes(),
             'name' => $dataTable->getConfig()->getName(),
             'title' => $dataTable->getConfig()->getTitle(),
             'title_translation_parameters' => $dataTable->getConfig()->getTitleTranslationParameters(),
@@ -165,6 +169,7 @@ final class DataTableType implements DataTableTypeInterface
     {
         $resolver
             ->setDefaults(self::DEFAULT_OPTIONS)
+            ->setAllowedTypes('themes', ['null', 'string[]'])
             ->setAllowedTypes('title', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('title_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
@@ -296,7 +301,7 @@ final class DataTableType implements DataTableTypeInterface
         $form = $dataTable->createFiltrationFormBuilder($view)->getForm();
         $form->setData($dataTable->getFiltrationData());
 
-        return $form->createView();
+        return $this->createFormView($form, $view, $dataTable);
     }
 
     private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
@@ -304,7 +309,7 @@ final class DataTableType implements DataTableTypeInterface
         $form = $dataTable->createPersonalizationFormBuilder($view)->getForm();
         $form->setData($dataTable->getPersonalizationData());
 
-        return $form->createView();
+        return $this->createFormView($form, $view, $dataTable);
     }
 
     private function createExportFormView(DataTableView $view, DataTableInterface $dataTable): FormView
@@ -324,6 +329,15 @@ final class DataTableType implements DataTableTypeInterface
         $form = $formBuilder->getForm();
         $form->setData($dataTable->getExportData());
 
-        return $form->createView();
+        return $this->createFormView($form, $view, $dataTable);
+    }
+
+    private function createFormView(FormInterface $form, DataTableView $view, DataTableInterface $dataTable): FormView
+    {
+        $formView = $form->createView();
+        $formView->vars['data_table'] = $dataTable;
+        $formView->vars['data_table_view'] = $view;
+
+        return $formView;
     }
 }

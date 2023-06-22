@@ -21,6 +21,7 @@ class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeEx
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'themes' => $this->defaults['themes'],
             'column_factory' => $this->defaults['column_factory'],
             'action_factory' => $this->defaults['action_factory'],
             'request_handler' => $this->defaults['request_handler'],

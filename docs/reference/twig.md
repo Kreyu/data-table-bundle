@@ -117,6 +117,7 @@ The following variables are common to every data table type:
 
 | Variable                         | Usage                                                                                                                                  |
 |----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `themes`                         | Themes to apply for the data table.                                                                                                    |
 | `name`                           | Name of the data table.                                                                                                                |
 | `title`                          | Title of the data table                                                                                                                |
 | `title_translation_parameters`   | Parameters used in title translation.                                                                                                  |

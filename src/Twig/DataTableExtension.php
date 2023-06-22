@@ -60,7 +60,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view,
+            dataTable: $this->getDecoratedDataTable($view, $variables),
             blockName: 'kreyu_data_table',
             context: array_merge($view->vars, $variables),
         );
@@ -75,7 +75,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view,
+            dataTable: $this->getDecoratedDataTable($view, $dataTableVariables),
             blockName: 'kreyu_data_table_form_aware',
             context: array_merge($view->vars, $dataTableVariables, ['form' => $formView, 'form_variables' => $formVariables]),
         );
@@ -89,7 +89,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view,
+            dataTable: $this->getDecoratedDataTable($view, $variables),
             blockName: 'kreyu_data_table_table',
             context: array_merge($view->vars, $variables),
         );
@@ -103,7 +103,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view,
+            dataTable: $this->getDecoratedDataTable($view, $variables),
             blockName: 'kreyu_data_table_action_bar',
             context: array_merge($view->vars, $variables),
         );
@@ -117,7 +117,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->parent,
+            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
             blockName: 'kreyu_data_table_header_row',
             context: array_merge($view->vars, $variables),
         );
@@ -131,7 +131,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->parent,
+            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
             blockName: 'kreyu_data_table_value_row',
             context: array_merge($view->vars, $variables),
         );
@@ -145,7 +145,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->getDataTable(),
+            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
             blockName: 'kreyu_data_table_column_label',
             context: array_merge($view->vars, $variables),
         );
@@ -159,7 +159,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->getDataTable(),
+            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
             blockName: 'kreyu_data_table_column_header',
             context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'header'),
         );
@@ -173,7 +173,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->getDataTable(),
+            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
             blockName: 'kreyu_data_table_column_value',
             context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'value'),
         );
@@ -187,7 +187,7 @@ class DataTableExtension extends AbstractExtension
     {
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->getDataTable(),
+            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
             blockName: 'kreyu_data_table_action',
             context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'value'),
         );
@@ -205,7 +205,7 @@ class DataTableExtension extends AbstractExtension
 
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $view->parent,
+            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
             blockName: 'kreyu_data_table_pagination',
             context: array_merge($view->vars, $variables),
         );
@@ -214,7 +214,7 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form): string
+    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
@@ -222,7 +222,7 @@ class DataTableExtension extends AbstractExtension
 
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $form->vars['data_table_view'],
+            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
             blockName: 'kreyu_data_table_filters_form',
             context: [
                 'form' => $form,
@@ -233,7 +233,7 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form): string
+    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
@@ -241,7 +241,7 @@ class DataTableExtension extends AbstractExtension
 
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $form->vars['data_table_view'],
+            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
             blockName: 'kreyu_data_table_personalization_form',
             context: [
                 'form' => $form,
@@ -252,7 +252,7 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderExportForm(Environment $environment, FormInterface|FormView $form): string
+    public function renderExportForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
@@ -260,7 +260,7 @@ class DataTableExtension extends AbstractExtension
 
         return $this->renderBlock(
             environment: $environment,
-            dataTable: $form->vars['data_table_view'],
+            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
             blockName: 'kreyu_data_table_export_form',
             context: [
                 'form' => $form,
@@ -315,5 +315,18 @@ class DataTableExtension extends AbstractExtension
         }
 
         return $context;
+    }
+
+    private function getDecoratedDataTable(DataTableView $view, array $variables = []): DataTableView
+    {
+        if (!empty($themes = $variables['themes'])) {
+            if (!is_array($themes)) {
+                throw new RuntimeError('The "themes" option passed in the template must be an array.');
+            }
+
+            $view->vars['themes'] = $themes;
+        }
+
+        return $view;
     }
 }

@@ -17,4 +17,13 @@ class ActionView
         public DataTableView|ColumnValueView $parent,
     ) {
     }
+
+    public function getDataTable(): DataTableView
+    {
+        if ($this->parent instanceof ColumnValueView) {
+            return $this->parent->parent->parent;
+        }
+
+        return $this->parent;
+    }
 }

@@ -48,6 +48,13 @@ class DataTableBuilder implements DataTableBuilderInterface
     private array $options;
 
     /**
+     * Stores an array of themes to used to render the data table.
+     *
+     * @var array<string>
+     */
+    private array $themes;
+
+    /**
      * User-friendly title used to describe a data table.
      */
     private null|string|TranslatableMessage $title = null;
@@ -311,6 +318,34 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setOptions(array $options): static
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    public function getThemes(): array
+    {
+        return $this->themes;
+    }
+
+    public function setThemes(array $themes): static
+    {
+        $this->themes = $themes;
+
+        return $this;
+    }
+
+    public function addTheme(string $theme): static
+    {
+        $this->themes[] = $theme;
+
+        return $this;
+    }
+
+    public function removeTheme(string $theme): static
+    {
+        if (false !== $key = array_search($theme, $this->themes, true)) {
+            unset($this->themes[$key]);
+        }
 
         return $this;
     }

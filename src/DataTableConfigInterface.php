@@ -42,6 +42,8 @@ interface DataTableConfigInterface
 
     public function getOptions(): array;
 
+    public function getThemes(): array;
+
     public function getTitle(): null|string|TranslatableMessage;
 
     public function getTitleTranslationParameters(): array;

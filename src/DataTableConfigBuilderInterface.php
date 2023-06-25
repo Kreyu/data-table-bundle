@@ -32,6 +32,12 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setOptions(array $options): static;
 
+    public function setThemes(array $themes): static;
+
+    public function addTheme(string $theme): static;
+
+    public function removeTheme(string $theme): static;
+
     public function setTitle(null|string|TranslatableMessage $title): static;
 
     public function setTitleTranslationParameters(array $titleTranslationParameters): static;

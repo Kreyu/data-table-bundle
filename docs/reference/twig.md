@@ -78,21 +78,21 @@ based on the column configuration (e.g. to display formatted `name` of the `Proj
 
 ### `data_table_filters_form`
 
-**With arguments**: `data_table_filters_form(form)`
+**With arguments**: `data_table_filters_form(form, variables)`
 
 Renders the filters form. Accepts both the `FormInterface` and `FormView`.
 If given value is instance of `FormInterface`, the `createView()` method will be called.
 
 ### `data_table_personalization_form`
 
-**With arguments**: `data_table_personalization_form(form)`
+**With arguments**: `data_table_personalization_form(form, variables)`
 
 Renders the personalization form. Accepts both the `FormInterface` and `FormView`.
 If given value is instance of `FormInterface`, the `createView()` method will be called.
 
 ### `data_table_export_form`
 
-**With arguments**: `data_table_export_form(form)`
+**With arguments**: `data_table_export_form(form, variables)`
 
 Renders the export form. Accepts both the `FormInterface` and `FormView`.
 If given value is instance of `FormInterface`, the `createView()` method will be called.
@@ -117,6 +117,7 @@ The following variables are common to every data table type:
 
 | Variable                         | Usage                                                                                                                                  |
 |----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `themes`                         | Themes to apply for the data table.                                                                                                    |
 | `name`                           | Name of the data table.                                                                                                                |
 | `title`                          | Title of the data table                                                                                                                |
 | `title_translation_parameters`   | Parameters used in title translation.                                                                                                  |

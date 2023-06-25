@@ -319,7 +319,7 @@ class DataTableExtension extends AbstractExtension
 
     private function getDecoratedDataTable(DataTableView $view, array $variables = []): DataTableView
     {
-        if (!empty($themes = $variables['themes'])) {
+        if (!empty($themes = $variables['themes'] ?? [])) {
             if (!is_array($themes)) {
                 throw new RuntimeError('The "themes" option passed in the template must be an array.');
             }

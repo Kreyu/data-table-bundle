@@ -61,6 +61,10 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         $this->parent?->buildHeaderView($view, $column, $options);
 
         $this->innerType->buildHeaderView($view, $column, $options);
+
+        foreach ($this->typeExtensions as $typeExtension) {
+            $typeExtension->buildHeaderView($view, $column, $options);
+        }
     }
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -68,6 +72,10 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         $this->parent?->buildValueView($view, $column, $options);
 
         $this->innerType->buildValueView($view, $column, $options);
+
+        foreach ($this->typeExtensions as $typeExtension) {
+            $typeExtension->buildValueView($view, $column, $options);
+        }
     }
 
     public function getOptionsResolver(): OptionsResolver

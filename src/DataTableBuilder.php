@@ -91,6 +91,13 @@ class DataTableBuilder implements DataTableBuilderInterface
     private array $actions = [];
 
     /**
+     * Stores an array of batch actions, used to interact with data in various ways.
+     *
+     * @var array<ActionInterface>
+     */
+    private array $batchActions = [];
+
+    /**
      * Stores an array of exporters, used to output data to various file types.
      *
      * @var array<ExporterInterface>
@@ -454,6 +461,30 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function removeAction(string $name): static
     {
         unset($this->actions[$name]);
+
+        return $this;
+    }
+
+    public function getBatchActions(): array
+    {
+        return $this->batchActions;
+    }
+
+    public function getBatchAction(string $name): ActionInterface
+    {
+        return $this->batchActions[$name] ?? throw new \InvalidArgumentException("Action \"$name\" does not exist");
+    }
+
+    public function addBatchAction(string $name, string $type, array $options = []): static
+    {
+        $this->batchActions[$name] = $this->getActionFactory()->create($name, $type, $options);
+
+        return $this;
+    }
+
+    public function removeBatchAction(string $name): static
+    {
+        unset($this->batchActions[$name]);
 
         return $this;
     }

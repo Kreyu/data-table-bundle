@@ -41,7 +41,8 @@ INCLUDE_ALL: Z wszystkich stron
 # Misc
 Filter: Filtruj
 Apply: Zastosuj
-No results: Brak wyników
+No results found: Brak wyników
+Try adjusting your search or filter to find what you're looking for: Spróbuj dostosować wyszukiwanie lub filtr, aby znaleźć to, czego szukasz
 Clear filter: Wyczyść filtr
 Clear all filters: Wyczyść filtry
 Action confirmation: Potwierdzenie wykonania akcji

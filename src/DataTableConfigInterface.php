@@ -81,6 +81,16 @@ interface DataTableConfigInterface
     public function getAction(string $name): ActionInterface;
 
     /**
+     * @return array<ActionInterface>
+     */
+    public function getBatchActions(): array;
+
+    /**
+     * @throws \InvalidArgumentException if batch action of given name does not exist
+     */
+    public function getBatchAction(string $name): ActionInterface;
+
+    /**
      * @return array<ExporterInterface>
      */
     public function getExporters(): array;

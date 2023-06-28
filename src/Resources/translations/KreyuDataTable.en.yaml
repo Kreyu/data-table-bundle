@@ -41,7 +41,8 @@ INCLUDE_ALL: From all pages
 # Misc
 Filter: Filter
 Apply: Apply
-No results: No results
+No results found: No results
+Try adjusting your search or filter to find what you're looking for: Try adjusting your search or filter to find what you're looking for
 Clear filter: Clear filter
 Clear all filters: Clear all filters
 Action confirmation: Action execution confirmation

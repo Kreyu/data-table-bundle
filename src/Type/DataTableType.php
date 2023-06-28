@@ -134,6 +134,7 @@ final class DataTableType implements DataTableTypeInterface
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
+            'has_batch_actions' => !empty($dataTable->getConfig()->getBatchActions()),
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -149,6 +150,7 @@ final class DataTableType implements DataTableTypeInterface
             'pagination' => $view->pagination,
             'filters' => $view->filters,
             'actions' => $view->actions,
+            'batch_actions' => $this->createBatchActionViews($view, $dataTable),
             'column_count' => count($view->headerRow),
         ]);
 
@@ -221,9 +223,38 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
     {
-        return array_map(
+        $views = array_map(
             fn (ActionInterface $action) => $action->createView($view),
             $dataTable->getConfig()->getActions(),
+        );
+
+        return array_map(
+            function (ActionView $actionView) {
+                $actionView->vars['batch'] = false;
+
+                return $actionView;
+            },
+            $views,
+        );
+    }
+
+    /**
+     * @return array<ActionView>
+     */
+    private function createBatchActionViews(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        $views = array_map(
+            fn (ActionInterface $action) => $action->createView($view),
+            $dataTable->getConfig()->getBatchActions(),
+        );
+
+        return array_map(
+            function (ActionView $actionView) {
+                $actionView->vars['batch'] = true;
+
+                return $actionView;
+            },
+            $views,
         );
     }
 

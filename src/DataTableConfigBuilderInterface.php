@@ -73,6 +73,13 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function removeAction(string $name): static;
 
+    /**
+     * @param class-string<ActionTypeInterface> $type
+     */
+    public function addBatchAction(string $name, string $type, array $options = []): static;
+
+    public function removeBatchAction(string $name): static;
+
     public function getActionFactory(): ActionFactoryInterface;
 
     public function setActionFactory(ActionFactoryInterface $actionFactory): static;

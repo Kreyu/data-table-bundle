@@ -10,6 +10,8 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 
 class Action implements ActionInterface
 {
+    private bool $batch = false;
+
     public function __construct(
         private string $name,
         private ResolvedActionTypeInterface $type,
@@ -39,5 +41,15 @@ class Action implements ActionInterface
         $this->type->buildView($view, $this, $this->options);
 
         return $view;
+    }
+
+    public function isBatch(): bool
+    {
+        return $this->batch;
+    }
+
+    public function setBatch(bool $batch): void
+    {
+        $this->batch = $batch;
     }
 }

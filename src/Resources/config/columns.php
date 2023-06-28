@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
@@ -59,6 +60,11 @@ return static function (ContainerConfigurator $configurator) {
         ->args([
             service('kreyu_data_table.action.factory'),
         ])
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.checkbox', CheckboxColumnType::class)
+        ->tag('kreyu_data_table.column.type')
     ;
 
     $services

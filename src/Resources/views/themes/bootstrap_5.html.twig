@@ -25,19 +25,17 @@
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
     {% if title or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
-        <div class="row m-2 p-1">
-            <div class="d-flex flex-wrap gap-1 align-items-center">
-                <div class="h2 m-0">
-                    {% if translation_domain is not same as false %}
-                        {{ title|trans(title_translation_parameters, translation_domain) }}
-                    {% else %}
-                        {{ title }}
-                    {% endif %}
-                </div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="card-title mb-0">
+                {% if translation_domain is not same as false %}
+                    {{ title|trans(title_translation_parameters, translation_domain) }}
+                {% else %}
+                    {{ title }}
+                {% endif %}
+            </h6>
 
-                <div class="d-flex col"></div>
-
-                <div class="d-flex flex-wrap gap-1">
+            <div class="card-actions">
+                <div class="d-flex flex-row gap-1">
                     {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
                         <div>
                             {{ block('action_search') }}
@@ -71,22 +69,39 @@
                     {% endif %}
                 </div>
             </div>
-
-            {% if filtration_enabled and filtration_form and filters|length > 0 %}
-                {{ data_table_filters_form(filtration_form) }}
-            {% endif %}
-
-            {% if has_active_filters %}
-                <div class="my-1">
-                    <div class="hr my-2"></div>
-                </div>
-
-                <div>{{ block('active_filters') }}</div>
-            {% endif %}
         </div>
+
+        {% if filtration_enabled and filtration_form and filters|length > 0 %}
+            <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
+                <div class="card-body">
+                    {{ data_table_filters_form(filtration_form) }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if has_active_filters %}
+            <div class="card-body border-bottom">
+                {{ block('active_filters') }}
+            </div>
+        {% endif %}
     {% endif %}
 
-    <div class="clearfix"></div>
+    {% if has_batch_actions %}
+        <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="infoBar">
+            <div class="card-title fs-4 fw-normal text-muted">
+                Zaznaczono <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span> rekordów
+            </div>
+            <div class="card-actions">
+                <div class="d-flex flex-row gap-1">
+                    {% for action in batch_actions %}
+                        <div>
+                            {{ data_table_action(action) }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block action_search %}
@@ -220,14 +235,8 @@
     {% endwith %}
 {% endblock %}
 
-{% block filtration_widget %}
-    {% with { attr: { class: 'collapse', id: form.vars.id ~ '__collapse' } } %}
-        {{ parent() }}
-    {% endwith %}
-{% endblock %}
-
 {% block filtration_form_content %}
-    {% with { attr: { class: 'row mt-2' } } %}
+    {% with { attr: { class: 'row' } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -635,8 +644,14 @@
 
 {% block action_button_value %}
     {% set attr = {
-        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '')
+        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
+
+    {% if batch is defined and batch %}
+        {% set attr = attr|merge({
+            'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+        }) %}
+    {% endif %}
 
     {% if confirmation %}
         {% set attr = {
@@ -701,4 +716,26 @@
         <span class="input-group-text">-</span>
         {{ form_widget(form.to) }}
     </div>
+{% endblock %}
+
+{% block column_checkbox_header %}
+    <th class="w-0">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            aria-label="Select all checkbox"
+            data-kreyu--data-table-bundle--batch-target="selectAllCheckbox"
+            data-action="input->kreyu--data-table-bundle--batch#selectAll"
+        >
+    </th>
+{% endblock %}
+
+{% block column_checkbox_value %}
+    <input
+        class="form-check-input"
+        type="checkbox"
+        aria-label="Select row checkbox"
+        data-kreyu--data-table-bundle--batch-target="selectRowCheckbox"
+        data-action="input->kreyu--data-table-bundle--batch#selectRow"
+    >
 {% endblock %}

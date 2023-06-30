@@ -3,7 +3,11 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    <turbo-frame id="kreyu_data_table_{{ name }}">
+    <turbo-frame id="kreyu_data_table_{{ name }}"
+        {% if has_batch_actions %}
+            data-controller="kreyu--data-table-bundle--batch"
+        {% endif %}
+    >
         {{ block('action_bar') }}
         {{ block('table') }}
 

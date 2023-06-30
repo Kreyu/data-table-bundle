@@ -589,15 +589,14 @@
                             </div>
                             <div class="col">
                                 {% block action_confirmation_modal_confirm_button %}
-                                {% set confirm_button_tag = confirm_button_tag|default('a') %}
-                                {% set confirm_button_attr = {
-                                    href: confirmation.href,
-                                    class: 'w-100 btn btn-' ~ modal_status_color_class
-                                }|merge(confirm_button_attr|default({})) %}
+                                    {% set confirm_button_tag = confirm_button_tag|default('a') %}
+                                    {% set confirm_button_attr = {
+                                        class: 'w-100 btn btn-' ~ modal_status_color_class
+                                    }|merge(confirm_button_attr|default({})) %}
 
-                                <{{ confirm_button_tag }} {% with { attr: confirm_button_attr } %}{{ block('attributes') }}{% endwith %}>
-                                {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
-                            </{{ confirm_button_tag }}>
+                                    <{{ confirm_button_tag }} {% with { attr: confirm_button_attr } %}{{ block('attributes') }}{% endwith %}>
+                                        {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
+                                    </{{ confirm_button_tag }}>
                             {% endblock %}
                         </div>
                     </div>
@@ -645,7 +644,7 @@
             'data-bs-target': '#' ~ confirmation.identifier,
         }|merge(attr) %}
 
-        {% with { attr: {} } %}{{ block('action_confirmation_modal') }}{% endwith %}
+        {% with { attr: {}, confirm_button_attr: { href } } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
     {{ parent() }}

@@ -222,8 +222,8 @@ final class DataTableType implements DataTableTypeInterface
     private function createActionViews(DataTableView $view, DataTableInterface $dataTable): array
     {
         return array_map(
-            fn (ActionInterface $action) => $action->createView($view),
-            $dataTable->getConfig()->getActions(),
+            static fn (ActionInterface $action) => $action->createView($view),
+            $dataTable->getActions(),
         );
     }
 

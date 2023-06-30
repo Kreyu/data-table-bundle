@@ -30,7 +30,7 @@ class ActionsColumnType extends AbstractColumnType
                 continue;
             }
 
-            $action = $this->actionFactory->create($name, $actionOptions['type'], $actionOptions['type_options']);
+            $action = $this->actionFactory->createNamed($name, $actionOptions['type'], $actionOptions['type_options']);
 
             $actions[$name] = $action->createView($view);
         }

@@ -15,22 +15,6 @@ export default class extends Controller {
         setTimeout(() => this.#update(), 1);
     }
 
-    #update() {
-        this.#updateBatchActionBar();
-        this.#updateIndeterminateStates();
-        this.#updateIdentifierHolder();
-    }
-
-    #getSelectAllCheckboxes(identifierName) {
-        return this.selectAllCheckboxTargets
-            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
-    }
-
-    #getSelectRowCheckboxes(identifierName) {
-        return this.selectRowCheckboxTargets
-            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
-    }
-
     selectAll(event) {
         const selectAllCheckbox = event.target;
         const identifierName = selectAllCheckbox.dataset.identifierName;
@@ -46,50 +30,10 @@ export default class extends Controller {
         this.#update()
     }
 
-    #updateIdentifierHolder() {
-        this.#updateIdentifierHolderHref();
-    }
-
-    #updateIdentifierHolderHref() {
-        if (!this.identifierHolderTarget.hasAttribute('href')) {
-            return;
-        }
-
-        let href = null;
-
-        try {
-            href = new URL(this.identifierHolderTarget.href);
-        } catch (exception) {
-            return;
-        }
-
-        if (null === href) {
-            return;
-        }
-
-        const identifierMap = {};
-
-        for (const selector of this.selectRowCheckboxTargets) {
-            if (!selector.checked) {
-                continue;
-            }
-
-            const identifier = selector.value;
-            const identifierName = selector.dataset.identifierName || 'id';
-
-            identifierMap[identifierName] ??= [];
-            identifierMap[identifierName].push(identifier);
-        }
-
-        for (const [identifierName, identifiers] of Object.entries(identifierMap)) {
-            href.searchParams.delete(identifierName + '[]');
-
-            for (const identifier of identifiers) {
-                href.searchParams.append(identifierName + '[]', identifier);
-            }
-        }
-
-        this.identifierHolderTarget.setAttribute('href', href.toString());
+    #update() {
+        this.#updateBatchActionBar();
+        this.#updateIndeterminateStates();
+        this.#updateIdentifierHolder();
     }
 
     #updateBatchActionBar() {
@@ -111,11 +55,67 @@ export default class extends Controller {
         }
     }
 
+    #updateIdentifierHolder() {
+        const identifierMap = new Map();
+        const checkboxes = this.selectRowCheckboxTargets.filter(checkbox => checkbox.checked);
+
+        for (const checkbox of checkboxes) {
+            const identifier = checkbox.value;
+            const identifierName = checkbox.dataset.identifierName || 'id';
+            const identifiers = identifierMap.get(identifierName) || [];
+
+            identifiers.push(identifier);
+
+            identifierMap.set(identifierName, identifiers);
+        }
+
+        console.log(this.identifierHolderTargets);
+
+        for (const identifierHolder of this.identifierHolderTargets) {
+            this.#updateIdentifierHolderHref(identifierHolder, identifierMap);
+            this.#updateIdentifierHolderDataParam(identifierHolder, identifierMap);
+        }
+    }
+
+    #updateIdentifierHolderHref(identifierHolder, identifierMap) {
+        let href;
+
+        try {
+            href = new URL(identifierHolder.href);
+        } catch (exception) {
+            return;
+        }
+
+        for (const [identifierName, identifiers] of identifierMap) {
+            for (const identifier of identifiers) {
+                href.searchParams.set(identifierName + '[]', identifier);
+            }
+        }
+
+        identifierHolder.href = href.toString();
+    }
+
+    #updateIdentifierHolderDataParam(identifierHolder, identifierMap) {
+        for (const [identifierName, identifiers] of identifierMap) {
+            identifierHolder.dataset[identifierName] = JSON.stringify(identifiers);
+        }
+    }
+
     #getUniqueSelectedCount() {
         const selectedIndexes = this.selectRowCheckboxTargets
             .filter(checkbox => checkbox.checked)
             .map(checkbox => checkbox.dataset.index);
 
         return new Set(selectedIndexes).size;
+    }
+
+    #getSelectAllCheckboxes(identifierName) {
+        return this.selectAllCheckboxTargets
+            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
+    }
+
+    #getSelectRowCheckboxes(identifierName) {
+        return this.selectRowCheckboxTargets
+            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
     }
 }

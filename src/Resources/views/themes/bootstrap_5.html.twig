@@ -648,9 +648,9 @@
     }|merge(attr) %}
 
     {% if batch %}
-        {% set attr = attr|merge({
+        {% set attr = {
             'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
-        }) %}
+        }|merge(attr) %}
     {% endif %}
 
     {% if confirmation %}
@@ -659,7 +659,15 @@
             'data-bs-target': '#' ~ confirmation.identifier,
         }|merge(attr) %}
 
-        {% with { attr: {}, confirm_button_attr: { href } } %}{{ block('action_confirmation_modal') }}{% endwith %}
+        {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
+
+        {% if batch %}
+            {% set confirm_button_attr = {
+                'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+            }|merge(confirm_button_attr) %}
+        {% endif %}
+
+        {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
     {{ parent() }}

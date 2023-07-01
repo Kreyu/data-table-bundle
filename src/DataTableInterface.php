@@ -34,9 +34,27 @@ interface DataTableInterface
      */
     public function getAction(string $name): ActionInterface;
 
+    public function hasAction(string $name): bool;
+
     public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static;
 
-    public function removeColumn(string $name): static;
+    public function removeAction(string $name): static;
+
+    /**
+     * @return array<string, ActionInterface>
+     */
+    public function getBatchActions(): array;
+
+    /**
+     * @throws OutOfBoundsException if batch action of given name does not exist
+     */
+    public function getBatchAction(string $name): ActionInterface;
+
+    public function hasBatchAction(string $name): bool;
+
+    public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeBatchAction(string $name): static;
 
     public function sort(SortingData $data): void;
 

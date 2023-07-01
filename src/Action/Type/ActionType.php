@@ -74,6 +74,7 @@ final class ActionType implements ActionTypeInterface
             'attr' => $options['attr'],
             'icon_attr' => $options['icon_attr'],
             'confirmation' => $options['confirmation'],
+            'batch' => $action->getConfig()->isBatch(),
         ]);
     }
 

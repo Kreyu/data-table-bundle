@@ -87,7 +87,7 @@
     {% endif %}
 
     {% if has_batch_actions %}
-        <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="infoBar">
+        <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
             <div class="card-title fs-4 fw-normal text-muted">
                 Zaznaczono <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span> rekordów
             </div>
@@ -647,7 +647,7 @@
         class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
 
-    {% if batch is defined and batch %}
+    {% if batch %}
         {% set attr = attr|merge({
             'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
         }) %}
@@ -724,6 +724,7 @@
             class="form-check-input"
             type="checkbox"
             aria-label="Select all checkbox"
+            data-identifier-name="{{ identifier_name }}"
             data-kreyu--data-table-bundle--batch-target="selectAllCheckbox"
             data-action="input->kreyu--data-table-bundle--batch#selectAll"
         >
@@ -735,6 +736,9 @@
         class="form-check-input"
         type="checkbox"
         aria-label="Select row checkbox"
+        data-index="{{ row.index }}"
+        data-identifier-name="{{ identifier_name }}"
+        value="{{ value }}"
         data-kreyu--data-table-bundle--batch-target="selectRowCheckbox"
         data-action="input->kreyu--data-table-bundle--batch#selectRow"
     >

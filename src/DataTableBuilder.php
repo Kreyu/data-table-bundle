@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -98,6 +99,20 @@ class DataTableBuilder implements DataTableBuilderInterface
      * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
      */
     private array $unresolvedActions = [];
+
+    /**
+     * The batch action builders defined for the data table.
+     *
+     * @var array<ActionBuilderInterface>
+     */
+    private array $batchActions = [];
+
+    /**
+     * The data of batch actions that haven't been converted to action builders yet.
+     *
+     * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
+     */
+    private array $unresolvedBatchActions = [];
 
     /**
      * Stores an array of exporters, used to output data to various file types.
@@ -480,6 +495,47 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function removeAction(string $name): static
     {
         unset($this->unresolvedActions[$name], $this->actions[$name]);
+
+        return $this;
+    }
+
+    public function getBatchActions(): array
+    {
+        return $this->batchActions;
+    }
+
+    public function getBatchAction(string $name): ActionBuilderInterface
+    {
+        if (isset($this->unresolvedBatchActions[$name])) {
+            return $this->resolveBatchAction($name);
+        }
+
+        if (isset($this->batchActions[$name])) {
+            return $this->batchActions[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The batch action with the name "%s" does not exist.', $name));
+    }
+
+    public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
+    {
+        if ($action instanceof ActionBuilderInterface) {
+            $this->batchActions[$action->getName()] = $action;
+
+            unset($this->unresolvedBatchActions[$action->getName()]);
+
+            return $this;
+        }
+
+        $this->batchActions[$action] = null;
+        $this->unresolvedBatchActions[$action] = [$type, $options];
+
+        return $this;
+    }
+
+    public function removeBatchAction(string $name): static
+    {
+        unset($this->unresolvedActions[$name], $this->batchActions[$name]);
 
         return $this;
     }
@@ -926,15 +982,29 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         $this->validate();
 
+        if (!empty($this->batchActions)) {
+            $this->addColumn('_batch', CheckboxColumnType::class);
+
+            $this->columns = [
+                '_batch' => $this->getColumn('_batch'),
+                ...$this->getColumns(),
+            ];
+        }
+
         $dataTable = new DataTable(
             query: clone $this->query,
             config: $this->getDataTableConfig(),
         );
 
         $this->resolveActions();
+        $this->resolveBatchActions();
 
         foreach ($this->actions as $action) {
             $dataTable->addAction($action->getAction());
+        }
+
+        foreach ($this->batchActions as $batchAction) {
+            $dataTable->addBatchAction($batchAction->getAction());
         }
 
         $dataTable->initialize();
@@ -961,8 +1031,27 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     private function resolveActions(): void
     {
-        foreach (array_keys($this->unresolvedActions) as $column) {
-            $this->resolveAction($column);
+        foreach (array_keys($this->unresolvedActions) as $action) {
+            $this->resolveAction($action);
+        }
+    }
+
+    private function resolveBatchAction(string $name): ActionBuilderInterface
+    {
+        [$type, $options] = $this->unresolvedBatchActions[$name];
+
+        unset($this->unresolvedBatchActions[$name]);
+
+        $batchAction = $this->getActionFactory()->createNamedBuilder($name, $type, $options);
+        $batchAction->setBatch(true);
+
+        return $this->batchActions[$name] = $batchAction;
+    }
+
+    private function resolveBatchActions(): void
+    {
+        foreach (array_keys($this->unresolvedBatchActions) as $batchAction) {
+            $this->resolveBatchAction($batchAction);
         }
     }
 

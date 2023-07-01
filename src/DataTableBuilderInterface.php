@@ -29,6 +29,23 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 
     public function removeAction(string $name): static;
 
+    /**
+     * @return array<ActionBuilderInterface>
+     */
+    public function getBatchActions(): array;
+
+    /**
+     * @throws InvalidArgumentException if batch action of given name does not exist
+     */
+    public function getBatchAction(string $name): ActionBuilderInterface;
+
+    /**
+     * @param null|class-string<ActionTypeInterface> $type
+     */
+    public function addBatchAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeBatchAction(string $name): static;
+
     public function getQuery(): ?ProxyQueryInterface;
 
     public function setQuery(?ProxyQueryInterface $query): static;

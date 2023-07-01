@@ -5,29 +5,45 @@ export default class extends Controller {
         'selectAllCheckbox',
         'selectRowCheckbox',
         'selectedCounter',
-        'infoBar',
+        'batchActionBar',
         'identifierHolder',
     ];
 
     connect() {
+        // The timeout is required so Stimulus can catch initial input values.
+        // https://github.com/hotwired/stimulus/issues/328
+        setTimeout(() => this.#update(), 1);
+    }
+
+    #update() {
+        this.#updateBatchActionBar();
+        this.#updateIndeterminateStates();
         this.#updateIdentifierHolder();
     }
 
-    selectAll() {
-        this.selectRowCheckboxTargets.forEach(checkbox => {
-            checkbox.checked = this.selectAllCheckboxTarget.checked;
+    #getSelectAllCheckboxes(identifierName) {
+        return this.selectAllCheckboxTargets
+            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
+    }
+
+    #getSelectRowCheckboxes(identifierName) {
+        return this.selectRowCheckboxTargets
+            .filter(checkbox => checkbox.dataset.identifierName === identifierName);
+    }
+
+    selectAll(event) {
+        const selectAllCheckbox = event.target;
+        const identifierName = selectAllCheckbox.dataset.identifierName;
+
+        this.#getSelectRowCheckboxes(identifierName).forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
         });
 
-        this.#updateInfoBar();
-        this.#updateIdentifierHolder();
+        this.#update();
     }
 
     selectRow() {
-        this.#updateInfoBar();
-        this.#updateIdentifierHolder();
-
-        this.selectAllCheckboxTarget.indeterminate = this.#selectedCount !== 0
-            && this.#selectedCount !== this.selectRowCheckboxTarget.length;
+        this.#update()
     }
 
     #updateIdentifierHolder() {
@@ -51,29 +67,55 @@ export default class extends Controller {
             return;
         }
 
-        href.searchParams.delete('id[]');
+        const identifierMap = {};
 
-        for (const identifier of this.selectedIdentifiers) {
-            href.searchParams.append('id[]', identifier);
+        for (const selector of this.selectRowCheckboxTargets) {
+            if (!selector.checked) {
+                continue;
+            }
+
+            const identifier = selector.value;
+            const identifierName = selector.dataset.identifierName || 'id';
+
+            identifierMap[identifierName] ??= [];
+            identifierMap[identifierName].push(identifier);
+        }
+
+        for (const [identifierName, identifiers] of Object.entries(identifierMap)) {
+            href.searchParams.delete(identifierName + '[]');
+
+            for (const identifier of identifiers) {
+                href.searchParams.append(identifierName + '[]', identifier);
+            }
         }
 
         this.identifierHolderTarget.setAttribute('href', href.toString());
     }
 
-    #updateInfoBar() {
-        this.selectedCounterTarget.innerHTML = this.#selectedCount;
-        this.infoBarTarget.hidden = this.#selectedCount === 0;
+    #updateBatchActionBar() {
+        const uniqueSelectedCount = this.#getUniqueSelectedCount();
+
+        this.selectedCounterTarget.innerHTML = uniqueSelectedCount;
+        this.batchActionBarTarget.hidden = uniqueSelectedCount === 0;
     }
 
-    #updateSelectedCounter() {
-        this.selectedCounterTarget.innerHTML = this.selectRowCheckboxTargets.filter(checkbox => checkbox.checked).length;
+    #updateIndeterminateStates() {
+        for (const selectAllCheckbox of this.selectAllCheckboxTargets) {
+            const identifierName = selectAllCheckbox.dataset.identifierName;
+
+            const selectRowCheckboxes = this.#getSelectRowCheckboxes(identifierName);
+            const selectedRowCheckboxes = selectRowCheckboxes.filter(checkbox => checkbox.checked);
+
+            selectAllCheckbox.indeterminate = selectedRowCheckboxes.length > 0
+                && selectRowCheckboxes.length !== selectedRowCheckboxes.length;
+        }
     }
 
-    get #selectedCount() {
-        return this.selectRowCheckboxTargets.filter(checkbox => checkbox.checked).length;
-    }
+    #getUniqueSelectedCount() {
+        const selectedIndexes = this.selectRowCheckboxTargets
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.dataset.index);
 
-    get selectedIdentifiers() {
-        return this.selectRowCheckboxTargets.filter(checkbox => checkbox.checked).map(checkbox => 1);
+        return new Set(selectedIndexes).size;
     }
 }

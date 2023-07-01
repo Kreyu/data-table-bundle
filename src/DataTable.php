@@ -31,6 +31,11 @@ class DataTable implements DataTableInterface
     private array $actions = [];
 
     /**
+     * @var array<ActionInterface>
+     */
+    private array $batchActions = [];
+
+    /**
      * The sorting data currently applied to the data table.
      */
     private ?SortingData $sortingData = null;
@@ -101,6 +106,11 @@ class DataTable implements DataTableInterface
         throw new OutOfBoundsException(sprintf('Action "%s" does not exist.', $name));
     }
 
+    public function hasAction(string $name): bool
+    {
+        return array_key_exists($name, $this->actions);
+    }
+
     public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static
     {
         if (is_string($action)) {
@@ -114,9 +124,48 @@ class DataTable implements DataTableInterface
         return $this;
     }
 
-    public function removeColumn(string $name): static
+    public function removeAction(string $name): static
     {
         unset($this->actions[$name]);
+
+        return $this;
+    }
+
+    public function getBatchActions(): array
+    {
+        return $this->batchActions;
+    }
+
+    public function getBatchAction(string $name): ActionInterface
+    {
+        if (isset($this->batchActions[$name])) {
+            return $this->batchActions[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Action "%s" does not exist.', $name));
+    }
+
+    public function hasBatchAction(string $name): bool
+    {
+        return array_key_exists($name, $this->batchActions);
+    }
+
+    public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    {
+        if (is_string($action)) {
+            $action = $this->getConfig()->getActionFactory()->createNamed($action, $type, $options);
+        }
+
+        $this->batchActions[$action->getName()] = $action;
+
+        $action->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeBatchAction(string $name): static
+    {
+        unset($this->batchActions[$name]);
 
         return $this;
     }

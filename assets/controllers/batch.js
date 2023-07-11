@@ -9,6 +9,8 @@ export default class extends Controller {
         'identifierHolder',
     ];
 
+    #previousIdentifierMap = null;
+
     connect() {
         // The timeout is required so Stimulus can catch initial input values.
         // https://github.com/hotwired/stimulus/issues/328
@@ -69,12 +71,12 @@ export default class extends Controller {
             identifierMap.set(identifierName, identifiers);
         }
 
-        console.log(this.identifierHolderTargets);
-
         for (const identifierHolder of this.identifierHolderTargets) {
             this.#updateIdentifierHolderHref(identifierHolder, identifierMap);
             this.#updateIdentifierHolderDataParam(identifierHolder, identifierMap);
         }
+
+        this.#previousIdentifierMap = identifierMap;
     }
 
     #updateIdentifierHolderHref(identifierHolder, identifierMap) {
@@ -86,9 +88,17 @@ export default class extends Controller {
             return;
         }
 
+        if (identifierMap.size === 0 && this.#previousIdentifierMap) {
+            for (const identifierName of this.#previousIdentifierMap.keys()) {
+                href.searchParams.delete(identifierName + '[]');
+            }
+        }
+
         for (const [identifierName, identifiers] of identifierMap) {
+            href.searchParams.delete(identifierName + '[]');
+
             for (const identifier of identifiers) {
-                href.searchParams.set(identifierName + '[]', identifier);
+                href.searchParams.append(identifierName + '[]', identifier);
             }
         }
 
@@ -96,6 +106,12 @@ export default class extends Controller {
     }
 
     #updateIdentifierHolderDataParam(identifierHolder, identifierMap) {
+        if (identifierMap.size === 0 && this.#previousIdentifierMap) {
+            for (const identifierName of this.#previousIdentifierMap.keys()) {
+                delete identifierHolder.dataset[identifierName];
+            }
+        }
+
         for (const [identifierName, identifiers] of identifierMap) {
             identifierHolder.dataset[identifierName] = JSON.stringify(identifiers);
         }

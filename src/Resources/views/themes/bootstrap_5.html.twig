@@ -87,21 +87,37 @@
     {% endif %}
 
     {% if has_batch_actions %}
-        <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
-            <div class="card-title fs-4 fw-normal text-muted">
-                Zaznaczono <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span> rekordów
-            </div>
-            <div class="card-actions">
-                <div class="d-flex flex-row gap-1">
-                    {% for action in batch_actions %}
-                        <div>
-                            {{ data_table_action(action) }}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        {{ block('batch_action_bar', theme) }}
     {% endif %}
+{% endblock %}
+
+{% block batch_action_bar %}
+    <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
+        <div class="d-flex justify-content-between align-items-center">
+            {{ block('batch_action_bar_title', theme) }}
+            {{ block('batch_action_bar_actions', theme) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block batch_action_bar_title %}
+    {% set wrapper_attr = { class: 'card-title fs-6 fw-normal text-muted mb-0' }|merge(wrapper_attr|default({})) %}
+
+    <div {% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+        Zaznaczono: <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span>
+    </div>
+{% endblock %}
+
+{% block batch_action_bar_actions %}
+    <div class="card-actions">
+        <div class="d-flex flex-row gap-1">
+            {% for action in batch_actions %}
+                <div>
+                    {{ data_table_action(action) }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block action_search %}
@@ -727,27 +743,19 @@
 {% endblock %}
 
 {% block column_checkbox_header %}
-    <th class="w-0">
-        <input
-            class="form-check-input"
-            type="checkbox"
-            aria-label="Select all checkbox"
-            data-identifier-name="{{ identifier_name }}"
-            data-kreyu--data-table-bundle--batch-target="selectAllCheckbox"
-            data-action="input->kreyu--data-table-bundle--batch#selectAll"
-        >
-    </th>
+    {% set attr = { class: 'text-center' }|merge(attr) %}
+
+    {% with { attr, input_attr: { class: 'form-check-input mt-0' } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
 
 {% block column_checkbox_value %}
-    <input
-        class="form-check-input"
-        type="checkbox"
-        aria-label="Select row checkbox"
-        data-index="{{ row.index }}"
-        data-identifier-name="{{ identifier_name }}"
-        value="{{ value }}"
-        data-kreyu--data-table-bundle--batch-target="selectRowCheckbox"
-        data-action="input->kreyu--data-table-bundle--batch#selectRow"
-    >
+    {% set wrapper_attr = { class: 'w-100 h-100 text-center' }|merge(wrapper_attr|default({})) %}
+
+    <div {% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+        {% with { input_attr: { class: 'form-check-input' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
 {% endblock %}

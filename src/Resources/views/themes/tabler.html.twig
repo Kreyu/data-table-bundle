@@ -11,90 +11,6 @@
     {% endwith %}
 {% endblock %}
 
-{% block action_bar %}
-    {% set display_filter_action = filtration_enabled and filters|length > 0 and filtration_form.children|length > 0 %}
-    {% set display_export_action = exporting_enabled and exporters|length > 0 %}
-
-    {% if title or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
-        <div class="card-header">
-            <div class="card-title">
-                {% if translation_domain is not same as false %}
-                    {{ title|trans(title_translation_parameters, translation_domain) }}
-                {% else %}
-                    {{ title }}
-                {% endif %}
-            </div>
-
-            <div class="card-actions">
-                <div class="d-flex flex-row gap-1">
-                    {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
-                        <div>
-                            {{ block('action_search') }}
-                        </div>
-                    {% endif %}
-
-                    {% for action in actions %}
-                        <div>
-                            {{ data_table_action(action) }}
-                        </div>
-                    {% endfor %}
-
-                    {% if display_filter_action %}
-                        <div>
-                            {{ block('action_filter') }}
-                        </div>
-                    {% endif %}
-
-                    {% if display_export_action %}
-                        <div>
-                            {{ block('action_export') }}
-                            {{ block('export_modal') }}
-                        </div>
-                    {% endif %}
-
-                    {% if personalization_enabled %}
-                        <div>
-                            {{ block('action_personalize') }}
-                            {{ block('personalization_modal') }}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        {% if filtration_enabled and filtration_form and filters|length > 0 %}
-            <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
-                <div class="card-body">
-                    {{ data_table_filters_form(filtration_form) }}
-                </div>
-            </div>
-        {% endif %}
-
-        {% if has_active_filters %}
-            <div class="card-body border-bottom">
-                {{ block('active_filters') }}
-            </div>
-        {% endif %}
-    {% endif %}
-
-    {% if has_batch_actions %}
-        <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
-            <div class="card-title fs-4 fw-normal text-muted">
-                Zaznaczono <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span> rekord(y/ów)
-            </div>
-            <div class="card-actions">
-                <div class="d-flex flex-row gap-1">
-                    {% for action in batch_actions %}
-                        <div>
-                            {{ data_table_action(action) }}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block table_body_row_no_results %}
     <tr>
         <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
@@ -214,4 +130,23 @@
             {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
         </div>
     </div>
+{% endblock %}
+
+{% block column_checkbox_header %}
+    {% with { attr: { class: 'w-0' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block batch_action_bar %}
+    <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
+        {{ block('batch_action_bar_title', theme) }}
+        {{ block('batch_action_bar_actions', theme) }}
+    </div>
+{% endblock %}
+
+{% block batch_action_bar_title %}
+    {% with { wrapper_attr: { class: 'card-title fs-4 fw-normal text-muted mb-0' } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}

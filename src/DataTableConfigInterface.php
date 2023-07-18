@@ -59,6 +59,8 @@ interface DataTableConfigInterface
      */
     public function getColumn(string $name): ColumnInterface;
 
+    public function hasColumn(string $name): bool;
+
     /**
      * @return array<FilterInterface>
      */

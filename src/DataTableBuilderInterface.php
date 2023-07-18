@@ -25,6 +25,8 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
      */
     public function getAction(string $name): ActionBuilderInterface;
 
+    public function hasAction(string $name): bool;
+
     /**
      * @param null|class-string<ActionTypeInterface> $type
      */
@@ -41,6 +43,8 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
      * @throws InvalidArgumentException if batch action of given name does not exist
      */
     public function getBatchAction(string $name): ActionBuilderInterface;
+
+    public function hasBatchAction(string $name): bool;
 
     /**
      * @param null|class-string<ActionTypeInterface> $type
@@ -62,6 +66,8 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
      * @throws InvalidArgumentException if row action of given name does not exist
      */
     public function getRowAction(string $name): ActionBuilderInterface;
+
+    public function hasRowAction(string $name): bool;
 
     /**
      * @param null|class-string<ActionTypeInterface> $type

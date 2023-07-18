@@ -448,6 +448,11 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this->columns[$name] ?? throw new \InvalidArgumentException("Column \"$name\" does not exist");
     }
 
+    public function hasColumn(string $name): bool
+    {
+        return array_key_exists($name, $this->columns);
+    }
+
     public function addColumn(string $name, string $type, array $options = []): static
     {
         $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
@@ -520,6 +525,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function hasAction(string $name): bool
+    {
+        return array_key_exists($name, $this->actions)
+            || array_key_exists($name, $this->unresolvedActions);
+    }
+
     public function removeAction(string $name): static
     {
         unset($this->unresolvedActions[$name], $this->actions[$name]);
@@ -543,6 +554,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         throw new InvalidArgumentException(sprintf('The batch action with the name "%s" does not exist.', $name));
+    }
+
+    public function hasBatchAction(string $name): bool
+    {
+        return array_key_exists($name, $this->batchActions)
+            || array_key_exists($name, $this->unresolvedBatchActions);
     }
 
     public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
@@ -596,6 +613,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         throw new InvalidArgumentException(sprintf('The row action with the name "%s" does not exist.', $name));
+    }
+
+    public function hasRowAction(string $name): bool
+    {
+        return array_key_exists($name, $this->rowActions)
+            || array_key_exists($name, $this->unresolvedRowActions);
     }
 
     public function addRowAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
@@ -1075,13 +1098,13 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         $this->validate();
 
-        if ($this->isAutoAddingBatchCheckboxColumn() && !empty($this->batchActions)) {
+        if ($this->shouldPrependBatchCheckboxColumn()) {
             $this->prependBatchCheckboxColumn();
         }
 
         $this->resolveRowActions();
 
-        if ($this->isAutoAddingActionsColumn() && !empty($this->rowActions)) {
+        if ($this->shouldAppendActionsColumn()) {
             $this->appendActionsColumn();
         }
 
@@ -1204,6 +1227,20 @@ class DataTableBuilder implements DataTableBuilderInterface
     private function getParameterName(string $prefix): string
     {
         return implode('_', array_filter([$prefix, $this->name]));
+    }
+
+    private function shouldPrependBatchCheckboxColumn(): bool
+    {
+        return $this->isAutoAddingBatchCheckboxColumn()
+            && !empty($this->batchActions)
+            && !$this->hasColumn(self::BATCH_CHECKBOX_COLUMN_NAME);
+    }
+
+    private function shouldAppendActionsColumn(): bool
+    {
+        return $this->isAutoAddingActionsColumn()
+            && !empty($this->rowActions)
+            && !$this->hasColumn(self::ACTIONS_COLUMN_NAME);
     }
 
     private function prependBatchCheckboxColumn(): void

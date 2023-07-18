@@ -29,7 +29,7 @@ export default class extends Controller {
     }
 
     selectRow() {
-        this.#update()
+        this.#update();
     }
 
     #update() {

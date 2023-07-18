@@ -115,6 +115,12 @@ class DataTableBuilder implements DataTableBuilderInterface
     private array $unresolvedBatchActions = [];
 
     /**
+     * Determines whether the builder should automatically add {@see CheckboxColumnType}
+     * when at least one batch action is defined in {@see DataTableBuilder::$batchActions}.
+     */
+    private bool $autoAddingBatchCheckboxColumn = true;
+
+    /**
      * Stores an array of exporters, used to output data to various file types.
      *
      * @var array<ExporterInterface>
@@ -536,6 +542,18 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function removeBatchAction(string $name): static
     {
         unset($this->unresolvedActions[$name], $this->batchActions[$name]);
+
+        return $this;
+    }
+
+    public function isAutoAddingBatchCheckboxColumn(): bool
+    {
+        return $this->autoAddingBatchCheckboxColumn;
+    }
+
+    public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static
+    {
+        $this->autoAddingBatchCheckboxColumn = $autoAddingBatchCheckboxColumn;
 
         return $this;
     }
@@ -982,13 +1000,8 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         $this->validate();
 
-        if (!empty($this->batchActions)) {
-            $this->addColumn('_batch', CheckboxColumnType::class);
-
-            $this->columns = [
-                '_batch' => $this->getColumn('_batch'),
-                ...$this->getColumns(),
-            ];
+        if ($this->isAutoAddingBatchCheckboxColumn() && !empty($this->batchActions)) {
+            $this->prependBatchCheckboxColumn();
         }
 
         $dataTable = new DataTable(
@@ -1083,5 +1096,15 @@ class DataTableBuilder implements DataTableBuilderInterface
     private function getParameterName(string $prefix): string
     {
         return implode('_', array_filter([$prefix, $this->name]));
+    }
+
+    private function prependBatchCheckboxColumn(): void
+    {
+        $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class);
+
+        $this->columns = [
+            self::BATCH_CHECKBOX_COLUMN_NAME => $this->getColumn(self::BATCH_CHECKBOX_COLUMN_NAME),
+            ...$this->getColumns(),
+        ];
     }
 }

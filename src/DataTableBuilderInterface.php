@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 {
+    public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
+
     /**
      * @return array<ActionBuilderInterface>
      */
@@ -45,6 +46,10 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function addBatchAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
     public function removeBatchAction(string $name): static;
+
+    public function isAutoAddingBatchCheckboxColumn(): bool;
+
+    public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static;
 
     public function getQuery(): ?ProxyQueryInterface;
 

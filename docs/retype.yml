@@ -3,7 +3,7 @@
 
 input: .
 output: .retype
-url: # Add your website address here
+url: https://data-table-bundle.swroblewski.pl/
 favicon: static/favicon.png
 branding:
   title: DataTableBundle

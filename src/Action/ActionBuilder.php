@@ -9,8 +9,8 @@ use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 
 class ActionBuilder implements ActionBuilderInterface
 {
+    private ActionContext $context = ActionContext::Global;
     private array $attributes = [];
-    private bool $batch = false;
     private bool $confirmable = false;
     private bool $locked = false;
 
@@ -127,18 +127,18 @@ class ActionBuilder implements ActionBuilderInterface
         return $this;
     }
 
-    public function isBatch(): bool
+    public function getContext(): ActionContext
     {
-        return $this->batch;
+        return $this->context;
     }
 
-    public function setBatch(bool $batch): static
+    public function setContext(ActionContext $context): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
 
-        $this->batch = $batch;
+        $this->context = $context;
 
         return $this;
     }

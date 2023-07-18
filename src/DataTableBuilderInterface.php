@@ -13,6 +13,8 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 {
     public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
 
+    public const ACTIONS_COLUMN_NAME = '__actions';
+
     /**
      * @return array<ActionBuilderInterface>
      */
@@ -50,6 +52,27 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function isAutoAddingBatchCheckboxColumn(): bool;
 
     public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static;
+
+    /**
+     * @return array<ActionBuilderInterface>
+     */
+    public function getRowActions(): array;
+
+    /**
+     * @throws InvalidArgumentException if row action of given name does not exist
+     */
+    public function getRowAction(string $name): ActionBuilderInterface;
+
+    /**
+     * @param null|class-string<ActionTypeInterface> $type
+     */
+    public function addRowAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeRowAction(string $name): static;
+
+    public function isAutoAddingActionsColumn(): bool;
+
+    public function setAutoAddingActionsColumn(bool $autoAddingActionsColumn): static;
 
     public function getQuery(): ?ProxyQueryInterface;
 

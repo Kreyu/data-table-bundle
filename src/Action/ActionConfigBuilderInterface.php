@@ -20,7 +20,7 @@ interface ActionConfigBuilderInterface extends ActionConfigInterface
 
     public function setAttribute(string $name, mixed $value = null): static;
 
-    public function setBatch(bool $batch): static;
+    public function setContext(ActionContext $context): static;
 
     public function setConfirmable(bool $confirmable): static;
 

@@ -663,12 +663,6 @@
         class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
 
-    {% if batch %}
-        {% set attr = {
-            'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
-        }|merge(attr) %}
-    {% endif %}
-
     {% if confirmation %}
         {% set attr = {
             'data-bs-toggle': 'modal',

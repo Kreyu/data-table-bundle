@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
@@ -119,6 +121,26 @@ class DataTableBuilder implements DataTableBuilderInterface
      * when at least one batch action is defined in {@see DataTableBuilder::$batchActions}.
      */
     private bool $autoAddingBatchCheckboxColumn = true;
+
+    /**
+     * The row action builders defined for the data table.
+     *
+     * @var array<ActionBuilderInterface>
+     */
+    private array $rowActions = [];
+
+    /**
+     * The data of row actions that haven't been converted to action builders yet.
+     *
+     * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
+     */
+    private array $unresolvedRowActions = [];
+
+    /**
+     * Determines whether the builder should automatically add {@see ActionsColumnType}
+     * when at least one row action is defined in {@see DataTableBuilder::$rowActions}.
+     */
+    private bool $autoAddingActionsColumn = true;
 
     /**
      * Stores an array of exporters, used to output data to various file types.
@@ -426,6 +448,11 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this->columns[$name] ?? throw new \InvalidArgumentException("Column \"$name\" does not exist");
     }
 
+    public function hasColumn(string $name): bool
+    {
+        return array_key_exists($name, $this->columns);
+    }
+
     public function addColumn(string $name, string $type, array $options = []): static
     {
         $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
@@ -498,6 +525,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         return $this;
     }
 
+    public function hasAction(string $name): bool
+    {
+        return array_key_exists($name, $this->actions)
+            || array_key_exists($name, $this->unresolvedActions);
+    }
+
     public function removeAction(string $name): static
     {
         unset($this->unresolvedActions[$name], $this->actions[$name]);
@@ -521,6 +554,12 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         throw new InvalidArgumentException(sprintf('The batch action with the name "%s" does not exist.', $name));
+    }
+
+    public function hasBatchAction(string $name): bool
+    {
+        return array_key_exists($name, $this->batchActions)
+            || array_key_exists($name, $this->unresolvedBatchActions);
     }
 
     public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
@@ -554,6 +593,65 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static
     {
         $this->autoAddingBatchCheckboxColumn = $autoAddingBatchCheckboxColumn;
+
+        return $this;
+    }
+
+    public function getRowActions(): array
+    {
+        return $this->rowActions;
+    }
+
+    public function getRowAction(string $name): ActionBuilderInterface
+    {
+        if (isset($this->unresolvedRowActions[$name])) {
+            return $this->resolveRowAction($name);
+        }
+
+        if (isset($this->rowActions[$name])) {
+            return $this->rowActions[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The row action with the name "%s" does not exist.', $name));
+    }
+
+    public function hasRowAction(string $name): bool
+    {
+        return array_key_exists($name, $this->rowActions)
+            || array_key_exists($name, $this->unresolvedRowActions);
+    }
+
+    public function addRowAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
+    {
+        if ($action instanceof ActionBuilderInterface) {
+            $this->rowActions[$action->getName()] = $action;
+
+            unset($this->unresolvedRowActions[$action->getName()]);
+
+            return $this;
+        }
+
+        $this->rowActions[$action] = null;
+        $this->unresolvedRowActions[$action] = [$type, $options];
+
+        return $this;
+    }
+
+    public function removeRowAction(string $name): static
+    {
+        unset($this->unresolvedActions[$name], $this->rowActions[$name]);
+
+        return $this;
+    }
+
+    public function isAutoAddingActionsColumn(): bool
+    {
+        return $this->autoAddingActionsColumn;
+    }
+
+    public function setAutoAddingActionsColumn(bool $autoAddingActionsColumn): static
+    {
+        $this->autoAddingActionsColumn = $autoAddingActionsColumn;
 
         return $this;
     }
@@ -1000,8 +1098,14 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         $this->validate();
 
-        if ($this->isAutoAddingBatchCheckboxColumn() && !empty($this->batchActions)) {
+        if ($this->shouldPrependBatchCheckboxColumn()) {
             $this->prependBatchCheckboxColumn();
+        }
+
+        $this->resolveRowActions();
+
+        if ($this->shouldAppendActionsColumn()) {
+            $this->appendActionsColumn();
         }
 
         $dataTable = new DataTable(
@@ -1010,14 +1114,19 @@ class DataTableBuilder implements DataTableBuilderInterface
         );
 
         $this->resolveActions();
-        $this->resolveBatchActions();
 
         foreach ($this->actions as $action) {
             $dataTable->addAction($action->getAction());
         }
 
+        $this->resolveBatchActions();
+
         foreach ($this->batchActions as $batchAction) {
             $dataTable->addBatchAction($batchAction->getAction());
+        }
+
+        foreach ($this->rowActions as $rowAction) {
+            $dataTable->addRowAction($rowAction->getAction());
         }
 
         $dataTable->initialize();
@@ -1039,7 +1148,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
         unset($this->unresolvedActions[$name]);
 
-        return $this->actions[$name] = $this->getActionFactory()->createNamedBuilder($name, $type, $options);
+        $action = $this->getActionFactory()->createNamedBuilder($name, $type, $options);
+        $action->setContext(ActionContext::Global);
+
+        return $this->actions[$name] = $action;
     }
 
     private function resolveActions(): void
@@ -1056,7 +1168,7 @@ class DataTableBuilder implements DataTableBuilderInterface
         unset($this->unresolvedBatchActions[$name]);
 
         $batchAction = $this->getActionFactory()->createNamedBuilder($name, $type, $options);
-        $batchAction->setBatch(true);
+        $batchAction->setContext(ActionContext::Batch);
 
         return $this->batchActions[$name] = $batchAction;
     }
@@ -1065,6 +1177,25 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         foreach (array_keys($this->unresolvedBatchActions) as $batchAction) {
             $this->resolveBatchAction($batchAction);
+        }
+    }
+
+    private function resolveRowAction(string $name): ActionBuilderInterface
+    {
+        [$type, $options] = $this->unresolvedRowActions[$name];
+
+        unset($this->unresolvedRowActions[$name]);
+
+        $rowAction = $this->getActionFactory()->createNamedBuilder($name, $type, $options);
+        $rowAction->setContext(ActionContext::Row);
+
+        return $this->rowActions[$name] = $rowAction;
+    }
+
+    private function resolveRowActions(): void
+    {
+        foreach (array_keys($this->unresolvedRowActions) as $rowAction) {
+            $this->resolveRowAction($rowAction);
         }
     }
 
@@ -1098,6 +1229,20 @@ class DataTableBuilder implements DataTableBuilderInterface
         return implode('_', array_filter([$prefix, $this->name]));
     }
 
+    private function shouldPrependBatchCheckboxColumn(): bool
+    {
+        return $this->isAutoAddingBatchCheckboxColumn()
+            && !empty($this->batchActions)
+            && !$this->hasColumn(self::BATCH_CHECKBOX_COLUMN_NAME);
+    }
+
+    private function shouldAppendActionsColumn(): bool
+    {
+        return $this->isAutoAddingActionsColumn()
+            && !empty($this->rowActions)
+            && !$this->hasColumn(self::ACTIONS_COLUMN_NAME);
+    }
+
     private function prependBatchCheckboxColumn(): void
     {
         $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class);
@@ -1106,5 +1251,12 @@ class DataTableBuilder implements DataTableBuilderInterface
             self::BATCH_CHECKBOX_COLUMN_NAME => $this->getColumn(self::BATCH_CHECKBOX_COLUMN_NAME),
             ...$this->getColumns(),
         ];
+    }
+
+    private function appendActionsColumn(): void
+    {
+        $this->addColumn(self::ACTIONS_COLUMN_NAME, ActionsColumnType::class, [
+            'actions' => $this->rowActions,
+        ]);
     }
 }

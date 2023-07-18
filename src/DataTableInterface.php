@@ -56,6 +56,22 @@ interface DataTableInterface
 
     public function removeBatchAction(string $name): static;
 
+    /**
+     * @return array<string, ActionInterface>
+     */
+    public function getRowActions(): array;
+
+    /**
+     * @throws OutOfBoundsException if row action of given name does not exist
+     */
+    public function getRowAction(string $name): ActionInterface;
+
+    public function hasRowAction(string $name): bool;
+
+    public function addRowAction(ActionInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeRowAction(string $name): static;
+
     public function sort(SortingData $data): void;
 
     public function filter(FiltrationData $data): void;

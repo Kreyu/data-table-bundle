@@ -24,7 +24,7 @@ interface ActionConfigInterface
 
     public function getAttribute(string $name, mixed $default = null): mixed;
 
-    public function isBatch(): bool;
+    public function getContext(): ActionContext;
 
     public function isConfirmable(): bool;
 }

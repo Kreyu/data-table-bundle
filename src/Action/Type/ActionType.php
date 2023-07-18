@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
@@ -74,7 +75,8 @@ final class ActionType implements ActionTypeInterface
             'attr' => $options['attr'],
             'icon_attr' => $options['icon_attr'],
             'confirmation' => $options['confirmation'],
-            'batch' => $action->getConfig()->isBatch(),
+            'context' => $action->getConfig()->getContext(),
+            'batch' => $action->getConfig()->getContext() === ActionContext::Batch,
         ]);
     }
 

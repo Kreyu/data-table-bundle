@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
@@ -34,6 +35,11 @@ class DataTable implements DataTableInterface
      * @var array<ActionInterface>
      */
     private array $batchActions = [];
+
+    /**
+     * @var array<ActionInterface>
+     */
+    private array $rowActions = [];
 
     /**
      * The sorting data currently applied to the data table.
@@ -114,7 +120,10 @@ class DataTable implements DataTableInterface
     public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static
     {
         if (is_string($action)) {
-            $action = $this->getConfig()->getActionFactory()->createNamed($action, $type, $options);
+            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder->setContext(ActionContext::Global);
+
+            $action = $builder->getAction();
         }
 
         $this->actions[$action->getName()] = $action;
@@ -142,7 +151,7 @@ class DataTable implements DataTableInterface
             return $this->batchActions[$name];
         }
 
-        throw new OutOfBoundsException(sprintf('Action "%s" does not exist.', $name));
+        throw new OutOfBoundsException(sprintf('Batch action "%s" does not exist.', $name));
     }
 
     public function hasBatchAction(string $name): bool
@@ -153,7 +162,10 @@ class DataTable implements DataTableInterface
     public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static
     {
         if (is_string($action)) {
-            $action = $this->getConfig()->getActionFactory()->createNamed($action, $type, $options);
+            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder->setContext(ActionContext::Batch);
+
+            $action = $builder->getAction();
         }
 
         $this->batchActions[$action->getName()] = $action;
@@ -166,6 +178,48 @@ class DataTable implements DataTableInterface
     public function removeBatchAction(string $name): static
     {
         unset($this->batchActions[$name]);
+
+        return $this;
+    }
+
+    public function getRowActions(): array
+    {
+        return $this->rowActions;
+    }
+
+    public function getRowAction(string $name): ActionInterface
+    {
+        if (isset($this->rowActions[$name])) {
+            return $this->rowActions[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Row action "%s" does not exist.', $name));
+    }
+
+    public function hasRowAction(string $name): bool
+    {
+        return array_key_exists($name, $this->rowActions);
+    }
+
+    public function addRowAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    {
+        if (is_string($action)) {
+            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder->setContext(ActionContext::Row);
+
+            $action = $builder->getAction();
+        }
+
+        $this->rowActions[$action->getName()] = $action;
+
+        $action->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeRowAction(string $name): static
+    {
+        unset($this->rowActions[$name]);
 
         return $this;
     }

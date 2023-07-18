@@ -1,14 +1,36 @@
 {% extends '@KreyuDataTable/themes/bootstrap_5.html.twig' %}
 
+{% trans_default_domain 'KreyuDataTable' %}
+
 {# Tabler Theme #}
 {# @see https://tabler.io/ #}
 
 {% block table %}
-    <div class="table-responsive">
-        {% with { table_attr: { class: 'table table-hover card-table table-vcenter text-nowrap datatable' } } %}
-            {{ parent() }}
-        {% endwith %}
-    </div>
+    {% with { table_attr: { class: 'table table-hover card-table table-vcenter' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block table_body_row_no_results %}
+    <tr>
+        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
+            <div class="empty">
+                <div class="empty-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <circle cx="12" cy="12" r="9" />
+                        <line x1="9" y1="10" x2="9.01" y2="10" />
+                        <line x1="15" y1="10" x2="15.01" y2="10" />
+                        <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
+                    </svg>
+                </div>
+                <p class="empty-title">{{ 'No results found'|trans }}</p>
+                <p class="empty-subtitle text-muted">
+                    {{ 'Try adjusting your search or filter to find what you\'re looking for'|trans }}
+                </p>
+            </div>
+        </td>
+    </tr>
 {% endblock %}
 
 {% block action_filter %}
@@ -94,12 +116,6 @@
     {% endwith %}
 {% endblock %}
 
-{% block table_body_row_no_results %}
-    {% with { table_body_row_no_results_attr: { class: 'text-muted text-center' } } %}
-        {{ parent() }}
-    {% endwith %}
-{% endblock %}
-
 {% block action_confirmation_modal_header %}{% endblock %}
 
 {% block action_confirmation_modal_body %}
@@ -114,4 +130,23 @@
             {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
         </div>
     </div>
+{% endblock %}
+
+{% block column_checkbox_header %}
+    {% with { attr: { class: 'w-0' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block batch_action_bar %}
+    <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
+        {{ block('batch_action_bar_title', theme) }}
+        {{ block('batch_action_bar_actions', theme) }}
+    </div>
+{% endblock %}
+
+{% block batch_action_bar_title %}
+    {% with { wrapper_attr: { class: 'card-title fs-4 fw-normal text-muted mb-0' } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}

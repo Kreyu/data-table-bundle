@@ -9,6 +9,11 @@
                 "main": "controllers/personalization.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "batch": {
+                "main": "controllers/batch.js",
+                "fetch": "eager",
+                "enabled": true
             }
         }
     },

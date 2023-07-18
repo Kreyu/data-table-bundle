@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
@@ -23,6 +25,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DataTable implements DataTableInterface
 {
+    /**
+     * @var array<ActionInterface>
+     */
+    private array $actions = [];
+
+    /**
+     * @var array<ActionInterface>
+     */
+    private array $batchActions = [];
+
     /**
      * The sorting data currently applied to the data table.
      */
@@ -63,8 +75,6 @@ class DataTable implements DataTableInterface
         private DataTableConfigInterface $config,
     ) {
         $this->nonFilteredQuery = clone $this->query;
-
-        $this->initialize();
     }
 
     public function __clone(): void
@@ -80,6 +90,84 @@ class DataTable implements DataTableInterface
     public function getConfig(): DataTableConfigInterface
     {
         return $this->config;
+    }
+
+    public function getActions(): array
+    {
+        return $this->actions;
+    }
+
+    public function getAction(string $name): ActionInterface
+    {
+        if (isset($this->actions[$name])) {
+            return $this->actions[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Action "%s" does not exist.', $name));
+    }
+
+    public function hasAction(string $name): bool
+    {
+        return array_key_exists($name, $this->actions);
+    }
+
+    public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    {
+        if (is_string($action)) {
+            $action = $this->getConfig()->getActionFactory()->createNamed($action, $type, $options);
+        }
+
+        $this->actions[$action->getName()] = $action;
+
+        $action->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeAction(string $name): static
+    {
+        unset($this->actions[$name]);
+
+        return $this;
+    }
+
+    public function getBatchActions(): array
+    {
+        return $this->batchActions;
+    }
+
+    public function getBatchAction(string $name): ActionInterface
+    {
+        if (isset($this->batchActions[$name])) {
+            return $this->batchActions[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Action "%s" does not exist.', $name));
+    }
+
+    public function hasBatchAction(string $name): bool
+    {
+        return array_key_exists($name, $this->batchActions);
+    }
+
+    public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    {
+        if (is_string($action)) {
+            $action = $this->getConfig()->getActionFactory()->createNamed($action, $type, $options);
+        }
+
+        $this->batchActions[$action->getName()] = $action;
+
+        $action->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeBatchAction(string $name): static
+    {
+        unset($this->batchActions[$name]);
+
+        return $this;
     }
 
     public function paginate(PaginationData $data): void
@@ -347,7 +435,7 @@ class DataTable implements DataTableInterface
         return $view;
     }
 
-    private function initialize(): void
+    public function initialize(): void
     {
         if ($paginationData = $this->getInitialPaginationData()) {
             $this->paginate($paginationData);

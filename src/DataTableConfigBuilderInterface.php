@@ -66,13 +66,6 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static;
 
-    /**
-     * @param class-string<ActionTypeInterface> $type
-     */
-    public function addAction(string $name, string $type, array $options = []): static;
-
-    public function removeAction(string $name): static;
-
     public function getActionFactory(): ActionFactoryInterface;
 
     public function setActionFactory(ActionFactoryInterface $actionFactory): static;

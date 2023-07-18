@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
@@ -16,8 +18,43 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 interface DataTableInterface
 {
+    public function initialize(): void;
+
     public function getQuery(): ProxyQueryInterface;
+
     public function getConfig(): DataTableConfigInterface;
+
+    /**
+     * @return array<string, ActionInterface>
+     */
+    public function getActions(): array;
+
+    /**
+     * @throws OutOfBoundsException if action of given name does not exist
+     */
+    public function getAction(string $name): ActionInterface;
+
+    public function hasAction(string $name): bool;
+
+    public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeAction(string $name): static;
+
+    /**
+     * @return array<string, ActionInterface>
+     */
+    public function getBatchActions(): array;
+
+    /**
+     * @throws OutOfBoundsException if batch action of given name does not exist
+     */
+    public function getBatchAction(string $name): ActionInterface;
+
+    public function hasBatchAction(string $name): bool;
+
+    public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static;
+
+    public function removeBatchAction(string $name): static;
 
     public function sort(SortingData $data): void;
 

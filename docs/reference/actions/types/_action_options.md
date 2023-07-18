@@ -68,22 +68,23 @@ $builder
 
 ### `confirmation`
 
-- **type**: `bool` or `array`
+- **type**: `bool`, `array` or `callable`
 - **default**: `false`
 
-Determines whether the action is confirmable.
-Setting it to `true` will make the action confirmable with default confirmation configuration.
-The array accepts the following options:
+Determines whether the action is confirmable, which displays a modal where user have to acknowledge the process.
+The modal can be configured by passing an array with the following options:
 
 #### `translation_domain`
 
-- **type**: `null` or `string`
+- **type**: `false` or `string`
 - **default**: `'KreyuDataTable'`
+
+Translation domain used in translation of action confirmation labels.
 
 #### `label_title`
 
 - **type**: `null` or `string`
-- **default**: `'Action confirmation'`
+- **default**: `'Action confirmation'` 
 
 #### `label_description`
 
@@ -103,10 +104,7 @@ The array accepts the following options:
 #### `type`
 
 - **type**: `null` or `string`
-- **default**: `'danger'`
-- **allowed values**: 'info', 'warning', 'danger'
+- **default**: `danger`
+- **allowed values**: `danger`, `warning`, `info`
 
-#### `href`
-
-- **type**: `null` or `string`
-- **default**: `null`
+Represents a type of the action confirmation, which determines the color of the displayed modal.

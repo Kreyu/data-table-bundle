@@ -3,7 +3,11 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    <turbo-frame id="kreyu_data_table_{{ name }}">
+    <turbo-frame id="kreyu_data_table_{{ name }}"
+        {% if has_batch_actions %}
+            data-controller="kreyu--data-table-bundle--batch"
+        {% endif %}
+    >
         {{ block('action_bar') }}
         {{ block('table') }}
 
@@ -423,6 +427,34 @@
     {% endif %}
 
     {{ form_widget(form) }}
+{% endblock %}
+
+{% block column_checkbox_header %}
+    <th {{ block('attributes') }}>
+        {% set input_attr = {
+            'type': 'checkbox',
+            'aria-label': 'Select all checkbox',
+            'data-identifier-name': identifier_name,
+            'data-kreyu--data-table-bundle--batch-target': 'selectAllCheckbox',
+            'data-action': 'input->kreyu--data-table-bundle--batch#selectAll'
+        }|merge(input_attr|default({})) %}
+
+        <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
+    </th>
+{% endblock %}
+
+{% block column_checkbox_value %}
+    {% set input_attr = {
+        'type': 'checkbox',
+        'value': value,
+        'aria-label': 'Select all checkbox',
+        'data-index': row.index,
+        'data-identifier-name': identifier_name,
+        'data-kreyu--data-table-bundle--batch-target': 'selectRowCheckbox',
+        'data-action': 'input->kreyu--data-table-bundle--batch#selectRow'
+    }|merge(input_attr|default({})) %}
+
+    <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
 {% endblock %}
 
 {# Action type templates #}

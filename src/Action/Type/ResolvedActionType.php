@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionBuilder;
+use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Action\Extension\ActionTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedActionType implements ResolvedActionTypeInterface
@@ -19,15 +23,30 @@ class ResolvedActionType implements ResolvedActionTypeInterface
      * @param array<ActionTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private ActionTypeInterface $innerType,
-        private array $typeExtensions = [],
-        private ?ResolvedActionTypeInterface $parent = null,
+        private readonly ActionTypeInterface $innerType,
+        private readonly array $typeExtensions = [],
+        private readonly ?ResolvedActionTypeInterface $parent = null,
     ) {
     }
 
     public function getBlockPrefix(): string
     {
         return $this->innerType->getBlockPrefix();
+    }
+
+    public function getBlockPrefixHierarchy(): array
+    {
+        $blockPrefixes = [
+            $this->getBlockPrefix(),
+        ];
+
+        $type = $this;
+
+        while (null !== $type->getParent()) {
+            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
+        }
+
+        return array_unique($blockPrefixes);
     }
 
     public function getParent(): ?ResolvedActionTypeInterface
@@ -45,9 +64,37 @@ class ResolvedActionType implements ResolvedActionTypeInterface
         return $this->typeExtensions;
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
+    public function createBuilder(ActionFactoryInterface $factory, string $name, array $options = []): ActionBuilderInterface
+    {
+        try {
+            $options = $this->getOptionsResolver()->resolve($options);
+        } catch (ExceptionInterface $exception) {
+            throw new $exception(sprintf(
+                'An error has occurred resolving the options of the action "%s": ',
+                get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception
+            );
+        }
+
+        return new ActionBuilder($name, $this, $options);
+    }
+
     public function createView(ActionInterface $action, DataTableView|ColumnValueView $parent): ActionView
     {
         return new ActionView($parent);
+    }
+
+    public function buildAction(ActionBuilderInterface $builder, array $options): void
+    {
+        $this->parent?->buildAction($builder, $options);
+
+        $this->innerType->buildAction($builder, $options);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->buildAction($builder, $options);
+        }
     }
 
     public function buildView(ActionView $view, ActionInterface $action, array $options): void

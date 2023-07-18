@@ -51,6 +51,9 @@ Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json
         "@kreyu/data-table-bundle": {
             "personalization": {
                 "enabled": true
+            },
+            "batch": {
+                "enabled": true
             }
         }
     }
@@ -63,7 +66,7 @@ The build process obviously depends on the configuration of your project.
 
 +++ yarn
 ```shell
-$ yarn install --force
+$ yarn install
 $ yarn watch
 ```
 +++ npm

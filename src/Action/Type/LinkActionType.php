@@ -27,10 +27,6 @@ class LinkActionType extends AbstractActionType
             'href' => $options['href'],
             'target' => $options['target'],
         ]);
-
-        if (is_array($view->vars['confirmation'])) {
-            $view->vars['confirmation']['href'] ??= $options['href'];
-        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

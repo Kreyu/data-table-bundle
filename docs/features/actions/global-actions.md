@@ -243,3 +243,30 @@ class ProductDataTableType extends AbstractDataTableType
 ```
 
 For reference, see [action's `confirmation` option documentation](../../reference/actions/types/action/#confirmation).
+
+## Conditionally rendering the action
+
+Action visibility can be configured using its [`visible` option](../../reference/actions/types/action/#visible):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addAction('create', ButtonActionType::class, [
+        'visible' => $this->isGranted('ROLE_ADMIN'),
+    ])
+;
+```
+
+Another approach would be simply not adding the action at all:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+if ($this->isGranted('ROLE_ADMIN')) {
+    $builder->addAction('create', ButtonActionType::class);
+}
+```
+
+What differentiates those two methods, is that by using the `visible` option, the action is still defined in the data table, but is not rendered in the view.
+It may be useful in some cases, for example, when the actions can be modified outside the data table builder.

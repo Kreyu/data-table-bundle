@@ -189,10 +189,10 @@ class ProductController extends AbstractController
         $actions = $dataTable->getRowActions();
         
         // or specific row action:
-        $action = $dataTable->getRowAction('create');
+        $action = $dataTable->getRowAction('update');
         
         // or simply check whether the row action is defined:
-        if ($dataTable->hasRowAction('create')) {
+        if ($dataTable->hasRowAction('update')) {
             // ...
         }
     }
@@ -236,7 +236,7 @@ class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addRowAction('create', ButtonActionType::class, [
+        $builder->addRowAction('update', ButtonActionType::class, [
             'confirmation' => true,
         ]);
     }
@@ -254,7 +254,7 @@ class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addRowAction('create', ButtonActionType::class, [
+        $builder->addRowAction('update', ButtonActionType::class, [
             'confirmation' => [
                 'translation_domain' => 'KreyuDataTable',
                 'label_title' => 'Action confirmation',
@@ -269,3 +269,33 @@ class ProductDataTableType extends AbstractDataTableType
 ```
 
 For reference, see [action's `confirmation` option documentation](../../reference/actions/types/action/#confirmation).
+
+## Conditionally rendering the action
+
+Action visibility can be configured using its [`visible` option](../../reference/actions/types/action/#visible):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('update', ButtonActionType::class, [
+        'visible' => $this->isGranted('ROLE_ADMIN'),
+    ])
+;
+```
+
+This will determine the visibility of the action in every row.
+In some cases, it may be useful to hide the action based on the row data, for example, only for products marked as "removable".
+In this case, the action's `visible` option can be set to a callable, which receives the row data as the first argument:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('update', ButtonActionType::class, [
+        'visible' => function (Product $product) {
+            return $product->isRemovable();
+        },
+    ])
+;
+```

@@ -36,6 +36,7 @@ final class ActionType implements ActionTypeInterface
                 'attr',
                 'icon_attr',
                 'confirmation',
+                'visible',
             ];
 
             foreach ($callableOptions as $optionName) {
@@ -77,6 +78,7 @@ final class ActionType implements ActionTypeInterface
             'confirmation' => $options['confirmation'],
             'context' => $action->getConfig()->getContext(),
             'batch' => $action->getConfig()->getContext() === ActionContext::Batch,
+            'visible' => $options['visible'],
         ]);
     }
 
@@ -91,6 +93,7 @@ final class ActionType implements ActionTypeInterface
                 'attr' => [],
                 'icon_attr' => [],
                 'confirmation' => false,
+                'visible' => true,
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableInterface::class])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', 'callable'])
@@ -99,6 +102,7 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedTypes('attr', ['array', 'callable'])
             ->setAllowedTypes('icon_attr', ['array', 'callable'])
             ->setAllowedTypes('confirmation', ['bool', 'array', 'callable'])
+            ->setAllowedTypes('visible', ['bool', 'callable'])
             ->setNormalizer('confirmation', function (Options $options, mixed $value) {
                 if (false === $value) {
                     return false;

@@ -117,7 +117,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_action %}
-    {{- block(block_name, theme) -}}
+    {% if visible %}{{- block(block_name, theme) -}}{% endif %}
 {% endblock %}
 
 {# Pagination #}

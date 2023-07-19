@@ -30,14 +30,15 @@ To add batch action, use data table builder's `addBatchAction()` method:
 ```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addBatchAction('settle', ButtonActionType::class, [
-            'href' => '/products/settle',
+        $builder->addBatchAction('remove', FormActionType::class, [
+            'action' => '/products',
+            'method' => 'DELETE',
         ]);
     }
 }
@@ -65,8 +66,9 @@ class ProductController extends AbstractController
     {
         $dataTable = $this->createDataTable(ProductDataTableType::class);
         
-        $dataTable->addBatchAction('settle', ButtonActionType::class, [
-            'href' => '/products/settle',
+        $dataTable->addBatchAction('remove', FormActionType::class, [
+            'action' => '/products',
+            'method' => 'DELETE',
         ]);
     }
 }
@@ -118,7 +120,7 @@ class ProductDataTableType extends AbstractDataTableType
     
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->removeBatchAction('settle');
+        $builder->removeBatchAction('remove');
     }
 }
 ```
@@ -139,7 +141,7 @@ class ProductController extends AbstractController
     {
         $dataTable = $this->createDataTable(ProductDataTableType::class);
         
-        $dataTable->removeBatchAction('settle');
+        $dataTable->removeBatchAction('remove');
     }
 }
 ```
@@ -162,10 +164,10 @@ class ProductDataTableType extends AbstractDataTableType
         $actions = $builder->getBatchActions();
         
         // or specific batch action:
-        $action = $builder->getBatchAction('settle');
+        $action = $builder->getBatchAction('remove');
         
         // or simply check whether the batch action is defined:
-        if ($builder->hasBatchAction('settle')) {
+        if ($builder->hasBatchAction('remove')) {
             // ...
         }
     }
@@ -192,10 +194,10 @@ class ProductController extends AbstractController
         $actions = $dataTable->getBatchActions();
         
         // or specific batch action:
-        $action = $dataTable->getBatchAction('create');
+        $action = $dataTable->getBatchAction('remove');
         
         // or simply check whether the batch action is defined:
-        if ($dataTable->hasBatchAction('create')) {
+        if ($dataTable->hasBatchAction('remove')) {
             // ...
         }
     }
@@ -331,13 +333,13 @@ To enable confirmation in the quickest way, set the action's `confirmation` opti
 ```php #10 src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addBatchAction('create', ButtonActionType::class, [
+        $builder->addBatchAction('remove', FormActionType::class, [
             'confirmation' => true,
         ]);
     }
@@ -349,13 +351,13 @@ To configure the confirmation modal, pass the array as the `confirmation` option
 ```php #10-17 src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        $builder->addBatchAction('create', ButtonActionType::class, [
+        $builder->addBatchAction('remove', FormActionType::class, [
             'confirmation' => [
                 'translation_domain' => 'KreyuDataTable',
                 'label_title' => 'Action confirmation',
@@ -370,3 +372,31 @@ class ProductDataTableType extends AbstractDataTableType
 ```
 
 For reference, see [action's `confirmation` option documentation](../../reference/actions/types/action/#confirmation).
+
+## Conditionally rendering the action
+
+Action visibility can be configured using its [`visible` option](../../reference/actions/types/action/#visible):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+
+$builder
+    ->addBatchAction('remove', FormActionType::class, [
+        'visible' => $this->isGranted('ROLE_ADMIN'),
+    ])
+;
+```
+
+Another approach would be simply not adding the action at all:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+if ($this->isGranted('ROLE_ADMIN')) {
+    $builder->addBatchAction('remove', FormActionType::class);
+}
+```
+
+What differentiates those two methods, is that by using the `visible` option, the action is still defined in the data table, but is not rendered in the view.
+It may be useful in some cases, for example, when the actions can be modified outside the data table builder.
+

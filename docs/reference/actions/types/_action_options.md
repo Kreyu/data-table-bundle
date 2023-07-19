@@ -28,6 +28,31 @@ Allows you to add a custom block prefix and override the block name used to rend
 Useful, for example, if you have multiple instances of the same action type, and you need to personalize
 the rendering of some of them, without the need to create a new action type.
 
+### `visible`
+
+- **type**: `bool` or `callable`
+- **default**: `true`
+
+Determines whether the action should be visible to the user.
+
+When action is used in the [row context](../../../features/actions/row-actions.md), the callable receives the row data as the first argument:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('remove', ButtonActionType::class, [
+        'visible' => function (Product $product) {
+            return $product->isRemovable();
+        },
+    ])
+;
+```
+
+!!!warning Warning
+When action is used in the [global](../../../features/actions/global-actions.md) or [batch](../../../features/actions/batch-actions.md) context, the callable receives no arguments!
+!!!
+
 ### `attr`
 
 - **type**: `array` 

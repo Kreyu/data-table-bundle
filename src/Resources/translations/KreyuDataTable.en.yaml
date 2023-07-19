@@ -39,6 +39,7 @@ INCLUDE_CURRENT_PAGE: Include current page
 INCLUDE_ALL: From all pages
 
 # Misc
+Selected: Selected
 Filter: Filter
 Apply: Apply
 No results found: No results

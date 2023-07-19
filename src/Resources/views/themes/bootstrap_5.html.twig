@@ -104,7 +104,7 @@
     {% set wrapper_attr = { class: 'card-title fs-6 fw-normal text-muted mb-0' }|merge(wrapper_attr|default({})) %}
 
     <div {% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
-        Zaznaczono: <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span>
+        {{ 'Selected'|trans({}, 'KreyuDataTable') }}: <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span>
     </div>
 {% endblock %}
 

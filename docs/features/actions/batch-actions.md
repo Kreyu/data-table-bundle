@@ -260,10 +260,17 @@ $builder->addColumn('__batch', CheckboxColumnType::class, [
 Using the above configuration, checking rows with ID 1, 2 will result in:
 
 - every batch action's `href` parameter appended with `product_id[]=1&product_id[]=2`
-- every batch action's `data-product-id` parameter set to `[1,2,3]`
+- every batch action's `data-product-id` parameter set to `[1,2]`
 
 If the action has no `href` parameter, the query parameters will not be appended.
 The data parameters are not used internally and can be used for custom scripts.
+
+If `FormActionType` is used, the scripts will append hidden inputs with selected values, for example:
+
+```html
+<input type="hidden" name="id[]" value="1">
+<input type="hidden" name="id[]" value="2">
+```
 
 ## Adding multiple checkbox columns
 
@@ -305,3 +312,10 @@ Checking the first row's product and second row's category will result in:
 
 - every batch action's `href` parameter appended with `product_id[]=1&category_id[]=4`
 - every batch action's `data-product-id` parameter set to `[1]` and `data-category-id` set to `[4]`
+
+If `FormActionType` is used, the scripts will append hidden inputs with selected values, for example:
+
+```html
+<input type="hidden" name="product_id[]" value="1">
+<input type="hidden" name="category_id[]" value="4">
+```

@@ -484,7 +484,13 @@
 {% endblock %}
 
 {% block action_form_value %}
-    <form id="{{ form_id }}" {% with { attr: { action, method: html_friendly_method }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+    {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <form id="{{ form_id }}" {{- block('attributes') -}}>
         <input type="hidden" name="_method" value="{{ method }}"/>
 
         {% set button_tag = button_tag|default('button') %}

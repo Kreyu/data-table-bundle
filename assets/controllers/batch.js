@@ -74,6 +74,10 @@ export default class extends Controller {
         for (const identifierHolder of this.identifierHolderTargets) {
             this.#updateIdentifierHolderHref(identifierHolder, identifierMap);
             this.#updateIdentifierHolderDataParam(identifierHolder, identifierMap);
+
+            if (identifierHolder.tagName === 'FORM') {
+                this.#updateIdentifierHolderInputs(identifierHolder, identifierMap);
+            }
         }
 
         this.#previousIdentifierMap = identifierMap;
@@ -114,6 +118,34 @@ export default class extends Controller {
 
         for (const [identifierName, identifiers] of identifierMap) {
             identifierHolder.dataset[identifierName] = JSON.stringify(identifiers);
+        }
+    }
+
+    #updateIdentifierHolderInputs(identifierHolder, identifierMap) {
+        if (identifierMap.size === 0 && this.#previousIdentifierMap) {
+            for (const identifierName of this.#previousIdentifierMap.keys()) {
+                const input = identifierHolder.querySelector(`input[name="${identifierName}[]"]`);
+
+                if (input) {
+                    input.remove();
+                }
+            }
+        }
+
+        for (const [identifierName, identifiers] of identifierMap) {
+            for (const identifier of identifiers) {
+                const input = identifierHolder.querySelector(`input[name="${identifierName}[]"][value="${identifier}"]`);
+
+                if (!input) {
+                    const input = document.createElement('input');
+
+                    input.type = 'hidden';
+                    input.name = identifierName + '[]';
+                    input.value = identifier;
+
+                    identifierHolder.appendChild(input);
+                }
+            }
         }
     }
 

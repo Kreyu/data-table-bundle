@@ -218,3 +218,54 @@ Therefore, actions retrieved by the methods:
 
 ...return instances of `ActionInterface` instead.
 !!!
+
+## Adding action confirmation
+
+Actions can be configured to require confirmation (by the user) before being executed.
+
+![Action confirmation modal with the Tabler theme](../../static/action_confirmation_modal.png)
+
+To enable confirmation in the quickest way, set the action's `confirmation` option to `true`:
+
+```php #10 src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addRowAction('create', ButtonActionType::class, [
+            'confirmation' => true,
+        ]);
+    }
+}
+```
+
+To configure the confirmation modal, pass the array as the `confirmation` option:
+
+```php #10-17 src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addRowAction('create', ButtonActionType::class, [
+            'confirmation' => [
+                'translation_domain' => 'KreyuDataTable',
+                'label_title' => 'Action confirmation',
+                'label_description' => 'Are you sure you want to execute this action?',
+                'label_confirm' => 'Confirm',
+                'label_cancel' => 'Cancel',
+                'type' => 'danger', // "danger", "warning" or "info"
+            ],
+        ]);
+    }
+}
+```
+
+For reference, see [action's `confirmation` option documentation](../../reference/actions/types/action/#confirmation).

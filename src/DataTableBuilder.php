@@ -493,6 +493,8 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getActions(): array
     {
+        $this->resolveActions();
+
         return $this->actions;
     }
 
@@ -540,6 +542,8 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getBatchActions(): array
     {
+        $this->resolveBatchActions();
+
         return $this->batchActions;
     }
 
@@ -599,6 +603,8 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getRowActions(): array
     {
+        $this->resolveRowActions();
+
         return $this->rowActions;
     }
 

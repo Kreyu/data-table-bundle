@@ -28,12 +28,12 @@ the ISO code will be automatically converted to the appropriate currency sign, f
 - `EUR` becomes `€`;
 - `PLN` becomes `zł`;
 
-Please note that the end result is also dependent on the locale used in the application, for example, with value of `100`: 
+Please note that the end result is also dependent on the locale used in the application, for example, with value of `1000`: 
 
-- `USD` currency will be rendered as `$100` when using the `en` locale;
-- `USD` currency will be rendered as `100 USD` when using the `pl` locale;
+- `USD` currency will be rendered as `$1,000.00` when using the `en` locale;
+- `USD` currency will be rendered as `1 000,00 USD` when using the `pl` locale;
 
-When the Intl formatter is **NOT** used, given currency is simply rendered after the monetary value.
+When the Intl formatter is **NOT** used, given currency is simply rendered after the raw value, e.g. `1000 USD`.
 
 Additionally, the option accepts a callable, which gets a row data as first argument:
 
@@ -48,7 +48,7 @@ $builder
 ### `use_intl_formatter`
 
 - **type**: `bool`
-- **default**: `true` if either [`symfony/intl`](https://packagist.org/packages/symfony/intl) or [`twig/intl-extra`](https://packagist.org/packages/twig/intl-extra) is installed
+- **default**: `true` if [`symfony/intl`](https://packagist.org/packages/symfony/intl), `false` instead
 
 Determines whether the [Intl number formatter](https://www.php.net/manual/en/class.numberformatter.php) should be used.
 Enabling this option will automatically handle the formatting based on the locale set in the application.

@@ -18,7 +18,7 @@ The `NumberColumnType` represents a column with value displayed as a number.
 ### `use_intl_formatter`
 
 - **type**: `bool`
-- **default**: `true` if either [`symfony/intl`](https://packagist.org/packages/symfony/intl) or [`twig/intl-extra`](https://packagist.org/packages/twig/intl-extra) is installed
+- **default**: `true` if [`symfony/intl`](https://packagist.org/packages/symfony/intl), `false` instead
 
 Determines whether the [Intl number formatter](https://www.php.net/manual/en/class.numberformatter.php) should be used.
 Enabling this option will automatically handle the formatting based on the locale set in the application.

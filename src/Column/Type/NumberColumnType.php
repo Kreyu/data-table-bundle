@@ -25,7 +25,7 @@ class NumberColumnType extends AbstractColumnType
     {
         $resolver
             ->setDefaults([
-                'use_intl_formatter' => false,
+                'use_intl_formatter' => class_exists(IntlFormatter::class),
                 'intl_formatter_options' => function (OptionsResolver $resolver) {
                     $resolver
                         ->setDefaults([
@@ -38,10 +38,6 @@ class NumberColumnType extends AbstractColumnType
                 }
             ])
             ->setAllowedTypes('use_intl_formatter', 'bool')
-            ->setNormalizer('use_intl_formatter', function () {
-                return class_exists(IntlFormatter::class)
-                    || class_exists(IntlExtension::class);
-            })
         ;
     }
 

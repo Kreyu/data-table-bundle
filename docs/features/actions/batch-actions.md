@@ -84,7 +84,7 @@ For reference, see [built-in action types](../../reference/actions/types.md).
 
 ## Adding checkbox column
 
-Batch actions require the user to select specific rows. This is handled by the CheckboxColumnType, 
+Batch actions require the user to select specific rows. This is handled by the [CheckboxColumnType](../../reference/columns/types/checkbox.md), 
 which simply renders a checkbox with value set to row identifier. To help with that process, 
 if at least one batch action is defined, this checkbox column will be added automatically.
 

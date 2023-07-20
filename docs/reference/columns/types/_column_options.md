@@ -1,7 +1,7 @@
 ### `label`
 
 - **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableMessage`
-- **default**: `null` - the label is "guessed" from the column name
+- **default**: {{ option_label_default_value ?? '`null` - the label is "guessed" from the column name' }}
 
 Sets the label that will be used when rendering the column header.
 
@@ -31,7 +31,7 @@ Setting the option to `false` disables its translation.
 ### `property_path`
 
 - **type**: `null`, `false` or `string`
-- **default**: `null` - the property path is "guessed" from the column name
+- **default**: {{ option_property_path_default_value ?? '`null` - the property path is "guessed" from the column name' }}
 
 Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.  
 Setting the option to `false` disables property accessor.

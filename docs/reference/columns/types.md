@@ -20,5 +20,6 @@ The following column types are natively available in the bundle:
     - [Form](types/form)
     - [Template](types/template)
     - [Actions](types/actions)
+    - [Checkbox](types/checkbox)
 - Base columns
     - [Column](types/column)

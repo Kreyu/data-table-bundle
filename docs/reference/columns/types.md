@@ -9,6 +9,7 @@ The following column types are natively available in the bundle:
 - Text columns
     - [Text](types/text)
     - [Number](types/number)
+    - [Money](types/money)
     - [Boolean](types/boolean)
     - [Link](types/link)
 - Date and time columns

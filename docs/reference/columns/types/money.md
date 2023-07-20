@@ -1,19 +1,49 @@
 ---
-label: Number
-order: b
+label: Money
+order: c
 ---
 
-# Number column type
+# Money column type
 
-The `NumberColumnType` represents a column with value displayed as a number.
+The `MoneyColumnType` represents a column with monetary value, appropriately formatted and rendered with currency sign.
 
 +-------------+---------------------------------------------------------------------+
-| Parent type | [ColumnType](column)
+| Parent type | [NumberType](number.md)
 +-------------+---------------------------------------------------------------------+
-| Class       | [:icon-mark-github: NumberColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/NumberColumnType.php)
+| Class       | [:icon-mark-github: MoneyColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/MoneyColumnType.php)
 +-------------+---------------------------------------------------------------------+
 
 ## Options
+
+### `currency`
+
+- **type**: `string` or `callable` - any [3-letter ISO 4217 code](https://en.wikipedia.org/wiki/ISO_4217) 
+
+Specifies the currency that the money is being specified in. 
+This determines the currency symbol that should be shown in the column.
+
+When using the [Intl number formatter](https://www.php.net/manual/en/class.numberformatter.php), 
+the ISO code will be automatically converted to the appropriate currency sign, for example:
+
+- `EUR` becomes `€`;
+- `PLN` becomes `zł`;
+
+Please note that the end result is also dependent on the locale used in the application, for example, with value of `100`: 
+
+- `USD` currency will be rendered as `$100` when using the `en` locale;
+- `USD` currency will be rendered as `100 USD` when using the `pl` locale;
+
+When the Intl formatter is **NOT** used, given currency is simply rendered after the monetary value.
+
+Additionally, the option accepts a callable, which gets a row data as first argument:
+
+```php
+$builder
+    ->addColumn('price', MoneyColumnType::class, [
+        'currency' => fn (Product $product) => $product->getPriceCurrency(),
+    ])
+;
+```
 
 ### `use_intl_formatter`
 
@@ -57,7 +87,7 @@ $builder
 
 For more details, see:
 - [Intl number formatter documentation](https://www.php.net/manual/en/class.numberformatter.php)
-- [Twig `format_number` filter documentation](https://twig.symfony.com/doc/2.x/filters/format_number.html)
+- [Twig `format_currency` filter documentation](https://twig.symfony.com/doc/2.x/filters/format_currency.html)
 
 ## Inherited options
 

@@ -1,6 +1,6 @@
 ---
 label: Boolean
-order: c
+order: d
 ---
 
 # Boolean column type

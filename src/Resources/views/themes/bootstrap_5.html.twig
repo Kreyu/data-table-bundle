@@ -740,6 +740,10 @@
     <div class="text-end">{{ parent() }}</div>
 {% endblock %}
 
+{% block column_money_value %}
+    <div class="text-end">{{ parent() }}</div>
+{% endblock %}
+
 {% block column_checkbox_header %}
     {% set attr = { class: 'text-center' }|merge(attr) %}
 

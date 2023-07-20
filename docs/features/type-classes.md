@@ -167,13 +167,12 @@ class UserController extends AbstractController
 
 The type extensions allow to easily extend existing types. Those classes contain methods similar as their corresponding feature type classes. They implement their own, feature-specific interface. For easier usage, there's also an abstract classes, which already implements the interface and provides some utilities.
 
-| Component   | Interface                                                                                                                                                             | Abstract class                                                                                                                                                     |
-|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Type/DataTableTypeInterface.php)        | [:icon-mark-github:&nbsp; AbstractDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableExtensionType.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Column/Type/ColumnTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractColumnTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnExtensionType.php)       |
-| Filters     | [:icon-mark-github:&nbsp; FilterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Filter/Type/FilterTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Action/Type/ActionTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ExporterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/Exporter/Type/ExporterTypeInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterExtensionType.php) |
+| Component   | Interface                                                                                                                                                                 | Abstract class                                                                                                                                                     |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github:&nbsp; DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/DataTableTypeExtensionInterface.php)        | [:icon-mark-github:&nbsp; AbstractDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableExtensionType.php)        |
+| Columns     | [:icon-mark-github:&nbsp; ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/ColumnTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractColumnTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnExtensionType.php)       |
+| Filters     | [:icon-mark-github:&nbsp; FilterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Extension/FilterTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
+| Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Extension/ActionTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
 
 ### Setting the types to extend
 
@@ -229,7 +228,6 @@ Every type extension in the bundle is registered as a [tagged service](https://s
 | Columns     | `kreyu_data_table.column.type_extension`   |
 | Filters     | `kreyu_data_table.filter.type_extension`   |
 | Actions     | `kreyu_data_table.action.type_extension`   |
-| Exporters   | `kreyu_data_table.exporter.type_extension` |
 
 Tagged services [can be prioritized using the `priority` attribute](https://symfony.com/doc/current/service\_container/tags.html#tagged-services-with-priority) to define the order the extensions will be loaded:
 

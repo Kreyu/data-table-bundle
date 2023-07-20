@@ -6,10 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\Formatter\IntlFormatter;
-use Twig\Extra\Intl\IntlExtension;
 
 class NumberColumnType extends AbstractColumnType
 {
@@ -30,12 +28,12 @@ class NumberColumnType extends AbstractColumnType
                     $resolver
                         ->setDefaults([
                             'attrs' => [],
-                            'style' => 'decimal'
+                            'style' => 'decimal',
                         ])
                         ->setAllowedTypes('attrs', 'array')
                         ->setAllowedTypes('style', 'string')
                     ;
-                }
+                },
             ])
             ->setAllowedTypes('use_intl_formatter', 'bool')
         ;

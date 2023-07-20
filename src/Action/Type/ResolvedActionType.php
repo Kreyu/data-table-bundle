@@ -72,10 +72,7 @@ class ResolvedActionType implements ResolvedActionTypeInterface
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
-            throw new $exception(sprintf(
-                'An error has occurred resolving the options of the action "%s": ',
-                get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception
-            );
+            throw new $exception(sprintf('An error has occurred resolving the options of the action "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return new ActionBuilder($name, $this, $options);

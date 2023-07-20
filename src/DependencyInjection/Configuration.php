@@ -32,7 +32,7 @@ class Configuration implements ConfigurationInterface
                     ->setDeprecated(
                         'kreyu/data-table-bundle',
                         '0.12.0',
-                        'The child node "%node%" at path "%path%" is deprecated, use "defaults.themes" instead.'
+                        'The child node "%node%" at path "%path%" is deprecated, use "defaults.themes" instead.',
                     )
                 ->end()
                 ->arrayNode('defaults')

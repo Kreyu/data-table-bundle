@@ -13,10 +13,9 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\Form\Extension\Core\Type as Form;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 
 use function Symfony\Component\Translation\t;
-
-use Symfony\Component\Translation\TranslatableMessage;
 
 class BooleanFilterType extends AbstractFilterType
 {

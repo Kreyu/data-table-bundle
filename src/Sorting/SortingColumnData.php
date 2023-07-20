@@ -16,8 +16,7 @@ class SortingColumnData
     }
 
     /**
-     * @param  array{name: string, direction: string} $data
-     * @return self
+     * @param array{name: string, direction: string} $data
      */
     public static function fromArray(array $data): self
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractExporterType;
@@ -18,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractExporterType extends BaseAbstractExporterType
 {
     public function __construct(
-        private ?TranslatorInterface $translator = null
+        private ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -77,7 +76,7 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
         return new ExportFile($path, "$filename.$extension");
     }
 
-    protected abstract function getExtension(): string;
+    abstract protected function getExtension(): string;
 
-    protected abstract function getWriter(array $options): WriterInterface;
+    abstract protected function getWriter(array $options): WriterInterface;
 }

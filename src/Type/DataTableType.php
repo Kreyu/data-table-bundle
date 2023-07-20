@@ -280,7 +280,8 @@ final class DataTableType implements DataTableTypeInterface
     }
 
     /**
-     * @param  array<ColumnInterface> $columns
+     * @param array<ColumnInterface> $columns
+     *
      * @return iterable<ValueRowView>
      */
     private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 
 use OpenSpout\Common\Entity\Style\Style;
-use OpenSpout\Writer\WriterInterface;
 use OpenSpout\Writer\ODS\Options;
 use OpenSpout\Writer\ODS\Writer;
+use OpenSpout\Writer\WriterInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OdsExporterType extends AbstractExporterType

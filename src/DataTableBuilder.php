@@ -314,7 +314,7 @@ class DataTableBuilder implements DataTableBuilderInterface
      */
     private bool $locked = false;
 
-    public function __construct(string $name, ?ProxyQueryInterface $query = null, array $options = [])
+    public function __construct(string $name, ProxyQueryInterface $query = null, array $options = [])
     {
         $this->name = $name;
         $this->query = $query;

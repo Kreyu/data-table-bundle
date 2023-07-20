@@ -260,11 +260,11 @@ class DataTable implements DataTableInterface
 
             $sortField = $column->getOptions()['sort'];
 
-            if ($sortField === false) {
+            if (false === $sortField) {
                 continue;
             }
 
-            if ($sortField === true) {
+            if (true === $sortField) {
                 $sortField = $column->getOptions()['property_path'] ?: $column->getName();
             }
 

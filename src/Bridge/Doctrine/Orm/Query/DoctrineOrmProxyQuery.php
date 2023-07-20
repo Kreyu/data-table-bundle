@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -13,7 +12,6 @@ use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 /**

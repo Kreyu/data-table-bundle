@@ -73,7 +73,7 @@ class ActionsColumnType extends AbstractColumnType
     private function resolveAction(
         string $name,
         array|ActionBuilderInterface|ActionInterface $action,
-        ColumnHeaderView|ColumnValueView $view
+        ColumnHeaderView|ColumnValueView $view,
     ): ?ActionInterface {
         if ($action instanceof ActionInterface) {
             return $action;

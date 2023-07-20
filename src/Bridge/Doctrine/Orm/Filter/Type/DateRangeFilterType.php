@@ -10,8 +10,8 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Symfony\Component\Translation\TranslatableMessage;
+
 use function Symfony\Component\Translation\t;
 
 class DateRangeFilterType extends AbstractFilterType

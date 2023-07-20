@@ -77,7 +77,7 @@ final class ActionType implements ActionTypeInterface
             'icon_attr' => $options['icon_attr'],
             'confirmation' => $options['confirmation'],
             'context' => $action->getConfig()->getContext(),
-            'batch' => $action->getConfig()->getContext() === ActionContext::Batch,
+            'batch' => ActionContext::Batch === $action->getConfig()->getContext(),
             'visible' => $options['visible'],
         ]);
     }

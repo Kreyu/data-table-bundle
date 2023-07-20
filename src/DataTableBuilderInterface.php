@@ -28,7 +28,7 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasAction(string $name): bool;
 
     /**
-     * @param null|class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
     public function addAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
@@ -47,7 +47,7 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasBatchAction(string $name): bool;
 
     /**
-     * @param null|class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
     public function addBatchAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
@@ -70,7 +70,7 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasRowAction(string $name): bool;
 
     /**
-     * @param null|class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
     public function addRowAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 

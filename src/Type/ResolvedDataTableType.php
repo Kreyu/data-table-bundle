@@ -51,7 +51,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
+    public function createBuilder(DataTableFactoryInterface $factory, string $name, ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);

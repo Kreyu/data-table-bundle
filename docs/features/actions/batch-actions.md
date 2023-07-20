@@ -243,7 +243,7 @@ $builder->addColumn('__batch', CheckboxColumnType::class, [
 ]);
 ```
 
-## Changing the identifier query parameter name
+## Changing the identifier parameter name
 
 By default, the checkbox column type will add the `id` parameter to the batch actions.
 For example, checking rows with ID 1, 2 will result in:
@@ -314,6 +314,9 @@ Checking the first row's product and second row's category will result in:
 
 - every batch action's `href` parameter appended with `product_id[]=1&category_id[]=4`
 - every batch action's `data-product-id` parameter set to `[1]` and `data-category-id` set to `[4]`
+
+If the action has no `href` parameter, the query parameters will not be appended.
+The data parameters are not used internally and can be used for custom scripts.
 
 If `FormActionType` is used, the scripts will append hidden inputs with selected values, for example:
 

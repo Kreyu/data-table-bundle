@@ -31,7 +31,7 @@ For example, value `123456.78` will be rendered differently:
 !!! Note
 When using Twig, enabling the Intl formatter without [`twig/intl-extra`](https://packagist.org/packages/twig/intl-extra) installed will result in an exception:
 
-> The "format_currency" filter is part of the IntlExtension, which is not installed/enabled; try running "composer require twig/intl-extra"
+> The "format_number" filter is part of the IntlExtension, which is not installed/enabled; try running "composer require twig/intl-extra"
 !!!
 
 ### `intl_formatter_options`

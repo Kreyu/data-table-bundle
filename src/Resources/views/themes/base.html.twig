@@ -368,31 +368,18 @@
     {{- block('column_value') -}}
 {% endblock %}
 
-{% block column_number_value %}
-    {# @var bool  use_intl_formatter - Determines whether the Intl formatter should be used #}
-    {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
-
-    {% if use_intl_formatter %}
-        {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
-    {% endif %}
-
-    {{- block('column_text_value') -}}
-{% endblock %}
-
 {% block column_money_value %}
-    {# @var bool    use_intl_formatter - Determines whether the Intl formatter should be used #}
-    {# @var array   intl_formatter_options - Options used to configure the Intl formatter #}
-    {# @var string  currency #}
-
-    {% if use_intl_formatter %}
-        {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
-    {% endif %}
-
-    {{- block('column_text_value') -}}
-
-    {% if not use_intl_formatter %}
-        {{ currency }}
-    {% endif %}
+    {%- set prepend = not (money_pattern starts with '{{') -%}
+    {%- set append = not (money_pattern ends with '}}') -%}
+    {%- if prepend or append -%}
+        <span>
+            {%- if prepend -%}{{ money_pattern|form_encode_currency }}{%- endif -%}
+            {{- block('column_text_value') -}}
+            {%- if append -%}{{ money_pattern|form_encode_currency }}{%- endif -%}
+        </span>
+    {%- else -%}
+        {{- block('column_text_value') -}}
+    {%- endif -%}
 {% endblock %}
 
 {% block column_link_value %}

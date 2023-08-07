@@ -737,7 +737,7 @@
 {% endblock %}
 
 {% block column_number_value %}
-    <div class="text-end">{{ parent() }}</div>
+    <div class="text-end">{{ block('column_text_value') }}</div>
 {% endblock %}
 
 {% block column_money_value %}

@@ -113,12 +113,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        $form = $dataTable->createExportFormBuilder()->getForm();
+        $form = $dataTable->getExportForm();
         $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            $dataTable->export($form->getData());
-        }
     }
 
     private function extractQueryParameter(Request $request, string $path): mixed

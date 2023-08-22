@@ -16,7 +16,9 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -107,10 +109,10 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $columns = $visibleColumns = $dataTable->getConfig()->getColumns();
+        $columns = $visibleColumns = $dataTable->getColumns();
 
-        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            $visibleColumns = $dataTable->getPersonalizationData()->compute($columns);
+        if ($dataTable->getConfig()->isPersonalizationEnabled() && $personalizationData = $dataTable->getPersonalizationData()) {
+            $visibleColumns = $personalizationData->compute($columns);
         }
 
         $view->vars = array_replace($view->vars, [
@@ -167,6 +169,21 @@ final class DataTableType implements DataTableTypeInterface
         }
     }
 
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
+    {
+        $columns = $visibleColumns = $dataTable->getColumns();
+
+        if ($dataTable->getConfig()->isPersonalizationEnabled() && $personalizationData = $dataTable->getPersonalizationData()) {
+            $visibleColumns = $personalizationData->compute($columns);
+        }
+
+        $view->vars = array_replace($view->vars, [
+            'translation_domain' => $dataTable->getConfig()->getTranslationDomain(),
+            'header_row' => $this->createExportHeaderRowView($view, $dataTable, $visibleColumns),
+            'value_rows' => new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns)),
+        ]);
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
@@ -213,8 +230,12 @@ final class DataTableType implements DataTableTypeInterface
         return null;
     }
 
-    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
+    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): ?PaginationView
     {
+        if (!$dataTable->getConfig()->isPaginationEnabled()) {
+            return null;
+        }
+
         return new PaginationView($view, $dataTable->getPagination());
     }
 
@@ -245,19 +266,17 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
     {
-        $filters = [];
-
         if (!$dataTable->getConfig()->isFiltrationEnabled()) {
             return [];
         }
 
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $data = $dataTable->getFiltrationData()->getFilterData($filter->getName()) ?? new FilterData();
-
-            $filters[$filter->getName()] = $filter->createView($data, $view);
-        }
-
-        return $filters;
+        return array_map(
+            static fn (FilterInterface $filter) => $filter->createView(
+                $dataTable->getFiltrationData()?->getFilterData($filter) ?? new FilterData(),
+                $view
+            ),
+            $dataTable->getConfig()->getFilters(),
+        );
     }
 
     /**
@@ -286,7 +305,13 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        foreach ($dataTable->getPagination()->getItems() as $index => $data) {
+        if ($dataTable->getConfig()->isPaginationEnabled()) {
+            $items = $dataTable->getPagination()->getItems();
+        } else {
+            $items = $dataTable->getQuery()->getItems();
+        }
+
+        foreach ($items as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);
             $valueRowView->vars['row'] = $valueRowView;
 
@@ -298,10 +323,36 @@ final class DataTableType implements DataTableTypeInterface
                 $valueRowView->vars['attr'][$key] = $value;
             }
 
-            $valueRowView->vars['attr']['data-index'] = $index;
-
             foreach ($columns as $column) {
                 $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
+            }
+
+            yield $valueRowView;
+        }
+
+        yield from [];
+    }
+
+    private function createExportHeaderRowView(DataTableView $view, DataTableInterface $dataTable, array $columns): HeaderRowView
+    {
+        $headerRowView = new HeaderRowView($view);
+
+        foreach ($columns as $column) {
+            $headerRowView->children[$column->getName()] = $column->createExportHeaderView($headerRowView);
+        }
+
+        return $headerRowView;
+    }
+
+    private function createExportValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
+    {
+        $items = $dataTable->getQuery()->getItems();
+
+        foreach ($items as $index => $data) {
+            $valueRowView = new ValueRowView($view, $index, $data);
+
+            foreach ($columns as $column) {
+                $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
             }
 
             yield $valueRowView;

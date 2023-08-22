@@ -43,15 +43,13 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
             $labels = [];
 
             foreach ($headerRow->children as $child) {
-                if (false !== $child->vars['export']) {
-                    $label = $child->vars['export']['label'];
+                $label = $child->vars['label'];
 
-                    if ($this->translator && $translationDomain = $child->vars['export']['translation_domain'] ?? null) {
-                        $label = $this->translator->trans($label, $child->vars['export']['translation_parameters'] ?? [], $translationDomain);
-                    }
-
-                    $labels[] = $label;
+                if ($this->translator && $translationDomain = $child->vars['translation_domain'] ?? null) {
+                    $label = $this->translator->trans($label, $child->vars['translation_parameters'] ?? [], $translationDomain);
                 }
+
+                $labels[] = $label;
             }
 
             $writer->addRow(Row::fromValues($labels));
@@ -61,8 +59,8 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
             $values = [];
 
             foreach ($valueRow->children as $child) {
-                if (false !== $child->vars['export']) {
-                    $values[] = $child->vars['export']['value'];
+                if (false !== $child->vars) {
+                    $values[] = $child->vars['value'];
                 }
             }
 

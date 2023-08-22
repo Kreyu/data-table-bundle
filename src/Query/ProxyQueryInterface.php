@@ -15,4 +15,6 @@ interface ProxyQueryInterface
     public function paginate(PaginationData $paginationData): void;
 
     public function getPagination(): PaginationInterface;
+
+    public function getItems(): iterable;
 }

@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
@@ -14,6 +16,25 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
 
     public const ACTIONS_COLUMN_NAME = '__actions';
+
+    /**
+     * @return array<ColumnBuilderInterface>
+     */
+    public function getColumns(): array;
+
+    /**
+     * @throws InvalidArgumentException if column of given name does not exist
+     */
+    public function getColumn(string $name): ColumnBuilderInterface;
+
+    public function hasColumn(string $name): bool;
+
+    /**
+     * @param class-string<ColumnTypeInterface>|null $type
+     */
+    public function addColumn(ColumnBuilderInterface|string $column, string $type = null, array $options = []): static;
+
+    public function removeColumn(string $name): static;
 
     /**
      * @return array<ActionBuilderInterface>

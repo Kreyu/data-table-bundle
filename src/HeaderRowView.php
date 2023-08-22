@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 
 class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {

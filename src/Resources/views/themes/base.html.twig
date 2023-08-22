@@ -420,10 +420,14 @@
 {% endblock %}
 
 {% block column_collection_value %}
-    {% for child in children %}
-        {{- data_table_column_value(child) -}}
-        <span>{% if not loop.last %}{{- separator -}}{% endif %}</span>
-    {% endfor %}
+    {# Note: do **not** remove the HTML comments below, because it makes sure the separator is rendered properly. #}
+    {% apply spaceless %}
+        {% for child in children %}
+            {% if not loop.first %}-->{% endif %}
+            {{- data_table_column_value(child) -}}<!--
+            -->{% if not loop.last %}{{- separator -}}<!--{% endif %}
+        {% endfor %}
+    {% endapply %}
 {% endblock %}
 
 {% block column_template_value %}

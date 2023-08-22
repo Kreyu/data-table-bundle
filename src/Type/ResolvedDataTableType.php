@@ -70,6 +70,11 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
         return new DataTableView();
     }
 
+    public function createExportView(DataTableInterface $dataTable): DataTableView
+    {
+        return new DataTableView();
+    }
+
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $this->parent?->buildDataTable($builder, $options);
@@ -89,6 +94,17 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
 
         foreach ($this->typeExtensions as $extension) {
             $extension->buildView($view, $dataTable, $options);
+        }
+    }
+
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
+    {
+        if ($this->parent && method_exists($this->parent, 'buildExportView')) {
+            $this->parent?->buildExportView($view, $dataTable, $options);
+        }
+
+        if (method_exists($this->innerType, 'buildExportView')) {
+            $this->innerType->buildExportView($view, $dataTable, $options);
         }
     }
 

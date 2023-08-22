@@ -60,7 +60,7 @@ The options resolver normalizer ensures the `property_path` is always present in
 ### `separator`
 
 - **type**: `null` or `string`
-- **default**: `','`
+- **default**: `', '`
 
 Sets the value displayed between every item in the collection.
 

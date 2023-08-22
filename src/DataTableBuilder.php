@@ -8,10 +8,12 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -75,11 +77,18 @@ class DataTableBuilder implements DataTableBuilderInterface
     private null|false|string $translationDomain = null;
 
     /**
-     * Stores an array of columns, used to display the data table to the user.
+     * The column builders defined for the data table.
      *
-     * @var array<ColumnInterface>
+     * @var array<ColumnBuilderInterface>
      */
     private array $columns = [];
+
+    /**
+     * The data of columns that haven't been converted to column builders yet.
+     *
+     * @var array<array{0: class-string<ColumnTypeInterface>, 1: array}>
+     */
+    private array $unresolvedColumns = [];
 
     /**
      * Stores an array of filters, used to build and handle the filtering feature.
@@ -440,29 +449,49 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getColumns(): array
     {
+        $this->resolveColumns();
+
         return $this->columns;
     }
 
-    public function getColumn(string $name): ColumnInterface
+    public function getColumn(string $name): ColumnBuilderInterface
     {
-        return $this->columns[$name] ?? throw new \InvalidArgumentException("Column \"$name\" does not exist");
+        if (isset($this->unresolvedColumns[$name])) {
+            return $this->resolveColumn($name);
+        }
+
+        if (isset($this->columns[$name])) {
+            return $this->columns[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
     }
 
-    public function hasColumn(string $name): bool
+    public function addColumn(string|ColumnBuilderInterface $column, string $type = null, array $options = []): static
     {
-        return array_key_exists($name, $this->columns);
-    }
+        if ($column instanceof ColumnBuilderInterface) {
+            $this->columns[$column->getName()] = $column;
 
-    public function addColumn(string $name, string $type, array $options = []): static
-    {
-        $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
+            unset($this->unresolvedColumns[$column->getName()]);
+
+            return $this;
+        }
+
+        $this->columns[$column] = null;
+        $this->unresolvedColumns[$column] = [$type, $options];
 
         return $this;
     }
 
+    public function hasColumn(string $name): bool
+    {
+        return array_key_exists($name, $this->columns)
+            || array_key_exists($name, $this->unresolvedColumns);
+    }
+
     public function removeColumn(string $name): static
     {
-        unset($this->columns[$name]);
+        unset($this->unresolvedColumns[$name], $this->columns[$name]);
 
         return $this;
     }
@@ -1104,20 +1133,24 @@ class DataTableBuilder implements DataTableBuilderInterface
     {
         $this->validate();
 
-        if ($this->shouldPrependBatchCheckboxColumn()) {
-            $this->prependBatchCheckboxColumn();
-        }
+//        if ($this->shouldPrependBatchCheckboxColumn()) {
+//            $this->prependBatchCheckboxColumn();
+//        }
 
-        $this->resolveRowActions();
-
-        if ($this->shouldAppendActionsColumn()) {
-            $this->appendActionsColumn();
-        }
+//        if ($this->shouldAppendActionsColumn()) {
+//            $this->appendActionsColumn();
+//        }
 
         $dataTable = new DataTable(
             query: clone $this->query,
             config: $this->getDataTableConfig(),
         );
+
+        $this->resolveColumns();
+
+        foreach ($this->columns as $column) {
+            $dataTable->addColumn($column->getColumn());
+        }
 
         $this->resolveActions();
 
@@ -1130,6 +1163,8 @@ class DataTableBuilder implements DataTableBuilderInterface
         foreach ($this->batchActions as $batchAction) {
             $dataTable->addBatchAction($batchAction->getAction());
         }
+
+        $this->resolveRowActions();
 
         foreach ($this->rowActions as $rowAction) {
             $dataTable->addRowAction($rowAction->getAction());
@@ -1146,6 +1181,22 @@ class DataTableBuilder implements DataTableBuilderInterface
         $config->locked = true;
 
         return $config;
+    }
+
+    private function resolveColumn(string $name): ColumnBuilderInterface
+    {
+        [$type, $options] = $this->unresolvedColumns[$name];
+
+        unset($this->unresolvedColumns[$name]);
+
+        return $this->columns[$name] = $this->getColumnFactory()->createNamedBuilder($name, $type, $options);
+    }
+
+    private function resolveColumns(): void
+    {
+        foreach (array_keys($this->unresolvedColumns) as $column) {
+            $this->resolveColumn($column);
+        }
     }
 
     private function resolveAction(string $name): ActionBuilderInterface

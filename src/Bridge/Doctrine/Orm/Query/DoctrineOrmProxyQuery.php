@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
@@ -20,6 +20,7 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 class DoctrineOrmProxyQuery implements ProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
+    private bool $entityManagerClearingEnabled = true;
 
     /**
      * @param array<string, mixed> $hints
@@ -100,6 +101,21 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->getPagination();
     }
 
+    public function getItems(): iterable
+    {
+        $query = clone $this->queryBuilder->getQuery();
+
+        $this->applyQueryHints($query);
+
+        foreach ($query->toIterable() as $item) {
+            yield $item;
+
+            if ($this->isEntityManagerClearingEnabled()) {
+                $this->getEntityManager()->clear();
+            }
+        }
+    }
+
     public function getUniqueParameterId(): int
     {
         return $this->uniqueParameterId++;
@@ -108,6 +124,16 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function setHint(string $name, mixed $value): void
     {
         $this->hints[$name] = $value;
+    }
+
+    public function isEntityManagerClearingEnabled(): bool
+    {
+        return $this->entityManagerClearingEnabled;
+    }
+
+    public function setEntityManagerClearingEnabled(bool $entityManagerClearingEnabled): void
+    {
+        $this->entityManagerClearingEnabled = $entityManagerClearingEnabled;
     }
 
     private function getCurrentPageNumber(): int
@@ -134,16 +160,17 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
         $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
 
-        $query = $this->queryBuilder->getQuery();
+        $query = clone $this->queryBuilder->getQuery();
 
-        if (!$hasJoins) {
-            $query->setHint(CountWalker::HINT_DISTINCT, false);
-        }
+        $this->applyQueryHints($query);
 
+        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
+    }
+
+    private function applyQueryHints(Query $query): void
+    {
         foreach ($this->hints as $name => $value) {
             $query->setHint($name, $value);
         }
-
-        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
     }
 }

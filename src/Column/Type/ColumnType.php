@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
@@ -16,6 +17,10 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 final class ColumnType implements ColumnTypeInterface
 {
+    public function buildColumn(ColumnBuilderInterface $builder, array $options): void
+    {
+    }
+
     public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
         if (true === $sort = $options['sort']) {
@@ -40,20 +45,6 @@ final class ColumnType implements ColumnTypeInterface
             'sort_direction' => $sortColumnData?->getDirection(),
             'export' => false,
         ]);
-
-        if (true === $export = $options['export']) {
-            $export = [];
-        }
-
-        if (false !== $export) {
-            $export = array_merge($options, [
-                'label' => $export['label'] ?? $view->vars['label'],
-                'translation_parameters' => $export['translation_parameters'] ?? $view->vars['translation_parameters'] ?? null,
-                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'] ?? null,
-            ], $export);
-        }
-
-        $view->vars['export'] = $export;
     }
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -80,28 +71,58 @@ final class ColumnType implements ColumnTypeInterface
             'translation_parameters' => $options['value_translation_parameters'] ?? [],
             'attr' => $attr,
         ]);
+    }
 
-        if (true === $export = $options['export']) {
-            $export = [];
+    public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
+    {
+        if (true === $options['export']) {
+            $options['export'] = [];
         }
 
-        if (false !== $export) {
-            $export = array_merge($options, $export);
+        $options['export']['label'] ??= $options['getter'];
+        $options['export']['property_path'] ??= $options['property_path'];
+        $options['export']['formatter'] ??= $options['formatter'];
 
-            $export = $column->getType()->getOptionsResolver()->resolve($export);
+        $translationDomain = $options['export']['value_translation_domain']
+            ?? $options['value_translation_domain']
+            ?? $view->parent->vars['translation_domain']
+            ?? null;
 
-            $normData = $this->getNormDataFromRowData($rowData, $column, $export);
-            $viewData = $this->getViewDataFromNormData($normData, $column, $export);
+        $view->vars = array_replace($view->vars, [
+            'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
+            'translation_domain' => $translationDomain,
+            'translation_parameters' => $options['header_translation_parameters'] ?? [],
+        ]);
+    }
 
-            $export = array_merge([
-                'data' => $normData,
-                'value' => $viewData,
-                'label' => $export['label'] ?? null,
-                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'],
-            ], $export);
+    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        $rowData = $view->parent->data;
+
+        if (true === $options['export']) {
+            $options['export'] = [];
         }
 
-        $view->vars['export'] = $export;
+        $options['export']['getter'] ??= $options['getter'];
+        $options['export']['property_path'] ??= $options['property_path'];
+        $options['export']['property_accessor'] ??= $options['property_accessor'];
+        $options['export']['formatter'] ??= $options['formatter'];
+
+        $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
+        $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);
+
+        $view->value = $viewData;
+
+        $translationDomain = $options['export']['value_translation_domain']
+            ?? $options['value_translation_domain']
+            ?? $view->parent->vars['translation_domain']
+            ?? null;
+
+        $view->vars = array_replace($view->vars, [
+            'value' => $viewData,
+            'translation_domain' => $translationDomain,
+            'translation_parameters' => $options['value_translation_parameters'] ?? [],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -219,7 +240,7 @@ final class ColumnType implements ColumnTypeInterface
      */
     private function getColumnBlockPrefixes(ColumnInterface $column, array $options): array
     {
-        $type = $column->getType();
+        $type = $column->getConfig()->getType();
 
         $blockPrefixes = [
             $type->getBlockPrefix(),

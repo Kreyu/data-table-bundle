@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 
@@ -12,11 +12,17 @@ interface ColumnInterface
 {
     public function getName(): string;
 
-    public function getType(): ResolvedColumnTypeInterface;
+    public function getConfig(): ColumnConfigInterface;
 
-    public function getOptions(): array;
+    public function getDataTable(): DataTableInterface;
+
+    public function setDataTable(DataTableInterface $dataTable): static;
 
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
 
     public function createValueView(ValueRowView $parent = null): ColumnValueView;
+
+    public function createExportHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
+
+    public function createExportValueView(ValueRowView $parent = null): ColumnValueView;
 }

@@ -43,13 +43,6 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setTranslationDomain(null|bool|string $translationDomain): static;
 
-    /**
-     * @param class-string<ColumnTypeInterface> $type
-     */
-    public function addColumn(string $name, string $type, array $options = []): static;
-
-    public function removeColumn(string $name): static;
-
     public function getColumnFactory(): ColumnFactoryInterface;
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;

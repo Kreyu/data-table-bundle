@@ -14,12 +14,17 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
 {
     use ColumnFactoryAwareTrait;
 
+    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        $view->vars['value'] = implode($options['separator'] ?? '', [...$view->vars['value']]);
+    }
+
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         $children = [];
 
         foreach ($view->value ?? [] as $index => $data) {
-            $child = $this->columnFactory->create(
+            $child = $this->columnFactory->createNamed(
                 name: $column->getName().'__'.($index + 1),
                 type: $options['entry_type'],
                 options: $options['entry_options'] + [
@@ -48,7 +53,7 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
             ->setDefaults([
                 'entry_type' => TextColumnType::class,
                 'entry_options' => [],
-                'separator' => ',',
+                'separator' => ', ',
             ])
             ->setAllowedTypes('entry_type', ['string'])
             ->setAllowedTypes('entry_options', ['array'])

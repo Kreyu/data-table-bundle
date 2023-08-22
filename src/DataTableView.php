@@ -21,7 +21,7 @@ class DataTableView
      */
     public iterable $valueRows = [];
 
-    public PaginationView $pagination;
+    public ?PaginationView $pagination = null;
 
     /**
      * @var array<FilterView>

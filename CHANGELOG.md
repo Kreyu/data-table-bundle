@@ -1,3 +1,8 @@
+# TBD
+
+- **[Bugfix]** CollectionColumnType now renders without spaces around separator
+- **[Feature]** CollectionColumnType default separator is now `', '` (with space after comma) instead of `','`
+
 # 0.13
 
 - **[Feature]** Batch actions ([see more](https://data-table-bundle.swroblewski.pl/features/actions/batch-actions/))

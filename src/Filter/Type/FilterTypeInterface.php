@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 interface FilterTypeInterface
 {
     /**
-     * @param T $query
+     * @param ProxyQueryInterface<T> $query
      */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 

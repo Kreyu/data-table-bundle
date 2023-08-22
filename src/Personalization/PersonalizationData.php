@@ -55,7 +55,7 @@ class PersonalizationData
     {
         $columns = [];
 
-        foreach (array_values($dataTable->getConfig()->getColumns()) as $index => $column) {
+        foreach (array_values($dataTable->getColumns()) as $index => $column) {
             $columns[] = PersonalizationColumnData::fromColumn($column, $index);
         }
 

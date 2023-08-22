@@ -50,18 +50,6 @@ interface DataTableConfigInterface
     public function getTranslationDomain(): null|bool|string;
 
     /**
-     * @return array<ColumnInterface>
-     */
-    public function getColumns(): array;
-
-    /**
-     * @throws \InvalidArgumentException if column of given name does not exist
-     */
-    public function getColumn(string $name): ColumnInterface;
-
-    public function hasColumn(string $name): bool;
-
-    /**
      * @return array<FilterInterface>
      */
     public function getFilters(): array;

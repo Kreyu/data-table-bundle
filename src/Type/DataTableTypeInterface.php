@@ -21,6 +21,11 @@ interface DataTableTypeInterface
      */
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
+
     public function configureOptions(OptionsResolver $resolver): void;
 
     public function getName(): string;

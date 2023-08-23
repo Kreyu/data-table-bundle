@@ -20,7 +20,10 @@ Streamlines the creation process of the data tables in Symfony applications.
 
 ## Documentation
 
-Check out the [official documentation](https://data-table-bundle.swroblewski.pl).
+Check out the [official documentation](https://data-table-bundle.swroblewski.pl).  
+
+If there's a problem with the domain, see [documentation on Netlify](https://incomparable-halva-a2f805.netlify.app/).
+Alternatively, see `docs` directory.
 
 ## License
 

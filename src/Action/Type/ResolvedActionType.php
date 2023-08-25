@@ -67,7 +67,7 @@ class ResolvedActionType implements ResolvedActionTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(ActionFactoryInterface $factory, string $name, array $options = []): ActionBuilderInterface
+    public function createBuilder(ActionFactoryInterface $factory, string $name, array $options): ActionBuilderInterface
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);

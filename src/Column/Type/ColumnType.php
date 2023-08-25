@@ -19,31 +19,38 @@ final class ColumnType implements ColumnTypeInterface
 {
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
+        $builder
+            ->setPropertyPath($options['property_path'] ?: null)
+            ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
+            ->setSortable(false !== $options['sort'])
+            ->setExportable(false !== $options['export'])
+        ;
     }
 
     public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
-        if (true === $sort = $options['sort']) {
-            $sort = $column->getName();
-        }
+        $dataTable = $column->getDataTable();
+        $sortColumnData = $dataTable->getSortingData()?->getColumn($column);
 
-        $sortColumnData = $view->parent->parent->vars['sorting_data']?->getColumn($column->getName());
+        $headerRowView = $view->parent;
+        $dataTableView = $headerRowView->parent;
 
         $view->vars = array_replace($view->vars, [
             'name' => $column->getName(),
             'column' => $view,
-            'row' => $view->parent,
-            'data_table' => $view->parent->parent,
+            'row' => $headerRowView,
+            'data_table' => $dataTableView,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
+            'translation_domain' => $options['header_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['header_translation_parameters'],
-            'translation_domain' => $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
-            'sort_parameter_name' => $view->parent->parent->vars['sort_parameter_name'],
+            'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'attr' => $options['header_attr'],
             'sorted' => null !== $sortColumnData,
-            'sort_field' => $sort,
+            'sort_field' => $column->getSortPropertyPath(),
             'sort_direction' => $sortColumnData?->getDirection(),
-            'export' => false,
+            'sortable' => $column->getConfig()->isSortable(),
+            'export' => $column->getConfig()->isExportable(),
         ]);
     }
 
@@ -79,9 +86,11 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export']['label'] ??= $options['getter'];
-        $options['export']['property_path'] ??= $options['property_path'];
-        $options['export']['formatter'] ??= $options['formatter'];
+        $options['export'] += [
+            'getter' => $options['getter'],
+            'property_path' => $options['property_path'],
+            'formatter' => $options['formatter'],
+        ];
 
         $translationDomain = $options['export']['value_translation_domain']
             ?? $options['value_translation_domain']
@@ -103,10 +112,12 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export']['getter'] ??= $options['getter'];
-        $options['export']['property_path'] ??= $options['property_path'];
-        $options['export']['property_accessor'] ??= $options['property_accessor'];
-        $options['export']['formatter'] ??= $options['formatter'];
+        $options['export'] += [
+            'getter' => $options['getter'],
+            'property_path' => $options['property_path'],
+            'property_accessor' => $options['property_accessor'],
+            'formatter' => $options['formatter'],
+        ];
 
         $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
         $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);

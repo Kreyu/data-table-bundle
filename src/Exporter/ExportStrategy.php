@@ -6,6 +6,14 @@ namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
 enum ExportStrategy: string
 {
-    case INCLUDE_CURRENT_PAGE = 'include-current-page';
-    case INCLUDE_ALL = 'include-all';
+    case IncludeCurrentPage = 'include-current-page';
+    case IncludeAll = 'include-all';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::IncludeCurrentPage => 'Include current page',
+            self::IncludeAll => 'Include all',
+        };
+    }
 }

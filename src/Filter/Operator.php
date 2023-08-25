@@ -6,14 +6,30 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 enum Operator: string
 {
-    case EQUALS = 'equals';
-    case CONTAINS = 'contains';
-    case NOT_CONTAINS = 'not-contains';
-    case NOT_EQUALS = 'not-equals';
-    case GREATER_THAN = 'greater-than';
-    case GREATER_THAN_EQUALS = 'greater-than-equals';
-    case LESS_THAN_EQUALS = 'less-than-equals';
-    case LESS_THAN = 'less-than';
-    case STARTS_WITH = 'starts-with';
-    case ENDS_WITH = 'ends-with';
+    case Equal = 'equal';
+    case NotEqual = 'not-equal';
+    case Contain = 'contain';
+    case NotContain = 'not-contain';
+    case GreaterThan = 'greater-than';
+    case GreaterThanEqual = 'greater-than-equal';
+    case LessThan = 'less-than';
+    case LessThanEqual = 'less-than-equal';
+    case StartWith = 'start-with';
+    case EndWith = 'end-with';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::Equal => 'Equal',
+            self::NotContain => 'Not contain',
+            self::Contain => 'Contain',
+            self::NotEqual => 'Not equal',
+            self::GreaterThan => 'Greater than',
+            self::GreaterThanEqual => 'Greater than or equal',
+            self::LessThan => 'Less than',
+            self::LessThanEqual => 'Less than or equal',
+            self::StartWith => 'Start with',
+            self::EndWith => 'End with',
+        };
+    }
 }

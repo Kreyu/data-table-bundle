@@ -25,15 +25,13 @@ class ExportDataType extends AbstractType
             ])
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
-                    fn (ExporterInterface $exporter) => $exporter->getOption('label', $exporter->getName()),
+                    fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),
                     $options['exporters'],
                 )),
                 'getter' => fn (ExportData $data) => $data->exporter->getName(),
                 'setter' => fn (ExportData $data, mixed $exporter) => $data->exporter = $options['exporters'][$exporter],
             ])
-            ->add('strategy', EnumType::class, [
-                'class' => ExportStrategy::class,
-            ])
+            ->add('strategy', ExportStrategyType::class)
             ->add('includePersonalization', CheckboxType::class, [
                 'required' => false,
             ])

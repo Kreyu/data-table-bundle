@@ -26,15 +26,15 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
          */
         $dataTable = $options['data_table'];
 
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
+        foreach ($dataTable->getFilters() as $filter) {
             $builder->add($filter->getFormName(), FilterDataType::class, array_merge($filter->getFormOptions() + [
+                'empty_data' => new FilterData(),
                 'getter' => function (FiltrationData $filtrationData, FormInterface $form) {
                     return $filtrationData->getFilterData($form->getName());
                 },
                 'setter' => function (FiltrationData $filtrationData, FilterData $filterData, FormInterface $form) {
                     $filtrationData->setFilterData($form->getName(), $filterData);
                 },
-                'empty_data' => new FilterData(),
             ]));
         }
 
@@ -71,12 +71,12 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
 
         foreach ($form as $child) {
             try {
-                $filter = $dataTable->getConfig()->getFilter($child->getName());
+                $filter = $dataTable->getFilter($child->getName());
             } catch (\InvalidArgumentException) {
                 continue;
             }
 
-            if ($filter->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
+            if ($filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
                 $searchField = $view[$child->getName()];
                 $searchField->vars['attr']['form'] = $view->vars['id'];
 

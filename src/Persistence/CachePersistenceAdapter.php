@@ -60,6 +60,9 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
         return u(implode('_', array_filter($parts)))->snake()->toString();
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function getCacheValue(string $key, string $tag, mixed $default = null): mixed
     {
         return $this->cache->get($key, function (ItemInterface $item) use ($tag, $default) {

@@ -12,7 +12,7 @@ class ExportData
 {
     public string $filename;
     public ExporterInterface $exporter;
-    public ExportStrategy $strategy = ExportStrategy::INCLUDE_ALL;
+    public ExportStrategy $strategy = ExportStrategy::IncludeAll;
     public bool $includePersonalization = true;
 
     public static function fromArray(array $data): self
@@ -21,7 +21,7 @@ class ExportData
             ->setRequired('exporter')
             ->setDefaults([
                 'filename' => 'export',
-                'strategy' => ExportStrategy::INCLUDE_CURRENT_PAGE,
+                'strategy' => ExportStrategy::IncludeCurrentPage,
                 'include_personalization' => false,
             ])
             ->setAllowedTypes('exporter', ExporterInterface::class)
@@ -48,7 +48,7 @@ class ExportData
 
     public static function fromDataTable(DataTableInterface $dataTable): self
     {
-        $exporters = $dataTable->getConfig()->getExporters();
+        $exporters = $dataTable->getExporters();
 
         if (empty($exporters)) {
             throw new \LogicException('Unable to create export data from data table without exporters');

@@ -6,12 +6,12 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType as BaseExporterType;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class PhpSpreadsheetExporterType implements ExporterTypeInterface
+final class PhpSpreadsheetExporterType extends AbstractExporterType
 {
     public function export(DataTableView $view, string $filename, array $options = []): ExportFile
     {

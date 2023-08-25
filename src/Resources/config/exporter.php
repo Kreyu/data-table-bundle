@@ -35,6 +35,7 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.exporter.registry', ExporterRegistry::class)
         ->args([
             tagged_iterator('kreyu_data_table.exporter.type'),
+            tagged_iterator('kreyu_data_table.exporter.type_extension'),
             service('kreyu_data_table.exporter.resolved_type_factory'),
         ])
         ->alias(ExporterRegistryInterface::class, 'kreyu_data_table.exporter.registry')

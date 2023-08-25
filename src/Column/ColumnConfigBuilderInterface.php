@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 interface ColumnConfigBuilderInterface extends ColumnConfigInterface
 {
@@ -19,6 +20,10 @@ interface ColumnConfigBuilderInterface extends ColumnConfigInterface
     public function setAttributes(array $attributes): static;
 
     public function setAttribute(string $name, mixed $value = null): static;
+
+    public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static;
+
+    public function setSortPropertyPath(null|string|PropertyPathInterface $sortPropertyPath): static;
 
     public function setSortable(bool $sortable): static;
 

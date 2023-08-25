@@ -62,7 +62,7 @@ class ColumnRegistry implements ColumnRegistryInterface
     {
         if (!isset($this->resolvedTypes[$name])) {
             if (!isset($this->types[$name])) {
-                throw new \InvalidArgumentException(sprintf('Could not load type "%s".', $name));
+                throw new \InvalidArgumentException(sprintf('Could not load column type "%s".', $name));
             }
 
             $this->resolvedTypes[$name] = $this->resolveType($this->types[$name]);

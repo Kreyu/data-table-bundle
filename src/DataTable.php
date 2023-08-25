@@ -6,15 +6,21 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exception\RuntimeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -35,6 +41,11 @@ class DataTable implements DataTableInterface
     private array $columns = [];
 
     /**
+     * @var array<FilterInterface>
+     */
+    private array $filters = [];
+
+    /**
      * @var array<ActionInterface>
      */
     private array $actions = [];
@@ -48,6 +59,11 @@ class DataTable implements DataTableInterface
      * @var array<ActionInterface>
      */
     private array $rowActions = [];
+
+    /**
+     * @var array<ExporterInterface>
+     */
+    private array $exporters = [];
 
     /**
      * The sorting data currently applied to the data table.
@@ -82,18 +98,46 @@ class DataTable implements DataTableInterface
     /**
      * The copy of a query used to retrieve the data, without any filters applied.
      */
-    private ProxyQueryInterface $nonFilteredQuery;
+    private ProxyQueryInterface $originalQuery;
 
+    private bool $initialized = false;
+
+    // TODO: Handle nullable query
     public function __construct(
         private ProxyQueryInterface $query,
-        private DataTableConfigInterface $config,
+        private /*readonly*/ DataTableConfigInterface $config,
     ) {
-        $this->nonFilteredQuery = clone $this->query;
+        $this->originalQuery = clone $this->query;
     }
 
     public function __clone(): void
     {
         $this->config = clone $this->config;
+    }
+
+    public function initialize(): void
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        if ($paginationData = $this->getInitialPaginationData()) {
+            $this->paginate($paginationData, false);
+        }
+
+        if ($sortingData = $this->getInitialSortingData()) {
+            $this->sort($sortingData, false);
+        }
+
+        if ($filtrationData = $this->getInitialFiltrationData()) {
+            $this->filter($filtrationData, false);
+        }
+
+        if ($personalizationData = $this->getInitialPersonalizationData()) {
+            $this->personalize($personalizationData, false);
+        }
+
+        $this->initialized = true;
     }
 
     public function getQuery(): ProxyQueryInterface
@@ -125,11 +169,10 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->columns);
     }
 
-    public function addColumn(ColumnInterface|string $column, string $type = null, array $options = []): static
+    public function addColumn(ColumnInterface|string $column, string $type = ColumnType::class, array $options = []): static
     {
         if (is_string($column)) {
-            $column = $this->getConfig()
-                ->getColumnFactory()
+            $column = $this->config->getColumnFactory()
                 ->createNamedBuilder($column, $type, $options)
                 ->getColumn()
             ;
@@ -145,6 +188,48 @@ class DataTable implements DataTableInterface
     public function removeColumn(string $name): static
     {
         unset($this->columns[$name]);
+
+        return $this;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getFilter(string $name): FilterInterface
+    {
+        if (isset($this->filters[$name])) {
+            return $this->filters[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Filter "%s" does not exist.', $name));
+    }
+
+    public function hasFilter(string $name): bool
+    {
+        return array_key_exists($name, $this->filters);
+    }
+
+    public function addFilter(FilterInterface|string $filter, string $type = FilterType::class, array $options = []): static
+    {
+        if (is_string($filter)) {
+            $filter = $this->config->getFilterFactory()
+                ->createNamedBuilder($filter, $type, $options)
+                ->getFilter()
+            ;
+        }
+
+        $this->filters[$filter->getName()] = $filter;
+
+        $filter->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeFilter(string $name): static
+    {
+        unset($this->filters[$name]);
 
         return $this;
     }
@@ -168,10 +253,10 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->actions);
     }
 
-    public function addAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    public function addAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
     {
         if (is_string($action)) {
-            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Global);
 
             $action = $builder->getAction();
@@ -210,10 +295,10 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->batchActions);
     }
 
-    public function addBatchAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    public function addBatchAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
     {
         if (is_string($action)) {
-            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Batch);
 
             $action = $builder->getAction();
@@ -252,10 +337,10 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->rowActions);
     }
 
-    public function addRowAction(ActionInterface|string $action, string $type = null, array $options = []): static
+    public function addRowAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
     {
         if (is_string($action)) {
-            $builder = $this->getConfig()->getActionFactory()->createNamedBuilder($action, $type, $options);
+            $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Row);
 
             $action = $builder->getAction();
@@ -275,7 +360,49 @@ class DataTable implements DataTableInterface
         return $this;
     }
 
-    public function paginate(PaginationData $data): void
+    public function getExporters(): array
+    {
+        return $this->exporters;
+    }
+
+    public function getExporter(string $name): ExporterInterface
+    {
+        if (isset($this->exporters[$name])) {
+            return $this->exporters[$name];
+        }
+
+        throw new OutOfBoundsException(sprintf('Exporter "%s" does not exist.', $name));
+    }
+
+    public function hasExporter(string $name): bool
+    {
+        return array_key_exists($name, $this->exporters);
+    }
+
+    public function addExporter(ExporterInterface|string $exporter, string $type = ExporterType::class, array $options = []): static
+    {
+        if (is_string($exporter)) {
+            $exporter = $this->config->getExporterFactory()
+                ->createNamedBuilder($exporter, $type, $options)
+                ->getExporter()
+            ;
+        }
+
+        $this->exporters[$exporter->getName()] = $exporter;
+
+        $exporter->setDataTable($this);
+
+        return $this;
+    }
+
+    public function removeExporter(string $name): static
+    {
+        unset($this->exporters[$name]);
+
+        return $this;
+    }
+
+    public function paginate(PaginationData $data, bool $persistence = true): void
     {
         if (!$this->config->isPaginationEnabled()) {
             return;
@@ -283,70 +410,63 @@ class DataTable implements DataTableInterface
 
         $this->query->paginate($data);
 
-        $this->nonFilteredQuery = $this->query;
+        $this->originalQuery = $this->query;
 
         $this->paginationData = $data;
 
-        if ($this->config->isPaginationPersistenceEnabled()) {
+        if ($persistence && $this->config->isPaginationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Pagination, $data);
         }
 
-        $this->pagination = null;
+        $this->resetPagination();
     }
 
-    public function sort(SortingData $data): void
+    public function sort(SortingData $data, bool $persistence = true): void
     {
         if (!$this->config->isSortingEnabled()) {
             return;
         }
 
+        $columns = $this->getColumns();
+
+        $data->removeRedundantColumns($columns);
+
         $sortingDataFiltered = new SortingData();
 
         foreach ($data->getColumns() as $sortingColumnData) {
             try {
-                $column = $this->getConfig()->getColumn($sortingColumnData->getName());
+                $column = $this->getColumn($sortingColumnData->getName());
             } catch (\Throwable) {
                 continue;
             }
 
-            $sortField = $column->getOptions()['sort'];
-
-            if (false === $sortField) {
-                continue;
-            }
-
-            if (true === $sortField) {
-                $sortField = $column->getOptions()['property_path'] ?: $column->getName();
-            }
-
             $sortingDataFiltered->addColumn($column->getName(), SortingColumnData::fromArray([
-                'name' => $sortField,
+                'name' => (string) $column->getSortPropertyPath(),
                 'direction' => $sortingColumnData->getDirection(),
             ]));
         }
 
         $this->query->sort($sortingDataFiltered);
 
-        $this->nonFilteredQuery = $this->query;
+        $this->originalQuery = $this->query;
 
-        $this->sortingData = $data;
-
-        if ($this->config->isSortingPersistenceEnabled()) {
+        if ($persistence && $this->config->isSortingPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Sorting, $data);
         }
 
-        $this->pagination = null;
+        $this->setSortingData($data);
+        $this->resetPagination();
     }
 
-    public function filter(FiltrationData $data): void
+    public function filter(FiltrationData $data, bool $persistence = true): void
     {
         if (!$this->config->isFiltrationEnabled()) {
             return;
         }
 
-        $this->query = clone $this->nonFilteredQuery;
+        $this->query = clone $this->originalQuery;
 
-        $filters = $this->config->getFilters();
+        $filters = $this->getFilters();
 
         foreach ($filters as $filter) {
             $filterData = $data->getFilterData($filter->getName());
@@ -356,21 +476,18 @@ class DataTable implements DataTableInterface
             }
         }
 
-        $filters = $this->config->getFilters();
-
         $data->appendMissingFilters($filters);
         $data->removeRedundantFilters($filters);
 
-        $this->filtrationData = $data;
-
-        if ($this->config->isFiltrationPersistenceEnabled()) {
+        if ($persistence && $this->config->isFiltrationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Filtration, $data);
         }
 
-        $this->pagination = null;
+        $this->setFiltrationData($data);
+        $this->resetPagination();
     }
 
-    public function personalize(PersonalizationData $data): void
+    public function personalize(PersonalizationData $data, bool $persistence = true): void
     {
         if (!$this->config->isPersonalizationEnabled()) {
             return;
@@ -381,12 +498,11 @@ class DataTable implements DataTableInterface
         $data->addMissingColumns($columns);
         $data->removeRedundantColumns($columns);
 
-        if ($this->config->isPersonalizationPersistenceEnabled()) {
+        if ($persistence && $this->config->isPersonalizationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Personalization, $data);
         }
 
-        $this->getPersonalizationForm()->setData($data);
-        $this->personalizationData = $data;
+        $this->setPersonalizationData($data);
     }
 
     public function export(ExportData $data = null): ExportFile
@@ -395,17 +511,11 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has exporting feature disabled.');
         }
 
-        if (null === $data) {
-            if ($this->getExportForm()->isSubmitted()) {
-                $data = $this->getExportForm()->getData();
-            } else {
-                $data = $this->getConfig()->getDefaultExportData() ?? ExportData::fromDataTable($this);
-            }
-        }
+        $data ??= $this->exportData ?? $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
         $dataTable = clone $this;
 
-        if (ExportStrategy::INCLUDE_ALL === $data->strategy) {
+        if (ExportStrategy::IncludeAll === $data->strategy) {
             $dataTable->getQuery()->paginate(new PaginationData(perPage: null));
         }
 
@@ -425,14 +535,28 @@ class DataTable implements DataTableInterface
         return $this->pagination ??= $this->query->getPagination();
     }
 
-    public function getSortingData(): SortingData
+    public function getSortingData(): ?SortingData
     {
         return $this->sortingData;
     }
 
-    public function getPaginationData(): PaginationData
+    public function setSortingData(?SortingData $sortingData): static
+    {
+        $this->sortingData = $sortingData;
+
+        return $this;
+    }
+
+    public function getPaginationData(): ?PaginationData
     {
         return $this->paginationData;
+    }
+
+    public function setPaginationData(?PaginationData $paginationData): static
+    {
+        $this->paginationData = $paginationData;
+
+        return $this;
     }
 
     public function getFiltrationData(): ?FiltrationData
@@ -440,14 +564,35 @@ class DataTable implements DataTableInterface
         return $this->filtrationData;
     }
 
+    public function setFiltrationData(?FiltrationData $filtrationData): static
+    {
+        $this->filtrationData = $filtrationData;
+
+        return $this;
+    }
+
     public function getPersonalizationData(): ?PersonalizationData
     {
         return $this->personalizationData;
     }
 
+    public function setPersonalizationData(?PersonalizationData $personalizationData): static
+    {
+        $this->personalizationData = $personalizationData;
+
+        return $this;
+    }
+
     public function getExportData(): ?ExportData
     {
-        return $this->getExportForm()->getData();
+        return $this->exportData;
+    }
+
+    public function setExportData(?ExportData $exportData): static
+    {
+        $this->exportData = $exportData;
+
+        return $this;
     }
 
     public function createFiltrationFormBuilder(DataTableView $view = null): FormBuilderInterface
@@ -461,7 +606,7 @@ class DataTable implements DataTableInterface
         }
 
         return $this->config->getFiltrationFormFactory()->createNamedBuilder(
-            name: $this->getConfig()->getFiltrationParameterName(),
+            name: $this->config->getFiltrationParameterName(),
             type: FiltrationDataType::class,
             options: [
                 'data_table' => $this,
@@ -481,7 +626,7 @@ class DataTable implements DataTableInterface
         }
 
         return $this->config->getFiltrationFormFactory()->createNamedBuilder(
-            name: $this->getConfig()->getPersonalizationParameterName(),
+            name: $this->config->getPersonalizationParameterName(),
             type: PersonalizationDataType::class,
             options: [
                 'data_table_view' => $view,
@@ -494,12 +639,7 @@ class DataTable implements DataTableInterface
         return $this->personalizationForm ??= $this->createPersonalizationFormBuilder()->getForm();
     }
 
-    public function getExportForm(): FormInterface
-    {
-        return $this->exportForm ??= $this->createExportFormBuilder()->getForm();
-    }
-
-    public function createExportFormBuilder(): FormBuilderInterface
+    public function createExportFormBuilder(DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isExportingEnabled()) {
             throw new RuntimeException('The data table has export feature disabled.');
@@ -510,17 +650,17 @@ class DataTable implements DataTableInterface
         }
 
         return $this->config->getExportFormFactory()->createNamedBuilder(
-            name: $this->getConfig()->getExportParameterName(),
+            name: $this->config->getExportParameterName(),
             type: ExportDataType::class,
             options: [
-                'exporters' => $this->config->getExporters(),
+                'exporters' => $this->getExporters(),
             ],
         );
     }
 
     public function isExporting(): bool
     {
-        return $this->getExportForm()->isSubmitted();
+        return null !== $this->exportData;
     }
 
     public function hasActiveFilters(): bool
@@ -539,8 +679,8 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
-        if (empty($this->config->getColumns())) {
-            throw new \LogicException('The data table has no configured columns.');
+        if (empty($this->getColumns())) {
+            throw new RuntimeException('The data table has no configured columns.');
         }
 
         $type = $this->config->getType();
@@ -555,8 +695,8 @@ class DataTable implements DataTableInterface
 
     public function createExportView(): DataTableView
     {
-        if (empty($this->config->getColumns())) {
-            throw new \LogicException('The data table has no configured columns.');
+        if (empty($this->getColumns())) {
+            throw new RuntimeException('The data table has no configured columns.');
         }
 
         $type = $this->config->getType();
@@ -569,23 +709,9 @@ class DataTable implements DataTableInterface
         return $view;
     }
 
-    public function initialize(): void
+    private function resetPagination(): void
     {
-        if ($paginationData = $this->getInitialPaginationData()) {
-            $this->paginate($paginationData);
-        }
-
-        if ($sortingData = $this->getInitialSortingData()) {
-            $this->sort($sortingData);
-        }
-
-        if ($filtrationData = $this->getInitialFiltrationData()) {
-            $this->filter($filtrationData);
-        }
-
-        if ($personalizationData = $this->getInitialPersonalizationData()) {
-            $this->personalize($personalizationData);
-        }
+        $this->pagination = null;
     }
 
     private function getInitialPaginationData(): ?PaginationData
@@ -642,7 +768,7 @@ class DataTable implements DataTableInterface
 
         $data ??= FiltrationData::fromDataTable($this);
 
-        $data->appendMissingFilters($this->getConfig()->getFilters());
+        $data->appendMissingFilters($this->getFilters());
 
         return $data;
     }
@@ -716,19 +842,22 @@ class DataTable implements DataTableInterface
         return $adapter;
     }
 
+    /**
+     * @throws Persistence\PersistenceSubjectNotFoundException
+     */
     private function getPersistenceSubject(PersistenceContext $context): PersistenceSubjectInterface
     {
-        $subject = match ($context) {
-            PersistenceContext::Sorting => $this->config->getSortingPersistenceSubject(),
-            PersistenceContext::Pagination => $this->config->getPaginationPersistenceSubject(),
-            PersistenceContext::Filtration => $this->config->getFiltrationPersistenceSubject(),
-            PersistenceContext::Personalization => $this->config->getPersonalizationPersistenceSubject(),
+        $provider = match ($context) {
+            PersistenceContext::Sorting => $this->config->getSortingPersistenceSubjectProvider(),
+            PersistenceContext::Pagination => $this->config->getPaginationPersistenceSubjectProvider(),
+            PersistenceContext::Filtration => $this->config->getFiltrationPersistenceSubjectProvider(),
+            PersistenceContext::Personalization => $this->config->getPersonalizationPersistenceSubjectProvider(),
         };
 
-        if (null === $subject) {
-            throw new RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have a subject.', $context->value));
+        if (null === $provider) {
+            throw new RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have a subject provider.', $context->value));
         }
 
-        return $subject;
+        return $provider->provide();
     }
 }

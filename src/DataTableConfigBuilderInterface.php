@@ -16,6 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
@@ -46,13 +47,6 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function getColumnFactory(): ColumnFactoryInterface;
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;
-
-    /**
-     * @param class-string<FilterTypeInterface> $type
-     */
-    public function addFilter(string $name, string $type, array $options = []): static;
-
-    public function removeFilter(string $name): static;
 
     public function getFilterFactory(): FilterFactoryInterface;
 
@@ -85,7 +79,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static;
 
-    public function setPersonalizationPersistenceSubject(?PersistenceSubjectInterface $personalizationPersistenceSubject): static;
+    public function setPersonalizationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $personalizationPersistenceSubjectProvider): static;
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static;
 
@@ -97,7 +91,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static;
 
-    public function setFiltrationPersistenceSubject(?PersistenceSubjectInterface $filtrationPersistenceSubject): static;
+    public function setFiltrationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider): static;
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
 
@@ -109,7 +103,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static;
 
-    public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static;
+    public function setSortingPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $sortingPersistenceSubjectProvider): static;
 
     public function setDefaultSortingData(?SortingData $defaultSortingData): static;
 
@@ -119,7 +113,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static;
 
-    public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static;
+    public function setPaginationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $paginationPersistenceSubjectProvider): static;
 
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static;
 

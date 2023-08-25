@@ -11,7 +11,7 @@ class FilterData
 {
     public function __construct(
         private mixed $value = '',
-        private mixed $operator = null,
+        private ?Operator $operator = null,
     ) {
     }
 

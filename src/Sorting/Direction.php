@@ -6,6 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 enum Direction: string
 {
-    case ASC = 'asc';
-    case DESC = 'desc';
+    case Asc = 'asc';
+    case Desc = 'desc';
 }

@@ -10,7 +10,7 @@ class ExportFile extends File
 {
     public function __construct(
         string $path,
-        private string $filename,
+        private ?string $filename = null,
     ) {
         parent::__construct($path);
     }

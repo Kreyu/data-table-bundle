@@ -21,6 +21,7 @@ use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -34,6 +35,7 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.type.data_table', DataTableType::class)
+        ->arg('$defaults', abstract_arg('Default options, provided by KreyuDataTableExtension and DefaultConfigurationPass'))
         ->tag('kreyu_data_table.type')
     ;
 

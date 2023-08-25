@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Writer\Exception\WriterNotOpenedException;
@@ -20,6 +22,10 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
         private ?TranslatorInterface $translator = null,
     ) {
     }
+
+    abstract protected function getExtension(): string;
+
+    abstract protected function getWriter(array $options): WriterInterface;
 
     /**
      * @throws IOException
@@ -73,8 +79,4 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
 
         return new ExportFile($path, "$filename.$extension");
     }
-
-    abstract protected function getExtension(): string;
-
-    abstract protected function getWriter(array $options): WriterInterface;
 }

@@ -27,7 +27,7 @@ interface ResolvedColumnTypeInterface
      */
     public function getTypeExtensions(): array;
 
-    public function createBuilder(ColumnFactoryInterface $factory, string $name, array $options = []): ColumnBuilderInterface;
+    public function createBuilder(ColumnFactoryInterface $factory, string $name, array $options): ColumnBuilderInterface;
 
     public function createHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView;
 

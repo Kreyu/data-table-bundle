@@ -7,11 +7,16 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class Column implements ColumnInterface
 {
     private ?DataTableInterface $dataTable = null;
+    private ?PropertyPathInterface $propertyPath = null;
+    private ?PropertyPathInterface $sortPropertyPath = null;
 
     public function __construct(
         private readonly ColumnConfigInterface $config,
@@ -42,6 +47,28 @@ class Column implements ColumnInterface
         $this->dataTable = $dataTable;
 
         return $this;
+    }
+
+    public function getPropertyPath(): ?PropertyPathInterface
+    {
+        if ($this->propertyPath || $this->propertyPath = $this->config->getPropertyPath()) {
+            return $this->propertyPath;
+        }
+
+        if ('' === $name = $this->getName()) {
+            return null;
+        }
+
+        return $this->propertyPath = new PropertyPath($name);
+    }
+
+    public function getSortPropertyPath(): ?PropertyPathInterface
+    {
+        if ($this->sortPropertyPath || $this->sortPropertyPath = $this->config->getSortPropertyPath()) {
+            return $this->sortPropertyPath;
+        }
+
+        return $this->sortPropertyPath = $this->getPropertyPath();
     }
 
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView

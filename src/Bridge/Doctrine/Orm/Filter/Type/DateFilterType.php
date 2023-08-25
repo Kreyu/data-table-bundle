@@ -4,82 +4,50 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
+use Doctrine\ORM\Query\Expr;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Symfony\Component\Form\Extension\Core\Type as Form;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateFilterType extends AbstractFilterType
 {
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
-    {
-        $operator = $data->getOperator() ?? Operator::EQUALS;
-        $value = $this->getDateTimeValue($data);
-
-        try {
-            $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
-        } catch (\InvalidArgumentException) {
-            return;
-        }
-
-        $parameterName = $this->getUniqueParameterName($query, $filter);
-
-        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFilterQueryPath($query, $filter), ":$parameterName");
-
-        $query
-            ->andWhere($expression)
-            ->setParameter($parameterName, $value);
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('field_type', Form\DateType::class);
-
-        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
-            $resolver->setDefaults([
-                'visible' => false,
-                'choices' => [
-                    Operator::EQUALS,
-                    Operator::NOT_EQUALS,
-                    Operator::GREATER_THAN,
-                    Operator::GREATER_THAN_EQUALS,
-                    Operator::LESS_THAN,
-                    Operator::LESS_THAN_EQUALS,
+        $resolver
+            ->setDefaults([
+                'value_form_type' => DateType::class,
+                'supported_operators' => [
+                    Operator::Equal,
+                    Operator::NotEqual,
+                    Operator::GreaterThan,
+                    Operator::GreaterThanEqual,
+                    Operator::LessThan,
+                    Operator::LessThanEqual,
                 ],
-            ]);
-        });
+                'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
+            ])
+            ->addNormalizer('value_form_options', function (OptionsResolver $resolver, array $value): array {
+                return $value + ['widget' => 'single_text'];
+            })
+            ->addNormalizer('empty_data', function (OptionsResolver $resolver, string|array $value): string|array {
+                if (DateType::class !== $resolver['value_form_type']) {
+                    return $value;
+                }
 
-        $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): mixed {
-            $value = $data->getValue();
-
-            if ($value instanceof \DateTimeInterface) {
-                return $value->format($options['field_options']['input_format'] ?? 'Y-m-d');
-            }
-
-            return $value;
-        });
+                // Note: because choice and text widgets are split into three fields,
+                //       we have to return an array with three empty values to properly set the empty data.
+                return match ($resolver['value_form_options']['widget'] ?? null) {
+                    'choice', 'text' => ['day' => '', 'month' => '', 'year' => ''],
+                    default => '',
+                };
+            })
+        ;
     }
 
-    private function getExpressionBuilderMethodName(Operator $operator): string
-    {
-        return match ($operator) {
-            Operator::EQUALS => 'eq',
-            Operator::NOT_EQUALS => 'neq',
-            Operator::GREATER_THAN => 'gt',
-            Operator::GREATER_THAN_EQUALS => 'gte',
-            Operator::LESS_THAN => 'lt',
-            Operator::LESS_THAN_EQUALS => 'lte',
-            default => throw new \InvalidArgumentException('Operator not supported'),
-        };
-    }
-
-    private function getDateTimeValue(FilterData $data): \DateTimeInterface
+    protected function getFilterValue(FilterData $data): \DateTimeInterface
     {
         $value = $data->getValue();
 
@@ -94,12 +62,38 @@ class DateFilterType extends AbstractFilterType
                 day: (int) $value['date']['day'] ?: 0,
             );
         } else {
-            throw new \InvalidArgumentException(sprintf('Unable to convert data of type "%s" to DateTime object.', get_debug_type($value)));
+            throw new InvalidArgumentException(sprintf('Unable to convert data of type "%s" to DateTime object.', get_debug_type($value)));
         }
 
         $dateTime = \DateTime::createFromInterface($dateTime);
         $dateTime->setTime(0, 0);
 
         return $dateTime;
+    }
+
+    protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
+    {
+        $expression = match ($operator) {
+            Operator::Equal => $expr->eq(...),
+            Operator::NotEqual => $expr->neq(...),
+            Operator::GreaterThan => $expr->gt(...),
+            Operator::GreaterThanEqual => $expr->gte(...),
+            Operator::LessThan => $expr->lt(...),
+            Operator::LessThanEqual => $expr->lte(...),
+            default => throw new InvalidArgumentException('Operator not supported'),
+        };
+
+        return $expression($queryPath, ":$parameterName");
+    }
+
+    private function getFormattedActiveFilterString(FilterData $data, FilterInterface $filter, array $options): string
+    {
+        $value = $data->getValue();
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format($options['field_options']['input_format'] ?? 'Y-m-d');
+        }
+
+        return (string) $value;
     }
 }

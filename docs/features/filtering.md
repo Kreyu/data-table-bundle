@@ -242,7 +242,7 @@ class ProductDataTableType extends AbstractDataTableType
             ->addFilter('name', StringFilterType::class, [
                 'operator_options' => [
                     'choices' => [
-                        Operator::CONTAINS,
+                        Operator::Contain,
                     ],
                 ],
             ])
@@ -296,8 +296,8 @@ class ProductDataTableType extends AbstractDataTableType
                 'operator_options' => [
                     'visible' => true,
                     'choices' => [
-                        Operator::CONTAINS,
-                        Operator::NOT_CONTAINS,
+                        Operator::Contain,
+                        Operator::NotContain,
                     ],
                 ],
             ])
@@ -322,7 +322,7 @@ class ProductDataTableType extends AbstractDataTableType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder->setDefaultFiltrationData(new FiltrationData([
-            'id' => new FilterData(value: 1, operator: Operator::CONTAINS),
+            'id' => new FilterData(value: 1, operator: Operator::Contain),
         ]));
         
         // or by creating the filtration data from an array:

@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 interface ColumnInterface
 {
@@ -17,6 +18,10 @@ interface ColumnInterface
     public function getDataTable(): DataTableInterface;
 
     public function setDataTable(DataTableInterface $dataTable): static;
+
+    public function getPropertyPath(): ?PropertyPathInterface;
+
+    public function getSortPropertyPath(): ?PropertyPathInterface;
 
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
 

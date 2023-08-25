@@ -28,7 +28,7 @@ interface ResolvedActionTypeInterface
      */
     public function getTypeExtensions(): array;
 
-    public function createBuilder(ActionFactoryInterface $factory, string $name, array $options = []): ActionBuilderInterface;
+    public function createBuilder(ActionFactoryInterface $factory, string $name, array $options): ActionBuilderInterface;
 
     public function createView(ActionInterface $action, DataTableView|ColumnValueView $parent): ActionView;
 

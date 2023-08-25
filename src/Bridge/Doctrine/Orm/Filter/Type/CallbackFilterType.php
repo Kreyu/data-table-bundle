@@ -23,10 +23,6 @@ class CallbackFilterType extends AbstractFilterType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('operator_options', [
-                'visible' => false,
-                'choices' => [],
-            ])
             ->setRequired('callback')
             ->setAllowedTypes('callback', ['callable'])
         ;

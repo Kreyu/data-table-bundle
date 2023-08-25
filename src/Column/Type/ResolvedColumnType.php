@@ -53,7 +53,7 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(ColumnFactoryInterface $factory, string $name, array $options = []): ColumnBuilderInterface
+    public function createBuilder(ColumnFactoryInterface $factory, string $name, array $options): ColumnBuilderInterface
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);

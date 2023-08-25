@@ -6,19 +6,24 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ColumnBuilder implements ColumnBuilderInterface
 {
     private array $attributes = [];
+    private ?PropertyPathInterface $propertyPath = null;
+    private ?PropertyPathInterface $sortPropertyPath = null;
     private bool $sortable = false;
     private bool $exportable = false;
     private bool $locked = false;
 
     public function __construct(
-        private string $name,
+        private string                      $name,
         private ResolvedColumnTypeInterface $type,
-        private array $options = [],
-    ) {
+        private array                       $options = [],
+    )
+    {
     }
 
     public function getName(): string
@@ -123,6 +128,46 @@ class ColumnBuilder implements ColumnBuilderInterface
         }
 
         $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    public function getPropertyPath(): ?PropertyPathInterface
+    {
+        return $this->propertyPath;
+    }
+
+    public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        }
+
+        $this->propertyPath = $propertyPath;
+
+        return $this;
+    }
+
+    public function getSortPropertyPath(): ?PropertyPathInterface
+    {
+        return $this->sortPropertyPath;
+    }
+
+    public function setSortPropertyPath(null|string|PropertyPathInterface $sortPropertyPath): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (is_string($sortPropertyPath)) {
+            $sortPropertyPath = new PropertyPath($sortPropertyPath);
+        }
+
+        $this->sortPropertyPath = $sortPropertyPath;
 
         return $this;
     }

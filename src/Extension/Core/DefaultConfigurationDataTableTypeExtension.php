@@ -28,21 +28,21 @@ class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeEx
             'sorting_enabled' => $this->defaults['sorting']['enabled'],
             'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'],
             'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'],
-            'sorting_persistence_subject' => $this->getPersistenceSubject($this->defaults['sorting']['persistence_subject_provider']),
+            'sorting_persistence_subject_provider' => $this->defaults['sorting']['persistence_subject_provider'],
             'pagination_enabled' => $this->defaults['pagination']['enabled'],
             'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'],
             'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'],
-            'pagination_persistence_subject' => $this->getPersistenceSubject($this->defaults['pagination']['persistence_subject_provider']),
+            'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'],
             'filtration_enabled' => $this->defaults['filtration']['enabled'],
             'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'],
             'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'],
-            'filtration_persistence_subject' => $this->getPersistenceSubject($this->defaults['filtration']['persistence_subject_provider']),
+            'filtration_persistence_subject_provider' => $this->defaults['filtration']['persistence_subject_provider'],
             'filtration_form_factory' => $this->defaults['filtration']['form_factory'],
             'filter_factory' => $this->defaults['filtration']['filter_factory'],
             'personalization_enabled' => $this->defaults['personalization']['enabled'],
             'personalization_persistence_enabled' => $this->defaults['personalization']['persistence_enabled'],
             'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'],
-            'personalization_persistence_subject' => $this->getPersistenceSubject($this->defaults['personalization']['persistence_subject_provider']),
+            'personalization_persistence_subject_provider' => $this->defaults['personalization']['persistence_subject_provider'],
             'personalization_form_factory' => $this->defaults['personalization']['form_factory'],
             'exporting_enabled' => $this->defaults['exporting']['enabled'],
             'exporting_form_factory' => $this->defaults['exporting']['form_factory'],
@@ -53,14 +53,5 @@ class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeEx
     public static function getExtendedTypes(): iterable
     {
         return [DataTableType::class];
-    }
-
-    private function getPersistenceSubject(?PersistenceSubjectProviderInterface $persistenceSubjectProvider): ?PersistenceSubjectInterface
-    {
-        try {
-            return $persistenceSubjectProvider?->provide();
-        } catch (PersistenceSubjectNotFoundException) {
-            return null;
-        }
     }
 }

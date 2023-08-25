@@ -121,9 +121,9 @@ class FiltrationData
      */
     public function appendMissingFilters(array $filters, FilterData $data = new FilterData()): void
     {
-        foreach ($filters as $column) {
-            if (null === $this->getFilterData($column)) {
-                $this->setFilterData($column, $data);
+        foreach ($filters as $filter) {
+            if (null === $this->getFilterData($filter)) {
+                $this->setFilterData($filter, $data);
             }
         }
     }

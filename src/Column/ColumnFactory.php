@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
-use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 
 class ColumnFactory implements ColumnFactoryInterface
 {

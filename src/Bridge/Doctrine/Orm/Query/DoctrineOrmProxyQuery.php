@@ -103,7 +103,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
 
     public function getItems(): iterable
     {
-        $query = clone $this->queryBuilder->getQuery();
+        $query = (clone $this->queryBuilder)->getQuery();
 
         $this->applyQueryHints($query);
 
@@ -160,7 +160,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
         $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
 
-        $query = clone $this->queryBuilder->getQuery();
+        $query = (clone $this->queryBuilder)->getQuery();
 
         $this->applyQueryHints($query);
 

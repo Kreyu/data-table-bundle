@@ -29,7 +29,11 @@ class DateRangeFilterType extends AbstractFilterType
 
         $criteria = $query->expr()->andX();
 
-        if (null !== $dateFrom = $value['from']) {
+        if (!is_array($value)) {
+            return;
+        }
+
+        if (null !== $dateFrom = $value['from'] ?? null) {
             $parameterNameFrom = $parameterName.'_from';
 
             $dateFrom = \DateTime::createFromInterface($dateFrom);
@@ -40,7 +44,7 @@ class DateRangeFilterType extends AbstractFilterType
             $query->setParameter($parameterNameFrom, $dateFrom);
         }
 
-        if (null !== $valueTo = $value['to']) {
+        if (null !== $valueTo = $value['to'] ?? null) {
             $parameterNameTo = $parameterName.'_to';
 
             $valueTo = \DateTime::createFromInterface($valueTo)->modify('+1 day');
@@ -51,15 +55,18 @@ class DateRangeFilterType extends AbstractFilterType
             $query->setParameter($parameterNameTo, $valueTo);
         }
 
-        $query->andWhere($criteria);
+        if ($criteria->count() > 0) {
+            $query->andWhere($criteria);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'field_type' => DateRangeType::class,
+                'value_form_type' => DateRangeType::class,
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
+                'empty_data' => ['from' => '', 'to' => ''],
             ])
         ;
     }

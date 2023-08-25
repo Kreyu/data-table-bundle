@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Event;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 
-class DataTableEvents
+final class DataTableEvents
 {
     /**
      * @see DataTableInterface::paginate()

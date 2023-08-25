@@ -366,12 +366,17 @@ final class DataTableType implements DataTableTypeInterface
         yield from [];
     }
 
+    /**
+     * @param array<ColumnInterface> $columns
+     */
     private function createExportHeaderRowView(DataTableView $view, DataTableInterface $dataTable, array $columns): HeaderRowView
     {
         $headerRowView = new HeaderRowView($view);
 
         foreach ($columns as $column) {
-            $headerRowView->children[$column->getName()] = $column->createExportHeaderView($headerRowView);
+            if ($column->getConfig()->isExportable()) {
+                $headerRowView->children[$column->getName()] = $column->createExportHeaderView($headerRowView);
+            }
         }
 
         return $headerRowView;
@@ -385,7 +390,9 @@ final class DataTableType implements DataTableTypeInterface
             $valueRowView = new ValueRowView($view, $index, $data);
 
             foreach ($columns as $column) {
-                $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
+                if ($column->getConfig()->isExportable()) {
+                    $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
+                }
             }
 
             yield $valueRowView;

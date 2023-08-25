@@ -82,6 +82,10 @@ final class ColumnType implements ColumnTypeInterface
 
     public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
+        if (false === $options['export']) {
+            return;
+        }
+
         if (true === $options['export']) {
             $options['export'] = [];
         }
@@ -106,11 +110,15 @@ final class ColumnType implements ColumnTypeInterface
 
     public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        $rowData = $view->parent->data;
+        if (false === $options['export']) {
+            return;
+        }
 
         if (true === $options['export']) {
             $options['export'] = [];
         }
+
+        $rowData = $view->parent->data;
 
         $options['export'] += [
             'getter' => $options['getter'],

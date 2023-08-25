@@ -19,6 +19,7 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 interface DataTableConfigInterface
 {
@@ -28,6 +29,8 @@ interface DataTableConfigInterface
     public const FILTRATION_PARAMETER = 'filter';
     public const PERSONALIZATION_PARAMETER = 'personalization';
     public const EXPORT_PARAMETER = 'export';
+
+    public function getEventDispatcher(): EventDispatcherInterface;
 
     public function getName(): string;
 

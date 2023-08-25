@@ -1,15 +1,17 @@
 # 0.14
 
-- **[Breaking Change]** The data tables `*_persistence_subject` options are removed in favor of `*_persistence_subject_provider` options
-- **[Breaking Change]** Column types now contains `buildExportHeaderView` and `buildExportValueView` used exclusively for exporting. 
-Any export-specific logic should be moved from existing `buildHeaderView` and `buildValueView` methods to the new ones.
-
-- **[Feature]** Improved DX with data table search handler
+- **[Feature]** Data table events (see more)
+- **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more) 
+- **[Feature] [Breaking Change]** Optimized exporting process - introduces breaking changes (see more)
+- **[Feature]** Doctrine ORM proxy query class now allows setting the hydration mode (see more)
+- **[Feature]** Improved DX with data table search handler (see more)
 - **[Feature]** CollectionColumnType default separator is now `', '` (with space after comma) instead of `','`
 - **[Bugfix]** CollectionColumnType now renders without spaces around separator
 
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.
 Please note that this is a **breaking change** for applications using internal bundle classes!
+
+For a list of all breaking changes, see the [upgrade guide](UPGRADE_GUIDE_0_14.md).
 
 # 0.13
 

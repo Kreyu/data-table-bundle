@@ -40,30 +40,18 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class DataTableBuilder implements DataTableBuilderInterface
 {
     /**
-     * Name of the data table, used to differentiate multiple data tables on the same page.
-     */
-    private string $name;
-
-    /**
      * Resolved type class, containing instructions on how to build a data table.
      */
     private ResolvedDataTableTypeInterface $type;
-
-    /**
-     * Query used to retrieve and manipulate source of the data table.
-     */
-    private null|ProxyQueryInterface $query;
-
-    /**
-     * Stores an array of options, used to configure a builder behavior.
-     */
-    private array $options;
 
     /**
      * Stores an array of themes to used to render the data table.
@@ -359,16 +347,26 @@ class DataTableBuilder implements DataTableBuilderInterface
      */
     private bool $locked = false;
 
-    public function __construct(string $name, ProxyQueryInterface $query = null, array $options = [])
-    {
-        $this->name = $name;
-        $this->query = $query;
-        $this->options = $options;
+    public function __construct(
+        private string $name,
+        private ?ProxyQueryInterface $query,
+        private EventDispatcherInterface $dispatcher,
+        private array $options = [],
+    ) {
     }
 
     public function __clone(): void
     {
         $this->query = clone $this->query;
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        if (!$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
+        return $this->dispatcher;
     }
 
     public function getName(): string
@@ -1237,6 +1235,20 @@ class DataTableBuilder implements DataTableBuilderInterface
     public function getExportParameterName(): string
     {
         return $this->getParameterName(static::EXPORT_PARAMETER);
+    }
+
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
+    {
+        $this->dispatcher->addListener($eventName, $listener, $priority);
+
+        return $this;
+    }
+
+    public function addEventSubscriber(EventSubscriberInterface $subscriber): static
+    {
+        $this->dispatcher->addSubscriber($subscriber);
+
+        return $this;
     }
 
     public function getDataTable(): DataTableInterface

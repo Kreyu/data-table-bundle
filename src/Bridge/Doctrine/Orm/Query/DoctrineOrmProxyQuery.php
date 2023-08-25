@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -28,6 +29,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function __construct(
         private QueryBuilder $queryBuilder,
         private array $hints = [],
+        private string|int $hydrationMode = AbstractQuery::HYDRATE_OBJECT,
     ) {
     }
 
@@ -107,7 +109,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
 
         $this->applyQueryHints($query);
 
-        foreach ($query->toIterable() as $item) {
+        foreach ($query->toIterable(hydrationMode: $this->hydrationMode) as $item) {
             yield $item;
 
             if ($this->isEntityManagerClearingEnabled()) {
@@ -124,6 +126,14 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function setHint(string $name, mixed $value): void
     {
         $this->hints[$name] = $value;
+    }
+
+    /**
+     * @psalm-param string|AbstractQuery::HYDRATE_* $hydrationMode
+     */
+    public function setHydrationMode(int|string $hydrationMode): void
+    {
+        $this->hydrationMode = $hydrationMode;
     }
 
     public function isEntityManagerClearingEnabled(): bool
@@ -163,6 +173,8 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $query = (clone $this->queryBuilder)->getQuery();
 
         $this->applyQueryHints($query);
+
+        $query->setHydrationMode($this->hydrationMode);
 
         return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
     }

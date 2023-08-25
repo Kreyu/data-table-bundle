@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -59,7 +60,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the data table "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        $builder = new DataTableBuilder($name, $query, $options);
+        $builder = new DataTableBuilder($name, $query, new EventDispatcher(), $options);
         $builder->setType($this);
 
         return $builder;

@@ -9,6 +9,13 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableExportEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePersonalizationEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exception\RuntimeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
@@ -408,6 +415,10 @@ class DataTable implements DataTableInterface
             return;
         }
 
+        $this->dispatch(DataTableEvents::PRE_PAGINATE, $event = new DataTablePaginationEvent($this, $data));
+
+        $data = $event->getPaginationData();
+
         $this->query->paginate($data);
 
         $this->originalQuery = $this->query;
@@ -419,6 +430,8 @@ class DataTable implements DataTableInterface
         }
 
         $this->resetPagination();
+
+        $this->dispatch(DataTableEvents::POST_PAGINATE, new DataTablePaginationEvent($this, $data));
     }
 
     public function sort(SortingData $data, bool $persistence = true): void
@@ -426,6 +439,10 @@ class DataTable implements DataTableInterface
         if (!$this->config->isSortingEnabled()) {
             return;
         }
+
+        $this->dispatch(DataTableEvents::PRE_SORT, $event = new DataTableSortingEvent($this, $data));
+
+        $data = $event->getSortingData();
 
         $columns = $this->getColumns();
 
@@ -456,6 +473,8 @@ class DataTable implements DataTableInterface
 
         $this->setSortingData($data);
         $this->resetPagination();
+
+        $this->dispatch(DataTableEvents::POST_SORT, new DataTableSortingEvent($this, $data));
     }
 
     public function filter(FiltrationData $data, bool $persistence = true): void
@@ -466,7 +485,14 @@ class DataTable implements DataTableInterface
 
         $this->query = clone $this->originalQuery;
 
+        $this->dispatch(DataTableEvents::PRE_FILTER, $event = new DataTableFiltrationEvent($this, $data));
+
+        $data = $event->getFiltrationData();
+
         $filters = $this->getFilters();
+
+        $data->appendMissingFilters($filters);
+        $data->removeRedundantFilters($filters);
 
         foreach ($filters as $filter) {
             $filterData = $data->getFilterData($filter->getName());
@@ -476,15 +502,14 @@ class DataTable implements DataTableInterface
             }
         }
 
-        $data->appendMissingFilters($filters);
-        $data->removeRedundantFilters($filters);
-
         if ($persistence && $this->config->isFiltrationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Filtration, $data);
         }
 
         $this->setFiltrationData($data);
         $this->resetPagination();
+
+        $this->dispatch(DataTableEvents::POST_FILTER, new DataTableFiltrationEvent($this, $data));
     }
 
     public function personalize(PersonalizationData $data, bool $persistence = true): void
@@ -492,6 +517,10 @@ class DataTable implements DataTableInterface
         if (!$this->config->isPersonalizationEnabled()) {
             return;
         }
+
+        $this->dispatch(DataTableEvents::PRE_PERSONALIZE, $event = new DataTablePersonalizationEvent($this, $data));
+
+        $data = $event->getPersonalizationData();
 
         $columns = $this->getColumns();
 
@@ -503,6 +532,8 @@ class DataTable implements DataTableInterface
         }
 
         $this->setPersonalizationData($data);
+
+        $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }
 
     public function export(ExportData $data = null): ExportFile
@@ -511,9 +542,13 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has exporting feature disabled.');
         }
 
+        $dataTable = clone $this;
+
         $data ??= $this->exportData ?? $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
-        $dataTable = clone $this;
+        $this->dispatch(DataTableEvents::PRE_EXPORT, $event = new DataTableExportEvent($dataTable, $data));
+
+        $data = $event->getExportData();
 
         if (ExportStrategy::IncludeAll === $data->strategy) {
             $dataTable->getQuery()->paginate(new PaginationData(perPage: null));
@@ -707,6 +742,15 @@ class DataTable implements DataTableInterface
         $type->buildExportView($view, $this, $options);
 
         return $view;
+    }
+
+    private function dispatch(string $eventName, DataTableEvent $event): void
+    {
+        $dispatcher = $this->config->getEventDispatcher();
+
+        if ($dispatcher->hasListeners($eventName)) {
+            $dispatcher->dispatch($event, $eventName);
+        }
     }
 
     private function resetPagination(): void

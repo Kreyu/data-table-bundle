@@ -18,28 +18,28 @@ class DateFilterType extends AbstractFilterType
     {
         $resolver
             ->setDefaults([
-                'value_form_type' => DateType::class,
+                'form_type' => DateType::class,
                 'supported_operators' => [
-                    Operator::Equal,
-                    Operator::NotEqual,
+                    Operator::Equals,
+                    Operator::NotEquals,
                     Operator::GreaterThan,
-                    Operator::GreaterThanEqual,
+                    Operator::GreaterThanEquals,
                     Operator::LessThan,
-                    Operator::LessThanEqual,
+                    Operator::LessThanEquals,
                 ],
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
-            ->addNormalizer('value_form_options', function (OptionsResolver $resolver, array $value): array {
+            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value): array {
                 return $value + ['widget' => 'single_text'];
             })
             ->addNormalizer('empty_data', function (OptionsResolver $resolver, string|array $value): string|array {
-                if (DateType::class !== $resolver['value_form_type']) {
+                if (DateType::class !== $resolver['form_type']) {
                     return $value;
                 }
 
                 // Note: because choice and text widgets are split into three fields,
                 //       we have to return an array with three empty values to properly set the empty data.
-                return match ($resolver['value_form_options']['widget'] ?? null) {
+                return match ($resolver['form_options']['widget'] ?? null) {
                     'choice', 'text' => ['day' => '', 'month' => '', 'year' => ''],
                     default => '',
                 };
@@ -74,12 +74,12 @@ class DateFilterType extends AbstractFilterType
     protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
         $expression = match ($operator) {
-            Operator::Equal => $expr->eq(...),
-            Operator::NotEqual => $expr->neq(...),
+            Operator::Equals => $expr->eq(...),
+            Operator::NotEquals => $expr->neq(...),
             Operator::GreaterThan => $expr->gt(...),
-            Operator::GreaterThanEqual => $expr->gte(...),
+            Operator::GreaterThanEquals => $expr->gte(...),
             Operator::LessThan => $expr->lt(...),
-            Operator::LessThanEqual => $expr->lte(...),
+            Operator::LessThanEquals => $expr->lte(...),
             default => throw new InvalidArgumentException('Operator not supported'),
         };
 

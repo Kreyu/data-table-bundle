@@ -52,8 +52,8 @@ class Filter implements FilterInterface
     public function getFormOptions(): array
     {
         return [
-            'value_form_type' => $this->config->getValueFormType(),
-            'value_form_options' => $this->config->getValueFormOptions(),
+            'form_type' => $this->config->getFormType(),
+            'form_options' => $this->config->getFormOptions(),
             'operator_form_type' => $this->config->getOperatorFormType(),
             'operator_form_options' => $this->config->getOperatorFormOptions(),
             'default_operator' => $this->config->getDefaultOperator(),

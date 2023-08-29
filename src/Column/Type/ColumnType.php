@@ -226,7 +226,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $propertyPath = $options['property_path'] ?? $column->getName();
 
-        if (is_string($propertyPath) && (is_array($data) || is_object($data))) {
+        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($data) || is_object($data))) {
             return $options['property_accessor']->getValue($data, $propertyPath);
         }
 

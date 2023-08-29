@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -24,57 +23,35 @@ class FilterDataType extends AbstractType implements DataMapperInterface
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $operatorFormType = $options['operator_form_type'];
-        $operatorFormOptions = $options['operator_form_options'];
-
-        if (!$options['operator_selectable']) {
-            $operatorFormType = HiddenType::class;
-            $operatorFormOptions['data'] = $options['default_operator']->value;
-        }
-
-        if (is_a($operatorFormType, OperatorType::class, true)) {
-            $operatorFormOptions['choices'] = $options['supported_operators'];
-            $operatorFormOptions['empty_data'] = $options['default_operator'];
-        }
-
         $builder
-            ->add('value', $options['value_form_type'], $options['value_form_options'])
-            ->add('operator', $operatorFormType, $operatorFormOptions)
+            ->add('value', $options['form_type'], $options['form_options'])
+            ->add('operator', $options['operator_form_type'], $options['operator_form_options'])
             ->setDataMapper($this)
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'required' => false,
-            'data_class' => FilterData::class,
-            'operator_type' => OperatorType::class,
-            'operator_options' => [
-                'visible' => false,
-            ],
-            'field_type' => TextType::class,
-            'field_options' => [],
-
-            'value_form_type' => TextType::class,
-            'value_form_options' => [],
-            'operator_form_type' => OperatorType::class,
-            'operator_form_options' => [],
-            'default_operator' => Operator::Equal,
-            'supported_operators' => [],
-            'operator_selectable' => false,
-        ]);
-
-        $resolver->setAllowedTypes('value_form_type', 'string');
-        $resolver->setAllowedTypes('value_form_options', 'array');
-
-        $resolver->setAllowedTypes('operator_form_type', 'string');
-        $resolver->setAllowedTypes('operator_form_options', 'array');
-
-        $resolver->setAllowedTypes('default_operator', Operator::class);
-        $resolver->setAllowedTypes('supported_operators', Operator::class.'[]');
-
-        $resolver->setAllowedTypes('operator_selectable', 'bool');
+        $resolver
+            ->setDefaults([
+                'required' => false,
+                'data_class' => FilterData::class,
+                'form_type' => TextType::class,
+                'form_options' => [],
+                'operator_form_type' => OperatorType::class,
+                'operator_form_options' => [],
+                'default_operator' => Operator::Equals,
+                'supported_operators' => [],
+                'operator_selectable' => false,
+            ])
+            ->setAllowedTypes('form_type', 'string')
+            ->setAllowedTypes('form_options', 'array')
+            ->setAllowedTypes('operator_form_type', 'string')
+            ->setAllowedTypes('operator_form_options', 'array')
+            ->setAllowedTypes('operator_selectable', 'bool')
+            ->setAllowedTypes('default_operator', Operator::class)
+            ->setAllowedTypes('supported_operators', Operator::class.'[]')
+        ;
     }
 
     public function getBlockPrefix(): string
@@ -89,12 +66,16 @@ class FilterDataType extends AbstractType implements DataMapperInterface
         }
 
         $forms = iterator_to_array($forms);
-        $forms['value']->setData($viewData->getValue());
+        $forms['value']->setData($viewData->hasValue() ? $viewData->getValue() : null);
         $forms['operator']->setData($viewData->getOperator());
     }
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
+        if (!$viewData instanceof FilterData) {
+            $viewData = new FilterData();
+        }
+
         $forms = iterator_to_array($forms);
 
         $operator = $forms['operator']->getData();
@@ -103,9 +84,8 @@ class FilterDataType extends AbstractType implements DataMapperInterface
             $operator = Operator::tryFrom($operator);
         }
 
-        if (null === $operator) {
-            $operator = $forms['operator']->getParent()->getConfig()->getOption('default_operator');
-        }
+        // TODO: Remove once the deprecated operators are removed.
+        $operator = $operator?->getNonDeprecatedCase();
 
         $viewData->setValue($forms['value']->getData() ?? '');
         $viewData->setOperator($operator);

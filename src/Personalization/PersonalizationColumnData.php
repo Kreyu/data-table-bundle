@@ -26,14 +26,14 @@ class PersonalizationColumnData
                 'visible' => true,
             ])
             ->setAllowedTypes('name', 'string')
-            ->setNormalizer('order', function (Options $options, mixed $value) {
+            ->addNormalizer('order', function (Options $options, mixed $value) {
                 if (null === $value) {
                     return null;
                 }
 
                 return (int) $value;
             })
-            ->setNormalizer('visible', function (Options $options, mixed $value) {
+            ->addNormalizer('visible', function (Options $options, mixed $value) {
                 return (bool) $value;
             })
         ;

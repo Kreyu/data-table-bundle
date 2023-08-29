@@ -18,28 +18,28 @@ class DateTimeFilterType extends AbstractFilterType
     {
         $resolver
             ->setDefaults([
-                'value_form_type' => DateTimeType::class,
+                'form_type' => DateTimeType::class,
                 'supported_operators' => [
-                    Operator::Equal,
-                    Operator::NotEqual,
+                    Operator::Equals,
+                    Operator::NotEquals,
                     Operator::GreaterThan,
-                    Operator::GreaterThanEqual,
+                    Operator::GreaterThanEquals,
                     Operator::LessThan,
-                    Operator::LessThanEqual,
+                    Operator::LessThanEquals,
                 ],
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
-            ->addNormalizer('value_form_options', function (OptionsResolver $resolver, array $value): array {
+            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value): array {
                 return $value + ['widget' => 'single_text'];
             })
             ->addNormalizer('empty_data', function (OptionsResolver $resolver, string|array $value): string|array {
-                if (DateTimeType::class !== $resolver['value_form_type']) {
+                if (DateTimeType::class !== $resolver['form_type']) {
                     return $value;
                 }
 
                 // Note: because choice and text widgets are split into three fields under "date" index,
                 //       we have to return an array with three empty "date" values to properly set the empty data.
-                return match ($resolver['value_form_options']['widget'] ?? null) {
+                return match ($resolver['form_options']['widget'] ?? null) {
                     'choice', 'text' => [
                         'date' => ['day' => '', 'month' => '', 'year' => ''],
                     ],
@@ -82,12 +82,12 @@ class DateTimeFilterType extends AbstractFilterType
     protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
         $expression = match ($operator) {
-            Operator::Equal => $expr->eq(...),
-            Operator::NotEqual => $expr->neq(...),
+            Operator::Equals => $expr->eq(...),
+            Operator::NotEquals => $expr->neq(...),
             Operator::GreaterThan => $expr->gt(...),
-            Operator::GreaterThanEqual => $expr->gte(...),
+            Operator::GreaterThanEquals => $expr->gte(...),
             Operator::LessThan => $expr->lt(...),
-            Operator::LessThanEqual => $expr->lte(...),
+            Operator::LessThanEquals => $expr->lte(...),
             default => throw new InvalidArgumentException('Operator not supported'),
         };
 
@@ -99,16 +99,16 @@ class DateTimeFilterType extends AbstractFilterType
         $value = $data->getValue();
 
         if ($value instanceof \DateTimeInterface) {
-            $format = $options['value_form_options']['input_format'] ?? null;
+            $format = $options['form_options']['input_format'] ?? null;
 
             if (null === $format) {
                 $format = 'Y-m-d H';
 
-                if ($options['value_form_options']['with_minutes'] ?? true) {
+                if ($options['form_options']['with_minutes'] ?? true) {
                     $format .= ':i';
                 }
 
-                if ($options['value_form_options']['with_seconds'] ?? true) {
+                if ($options['form_options']['with_seconds'] ?? true) {
                     $format .= ':s';
                 }
             }

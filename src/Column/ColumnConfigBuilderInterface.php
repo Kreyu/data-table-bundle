@@ -19,7 +19,7 @@ interface ColumnConfigBuilderInterface extends ColumnConfigInterface
 
     public function setAttributes(array $attributes): static;
 
-    public function setAttribute(string $name, mixed $value = null): static;
+    public function setAttribute(string $name, mixed $value): static;
 
     public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static;
 

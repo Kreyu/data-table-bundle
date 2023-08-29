@@ -1,14 +1,14 @@
 # Operators
-Equal: equal
-Not equal: not equal
-Contain: contain
-Not contain: not contain
+Equals: equals
+Not equals: not equals
+Contains: contains
+Not contains: not contains
 Greater than: greater than
-Greater than or equal: greater than or equal
+Greater than or equals: greater than or equals
 Less than: less than
-Less than or equal: less than or equal
-Start with: start with
-End with: end with
+Less than or equals: less than or equals
+Starts with: starts with
+Ends with: ends with
 
 # Boolean type
 Yes: Yes

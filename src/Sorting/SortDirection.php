@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
-enum Direction: string
+enum SortDirection
 {
-    case ASC = 'asc';
-    case DESC = 'desc';
+    case Asc;
+    case Desc;
 }

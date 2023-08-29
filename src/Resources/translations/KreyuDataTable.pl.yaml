@@ -1,14 +1,14 @@
 # Operators
-Equal: równa się
-Not equal: różne od
-Contain: zawiera
-Not contain: nie zawiera
+Equals: równa się
+Not equals: różne od
+Contains: zawiera
+Not contains: nie zawiera
 Greater than: większe od
-Greater than or equal: większe lub równe
+Greater than or equals: większe lub równe
 Less than: mniejsze od
-Less than or equal: mniejsze lub równe
-Start with: zaczyna się od
-End with: kończy się z
+Less than or equals: mniejsze lub równe
+Starts with: zaczyna się od
+Ends with: kończy się z
 
 # Boolean type
 Yes: Tak

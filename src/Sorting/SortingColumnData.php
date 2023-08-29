@@ -25,7 +25,7 @@ class SortingColumnData
             ->setDefault('direction', 'asc')
             ->setAllowedTypes('name', 'string')
             ->setAllowedValues('direction', [null, 'asc', 'desc'])
-            ->setNormalizer('direction', function (Options $options, mixed $value) {
+            ->addNormalizer('direction', function (Options $options, mixed $value) {
                 if (null === $value) {
                     return 'asc';
                 }

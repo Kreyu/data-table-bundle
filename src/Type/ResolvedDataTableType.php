@@ -60,8 +60,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the data table "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        $builder = new DataTableBuilder($name, $query, new EventDispatcher(), $options);
-        $builder->setType($this);
+        $builder = new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
 
         return $builder;
     }

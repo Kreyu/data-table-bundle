@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
@@ -18,49 +17,22 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Translation\TranslatableMessage;
 
 interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 {
-    public function setName(string $name): static;
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static;
+
+    public function addEventSubscriber(EventSubscriberInterface $subscriber): static;
 
     public function setType(ResolvedDataTableTypeInterface $type): static;
 
-    public function setOptions(array $options): static;
-
-    public function setThemes(array $themes): static;
-
-    public function addTheme(string $theme): static;
-
-    public function removeTheme(string $theme): static;
-
-    public function setTitle(null|string|TranslatableMessage $title): static;
-
-    public function setTitleTranslationParameters(array $titleTranslationParameters): static;
-
-    public function setTranslationDomain(null|bool|string $translationDomain): static;
-
-    public function getColumnFactory(): ColumnFactoryInterface;
-
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;
-
-    public function getFilterFactory(): FilterFactoryInterface;
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static;
 
-    public function getActionFactory(): ActionFactoryInterface;
-
     public function setActionFactory(ActionFactoryInterface $actionFactory): static;
-
-    /**
-     * @param class-string<ExporterTypeInterface> $type
-     */
-    public function addExporter(string $name, string $type, array $options = []): static;
-
-    public function removeExporter(string $name): static;
-
-    public function getExporterFactory(): ExporterFactoryInterface;
 
     public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static;
 
@@ -116,7 +88,11 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
 
+    public function setHeaderRowAttribute(string $name, mixed $value): static;
+
     public function setHeaderRowAttributes(array $headerRowAttributes): static;
+
+    public function setValueRowAttribute(string $name, mixed $value): static;
 
     public function setValueRowAttributes(array $valueRowAttributes): static;
 

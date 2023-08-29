@@ -3,6 +3,7 @@
 - **[Feature]** Data table events (see more)
 - **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more) 
 - **[Feature] [Breaking Change]** Optimized exporting process - introduces breaking changes (see more)
+- **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type` (see more)
 - **[Feature]** Doctrine ORM proxy query class now allows setting the hydration mode (see more)
 - **[Feature]** Improved DX with data table search handler (see more)
 - **[Feature]** CollectionColumnType default separator is now `', '` (with space after comma) instead of `','`

@@ -18,11 +18,11 @@ interface FilterConfigBuilderInterface extends FilterConfigInterface
     public function setOption(string $name, mixed $value): static;
 
     /**
-     * @param class-string<FormTypeInterface> $valueFormType
+     * @param class-string<FormTypeInterface> $formType
      */
-    public function setValueFormType(string $valueFormType): static;
+    public function setFormType(string $formType): static;
 
-    public function setValueFormOptions(array $valueFormOptions): static;
+    public function setFormOptions(array $formOptions): static;
 
     /**
      * @param class-string<FormTypeInterface> $operatorFormType

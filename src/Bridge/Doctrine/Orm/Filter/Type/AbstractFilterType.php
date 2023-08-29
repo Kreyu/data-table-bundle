@@ -32,7 +32,11 @@ abstract class AbstractFilterType extends BaseAbstractType
 
         $parameterName = $this->getUniqueParameterName($query, $filter);
 
-        $expression = $this->getOperatorExpression($queryPath, $parameterName, $operator, new Expr());
+        try {
+            $expression = $this->getOperatorExpression($queryPath, $parameterName, $operator, new Expr());
+        } catch (InvalidArgumentException) {
+            return;
+        }
 
         $query
             ->andWhere($expression)

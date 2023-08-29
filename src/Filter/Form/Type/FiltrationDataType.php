@@ -115,11 +115,7 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
         $forms = iterator_to_array($forms);
 
         foreach ($forms as $name => $form) {
-            $filterData = $viewData->getFilterData($name);
-
-            if ($filterData && $filterData->hasValue()) {
-                $form->setData($filterData);
-            }
+            $form->setData($viewData->getFilterData($name));
         }
     }
 

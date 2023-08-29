@@ -64,7 +64,7 @@ class DateRangeFilterType extends AbstractFilterType
     {
         $resolver
             ->setDefaults([
-                'value_form_type' => DateRangeType::class,
+                'form_type' => DateRangeType::class,
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
                 'empty_data' => ['from' => '', 'to' => ''],
             ])

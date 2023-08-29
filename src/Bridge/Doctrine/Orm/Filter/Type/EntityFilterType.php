@@ -25,19 +25,19 @@ class EntityFilterType extends AbstractFilterType
     {
         $resolver
             ->setDefaults([
-                'value_form_type' => EntityType::class,
+                'form_type' => EntityType::class,
                 'supported_operators' => [
-                    Operator::Equal,
-                    Operator::NotEqual,
-                    Operator::Contain,
-                    Operator::NotContain,
+                    Operator::Equals,
+                    Operator::NotEquals,
+                    Operator::Contains,
+                    Operator::NotContains,
                 ],
                 'choice_label' => null,
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
             ->setAllowedTypes('choice_label', ['null', 'string', 'callable'])
-            ->addNormalizer('value_form_options', function (OptionsResolver $resolver, array $value) {
-                if (EntityType::class !== $resolver['value_form_type']) {
+            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value) {
+                if (EntityType::class !== $resolver['form_type']) {
                     return $value;
                 }
 
@@ -58,8 +58,8 @@ class EntityFilterType extends AbstractFilterType
     protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
         $expression = match ($operator) {
-            Operator::Equal, Operator::Contain => $expr->in(...),
-            Operator::NotEqual, Operator::NotContain => $expr->notIn(...),
+            Operator::Equals, Operator::Contains => $expr->in(...),
+            Operator::NotEquals, Operator::NotContains => $expr->notIn(...),
             default => throw new InvalidArgumentException('Operator not supported'),
         };
 

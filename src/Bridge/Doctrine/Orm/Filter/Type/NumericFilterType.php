@@ -16,13 +16,13 @@ class NumericFilterType extends AbstractFilterType
     {
         $resolver
             ->setDefaults([
-                'value_form_type' => NumberType::class,
+                'form_type' => NumberType::class,
                 'supported_operators' => [
-                    Operator::Equal,
-                    Operator::NotEqual,
-                    Operator::GreaterThanEqual,
+                    Operator::Equals,
+                    Operator::NotEquals,
+                    Operator::GreaterThanEquals,
                     Operator::GreaterThan,
-                    Operator::LessThanEqual,
+                    Operator::LessThanEquals,
                     Operator::LessThan,
                 ],
             ])
@@ -32,11 +32,11 @@ class NumericFilterType extends AbstractFilterType
     protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
         $expression = match ($operator) {
-            Operator::Equal => $expr->eq(...),
-            Operator::NotEqual => $expr->neq(...),
-            Operator::GreaterThanEqual => $expr->gte(...),
+            Operator::Equals => $expr->eq(...),
+            Operator::NotEquals => $expr->neq(...),
+            Operator::GreaterThanEquals => $expr->gte(...),
             Operator::GreaterThan => $expr->gt(...),
-            Operator::LessThanEqual => $expr->lte(...),
+            Operator::LessThanEquals => $expr->lte(...),
             Operator::LessThan => $expr->lt(...),
             default => throw new InvalidArgumentException('Operator not supported'),
         };

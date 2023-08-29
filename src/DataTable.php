@@ -119,6 +119,7 @@ class DataTable implements DataTableInterface
     public function __clone(): void
     {
         $this->config = clone $this->config;
+        $this->query = clone $this->query;
     }
 
     public function initialize(): void

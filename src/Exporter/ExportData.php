@@ -28,7 +28,7 @@ class ExportData
             ->setAllowedTypes('filename', 'string')
             ->setAllowedTypes('strategy', ['string', ExportStrategy::class])
             ->setAllowedTypes('include_personalization', 'bool')
-            ->setNormalizer('strategy', function (Options $options, $value): ExportStrategy {
+            ->addNormalizer('strategy', function (Options $options, $value): ExportStrategy {
                 return $value instanceof ExportStrategy ? $value : ExportStrategy::from($value);
             })
         ;

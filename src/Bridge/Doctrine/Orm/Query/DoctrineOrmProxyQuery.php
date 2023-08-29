@@ -103,16 +103,16 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->getPagination();
     }
 
-    public function getItems(): iterable
+    public function getItems(int $batchSize = 1000): iterable
     {
         $query = (clone $this->queryBuilder)->getQuery();
 
         $this->applyQueryHints($query);
 
-        foreach ($query->toIterable(hydrationMode: $this->hydrationMode) as $item) {
+        foreach ($query->toIterable(hydrationMode: $this->hydrationMode) as $index => $item) {
             yield $item;
 
-            if ($this->isEntityManagerClearingEnabled()) {
+            if (0 === $index % $batchSize && $this->isEntityManagerClearingEnabled()) {
                 $this->getEntityManager()->clear();
             }
         }

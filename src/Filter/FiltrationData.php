@@ -57,8 +57,8 @@ class FiltrationData
     {
         $filters = [];
 
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $filters[$filter->getName()] = new FilterData();
+        foreach ($dataTable->getFilters() as $filter) {
+            $filters[$filter->getName()] = new FilterData(operator: $filter->getConfig()->getDefaultOperator());
         }
 
         return new self($filters);

@@ -23,11 +23,8 @@ The column type classes now contain two additional methods:
 - `buildExportHeaderView`
 - `buildExportValueView`
 
-These methods are used exclusively for exporting. 
+These methods are meant to be _especially_ lightweight, and used exclusively for exporting. 
 Move any export-specific logic from existing `buildHeaderView` and `buildValueView` methods to the new ones.
-
-**Note**: these methods have to be especially lightweight, as they are called for every row in the data table,
-and exporting large data sets may take a very long time.
 
 ## New sort direction enum cases
 
@@ -60,35 +57,35 @@ Additionally, the translation keys of operator cases have changed:
 
 The `Kreyu\Bundle\DataTableBundle\Filter\Operator` enum has changed its cases:
 
-| Before                | After              |
-|-----------------------|--------------------|
-| `EQUALS`              | `Equal`            |
-| `CONTAINS`            | `Contain`          |
-| `NOT_CONTAINS`        | `NotContain`       |
-| `NOT_EQUALS`          | `NotEqual`         |
-| `GREATER_THAN`        | `GreaterThan`      |
-| `GREATER_THAN_EQUALS` | `GreaterThanEqual` |
-| `LESS_THAN_EQUALS`    | `LessThanEqual`    |
-| `LESS_THAN`           | `LessThan`         |
-| `START_WITH`          | `StartWith`        |
-| `END_WITH`            | `EndWith`          |
+| Before                | After               |
+|-----------------------|---------------------|
+| `EQUALS`              | `Equals`            |
+| `CONTAINS`            | `Contains`          |
+| `NOT_CONTAINS`        | `NotContains`       |
+| `NOT_EQUALS`          | `NotEquals`         |
+| `GREATER_THAN`        | `GreaterThan`       |
+| `GREATER_THAN_EQUALS` | `GreaterThanEquals` |
+| `LESS_THAN_EQUALS`    | `LessThanEquals`    |
+| `LESS_THAN`           | `LessThan`          |
+| `START_WITH`          | `StartsWith`        |
+| `END_WITH`            | `EndsWith`          |
 
 Replace all occurrences of the old cases with the new ones.
 
 Additionally, the translation keys of operator cases have changed:
 
-| Operator           | Translation key before | Translation key after   |
-|--------------------|------------------------|-------------------------|
-| `Equal`            | `EQUALS`               | `Equal`                 |
-| `Contain`          | `CONTAINS`             | `Contain`               |
-| `NotContain`       | `NOT_CONTAINS`         | `Not contain`           |
-| `NotEqual`         | `NOT_EQUALS`           | `Not equal`             |
-| `GreaterThan`      | `GREATER_THAN`         | `Greater than`          |
-| `GreaterThanEqual` | `GREATER_THAN_EQUALS`  | `Greater than or equal` |
-| `LessThanEqual`    | `LESS_THAN_EQUALS`     | `Less than or equal`    |
-| `LessThan`         | `LESS_THAN`            | `Less than`             |
-| `StartWith`        | `STARTS_WITH`          | `Start with`            |
-| `EndWith`          | `ENDS_WITH`            | `End with`              |
+| Operator           | Translation key before | Translation key after    |
+|--------------------|------------------------|--------------------------|
+| `Equal`            | `EQUALS`               | `Equals`                 |
+| `Contain`          | `CONTAINS`             | `Contains`               |
+| `NotContain`       | `NOT_CONTAINS`         | `Not contains`           |
+| `NotEqual`         | `NOT_EQUALS`           | `Not equals`             |
+| `GreaterThan`      | `GREATER_THAN`         | `Greater than`           |
+| `GreaterThanEqual` | `GREATER_THAN_EQUALS`  | `Greater than or equals` |
+| `LessThanEqual`    | `LESS_THAN_EQUALS`     | `Less than or equals`    |
+| `LessThan`         | `LESS_THAN`            | `Less than`              |
+| `StartWith`        | `STARTS_WITH`          | `Starts with`            |
+| `EndWith`          | `ENDS_WITH`            | `Ends with`              |
 
 ## Removed data tables `*_persistence_subject` options
 

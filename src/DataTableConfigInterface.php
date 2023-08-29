@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -14,7 +18,6 @@ use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 interface DataTableConfigInterface
@@ -34,13 +37,19 @@ interface DataTableConfigInterface
 
     public function getOptions(): array;
 
+    public function hasOption(string $name): bool;
+
+    public function getOption(string $name, mixed $default = null): mixed;
+
     public function getThemes(): array;
 
-    public function getTitle(): null|string|TranslatableMessage;
+    public function getColumnFactory(): ColumnFactoryInterface;
 
-    public function getTitleTranslationParameters(): array;
+    public function getFilterFactory(): FilterFactoryInterface;
 
-    public function getTranslationDomain(): null|bool|string;
+    public function getActionFactory(): ActionFactoryInterface;
+
+    public function getExporterFactory(): ExporterFactoryInterface;
 
     public function isExportingEnabled(): bool;
 
@@ -96,7 +105,15 @@ interface DataTableConfigInterface
 
     public function getHeaderRowAttributes(): array;
 
+    public function hasHeaderRowAttribute(string $name): bool;
+
+    public function getHeaderRowAttribute(string $name, mixed $default = null): mixed;
+
     public function getValueRowAttributes(): array;
+
+    public function hasValueRowAttribute(string $name): bool;
+
+    public function getValueRowAttribute(string $name, mixed $default = null): mixed;
 
     public function getPageParameterName(): string;
 

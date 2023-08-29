@@ -41,10 +41,6 @@ final class DataTableType implements DataTableTypeInterface
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $setters = [
-            'themes' => $builder->setThemes(...),
-            'title' => $builder->setTitle(...),
-            'title_translation_parameters' => $builder->setTitleTranslationParameters(...),
-            'translation_domain' => $builder->setTranslationDomain(...),
             'column_factory' => $builder->setColumnFactory(...),
             'filter_factory' => $builder->setFilterFactory(...),
             'action_factory' => $builder->setActionFactory(...),
@@ -86,11 +82,11 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         $view->vars = array_replace($view->vars, [
-            'themes' => $dataTable->getConfig()->getThemes(),
+            'themes' => $options['themes'],
+            'title' => $options['title'],
+            'title_translation_parameters' => $options['title_translation_parameters'],
+            'translation_domain' => $options['translation_domain'],
             'name' => $dataTable->getConfig()->getName(),
-            'title' => $dataTable->getConfig()->getTitle(),
-            'title_translation_parameters' => $dataTable->getConfig()->getTitleTranslationParameters(),
-            'translation_domain' => $dataTable->getConfig()->getTranslationDomain(),
             'exporters' => $dataTable->getExporters(),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
@@ -148,7 +144,7 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         $view->vars = array_replace($view->vars, [
-            'translation_domain' => $dataTable->getConfig()->getTranslationDomain(),
+            'translation_domain' => $dataTable->getConfig()->getOption('translation_domain'),
             'header_row' => $this->createExportHeaderRowView($view, $dataTable, $visibleColumns),
             'value_rows' => new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns)),
         ]);

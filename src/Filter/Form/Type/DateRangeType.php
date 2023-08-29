@@ -8,7 +8,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeType extends AbstractType implements DataMapperInterface
 {
@@ -59,6 +58,7 @@ class DateRangeType extends AbstractType implements DataMapperInterface
 
         if (null === $from && null === $to) {
             $viewData = '';
+
             return;
         }
 

@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
-use Kreyu\Bundle\DataTableBundle\Sorting\Direction;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;

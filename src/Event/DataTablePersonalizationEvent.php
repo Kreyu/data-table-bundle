@@ -9,8 +9,10 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 
 class DataTablePersonalizationEvent extends DataTableEvent
 {
-    public function __construct(DataTableInterface $dataTable, private PersonalizationData $personalizationData)
-    {
+    public function __construct(
+        DataTableInterface $dataTable,
+        private PersonalizationData $personalizationData,
+    ) {
         parent::__construct($dataTable);
     }
 

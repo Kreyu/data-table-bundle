@@ -6,16 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;

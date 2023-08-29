@@ -33,7 +33,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;

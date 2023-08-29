@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
-use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Writer\Exception\WriterNotOpenedException;

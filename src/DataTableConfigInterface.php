@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;

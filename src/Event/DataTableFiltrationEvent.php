@@ -9,8 +9,10 @@ use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 
 class DataTableFiltrationEvent extends DataTableEvent
 {
-    public function __construct(DataTableInterface $dataTable, private FiltrationData $filtrationData)
-    {
+    public function __construct(
+        DataTableInterface $dataTable,
+        private FiltrationData $filtrationData,
+    ) {
         parent::__construct($dataTable);
     }
 

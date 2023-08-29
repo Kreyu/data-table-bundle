@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 

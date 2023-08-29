@@ -109,10 +109,9 @@ class DataTable implements DataTableInterface
 
     private bool $initialized = false;
 
-    // TODO: Handle nullable query
     public function __construct(
         private ProxyQueryInterface $query,
-        private /*readonly*/ DataTableConfigInterface $config,
+        private /* readonly */ DataTableConfigInterface $config,
     ) {
         $this->originalQuery = clone $this->query;
     }

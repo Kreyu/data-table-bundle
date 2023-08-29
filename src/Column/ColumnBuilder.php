@@ -19,11 +19,10 @@ class ColumnBuilder implements ColumnBuilderInterface
     private bool $locked = false;
 
     public function __construct(
-        private string                      $name,
+        private string $name,
         private ResolvedColumnTypeInterface $type,
-        private array                       $options = [],
-    )
-    {
+        private array $options = [],
+    ) {
     }
 
     public function getName(): string

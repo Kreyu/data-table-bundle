@@ -29,45 +29,12 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DataTableType implements DataTableTypeInterface
 {
-    public const DEFAULT_OPTIONS = [
-        'themes' => null,
-        'title' => null,
-        'title_translation_parameters' => [],
-        'translation_domain' => null,
-        'column_factory' => null,
-        'action_factory' => null,
-        'request_handler' => null,
-        'sorting_enabled' => null,
-        'sorting_persistence_enabled' => null,
-        'sorting_persistence_adapter' => null,
-        'sorting_persistence_subject_provider' => null,
-        'pagination_enabled' => null,
-        'pagination_persistence_enabled' => null,
-        'pagination_persistence_adapter' => null,
-        'pagination_persistence_subject_provider' => null,
-        'filtration_enabled' => null,
-        'filtration_persistence_enabled' => null,
-        'filtration_persistence_adapter' => null,
-        'filtration_persistence_subject_provider' => null,
-        'filtration_form_factory' => null,
-        'filter_factory' => null,
-        'personalization_enabled' => null,
-        'personalization_persistence_enabled' => null,
-        'personalization_persistence_adapter' => null,
-        'personalization_persistence_subject_provider' => null,
-        'personalization_form_factory' => null,
-        'exporting_enabled' => null,
-        'exporting_form_factory' => null,
-        'exporter_factory' => null,
-    ];
-
     public function __construct(
-        private readonly array $defaults = []
+        private readonly array $defaults = [],
     ) {
     }
 
@@ -306,7 +273,7 @@ final class DataTableType implements DataTableTypeInterface
         return array_map(
             static fn (FilterInterface $filter) => $filter->createView(
                 $dataTable->getFiltrationData()?->getFilterData($filter) ?? new FilterData(),
-                $view
+                $view,
             ),
             $dataTable->getFilters(),
         );

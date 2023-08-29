@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
-use Kreyu\Bundle\DataTableBundle\DataTableConfigInterface;
 use Kreyu\Bundle\DataTableBundle\PersistenceContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

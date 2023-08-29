@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

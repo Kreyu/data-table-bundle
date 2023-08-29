@@ -18,6 +18,7 @@ interface FilterTypeInterface
 {
     /**
      * @param ProxyQuery $query
+     *
      * @noinspection PhpDocSignatureInspection
      */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Extension\Core;
 
 use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectNotFoundException;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

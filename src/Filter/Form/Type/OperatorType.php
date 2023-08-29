@@ -6,9 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;

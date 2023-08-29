@@ -9,8 +9,10 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 
 class DataTableExportEvent extends DataTableEvent
 {
-    public function __construct(DataTableInterface $dataTable, private ExportData $exportData)
-    {
+    public function __construct(
+        DataTableInterface $dataTable,
+        private ExportData $exportData,
+    ) {
         parent::__construct($dataTable);
     }
 

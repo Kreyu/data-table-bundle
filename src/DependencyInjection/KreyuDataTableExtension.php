@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {

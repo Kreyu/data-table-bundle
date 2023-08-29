@@ -40,10 +40,6 @@ class PersonalizationDataType extends AbstractType
                 'translation_parameters' => $columnView->vars['translation_parameters'],
             ]);
         }
-
-        usort($view['columns']->children, function (FormView $columnA, FormView $columnB) {
-            return $columnA->vars['data']->getOrder() <=> $columnB->vars['data']->getOrder();
-        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

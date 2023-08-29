@@ -1,12 +1,14 @@
 # 0.14
 
 - **[Feature]** Data table events (see more)
-- **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more) 
-- **[Feature] [Breaking Change]** Optimized exporting process - introduces breaking changes (see more)
+- **[Feature]** Column `priority` option to allow setting order of columns (see more)
+- **[Feature]** Column `visible` option to allow setting visibility of columns (see more)
 - **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type` (see more)
-- **[Feature]** Doctrine ORM proxy query class now allows setting the hydration mode (see more)
-- **[Feature]** Improved DX with data table search handler (see more)
-- **[Feature]** CollectionColumnType default separator is now `', '` (with space after comma) instead of `','`
+- **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query (see more)
+- **[Feature]** Data table builder's `setSearchHandler` method for easier search definition (see more)
+- **[Feature]** Collection column type default separator changed `', '` (with space after comma) instead of `','`
+- **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more)
+- **[Feature] [Breaking Change]** Optimized exporting process - introduces breaking changes (see more)
 - **[Bugfix]** CollectionColumnType now renders without spaces around separator
 
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.

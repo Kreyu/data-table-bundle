@@ -691,18 +691,15 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     private function prependBatchCheckboxColumn(): void
     {
-        $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class);
-
-        // TODO: Remove this logic after adding the column "priority" option.
-        $this->columns = [
-            self::BATCH_CHECKBOX_COLUMN_NAME => $this->getColumn(self::BATCH_CHECKBOX_COLUMN_NAME),
-            ...$this->columns,
-        ];
+        $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class, [
+            'priority' => self::BATCH_CHECKBOX_COLUMN_PRIORITY,
+        ]);
     }
 
     private function appendActionsColumn(): void
     {
         $this->addColumn(self::ACTIONS_COLUMN_NAME, ActionsColumnType::class, [
+            'priority' => self::ACTIONS_COLUMN_PRIORITY,
             'actions' => $this->getRowActions(),
         ]);
     }

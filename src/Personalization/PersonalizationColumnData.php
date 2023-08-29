@@ -48,12 +48,12 @@ class PersonalizationColumnData
         return $self;
     }
 
-    public static function fromColumn(ColumnInterface $column, int $order = 0, bool $visible = true): self
+    public static function fromColumn(ColumnInterface $column): self
     {
         $self = new self();
         $self->name = $column->getName();
-        $self->order = $order;
-        $self->visible = $visible;
+        $self->order = $column->getPriority();
+        $self->visible = $column->isVisible();
 
         return $self;
     }

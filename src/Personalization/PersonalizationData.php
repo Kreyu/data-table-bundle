@@ -55,101 +55,88 @@ class PersonalizationData
     {
         $columns = [];
 
-        foreach (array_values($dataTable->getColumns()) as $index => $column) {
-            $columns[] = PersonalizationColumnData::fromColumn($column, $index);
+        foreach ($dataTable->getColumns() as $column) {
+            $columns[] = PersonalizationColumnData::fromColumn($column);
         }
 
         return new self($columns);
     }
 
     /**
-     * Retrieves every defined column personalization data.
-     *
-     * @return PersonalizationColumnData[]
+     * Applies personalization on given column(s), updating its priority and visibility.
      */
+    public function apply(ColumnInterface ...$columns): void
+    {
+        foreach ($columns as $column) {
+            $data = $this->getColumn($column);
+
+            $column
+                ->setPriority($data->getOrder())
+                ->setVisible($data->isVisible());
+        }
+    }
+
     public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * Retrieves a column personalization data by its name.
-     */
-    public function getColumn(string|ColumnInterface $column): ?PersonalizationColumnData
+    public function hasColumn(string|ColumnInterface|PersonalizationColumnData $column): bool
     {
-        if ($column instanceof ColumnInterface) {
+        if (!is_string($column)) {
+            $column = $column->getName();
+        }
+
+        return array_key_exists($column, $this->columns);
+    }
+
+    public function getColumn(string|ColumnInterface|PersonalizationColumnData $column): ?PersonalizationColumnData
+    {
+        if (!is_string($column)) {
             $column = $column->getName();
         }
 
         return $this->columns[$column] ?? null;
     }
 
-    /**
-     * Adds a column personalization data to the stack.
-     */
-    public function addColumn(PersonalizationColumnData $column): void
+    public function addColumn(ColumnInterface|PersonalizationColumnData $column): void
     {
+        if ($column instanceof ColumnInterface) {
+            $column = PersonalizationColumnData::fromColumn($column);
+        }
+
         $this->columns[$column->getName()] = $column;
     }
 
-    /**
-     * Removes a column personalization data from the stack.
-     */
-    public function removeColumn(PersonalizationColumnData $column): void
+    public function removeColumn(string|ColumnInterface|PersonalizationColumnData $column): void
     {
-        unset($this->columns[$column->getName()]);
+        if (!is_string($column)) {
+            $column = $column->getName();
+        }
+
+        unset($this->columns[$column]);
     }
 
     /**
-     * Adds columns not present in the personalization data to the stack.
-     *
-     * @param array<ColumnInterface> $columns
+     * @param array<ColumnInterface|PersonalizationColumnData> $columns
      */
-    public function addMissingColumns(array $columns, bool $visible = true): void
+    public function addMissingColumns(array $columns): void
     {
         foreach ($columns as $column) {
             if (null === $this->getColumn($column)) {
-                $this->appendColumn($column, $visible);
+                $this->addColumn($column);
             }
         }
     }
 
     /**
-     * Removes columns from the personalization data that does not exist in the given set of columns.
-     *
-     * @param array<ColumnInterface> $columns
+     * @param array<ColumnInterface|PersonalizationColumnData> $columns
      */
     public function removeRedundantColumns(array $columns): void
     {
         foreach (array_diff_key($this->columns, $columns) as $column) {
             $this->removeColumn($column);
         }
-    }
-
-    /**
-     * Computes given set of {@see ColumnInterface}, ordering it and excluding hidden ones.
-     *
-     * @param array<ColumnInterface> $columns
-     *
-     * @return array<ColumnInterface>
-     */
-    public function compute(array $columns): array
-    {
-        foreach ($columns as $column) {
-            if (!$column instanceof ColumnInterface) {
-                throw new UnexpectedTypeException($column, ColumnInterface::class);
-            }
-        }
-
-        $columns = array_filter($columns, function (ColumnInterface $column) {
-            return $this->isColumnVisible($column);
-        });
-
-        uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB) {
-            return $this->getColumnOrder($columnA) <=> $this->getColumnOrder($columnB);
-        });
-
-        return $columns;
     }
 
     public function getColumnOrder(string|ColumnInterface $column): int
@@ -196,7 +183,7 @@ class PersonalizationData
         return $this->setColumnVisibility($column, false);
     }
 
-    private function appendColumn(string|ColumnInterface $column, bool $visible): void
+    private function appendColumn(string|ColumnInterface $column): void
     {
         $columnsOrders = array_map(
             fn (PersonalizationColumnData $column) => $column->getOrder(),
@@ -212,10 +199,6 @@ class PersonalizationData
             $columnOrder = max($columnsOrders) + 1;
         }
 
-        $this->columns[$column->getName()] = PersonalizationColumnData::fromColumn(
-            column: $column,
-            order: $columnOrder,
-            visible: $visible,
-        );
+        $this->columns[$column->getName()] = PersonalizationColumnData::fromColumn($column;
     }
 }

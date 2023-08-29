@@ -22,6 +22,8 @@ final class ColumnType implements ColumnTypeInterface
         $builder
             ->setPropertyPath($options['property_path'] ?: null)
             ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
+            ->setPriority($options['priority'])
+            ->setVisible($options['visible'])
             ->setSortable(false !== $options['sort'])
             ->setExportable(false !== $options['export'])
         ;
@@ -163,6 +165,8 @@ final class ColumnType implements ColumnTypeInterface
                 'getter' => null,
                 'header_attr' => [],
                 'value_attr' => [],
+                'priority' => 0,
+                'visible' => true,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
@@ -177,23 +181,10 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
             ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
             ->setAllowedTypes('getter', ['null', 'callable'])
-            ->setAllowedTypes('header_attr', ['array'])
+            ->setAllowedTypes('header_attr', 'array')
             ->setAllowedTypes('value_attr', ['array', 'callable'])
-            ->setInfo('label', 'A user-friendly label that describes a column.')
-            ->setInfo('header_translation_domain', 'Translation domain used to translate the column header.')
-            ->setInfo('header_translation_parameters', 'Parameters used within the column header translation.')
-            ->setInfo('value_translation_domain', 'Translation domain used to translate the column value.')
-            ->setInfo('value_translation_parameters', 'Parameters used within the column value translation.')
-            ->setInfo('block_name', 'Name of the block that renders the column.')
-            ->setInfo('block_prefix', 'A custom prefix of the block name that renders the column.')
-            ->setInfo('sort', 'Determines whether the column can be sorted (and optionally on what path).')
-            ->setInfo('export', 'Determines whether the column can be exported (and optionally with custom options).')
-            ->setInfo('formatter', 'A formatter used to format the column norm data to the view data.')
-            ->setInfo('property_path', 'Property path used to retrieve the column norm data from the row data.')
-            ->setInfo('property_accessor', 'An instance of property accessor used to retrieve column norm data from the row data.')
-            ->setInfo('getter', 'A callable data accessor used to retrieve column norm data from the row data manually, instead of property accessor.')
-            ->setInfo('header_attr', 'An array of attributes (e.g. HTML attributes) passed to the header view.')
-            ->setInfo('value_attr', 'An array of attributes (e.g. HTML attributes) passed to the column value view.')
+            ->setAllowedTypes('priority', 'int')
+            ->setAllowedTypes('visible', 'bool')
         ;
     }
 

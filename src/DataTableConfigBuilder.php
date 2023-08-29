@@ -496,6 +496,13 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         return $this->themes;
     }
 
+    public function addTheme(string $theme): static
+    {
+        $this->themes[] = $theme;
+
+        return $this;
+    }
+
     public function setThemes(array $themes): static
     {
         $this->themes = $themes;

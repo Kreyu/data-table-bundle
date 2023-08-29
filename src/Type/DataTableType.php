@@ -41,6 +41,7 @@ final class DataTableType implements DataTableTypeInterface
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $setters = [
+            'themes' => $builder->setThemes(...),
             'column_factory' => $builder->setColumnFactory(...),
             'filter_factory' => $builder->setFilterFactory(...),
             'action_factory' => $builder->setActionFactory(...),
@@ -75,14 +76,11 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $columns = $visibleColumns = $dataTable->getColumns();
-
-        if ($dataTable->getConfig()->isPersonalizationEnabled() && $personalizationData = $dataTable->getPersonalizationData()) {
-            $visibleColumns = $personalizationData->compute($columns);
-        }
+        $columns = $dataTable->getColumns();
+        $visibleColumns = $dataTable->getVisibleColumns();
 
         $view->vars = array_replace($view->vars, [
-            'themes' => $options['themes'],
+            'themes' => $dataTable->getConfig()->getThemes(),
             'title' => $options['title'],
             'title_translation_parameters' => $options['title_translation_parameters'],
             'translation_domain' => $options['translation_domain'],

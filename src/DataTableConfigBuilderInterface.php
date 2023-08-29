@@ -88,6 +88,10 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
 
+    public function addTheme(string $theme): static;
+
+    public function setThemes(array $themes): static;
+
     public function setHeaderRowAttribute(string $name, mixed $value): static;
 
     public function setHeaderRowAttributes(array $headerRowAttributes): static;

@@ -23,7 +23,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 {
     public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
 
+    public const BATCH_CHECKBOX_COLUMN_PRIORITY = 1000;
+
     public const ACTIONS_COLUMN_NAME = '__actions';
+
+    public const ACTIONS_COLUMN_PRIORITY = -1;
 
     public const SEARCH_FILTER_NAME = '__search';
 

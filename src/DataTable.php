@@ -159,7 +159,23 @@ class DataTable implements DataTableInterface
 
     public function getColumns(): array
     {
-        return $this->columns;
+        $columns = $this->columns;
+
+        uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB) {
+            return $columnA->getPriority() < $columnB->getPriority();
+        });
+
+        return $columns;
+    }
+
+    public function getVisibleColumns(): array
+    {
+        return array_filter($this->getColumns(), fn (ColumnInterface $column) => $column->isVisible());
+    }
+
+    public function getHiddenColumns(): array
+    {
+        return array_filter($this->getColumns(), fn (ColumnInterface $column) => !$column->isVisible());
     }
 
     public function getColumn(string $name): ColumnInterface
@@ -532,6 +548,8 @@ class DataTable implements DataTableInterface
         }
 
         $this->setPersonalizationData($data);
+
+        $data->apply(...$this->getColumns());
 
         $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }

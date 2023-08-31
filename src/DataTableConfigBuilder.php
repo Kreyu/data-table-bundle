@@ -782,6 +782,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getDataTableConfig(): DataTableConfigInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $config = clone $this;
         $config->locked = true;
 

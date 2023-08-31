@@ -212,6 +212,10 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function getFilterConfig(): FilterConfigInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $config = clone $this;
         $config->locked = true;
 

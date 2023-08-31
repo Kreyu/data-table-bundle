@@ -11,6 +11,15 @@ class ActionBuilder extends ActionConfigBuilder implements ActionBuilderInterfac
 {
     public function getAction(): ActionInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return new Action($this->getActionConfig());
+    }
+
+    private function createBuilderLockedException(): BadMethodCallException
+    {
+        return new BadMethodCallException('ActionBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.');
     }
 }

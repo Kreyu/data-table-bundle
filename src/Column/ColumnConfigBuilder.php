@@ -223,6 +223,10 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getColumnConfig(): ColumnConfigInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $config = clone $this;
         $config->locked = true;
 

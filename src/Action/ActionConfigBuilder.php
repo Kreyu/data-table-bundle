@@ -162,6 +162,10 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function getActionConfig(): ActionConfigInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $config = clone $this;
         $config->locked = true;
 

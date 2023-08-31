@@ -89,6 +89,10 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function getExporterConfig(): ExporterConfigInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $config = clone $this;
         $config->locked = true;
 

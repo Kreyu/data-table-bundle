@@ -184,7 +184,7 @@ class DataTable implements DataTableInterface
         );
     }
 
-    public function getExportableColumns(bool $includePersonalization = true): array
+    public function getExportableColumns(): array
     {
         return array_filter(
             $this->getVisibleColumns(),

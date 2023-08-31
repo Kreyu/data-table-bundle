@@ -4,13 +4,21 @@ import Sortable from 'sortablejs'
 export default class extends Controller {
     static targets = [ 'visibleColumns', 'hiddenColumns' ]
 
+    #visibleColumnsSortable = null
+    #hiddenColumnSortable = null
+
     connect() {
-        this.#initializeSortable(this.visibleColumnsTarget)
-        this.#initializeSortable(this.hiddenColumnsTarget)
+        this.#visibleColumnsSortable = this.#initializeSortable(this.visibleColumnsTarget)
+        this.#hiddenColumnSortable = this.#initializeSortable(this.hiddenColumnsTarget)
+    }
+
+    disconnect() {
+        this.#visibleColumnsSortable.destroy();
+        this.#hiddenColumnSortable.destroy();
     }
 
     #initializeSortable(target) {
-        new Sortable(target, {
+        return new Sortable(target, {
             group: 'shared',
             animation: 150,
             onAdd: event => {
@@ -19,12 +27,16 @@ export default class extends Controller {
                 input.value = event.to.dataset.visible
             },
             onChange: event => {
-                const orderInput = event.item.querySelector('[name$="[order]"]')
-                const originalOrderInput = event.originalEvent.target.querySelector('[name$="[order]"]')
+                const priorityInput = event.item.querySelector('[name$="[priority]"]')
+                const originalPriorityInput = event.originalEvent.target.querySelector('[name$="[priority]"]')
 
-                orderInput.value = event.newIndex
-                originalOrderInput.value = event.oldIndex
+                priorityInput.value = this.#calculatePriority(target, event.newIndex)
+                originalPriorityInput.value = this.#calculatePriority(target, event.oldIndex)
             }
         })
+    }
+
+    #calculatePriority(target, index) {
+        return target.childElementCount - index - 1;
     }
 }

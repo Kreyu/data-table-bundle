@@ -10,6 +10,9 @@ use OpenSpout\Writer\XLSX\Options;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated use {@link https://github.com/Kreyu/data-table-open-spout-bundle} instead
+ */
 class XlsxExporterType extends AbstractExporterType
 {
     protected function getExtension(): string

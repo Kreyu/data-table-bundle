@@ -3,6 +3,7 @@
 - **[Feature]** Data table events (see more)
 - **[Feature]** Column `priority` option to allow setting order of columns (see more)
 - **[Feature]** Column `visible` option to allow setting visibility of columns (see more)
+- **[Feature]** Column `personalizable` option to allow excluding the column from personalization (see more)
 - **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type` (see more)
 - **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query (see more)
 - **[Feature]** Data table builder's `setSearchHandler` method for easier search definition (see more)
@@ -14,7 +15,7 @@
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.
 Please note that this is a **breaking change** for applications using internal bundle classes!
 
-For a list of all breaking changes, see the [upgrade guide](UPGRADE_GUIDE_0_14.md).
+For a list of all breaking changes, see the [upgrade guide](docs/upgrade-guide/0.14.md).
 
 # 0.13
 

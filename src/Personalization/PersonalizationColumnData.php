@@ -10,52 +10,47 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnData
 {
-    public string $name;
-    public int $order;
-    public bool $visible;
+    private static ?OptionsResolver $optionsResolver = null;
+
+    public function __construct(
+        public string $name,
+        public int $priority = 0,
+        public bool $visible = true,
+    ) {
+    }
 
     /**
      * @param array{name: string, order: int, visible: bool} $data
      */
     public static function fromArray(array $data): self
     {
-        ($resolver = new OptionsResolver())
+        $resolver = static::$optionsResolver ??= (new OptionsResolver())
             ->setRequired('name')
             ->setDefaults([
-                'order' => 0,
+                'priority' => 0,
                 'visible' => true,
             ])
             ->setAllowedTypes('name', 'string')
-            ->addNormalizer('order', function (Options $options, mixed $value) {
-                if (null === $value) {
-                    return null;
-                }
-
-                return (int) $value;
-            })
-            ->addNormalizer('visible', function (Options $options, mixed $value) {
-                return (bool) $value;
-            })
+            ->setAllowedTypes('priority', 'int')
+            ->setAllowedTypes('visible', 'bool')
         ;
 
         $data = $resolver->resolve($data);
 
-        $self = new self();
-        $self->name = $data['name'];
-        $self->order = $data['order'];
-        $self->visible = $data['visible'];
-
-        return $self;
+        return new self(
+            $data['name'],
+            $data['priority'],
+            $data['visible'],
+        );
     }
 
     public static function fromColumn(ColumnInterface $column): self
     {
-        $self = new self();
-        $self->name = $column->getName();
-        $self->order = $column->getPriority();
-        $self->visible = $column->isVisible();
-
-        return $self;
+        return new self(
+            $column->getName(),
+            $column->getPriority(),
+            $column->isVisible(),
+        );
     }
 
     public function getName(): string
@@ -63,14 +58,14 @@ class PersonalizationColumnData
         return $this->name;
     }
 
-    public function getOrder(): int
+    public function getPriority(): int
     {
-        return $this->order;
+        return $this->priority;
     }
 
-    public function setOrder(int $order): void
+    public function setPriority(int $priority): void
     {
-        $this->order = $order;
+        $this->priority = $priority;
     }
 
     public function isVisible(): bool

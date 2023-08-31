@@ -8,6 +8,9 @@ use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated this extension is not used and the default configuration is applied in the {@see DataTableType}
+ */
 class DefaultConfigurationDataTableTypeExtension extends AbstractDataTableTypeExtension
 {
     public function __construct(

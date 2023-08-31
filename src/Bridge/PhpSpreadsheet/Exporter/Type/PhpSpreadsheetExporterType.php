@@ -11,6 +11,9 @@ use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType as BaseExporterType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated the PhpSpreadsheet exporters are deprecated, use OpenSpout instead
+ */
 final class PhpSpreadsheetExporterType extends AbstractExporterType
 {
     public function export(DataTableView $view, string $filename, array $options = []): ExportFile

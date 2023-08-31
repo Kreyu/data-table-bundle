@@ -14,6 +14,9 @@ use OpenSpout\Writer\Exception\WriterNotOpenedException;
 use OpenSpout\Writer\WriterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @deprecated use {@link https://github.com/Kreyu/data-table-open-spout-bundle} instead
+ */
 abstract class AbstractExporterType extends BaseAbstractExporterType
 {
     public function __construct(

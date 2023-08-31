@@ -26,7 +26,22 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function addEventSubscriber(EventSubscriberInterface $subscriber): static;
 
+    /**
+     * @deprecated provide the name using the factory {@see DataTableFactoryInterface} "named" methods instead
+     */
+    public function setName(string $name): static;
+
     public function setType(ResolvedDataTableTypeInterface $type): static;
+
+    /**
+     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     */
+    public function setOptions(array $options): static;
+
+    /**
+     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     */
+    public function setOption(string $name, mixed $value): static;
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;
 

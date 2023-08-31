@@ -41,6 +41,21 @@ interface DataTableInterface
     public function getColumns(): array;
 
     /**
+     * @return array<string, ColumnInterface>
+     */
+    public function getVisibleColumns(): array;
+
+    /**
+     * @return array<string, ColumnInterface>
+     */
+    public function getHiddenColumns(): array;
+
+    /**
+     * @return array<string, ColumnInterface>
+     */
+    public function getExportableColumns(): array;
+
+    /**
      * @throws OutOfBoundsException if column of given name does not exist
      */
     public function getColumn(string $name): ColumnInterface;

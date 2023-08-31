@@ -26,7 +26,7 @@ final class ExporterType implements ExporterTypeInterface
         $resolver->setDefaults([
             'use_headers' => true,
             'label' => null,
-            'tempnam_dir' => '/tmp',
+            'tempnam_dir' => sys_get_temp_dir(),
             'tempnam_prefix' => 'exporter_',
         ]);
     }

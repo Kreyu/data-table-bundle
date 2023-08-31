@@ -170,12 +170,26 @@ class DataTable implements DataTableInterface
 
     public function getVisibleColumns(): array
     {
-        return array_filter($this->getColumns(), fn (ColumnInterface $column) => $column->isVisible());
+        return array_filter(
+            $this->getColumns(),
+            static fn (ColumnInterface $column) => $column->isVisible(),
+        );
     }
 
     public function getHiddenColumns(): array
     {
-        return array_filter($this->getColumns(), fn (ColumnInterface $column) => !$column->isVisible());
+        return array_filter(
+            $this->getColumns(),
+            static fn (ColumnInterface $column) => !$column->isVisible(),
+        );
+    }
+
+    public function getExportableColumns(bool $includePersonalization = true): array
+    {
+        return array_filter(
+            $this->getVisibleColumns(),
+            static fn (ColumnInterface $column) => $column->getConfig()->isExportable(),
+        );
     }
 
     public function getColumn(string $name): ColumnInterface
@@ -549,7 +563,7 @@ class DataTable implements DataTableInterface
 
         $this->setPersonalizationData($data);
 
-        $data->apply(...$this->getColumns());
+        $data->apply($this->getColumns());
 
         $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }
@@ -564,6 +578,9 @@ class DataTable implements DataTableInterface
 
         $data ??= $this->exportData ?? $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
+        // TODO: Remove "getNonDeprecatedCase()" call once the deprecated strategies are removed.
+        $data->strategy = $data->strategy->getNonDeprecatedCase();
+
         $this->dispatch(DataTableEvents::PRE_EXPORT, $event = new DataTableExportEvent($dataTable, $data));
 
         $data = $event->getExportData();
@@ -573,7 +590,7 @@ class DataTable implements DataTableInterface
         }
 
         if (!$data->includePersonalization) {
-            $dataTable->personalizationData = null;
+            $dataTable->resetPersonalization();
         }
 
         return $data->exporter->export($dataTable->createExportView(), $data->filename);
@@ -921,5 +938,17 @@ class DataTable implements DataTableInterface
         }
 
         return $provider->provide();
+    }
+
+    private function resetPersonalization(): void
+    {
+        $this->personalizationData = null;
+
+        foreach ($this->columns as $column) {
+            $column
+                ->setPriority($column->getConfig()->getOption('priority'))
+                ->setVisible($column->getConfig()->getOption('visible'))
+            ;
+        }
     }
 }

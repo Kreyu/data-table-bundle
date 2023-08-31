@@ -14,9 +14,15 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ColumnType implements ColumnTypeInterface
 {
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
+    }
+
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
         $builder
@@ -24,6 +30,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
             ->setPriority($options['priority'])
             ->setVisible($options['visible'])
+            ->setPersonalizable($options['personalizable'])
             ->setSortable(false !== $options['sort'])
             ->setExportable(false !== $options['export'])
         ;
@@ -98,16 +105,24 @@ final class ColumnType implements ColumnTypeInterface
             'formatter' => $options['formatter'],
         ];
 
-        $translationDomain = $options['export']['value_translation_domain']
-            ?? $options['value_translation_domain']
-            ?? $view->parent->vars['translation_domain']
-            ?? null;
+        $label = $options['label'] ?? StringUtil::camelToSentence($column->getName());
 
-        $view->vars = array_replace($view->vars, [
-            'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
-            'translation_domain' => $translationDomain,
-            'translation_parameters' => $options['header_translation_parameters'] ?? [],
-        ]);
+        if ($this->translator) {
+            $translationDomain = $options['export']['header_translation_domain']
+                ?? $options['header_translation_domain']
+                ?? $view->parent->parent->vars['translation_domain']
+                ?? false;
+
+            if ($translationDomain) {
+                $label = $this->translator->trans(
+                    id: $label,
+                    parameters: $options['header_translation_parameters'],
+                    domain: $translationDomain,
+                );
+            }
+        }
+
+        $view->vars['label'] = $label;
     }
 
     public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -120,8 +135,6 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $rowData = $view->parent->data;
-
         $options['export'] += [
             'getter' => $options['getter'],
             'property_path' => $options['property_path'],
@@ -129,21 +142,25 @@ final class ColumnType implements ColumnTypeInterface
             'formatter' => $options['formatter'],
         ];
 
-        $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
+        $normData = $this->getNormDataFromRowData($view->parent->data, $column, $options['export']);
         $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);
 
+        if ($this->translator && is_string($viewData)) {
+            $translationDomain = $options['export']['value_translation_domain']
+                ?? $options['value_translation_domain']
+                ?? $view->parent->parent->vars['translation_domain']
+                ?? false;
+
+            if ($translationDomain) {
+                $viewData = $this->translator->trans(
+                    id: $viewData,
+                    parameters: $options['value_translation_parameters'],
+                    domain: $translationDomain,
+                );
+            }
+        }
+
         $view->value = $viewData;
-
-        $translationDomain = $options['export']['value_translation_domain']
-            ?? $options['value_translation_domain']
-            ?? $view->parent->vars['translation_domain']
-            ?? null;
-
-        $view->vars = array_replace($view->vars, [
-            'value' => $viewData,
-            'translation_domain' => $translationDomain,
-            'translation_parameters' => $options['value_translation_parameters'] ?? [],
-        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -167,24 +184,26 @@ final class ColumnType implements ColumnTypeInterface
                 'value_attr' => [],
                 'priority' => 0,
                 'visible' => true,
+                'personalizable' => true,
             ])
             ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('value_translation_parameters', ['array'])
+            ->setAllowedTypes('value_translation_parameters', 'array')
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('export', ['bool', 'array'])
             ->setAllowedTypes('formatter', ['null', 'callable'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
-            ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
+            ->setAllowedTypes('property_accessor', PropertyAccessorInterface::class)
             ->setAllowedTypes('getter', ['null', 'callable'])
             ->setAllowedTypes('header_attr', 'array')
             ->setAllowedTypes('value_attr', ['array', 'callable'])
             ->setAllowedTypes('priority', 'int')
             ->setAllowedTypes('visible', 'bool')
+            ->setAllowedTypes('personalizable', 'bool')
         ;
     }
 

@@ -9,6 +9,9 @@ use OpenSpout\Writer\CSV\Writer;
 use OpenSpout\Writer\WriterInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated use {@link https://github.com/Kreyu/data-table-open-spout-bundle} instead
+ */
 class CsvExporterType extends AbstractExporterType
 {
     protected function getExtension(): string

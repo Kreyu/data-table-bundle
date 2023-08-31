@@ -52,6 +52,7 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.column', ColumnType::class)
+        ->args([service('translator')->nullOnInvalid()])
         ->tag('kreyu_data_table.column.type')
     ;
 

@@ -21,7 +21,9 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -40,6 +42,21 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
+        $deprecatedPersistenceSubjectSetters = [
+            'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubjectProvider(...),
+            'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubjectProvider(...),
+            'sorting_persistence_subject' => $builder->setSortingPersistenceSubjectProvider(...),
+            'pagination_persistence_subject' => $builder->setPaginationPersistenceSubjectProvider(...),
+        ];
+
+        foreach ($deprecatedPersistenceSubjectSetters as $option => $setter) {
+            $persistenceSubject = $options[$option];
+
+            if ($persistenceSubject instanceof PersistenceSubjectInterface) {
+                $setter(new StaticPersistenceSubjectProvider($persistenceSubject->getDataTablePersistenceIdentifier()));
+            }
+        }
+
         $setters = [
             'themes' => $builder->setThemes(...),
             'column_factory' => $builder->setColumnFactory(...),
@@ -135,17 +152,12 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $columns = $visibleColumns = $dataTable->getColumns();
+        $visibleColumns = $dataTable->getExportableColumns();
 
-        if ($dataTable->getConfig()->isPersonalizationEnabled() && $personalizationData = $dataTable->getPersonalizationData()) {
-            $visibleColumns = $personalizationData->compute($columns);
-        }
+        $view->vars['translation_domain'] = $dataTable->getConfig()->getOption('translation_domain');
 
-        $view->vars = array_replace($view->vars, [
-            'translation_domain' => $dataTable->getConfig()->getOption('translation_domain'),
-            'header_row' => $this->createExportHeaderRowView($view, $dataTable, $visibleColumns),
-            'value_rows' => new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns)),
-        ]);
+        $view->headerRow = $this->createExportHeaderRowView($view, $dataTable, $visibleColumns);
+        $view->valueRows = new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -181,10 +193,16 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'],
                 'exporting_enabled' => $this->defaults['exporting']['enabled'],
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'],
+
+                // TODO: Remove deprecated options
+                'sorting_persistence_subject' => null,
+                'pagination_persistence_subject' => null,
+                'filtration_persistence_subject' => null,
+                'personalization_persistence_subject' => null,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
-            ->setAllowedTypes('translation_domain', ['bool', 'string'])
+            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('themes', ['null', 'string[]'])
             ->setAllowedTypes('column_factory', ColumnFactoryInterface::class)
             ->setAllowedTypes('filter_factory', FilterFactoryInterface::class)
@@ -211,6 +229,12 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+
+            // TODO: Remove deprecated options
+            ->setDeprecated('sorting_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "sorting_persistence_subject_provider" instead.')
+            ->setDeprecated('pagination_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "pagination_persistence_subject_provider" instead.')
+            ->setDeprecated('filtration_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "filtration_persistence_subject_provider" instead.')
+            ->setDeprecated('personalization_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "personalization_persistence_subject_provider" instead.')
         ;
     }
 
@@ -351,9 +375,7 @@ final class DataTableType implements DataTableTypeInterface
             $valueRowView = new ValueRowView($view, $index, $data);
 
             foreach ($columns as $column) {
-                if ($column->getConfig()->isExportable()) {
-                    $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
-                }
+                $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
             }
 
             yield $valueRowView;

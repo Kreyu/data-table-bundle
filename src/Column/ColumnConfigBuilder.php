@@ -18,11 +18,12 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private ?PropertyPathInterface $sortPropertyPath = null;
     private bool $sortable = false;
     private bool $exportable = false;
+    private bool $personalizable = true;
 
     public function __construct(
-        private string $name,
+        private /*readonly*/ string $name,
         private ResolvedColumnTypeInterface $type,
-        private array $options = [],
+        private /*readonly*/ array $options = [],
     ) {
     }
 
@@ -200,6 +201,22 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         }
 
         $this->exportable = $exportable;
+
+        return $this;
+    }
+
+    public function isPersonalizable(): bool
+    {
+        return $this->personalizable;
+    }
+
+    public function setPersonalizable(bool $personalizable): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->personalizable = $personalizable;
 
         return $this;
     }

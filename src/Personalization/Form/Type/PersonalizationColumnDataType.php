@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnDataType extends AbstractType
@@ -16,16 +17,16 @@ class PersonalizationColumnDataType extends AbstractType
     {
         $builder
             ->add('name', HiddenType::class)
-            ->add('order', HiddenType::class)
-            ->add('visible', HiddenType::class, [
-                'empty_data' => false,
-            ]);
+            ->add('priority', HiddenType::class)
+            ->add('visible', HiddenType::class)
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => PersonalizationColumnData::class,
+            'empty_data' => fn (FormInterface $form) => new PersonalizationColumnData($form->getName()),
         ]);
     }
 

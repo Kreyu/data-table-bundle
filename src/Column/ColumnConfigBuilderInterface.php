@@ -9,12 +9,21 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 interface ColumnConfigBuilderInterface extends ColumnConfigInterface
 {
+    /**
+     * @deprecated provide the name using the factory {@see ColumnFactoryInterface} "named" methods instead
+     */
     public function setName(string $name): static;
 
     public function setType(ResolvedColumnTypeInterface $type): static;
 
+    /**
+     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     */
     public function setOptions(array $options): static;
 
+    /**
+     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     */
     public function setOption(string $name, mixed $value): static;
 
     public function setAttributes(array $attributes): static;
@@ -28,6 +37,8 @@ interface ColumnConfigBuilderInterface extends ColumnConfigInterface
     public function setSortable(bool $sortable): static;
 
     public function setExportable(bool $exportable): static;
+
+    public function setPersonalizable(bool $personalizable): static;
 
     public function getColumnConfig(): ColumnConfigInterface;
 }

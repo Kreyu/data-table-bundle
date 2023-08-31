@@ -32,4 +32,6 @@ interface ColumnConfigInterface
     public function isSortable(): bool;
 
     public function isExportable(): bool;
+
+    public function isPersonalizable(): bool;
 }

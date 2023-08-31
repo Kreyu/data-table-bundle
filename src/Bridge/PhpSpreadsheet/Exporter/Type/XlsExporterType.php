@@ -8,6 +8,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
+/**
+ * @deprecated the PhpSpreadsheet exporters are deprecated, use OpenSpout instead
+ */
 class XlsExporterType extends AbstractExporterType
 {
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter

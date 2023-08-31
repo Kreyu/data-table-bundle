@@ -318,7 +318,6 @@
             </div>
 
             <ul class="p-2 mb-0"
-                role="button"
                 data-visible="1"
                 data-kreyu--data-table-bundle--personalization-target="visibleColumns"
             >
@@ -338,7 +337,6 @@
             </div>
 
             <ul class="p-2 mb-0"
-                role="button"
                 data-visible="0"
                 data-kreyu--data-table-bundle--personalization-target="hiddenColumns"
             >
@@ -558,7 +556,7 @@
     <li class="list-group-item">
         {{ form_label(form) }}
         {{ form_widget(form.name) }}
-        {{ form_widget(form.order) }}
+        {{ form_widget(form.priority) }}
         {{ form_widget(form.visible) }}
     </li>
 {% endblock %}

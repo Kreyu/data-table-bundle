@@ -16,6 +16,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @deprecated the PhpSpreadsheet exporters are deprecated, use OpenSpout instead
+ */
 abstract class AbstractExporterType extends BaseAbstractType
 {
     public function __construct(

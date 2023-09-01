@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnData

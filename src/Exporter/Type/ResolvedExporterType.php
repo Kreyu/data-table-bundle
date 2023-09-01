@@ -19,9 +19,9 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
      * @param array<ExporterTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private ExporterTypeInterface $innerType,
-        private array $typeExtensions = [],
-        private ?ResolvedExporterTypeInterface $parent = null,
+        private readonly ExporterTypeInterface $innerType,
+        private readonly array $typeExtensions = [],
+        private readonly ?ResolvedExporterTypeInterface $parent = null,
     ) {
     }
 

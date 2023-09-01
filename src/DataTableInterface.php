@@ -174,6 +174,8 @@ interface DataTableInterface
 
     public function export(ExportData $data = null): ExportFile;
 
+    public function getItems(): iterable;
+
     public function getPagination(): PaginationInterface;
 
     public function getSortingData(): ?SortingData;

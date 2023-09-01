@@ -21,9 +21,9 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private bool $personalizable = true;
 
     public function __construct(
-        private /*readonly*/ string $name,
+        private /* readonly */ string $name,
         private ResolvedColumnTypeInterface $type,
-        private /*readonly*/ array $options = [],
+        private /* readonly */ array $options = [],
     ) {
     }
 

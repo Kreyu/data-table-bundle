@@ -9,12 +9,12 @@ enum ExportStrategy: string
     case IncludeCurrentPage = 'include-current-page';
     case IncludeAll = 'include-all';
 
-    /**
+    /*
      * @deprecated use {@see ExportStrategy::IncludeCurrentPage} instead
      */
     case INCLUDE_CURRENT_PAGE = 'deprecated-include-current-page';
 
-    /**
+    /*
      * @deprecated use {@see ExportStrategy::IncludeAll} instead
      */
     case INCLUDE_ALL = 'deprecated-include-all';

@@ -7,12 +7,11 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
 {
-    private static ?OptionsResolver $optionsResolver = null;
+    private static OptionsResolver $optionsResolver;
 
     private array $columns = [];
 
@@ -38,11 +37,12 @@ class PersonalizationData
                             'priority' => 0,
                             'visible' => true,
                         ])
+                        ->setDeprecated('order')
                         ->setAllowedTypes('name', ['null', 'string'])
                         ->setAllowedTypes('priority', 'int')
                         ->setAllowedTypes('visible', 'bool')
                     ;
-                }
+                },
             ])
             ->addNormalizer('columns', function (OptionsResolver $resolver, array $value) {
                 foreach ($value as $name => $column) {
@@ -65,7 +65,7 @@ class PersonalizationData
     {
         return new self(array_filter(
             $dataTable->getColumns(),
-            static fn (ColumnInterface $column) => $column->getConfig()->isPersonalizable()
+            static fn (ColumnInterface $column) => $column->getConfig()->isPersonalizable(),
         ));
     }
 

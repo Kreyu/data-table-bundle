@@ -15,14 +15,13 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 {
@@ -70,10 +69,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     protected bool $locked = false;
 
     public function __construct(
-        private /*readonly*/ string $name,
+        private /* readonly */ string $name,
         private ResolvedDataTableTypeInterface $type,
         private EventDispatcherInterface $dispatcher,
-        private /*readonly*/ array $options = [],
+        private /* readonly */ array $options = [],
     ) {
     }
 

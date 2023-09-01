@@ -596,6 +596,15 @@ class DataTable implements DataTableInterface
         return $data->exporter->export($dataTable->createExportView(), $data->filename);
     }
 
+    public function getItems(): iterable
+    {
+        if ($this->getConfig()->isPaginationEnabled()) {
+            return $this->getPagination()->getItems();
+        }
+
+        return $this->query->getItems();
+    }
+
     public function getPagination(): PaginationInterface
     {
         if (!$this->config->isPaginationEnabled()) {

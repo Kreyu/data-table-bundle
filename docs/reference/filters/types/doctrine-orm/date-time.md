@@ -14,7 +14,7 @@ The `DateTimeFilterType` represents a filter that operates on datetime values.
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [DateTimeType](https://symfony.com/doc/current/reference/forms/types/datetime.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_EQUALS, LESS_THAN, LESS_THAN_EQUALS
+| Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -22,5 +22,7 @@ The `DateTimeFilterType` represents a filter that operates on datetime values.
 This filter type has no additional options.
 
 ## Inherited options
+
+{{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\DateTimeType\'`' }}
 
 {{ include '_filter_options' }}

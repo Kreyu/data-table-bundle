@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -36,8 +37,8 @@ class EntityFilterType extends AbstractFilterType
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
             ->setAllowedTypes('choice_label', ['null', 'string', 'callable'])
-            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value) {
-                if (EntityType::class !== $resolver['form_type']) {
+            ->addNormalizer('form_options', function (Options $options, array $value) {
+                if (EntityType::class !== $options['form_type']) {
                     return $value;
                 }
 

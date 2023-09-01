@@ -14,7 +14,7 @@ The `StringFilterType` represents a filter that operates on string values.
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS, CONTAINS, NOT_CONTAINS
+| Supported operators | Equals, NotEquals, Contains, NotContains, StartsWith, EndsWith
 +---------------------+--------------------------------------------------------------+
 
 ## Options

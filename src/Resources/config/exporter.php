@@ -15,6 +15,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactory;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\CallbackExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactoryInterface;
@@ -49,6 +50,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.exporter.type.exporter', ExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.exporter.type.callback', CallbackExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 

@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
@@ -44,7 +45,7 @@ class PersonalizationData
                     ;
                 },
             ])
-            ->addNormalizer('columns', function (OptionsResolver $resolver, array $value) {
+            ->addNormalizer('columns', function (Options $options, array $value) {
                 foreach ($value as $name => $column) {
                     $value[$name]['name'] ??= $name;
                 }

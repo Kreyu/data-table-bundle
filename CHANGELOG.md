@@ -8,14 +8,16 @@
 - **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query (see more)
 - **[Feature]** Data table builder's `setSearchHandler` method for easier search definition (see more)
 - **[Feature]** Collection column type default separator changed `', '` (with space after comma) instead of `','`
+- **[Feature]** Ability to create `ExportData` with exporter name string
 - **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more)
-- **[Feature] [Breaking Change]** Optimized exporting process - introduces breaking changes (see more)
+- **[Feature] [Breaking change]** Optimized exporting process - introduces breaking changes (see more)
 - **[Bugfix]** CollectionColumnType now renders without spaces around separator
+- **[Bugfix]** Default export data is now properly used within the export form 
 
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.
 Please note that this is a **breaking change** for applications using internal bundle classes!
 
-For a list of all breaking changes, see the [upgrade guide](docs/upgrade-guide/0.14.md).
+For a list of all breaking changes and deprecations, see the [upgrade guide](docs/upgrade-guide/0.14.md).
 
 # 0.13
 

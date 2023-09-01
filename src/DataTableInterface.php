@@ -31,6 +31,8 @@ interface DataTableInterface
 {
     public function initialize(): void;
 
+    public function getName(): string;
+
     public function getQuery(): ProxyQueryInterface;
 
     public function getConfig(): DataTableConfigInterface;

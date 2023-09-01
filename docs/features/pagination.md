@@ -4,7 +4,7 @@ order: a
 
 # Pagination
 
-The data tables can be _paginated_, which is crucial when working with extensive data sources.
+The data tables can be _paginated_, which is crucial when working with large data sources.
 
 ## Toggling the feature
 

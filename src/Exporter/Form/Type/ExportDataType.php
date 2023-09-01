@@ -18,16 +18,12 @@ class ExportDataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('filename', TextType::class, [
-                'data' => $options['default_filename'],
-            ])
+            ->add('filename', TextType::class)
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
                     fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),
                     $options['exporters'],
                 )),
-                'getter' => fn (ExportData $data) => $data->exporter->getName(),
-                'setter' => fn (ExportData $data, mixed $exporter) => $data->exporter = $options['exporters'][$exporter],
             ])
             ->add('strategy', ExportStrategyType::class)
             ->add('includePersonalization', CheckboxType::class, [
@@ -41,11 +37,13 @@ class ExportDataType extends AbstractType
         $resolver->setDefaults([
             'data_class' => ExportData::class,
             'translation_domain' => 'KreyuDataTable',
-            'default_filename' => null,
             'exporters' => [],
         ]);
 
         $resolver->setAllowedTypes('exporters', ExporterInterface::class.'[]');
-        $resolver->setAllowedTypes('default_filename', ['null', 'string']);
+
+        // TODO: Remove deprecated default filename option
+        $resolver->setDefault('default_filename', null);
+        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated.');
     }
 }

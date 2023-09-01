@@ -1,6 +1,6 @@
 ### `label`
 
-- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableMessage`
+- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableInterface`
 - **default**: {{ option_label_default_value ?? '`null` - the label is "guessed" from the column name' }}
 
 Sets the label that will be used when rendering the column header.

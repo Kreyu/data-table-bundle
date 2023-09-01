@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInterface
@@ -30,7 +31,7 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
             ])
             ->setRequired('handler')
             ->setAllowedTypes('handler', 'callable')
-            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value): array {
+            ->addNormalizer('form_options', function (Options $options, array $value): array {
                 return $value + [
                     'attr' => ($value['attr'] ?? []) + ['placeholder' => 'Search...'],
                 ];

@@ -14,6 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ColumnType implements ColumnTypeInterface
@@ -186,7 +187,7 @@ final class ColumnType implements ColumnTypeInterface
                 'visible' => true,
                 'personalizable' => true,
             ])
-            ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])

@@ -1,41 +1,37 @@
 ---
-label: Callback
-order: g
+label: Search
 ---
 
-# Callback filter type
+# Search filter type
 
-The `CallbackFilterType` represents a filter that operates on identifier values.
-
-Displayed as a selector, allows the user to select a specific entity loaded from the database, to query by its identifier.
+The `SearchFilterType` represents a special filter to handle the [global search](../../../features/global-search.md) feature.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [FilterType](../../filter)
+| Parent type         | [FilterType](../filter)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: CallbackFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CallbackFilterType.php)
+| Class               | [:icon-mark-github: SearchFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/SearchFilterType.php)
 +---------------------+--------------------------------------------------------------+
-| Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
+| Form Type           | [SearchType](https://symfony.com/doc/current/reference/forms/types/search.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Supports all operators, but it doesn't affect the actual query.
 +---------------------+--------------------------------------------------------------+
 
 ## Options
 
-### `callback`
+### `handler`
 
 **type**: `callable`
 
 Sets callable that operates on the query passed as a first argument:
 
 ```php #
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
 
 $builder
-    ->addFilter('type', CallbackFilterType::class, [
-        'callback' => function (DoctrineOrmProxyQuery $query, FilterData $data, FilterInterface $filter): void {
+    ->addFilter('search', SearchFilterType::class, [
+        'handler' => function (DoctrineOrmProxyQuery $query, string $search): void {
             $alias = current($query->getRootAliases());
 
             // Remember to use parameters to prevent SQL Injection!
@@ -47,10 +43,24 @@ $builder
                 ->andWhere($query->expr()->eq("$alias.type", ":$parameter"))
                 ->setParameter($parameter, $data->getValue())
             ;
+            
+            $criteria = $query->expr()->orX(
+                $query->expr()->like("$alias.id", ":$parameter"),
+                $query->expr()->like("$alias.name", ":$parameter"),
+            );
+            
+            $query
+                ->andWhere($criteria)
+                ->setParameter($parameter, "%$search%")
+            ;
         } 
     ])
 ```
 
 ## Inherited options
+
+{{ option_label_default_value = '`false`' }}
+{{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\SearchType\'`' }}
+{{ option_form_options_default_value = '`[\'attr\' => [\'placeholder\' => \'Search...\']]`' }}
 
 {{ include '_filter_options' }}

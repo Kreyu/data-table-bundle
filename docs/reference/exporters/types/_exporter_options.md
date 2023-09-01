@@ -1,6 +1,6 @@
 ### `label`
 
-- **type**: `string` or `Symfony\Component\Translation\TranslatableMessage` 
+- **type**: `string` or `Symfony\Component\Translation\TranslatableInterface` 
 - **default**: the label is "guessed" from the filter name
 
 Sets the label that will be used when rendering the filter.

@@ -16,7 +16,7 @@ Displayed as a selector, allows the user to select a specific entity loaded from
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [EntityType](https://symfony.com/doc/current/reference/forms/types/entity.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS, CONTAINS, NOT_CONTAINS
+| Supported operators | Equals, NotEquals, Contains, NotContains
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -24,5 +24,7 @@ Displayed as a selector, allows the user to select a specific entity loaded from
 This filter type has no additional options.
 
 ## Inherited options
+
+{{ option_form_type_default_value = '`\'Symfony\\Bridge\\Doctrine\\Form\\Type\\EntityType\'`' }}
 
 {{ include '_filter_options' }}

@@ -1,7 +1,7 @@
 ### `label`
 
-- **type**: `string` or `Symfony\Component\Translation\TranslatableMessage` 
-- **default**: the label is "guessed" from the filter name
+- **type**: `null`, `false`, `string` or `Symfony\Component\Translation\TranslatableInterface` 
+- **default**: {{ option_label_default_value ?? '`null` - the label is "guessed" from the column name' }}
 
 Sets the label that will be used when rendering the filter.
 
@@ -27,30 +27,30 @@ Setting the option to `false` disables translation for the filter.
 
 Sets the path used in the proxy query to perform the filtering on.
 
-### `field_type`
+### `form_type`
 
 - **type**: `string` 
-- **default**: `'Symfony\Component\Form\Extension\Core\Type\TextType`
+- **default**: {{ option_form_type_default_value ?? '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType\'`' }}
 
-This is the form type used to render the filter field.
+This is the form type used to render the filter value field.
 
-### `field_options`
+### `form_options`
 
 - **type**: `array`
-- **default**: `[]`
+- **default**: {{ option_form_options_default_value ?? '`[]`' }}
 
-This is the array that's passed to the form type specified in the `field_type` option.
+This is the array that's passed to the form type specified in the `form_type` option.
 
-### `operator_type`
+### `operator_form_type`
 
 - **type**: `string` 
 - **default**: `Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType`
 
-This is the form type used to render the operator field.
+This is the form type used to render the filter operator field.
 
-### `operator_options`
+### `operator_form_options`
 
 - **type**: `array` 
 - **default**: `[]`
 
-This is the array that's passed to the form type specified in the `operator_type` option.
+This is the array that's passed to the form type specified in the `operator_form_type` option.

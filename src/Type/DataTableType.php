@@ -402,19 +402,7 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createExportFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $formFactory = $dataTable->getConfig()->getExportFormFactory();
-
-        $formBuilder = $formFactory->createNamedBuilder(
-            name: $dataTable->getConfig()->getExportParameterName(),
-            type: ExportDataType::class,
-            options: [
-                'method' => 'POST',
-                'exporters' => $dataTable->getExporters(),
-                'default_filename' => $dataTable->getConfig()->getName(),
-            ],
-        );
-
-        $form = $formBuilder->getForm();
+        $form = $dataTable->createExportFormBuilder()->getForm();
         $form->setData($dataTable->getExportData());
 
         return $this->createFormView($form, $view, $dataTable);

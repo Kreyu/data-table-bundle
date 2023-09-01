@@ -73,7 +73,7 @@ class ProductDataTableType extends AbstractDataTableType
         
         $query
             ->andWhere($criteria)
-            ->setParameter('search', '%' . $search . '%')
+            ->setParameter('search', "%$search%")
         ;
     }
 }

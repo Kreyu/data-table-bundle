@@ -10,26 +10,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportData
 {
-    public string $filename;
-    public ExporterInterface $exporter;
+    public ?string $filename = null;
+    public ?string $exporter = null;
     public ExportStrategy $strategy = ExportStrategy::IncludeAll;
     public bool $includePersonalization = true;
 
     public static function fromArray(array $data): self
     {
         $resolver = (new OptionsResolver())
-            ->setRequired('exporter')
             ->setDefaults([
-                'filename' => 'export',
+                'filename' => null,
+                'exporter' => null,
                 'strategy' => ExportStrategy::IncludeCurrentPage,
-                'include_personalization' => false,
+                'include_personalization' => true,
             ])
-            ->setAllowedTypes('exporter', ExporterInterface::class)
-            ->setAllowedTypes('filename', 'string')
+            ->setAllowedTypes('exporter', ['null', 'string', ExporterInterface::class])
+            ->setAllowedTypes('filename', ['null', 'string'])
             ->setAllowedTypes('strategy', ['string', ExportStrategy::class])
             ->setAllowedTypes('include_personalization', 'bool')
             ->addNormalizer('strategy', function (Options $options, $value): ExportStrategy {
                 return $value instanceof ExportStrategy ? $value : ExportStrategy::from($value);
+            })
+            ->addNormalizer('exporter', function (Options $options, $value): ?string {
+                if ($value instanceof ExporterInterface) {
+                    return $value->getName();
+                }
+
+                return $value;
             })
         ;
 
@@ -48,15 +55,8 @@ class ExportData
 
     public static function fromDataTable(DataTableInterface $dataTable): self
     {
-        $exporters = $dataTable->getExporters();
-
-        if (empty($exporters)) {
-            throw new \LogicException('Unable to create export data from data table without exporters');
-        }
-
         $self = new self();
         $self->filename = $dataTable->getConfig()->getName();
-        $self->exporter = $exporters[array_key_first($exporters)];
 
         return $self;
     }

@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateFilterType extends AbstractFilterType
@@ -29,17 +30,17 @@ class DateFilterType extends AbstractFilterType
                 ],
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
-            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value): array {
+            ->addNormalizer('form_options', function (Options $options, array $value): array {
                 return $value + ['widget' => 'single_text'];
             })
-            ->addNormalizer('empty_data', function (OptionsResolver $resolver, string|array $value): string|array {
-                if (DateType::class !== $resolver['form_type']) {
+            ->addNormalizer('empty_data', function (Options $options, string|array $value): string|array {
+                if (DateType::class !== $options['form_type']) {
                     return $value;
                 }
 
                 // Note: because choice and text widgets are split into three fields,
                 //       we have to return an array with three empty values to properly set the empty data.
-                return match ($resolver['form_options']['widget'] ?? null) {
+                return match ($options['form_options']['widget'] ?? null) {
                     'choice', 'text' => ['day' => '', 'month' => '', 'year' => ''],
                     default => '',
                 };

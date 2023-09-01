@@ -14,7 +14,7 @@ The `BooleanFilterType` represents a filter that operates on boolean values.
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [ChoiceType](https://symfony.com/doc/current/reference/forms/types/choice.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS
+| Supported operators | Equals, NotEquals
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -22,5 +22,7 @@ The `BooleanFilterType` represents a filter that operates on boolean values.
 This filter type has no additional options.
 
 ## Inherited options
+
+{{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType\'`' }}
 
 {{ include '_filter_options' }}

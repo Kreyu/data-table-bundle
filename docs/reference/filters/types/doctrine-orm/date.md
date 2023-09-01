@@ -14,7 +14,7 @@ The `DateFilterType` represents a filter that operates on date values.
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [DateType](https://symfony.com/doc/current/reference/forms/types/date.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_EQUALS, LESS_THAN, LESS_THAN_EQUALS
+| Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -22,5 +22,7 @@ The `DateFilterType` represents a filter that operates on date values.
 This filter type has no additional options.
 
 ## Inherited options
+
+{{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\DateType\'`' }}
 
 {{ include '_filter_options' }}

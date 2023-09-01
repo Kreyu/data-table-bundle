@@ -147,6 +147,11 @@ class DataTable implements DataTableInterface
         $this->initialized = true;
     }
 
+    public function getName(): string
+    {
+        return $this->config->getName();
+    }
+
     public function getQuery(): ProxyQueryInterface
     {
         return $this->query;
@@ -593,7 +598,13 @@ class DataTable implements DataTableInterface
             $dataTable->resetPersonalization();
         }
 
-        return $data->exporter->export($dataTable->createExportView(), $data->filename);
+        if (null === $data->exporter) {
+            $exporter = $this->exporters[array_key_first($this->exporters)];
+        } else {
+            $exporter = $this->getExporter($data->exporter);
+        }
+
+        return $exporter->export($dataTable->createExportView(), $data->filename);
     }
 
     public function getItems(): iterable
@@ -713,11 +724,6 @@ class DataTable implements DataTableInterface
         );
     }
 
-    public function getPersonalizationForm(): FormInterface
-    {
-        return $this->personalizationForm ??= $this->createPersonalizationFormBuilder()->getForm();
-    }
-
     public function createExportFormBuilder(DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isExportingEnabled()) {
@@ -728,9 +734,13 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has no configured export form factory.');
         }
 
+        $data = $this->config->getDefaultExportData();
+        $data->filename ??= $this->getName();
+
         return $this->config->getExportFormFactory()->createNamedBuilder(
             name: $this->config->getExportParameterName(),
             type: ExportDataType::class,
+            data: $data,
             options: [
                 'exporters' => $this->getExporters(),
             ],

@@ -14,8 +14,10 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class FilterType implements FilterTypeInterface
 {
@@ -102,25 +104,25 @@ final class FilterType implements FilterTypeInterface
                     'choices' => [],
                 ],
             ])
-            ->addNormalizer('form_options', function (OptionsResolver $resolver, array $value): array {
+            ->addNormalizer('form_options', function (Options $options, array $value): array {
                 return $value + ['required' => false];
             })
-            ->addNormalizer('operator_form_type', function (OptionsResolver $resolver, string $value): string {
-                return $resolver['operator_selectable'] ? $value : HiddenType::class;
+            ->addNormalizer('operator_form_type', function (Options $options, string $value): string {
+                return $options['operator_selectable'] ? $value : HiddenType::class;
             })
-            ->addNormalizer('operator_form_options', function (OptionsResolver $resolver, array $value): array {
-                if (!$resolver['operator_selectable']) {
-                    $value['data'] ??= $resolver['default_operator']->value;
+            ->addNormalizer('operator_form_options', function (Options $options, array $value): array {
+                if (!$options['operator_selectable']) {
+                    $value['data'] ??= $options['default_operator']->value;
                 }
 
-                if (is_a($resolver['operator_form_type'], OperatorType::class, true)) {
-                    $value['choices'] ??= $resolver['supported_operators'];
-                    $value['empty_data'] ??= $resolver['default_operator'];
+                if (is_a($options['operator_form_type'], OperatorType::class, true)) {
+                    $value['choices'] ??= $options['supported_operators'];
+                    $value['empty_data'] ??= $options['default_operator'];
                 }
 
                 return $value;
             })
-            ->setAllowedTypes('label', ['null', 'bool', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'bool', 'string', TranslatableInterface::class])
             ->setAllowedTypes('query_path', ['null', 'string'])
             ->setAllowedTypes('form_type', ['string'])
             ->setAllowedTypes('form_options', ['array'])
@@ -140,32 +142,32 @@ final class FilterType implements FilterTypeInterface
             ->setDeprecated('field_options', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "form_options" instead.')
             ->setDeprecated('operator_type', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "operator_form_type" instead.')
             ->setDeprecated('operator_options', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "operator_form_options", "supported_operators", "operator_selectable" and "default_operator" instead.')
-            ->addNormalizer('form_type', function (OptionsResolver $resolver, mixed $value) {
-                return $resolver['field_type'] ?? $value;
+            ->addNormalizer('form_type', function (Options $options, mixed $value) {
+                return $options['field_type'] ?? $value;
             })
-            ->addNormalizer('form_options', function (OptionsResolver $resolver, mixed $value) {
-                return $resolver['field_options'] ?: $value;
+            ->addNormalizer('form_options', function (Options $options, mixed $value) {
+                return $options['field_options'] ?: $value;
             })
-            ->addNormalizer('operator_form_type', function (OptionsResolver $resolver, mixed $value) {
-                return $resolver['operator_type'] ?? $value;
+            ->addNormalizer('operator_form_type', function (Options $options, mixed $value) {
+                return $options['operator_type'] ?? $value;
             })
-            ->addNormalizer('operator_form_options', function (OptionsResolver $resolver, mixed $value) {
-                if ($deprecatedValue = $resolver['operator_options']) {
+            ->addNormalizer('operator_form_options', function (Options $options, mixed $value) {
+                if ($deprecatedValue = $options['operator_options']) {
                     unset($deprecatedValue['visible'], $deprecatedValue['choices']);
                 }
 
                 return $deprecatedValue ?: $value;
             })
-            ->addNormalizer('supported_operators', function (OptionsResolver $resolver, mixed $value) {
-                return ($resolver['operator_options']['choices'] ?? []) ?: $value;
+            ->addNormalizer('supported_operators', function (Options $options, mixed $value) {
+                return ($options['operator_options']['choices'] ?? []) ?: $value;
             })
-            ->addNormalizer('default_operator', function (OptionsResolver $resolver, mixed $value) {
-                $deprecatedChoices = $resolver['operator_options']['choices'] ?? [];
+            ->addNormalizer('default_operator', function (Options $options, mixed $value) {
+                $deprecatedChoices = $options['operator_options']['choices'] ?? [];
 
                 return reset($deprecatedChoices) ?: $value;
             })
-            ->addNormalizer('operator_selectable', function (OptionsResolver $resolver, mixed $value) {
-                return ($resolver['operator_options']['visible'] ?? null) ?: $value;
+            ->addNormalizer('operator_selectable', function (Options $options, mixed $value) {
+                return ($options['operator_options']['visible'] ?? null) ?: $value;
             })
         ;
     }

@@ -53,4 +53,4 @@ $builder
 
 ## Inherited options
 
-{{ include '_filter_options' }}
+{{ include '_doctrine_orm_filter_options' }}

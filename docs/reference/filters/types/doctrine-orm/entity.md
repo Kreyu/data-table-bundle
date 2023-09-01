@@ -27,4 +27,4 @@ This filter type has no additional options.
 
 {{ option_form_type_default_value = '`\'Symfony\\Bridge\\Doctrine\\Form\\Type\\EntityType\'`' }}
 
-{{ include '_filter_options' }}
+{{ include '_doctrine_orm_filter_options' }}

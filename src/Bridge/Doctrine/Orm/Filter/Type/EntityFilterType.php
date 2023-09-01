@@ -44,8 +44,8 @@ class EntityFilterType extends AbstractFilterType
 
                 $identifiers = $this->doctrineRegistry
                     ->getManagerForClass($value['class'])
-                    ->getClassMetadata($value['class'])
-                    ->getIdentifier();
+                    ?->getClassMetadata($value['class'])
+                    ->getIdentifier() ?? [];
 
                 if (1 === count($identifiers)) {
                     $value += ['choice_value' => reset($identifiers)];

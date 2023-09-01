@@ -40,6 +40,14 @@ This is the form type used to render the filter value field.
 - **default**: {{ option_form_options_default_value ?? '`[]`' }}
 
 This is the array that's passed to the form type specified in the `form_type` option.
+The normalizer appends the default `['required' => false]`.
+
+!!!
+**Note**: the normalizer ensures the `required` option defaults to `false`.
+!!!
+
+
+{{ option_form_options_notes }}
 
 ### `operator_form_type`
 
@@ -48,9 +56,53 @@ This is the array that's passed to the form type specified in the `form_type` op
 
 This is the form type used to render the filter operator field.
 
+!!!
+**Note**: if the `operator_selectable` option is `false`, the form type is changed to `Symfony\Component\Form\Extension\Core\Type\HiddenType` by the normalizer.
+!!!
+
 ### `operator_form_options`
 
 - **type**: `array` 
 - **default**: `[]`
 
 This is the array that's passed to the form type specified in the `operator_form_type` option.
+
+!!! Note
+The normalizer can change default value of this option based on another options:
+
+- if the `operator_selectable` option is `false`, the `default_operator` is used as a `data` option
+- if the `operator_form_type` is `OperatorType`, the `choices` array defaults to the `supported_operators` option
+- if the `operator_form_type` is `OperatorType`, the `empty_data` defaults to the `default_operator` option value.
+!!!
+
+### `default_operator`
+
+- **type**: `Kreyu\Bundle\DataTableBundle\Filter\Operator`
+- **default**: `Kreyu\Bundle\DataTableBundle\Filter\Operator\Operator::Equals`
+
+The default operator used for the filter.
+
+### `supported_operators`
+
+- **type**: `Kreyu\Bundle\DataTableBundle\Filter\Operator[]`
+- **default**: depends on the filters, see "supported operators" at the top of the page
+
+The operators supported by the filter.
+
+### `operator_selectable`
+
+- **type**: `bool`
+- **default**: `false`
+
+Determines whether the operator can be selected by the user.
+
+By setting this option to `false`, the normalizer changes the `operator_form_type` to `Symfony\Component\Form\Extension\Core\Type\HiddenType`. 
+
+### `empty_data`
+
+- **type**: `string` or `array`
+- **default**: {{ option_empty_data_default_value ?? '`\'\'`' }}
+
+Represents a value of the filter when it's empty.
+
+{{ option_empty_data_note }}

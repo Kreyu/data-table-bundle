@@ -25,4 +25,4 @@ This filter type has no additional options.
 
 {{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\NumberType\'`' }}
 
-{{ include '_filter_options' }}
+{{ include '_doctrine_orm_filter_options' }}

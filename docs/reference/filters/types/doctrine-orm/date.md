@@ -25,4 +25,15 @@ This filter type has no additional options.
 
 {{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\DateType\'`' }}
 
-{{ include '_filter_options' }}
+{% capture option_empty_data_note %}
+If form option `widget` equals `'choice'` or `'text'` then the normalizer changes default value to:
+```
+[
+    'day' => '', 
+    'month' => '', 
+    'year' => ''
+]
+```
+{% endcapture %}
+
+{{ include '_doctrine_orm_filter_options' }}

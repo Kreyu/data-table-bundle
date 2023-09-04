@@ -13,7 +13,6 @@ use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
@@ -42,6 +41,7 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
+        // TODO: Remove backwards compatibility layer
         $deprecatedPersistenceSubjectSetters = [
             'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubjectProvider(...),
             'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubjectProvider(...),
@@ -87,7 +87,9 @@ final class DataTableType implements DataTableTypeInterface
         ];
 
         foreach ($setters as $option => $setter) {
-            $setter($options[$option]);
+            if (null !== $value = $options[$option]) {
+                $setter($value);
+            }
         }
     }
 
@@ -167,32 +169,32 @@ final class DataTableType implements DataTableTypeInterface
                 'title' => null,
                 'title_translation_parameters' => [],
                 'translation_domain' => null,
-                'themes' => $this->defaults['themes'],
-                'column_factory' => $this->defaults['column_factory'],
-                'filter_factory' => $this->defaults['filtration']['filter_factory'],
-                'action_factory' => $this->defaults['action_factory'],
-                'exporter_factory' => $this->defaults['exporting']['exporter_factory'],
-                'request_handler' => $this->defaults['request_handler'],
-                'sorting_enabled' => $this->defaults['sorting']['enabled'],
-                'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'],
-                'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'],
-                'sorting_persistence_subject_provider' => $this->defaults['sorting']['persistence_subject_provider'],
-                'pagination_enabled' => $this->defaults['pagination']['enabled'],
-                'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'],
-                'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'],
-                'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'],
-                'filtration_enabled' => $this->defaults['filtration']['enabled'],
-                'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'],
-                'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'],
-                'filtration_persistence_subject_provider' => $this->defaults['filtration']['persistence_subject_provider'],
-                'filtration_form_factory' => $this->defaults['filtration']['form_factory'],
-                'personalization_enabled' => $this->defaults['personalization']['enabled'],
-                'personalization_persistence_enabled' => $this->defaults['personalization']['persistence_enabled'],
-                'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'],
-                'personalization_persistence_subject_provider' => $this->defaults['personalization']['persistence_subject_provider'],
-                'personalization_form_factory' => $this->defaults['personalization']['form_factory'],
-                'exporting_enabled' => $this->defaults['exporting']['enabled'],
-                'exporting_form_factory' => $this->defaults['exporting']['form_factory'],
+                'themes' => $this->defaults['themes'] ?? [],
+                'column_factory' => $this->defaults['column_factory'] ?? null,
+                'filter_factory' => $this->defaults['filtration']['filter_factory'] ?? null,
+                'action_factory' => $this->defaults['action_factory'] ?? null,
+                'exporter_factory' => $this->defaults['exporting']['exporter_factory'] ?? null,
+                'request_handler' => $this->defaults['request_handler'] ?? null,
+                'sorting_enabled' => $this->defaults['sorting']['enabled'] ?? true,
+                'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'] ?? false,
+                'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'] ?? null,
+                'sorting_persistence_subject_provider' => $this->defaults['sorting']['persistence_subject_provider'] ?? null,
+                'pagination_enabled' => $this->defaults['pagination']['enabled'] ?? true,
+                'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'] ?? false,
+                'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
+                'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
+                'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? true,
+                'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
+                'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,
+                'filtration_persistence_subject_provider' => $this->defaults['filtration']['persistence_subject_provider'] ?? null,
+                'filtration_form_factory' => $this->defaults['filtration']['form_factory'] ?? null,
+                'personalization_enabled' => $this->defaults['personalization']['enabled'] ?? false,
+                'personalization_persistence_enabled' => $this->defaults['personalization']['persistence_enabled'] ?? false,
+                'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'] ?? null,
+                'personalization_persistence_subject_provider' => $this->defaults['personalization']['persistence_subject_provider'] ?? null,
+                'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
+                'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? true,
+                'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
 
                 // TODO: Remove deprecated options
                 'sorting_persistence_subject' => null,
@@ -204,10 +206,10 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('title_translation_parameters', ['array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('themes', ['null', 'string[]'])
-            ->setAllowedTypes('column_factory', ColumnFactoryInterface::class)
-            ->setAllowedTypes('filter_factory', FilterFactoryInterface::class)
-            ->setAllowedTypes('action_factory', ActionFactoryInterface::class)
-            ->setAllowedTypes('exporter_factory', ExporterFactoryInterface::class)
+            ->setAllowedTypes('column_factory', ['null', ColumnFactoryInterface::class])
+            ->setAllowedTypes('filter_factory', ['null', FilterFactoryInterface::class])
+            ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])
+            ->setAllowedTypes('exporter_factory', ['null', ExporterFactoryInterface::class])
             ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
             ->setAllowedTypes('sorting_enabled', 'bool')
             ->setAllowedTypes('sorting_persistence_enabled', 'bool')

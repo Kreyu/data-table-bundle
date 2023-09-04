@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
@@ -13,14 +14,9 @@ use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 class DataTableRegistry implements DataTableRegistryInterface
 {
     /**
-     * @var array<string, DataTableTypeInterface>
+     * @var array<string, ResolvedDataTableTypeInterface>
      */
     private array $types = [];
-
-    /**
-     * @var array<ResolvedDataTableTypeInterface>
-     */
-    private array $resolvedTypes = [];
 
     /**
      * @var array<string, bool>
@@ -33,42 +29,47 @@ class DataTableRegistry implements DataTableRegistryInterface
     private array $typeExtensions = [];
 
     /**
-     * @param iterable<DataTableTypeInterface>          $types
-     * @param iterable<DataTableTypeExtensionInterface> $typeExtensions
+     * @param iterable<DataTableExtensionInterface> $extensions
      */
     public function __construct(
-        iterable $types,
-        iterable $typeExtensions,
-        private ResolvedDataTableTypeFactoryInterface $resolvedDataTableTypeFactory,
+        private readonly iterable $extensions,
+        private readonly ResolvedDataTableTypeFactoryInterface $resolvedDataTableTypeFactory,
     ) {
-        foreach ($types as $type) {
-            if (!$type instanceof DataTableTypeInterface) {
-                throw new UnexpectedTypeException($type, DataTableTypeInterface::class);
+        foreach ($extensions as $extension) {
+            if (!$extension instanceof DataTableExtensionInterface) {
+                throw new UnexpectedTypeException($extension, DataTableExtensionInterface::class);
             }
-
-            $this->types[$type::class] = $type;
-        }
-
-        foreach ($typeExtensions as $typeExtension) {
-            if (!$typeExtension instanceof DataTableTypeExtensionInterface) {
-                throw new UnexpectedTypeException($typeExtension, DataTableTypeExtensionInterface::class);
-            }
-
-            $this->typeExtensions[$typeExtension::class] = $typeExtension;
         }
     }
 
     public function getType(string $name): ResolvedDataTableTypeInterface
     {
-        if (!isset($this->resolvedTypes[$name])) {
-            if (!isset($this->types[$name])) {
-                throw new \InvalidArgumentException(sprintf('Could not load data table type "%s".', $name));
+        if (!isset($this->types[$name])) {
+            $type = null;
+
+            foreach ($this->extensions as $extension) {
+                if ($extension->hasType($name)) {
+                    $type = $extension->getType($name);
+                    break;
+                }
             }
 
-            $this->resolvedTypes[$name] = $this->resolveType($this->types[$name]);
+            if (!$type) {
+                // Support fully-qualified class names
+                if (!class_exists($name)) {
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $name));
+                }
+                if (!is_subclass_of($name, DataTableTypeInterface::class)) {
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "%s".', $name, DataTableTypeInterface::class));
+                }
+
+                $type = new $name();
+            }
+
+            $this->types[$name] = $this->resolveType($type);
         }
 
-        return $this->resolvedTypes[$name];
+        return $this->types[$name];
     }
 
     private function resolveType(DataTableTypeInterface $type): ResolvedDataTableTypeInterface

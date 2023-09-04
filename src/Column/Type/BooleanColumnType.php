@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 class BooleanColumnType extends AbstractColumnType

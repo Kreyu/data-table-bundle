@@ -671,6 +671,10 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
+        if (null === $this->query) {
+            throw new BadMethodCallException(sprintf('Unable to create data table without a query. Use the "%s::setQuery()" method to set a query.', $this::class));
+        }
+
         $dataTable = new DataTable(clone $this->query, $this->getDataTableConfig());
 
         if ($this->shouldPrependBatchCheckboxColumn()) {

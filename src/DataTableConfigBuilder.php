@@ -170,6 +170,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getColumnFactory(): ColumnFactoryInterface
     {
+        if (!isset($this->columnFactory)) {
+            throw new BadMethodCallException(sprintf('The column factory is not set, use the "%s::setColumnFactory()" method to set the column factory.', $this::class));
+        }
+
         return $this->columnFactory;
     }
 
@@ -186,6 +190,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getFilterFactory(): FilterFactoryInterface
     {
+        if (!isset($this->filterFactory)) {
+            throw new BadMethodCallException(sprintf('The filter factory is not set, use the "%s::setFilterFactory()" method to set the filter factory.', $this::class));
+        }
+
         return $this->filterFactory;
     }
 
@@ -202,6 +210,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getActionFactory(): ActionFactoryInterface
     {
+        if (!isset($this->actionFactory)) {
+            throw new BadMethodCallException(sprintf('The action factory is not set, use the "%s::setActionFactory()" method to set the action factory.', $this::class));
+        }
+
         return $this->actionFactory;
     }
 
@@ -218,6 +230,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getExporterFactory(): ExporterFactoryInterface
     {
+        if (!isset($this->exporterFactory)) {
+            throw new BadMethodCallException(sprintf('The exporter factory is not set, use the "%s::setExporterFactory()" method to set the exporter factory.', $this::class));
+        }
+
         return $this->exporterFactory;
     }
 

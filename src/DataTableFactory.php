@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
@@ -12,7 +13,7 @@ class DataTableFactory implements DataTableFactoryInterface
 {
     public function __construct(
         private DataTableRegistryInterface $registry,
-        private ProxyQueryFactoryInterface $proxyQueryFactory,
+        private ?ProxyQueryFactoryInterface $proxyQueryFactory = null,
     ) {
     }
 
@@ -34,6 +35,10 @@ class DataTableFactory implements DataTableFactoryInterface
     public function createNamedBuilder(string $name, string $type = DataTableType::class, mixed $query = null, array $options = []): DataTableBuilderInterface
     {
         if (null !== $query && !$query instanceof ProxyQueryInterface) {
+            if (null === $this->proxyQueryFactory) {
+                throw new InvalidArgumentException(sprintf('Expected query of type %s, %s given', ProxyQueryInterface::class, get_debug_type($query)));
+            }
+
             $query = $this->proxyQueryFactory->create($query);
         }
 

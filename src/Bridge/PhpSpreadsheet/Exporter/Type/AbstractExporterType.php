@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractType;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
@@ -31,7 +32,7 @@ abstract class AbstractExporterType extends BaseAbstractType
     /**
      * @throws Exception
      */
-    public function export(DataTableView $view, string $filename, array $options = []): ExportFile
+    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
     {
         $spreadsheet = $this->createSpreadsheet($view, $options);
 

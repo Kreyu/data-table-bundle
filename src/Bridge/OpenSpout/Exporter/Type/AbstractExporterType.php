@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType as BaseAbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
@@ -32,7 +33,7 @@ abstract class AbstractExporterType extends BaseAbstractExporterType
      * @throws IOException
      * @throws WriterNotOpenedException
      */
-    public function export(DataTableView $view, string $filename, array $options = []): ExportFile
+    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
     {
         if (!class_exists(Row::class)) {
             throw new \LogicException('Trying to use exporter that requires OpenSpout which is not installed. Try running "composer require openspout/openspout".');

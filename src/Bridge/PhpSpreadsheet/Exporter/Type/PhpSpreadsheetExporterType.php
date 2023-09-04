@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType as BaseExporterType;
@@ -16,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class PhpSpreadsheetExporterType extends AbstractExporterType
 {
-    public function export(DataTableView $view, string $filename, array $options = []): ExportFile
+    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
     {
         throw new \LogicException('Base exporter type cannot be called directly');
     }

@@ -50,8 +50,7 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.filter.registry', FilterRegistry::class)
         ->args([
-            tagged_iterator('kreyu_data_table.filter.type'),
-            tagged_iterator('kreyu_data_table.filter.type_extension'),
+            tagged_iterator('kreyu_data_table.filter.extension'),
             service('kreyu_data_table.filter.resolved_type_factory'),
         ])
         ->alias(FilterRegistryInterface::class, 'kreyu_data_table.filter.registry')

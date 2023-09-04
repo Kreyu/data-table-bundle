@@ -15,7 +15,6 @@ use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvi
 use Kreyu\Bundle\DataTableBundle\Query\ChainProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
-use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
@@ -68,7 +67,6 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.request_handler.http_foundation', HttpFoundationRequestHandler::class)
-        ->alias(RequestHandlerInterface::class, 'kreyu_data_table.request_handler.http_foundation')
     ;
 
     $services

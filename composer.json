@@ -23,6 +23,7 @@
         "twig/intl-extra": "^3.6"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "friendsofphp/php-cs-fixer": "^3.23",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.11",
         "symfony/maker-bundle": "^1.48",

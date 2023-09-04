@@ -24,11 +24,10 @@ class FilterData
             ])
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
             ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
-                return is_string($value) ? Operator::from($value) : $value;
+                // TODO: Remove call to "getNonDeprecatedCase()"
+                return is_string($value) ? Operator::from($value)->getNonDeprecatedCase() : $value;
             })
         ;
-
-        $data = array_intersect_key($data, array_flip($resolver->getDefinedOptions()));
 
         $data = $resolver->resolve($data);
 

@@ -96,6 +96,7 @@ final class FilterType implements FilterTypeInterface
                 'empty_data' => '',
 
                 // TODO: Remove deprecated options
+                'auto_alias_resolving' => true,
                 'field_type' => null,
                 'field_options' => [],
                 'operator_type' => null,

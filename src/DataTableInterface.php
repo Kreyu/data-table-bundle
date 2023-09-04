@@ -213,4 +213,6 @@ interface DataTableInterface
     public function handleRequest(mixed $request): void;
 
     public function createView(): DataTableView;
+
+    public function createExportView(): DataTableView;
 }

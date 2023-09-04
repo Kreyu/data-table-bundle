@@ -10,13 +10,13 @@ The `CallbackFilterType` represents a filter that operates on identifier values.
 Displayed as a selector, allows the user to select a specific entity loaded from the database, to query by its identifier.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [FilterType](../../filter)
+| Parent type         | [DoctrineOrmFilterType](doctrine-orm.md)
 +---------------------+--------------------------------------------------------------+
 | Class               | [:icon-mark-github: CallbackFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CallbackFilterType.php)
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | Supports all operators, but it doesn't affect the actual query.
+| Supported operators | Supports all operators
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -53,4 +53,5 @@ $builder
 
 ## Inherited options
 
+{{ include '../_filter_options' }}
 {{ include '_doctrine_orm_filter_options' }}

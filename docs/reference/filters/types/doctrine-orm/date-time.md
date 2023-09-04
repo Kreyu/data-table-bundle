@@ -8,7 +8,7 @@ order: e
 The `DateTimeFilterType` represents a filter that operates on datetime values.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [FilterType](../../filter)
+| Parent type         | [DoctrineOrmFilterType](doctrine-orm.md)
 +---------------------+--------------------------------------------------------------+
 | Class               | [:icon-mark-github: DateTimeFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/DateTimeFilterType.php)
 +---------------------+--------------------------------------------------------------+
@@ -44,4 +44,5 @@ If form option `widget` equals `'choice'` or `'text'` then the normalizer change
 !!!
 {% endcapture %}
 
+{{ include '../_filter_options' }}
 {{ include '_doctrine_orm_filter_options' }}

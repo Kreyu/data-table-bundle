@@ -1,5 +1,3 @@
-{{ include '../_filter_options' }}
-
 ### `auto_alias_resolving`
 
 - **type**: `bool`

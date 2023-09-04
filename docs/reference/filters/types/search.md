@@ -13,7 +13,7 @@ The `SearchFilterType` represents a special filter to handle the [global search]
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [SearchType](https://symfony.com/doc/current/reference/forms/types/search.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | Supports all operators, but it doesn't affect the actual query.
+| Supported operators | Supports all operators
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -61,6 +61,9 @@ $builder
 
 {{ option_label_default_value = '`false`' }}
 {{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\SearchType\'`' }}
-{{ option_form_options_default_value = '`[\'attr\' => [\'placeholder\' => \'Search...\']]`' }}
+
+{% capture option_form_options_notes %}
+The normalizer ensures the default `['attr' => ['placeholder' => 'Search...']]` is added.
+{% endcapture %}
 
 {{ include '_filter_options' }}

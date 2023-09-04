@@ -40,12 +40,8 @@ This is the form type used to render the filter value field.
 - **default**: {{ option_form_options_default_value ?? '`[]`' }}
 
 This is the array that's passed to the form type specified in the `form_type` option.
-The normalizer appends the default `['required' => false]`.
 
-!!!
-**Note**: the normalizer ensures the `required` option defaults to `false`.
-!!!
-
+The normalizer ensures the default `['required' => false]` is added.
 
 {{ option_form_options_notes }}
 

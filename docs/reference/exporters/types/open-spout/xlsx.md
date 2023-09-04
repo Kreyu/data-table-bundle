@@ -1,32 +1,33 @@
 ---
 label: XLSX
 order: b
+tags:
+  - exporter
+  - openspout
 ---
 
 # OpenSpout XLSX exporter type
 
+[!badge Requires integration bundle installed](https://github.com/kreyu/data-table-open-spout-bundle)
+
 The `XlsxExporterType` represents an exporter that uses an [OpenSpout](https://github.com/openspout/openspout) XLSX writer.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [ExporterType](../exporter.md)
+| Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/XlsxExporterType.php)
+| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Exporter/Type/XlsxExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options
 
-### `default_row_style`
+### `writer_options`
 
-**type**: `\OpenSpout\Common\Entity\Style\Style` **default**: object of class with default values
+**type**: `callable` or `OpenSpout\Writer\XLSX\Options`
 
-### `should_create_new_sheets_automatically`
+Represents the writer options object used in the writer.
+For more information and possible configuration, see [official documentation](https://github.com/openspout/openspout/blob/4.x/docs/documentation.md).
 
-**type**: `bool` **default**: `true`
+## Inherited options
 
-### `default_column_width`
-
-**type**: `null` or `int` **default**: `null`
-
-### `default_row_height`
-
-**type**: `null` or `int` **default**: `null`
+{{ include '_open-spout_options.md' }}
+{{ include '../_exporter_options.md' }}

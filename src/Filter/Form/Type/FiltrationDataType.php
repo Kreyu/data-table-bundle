@@ -54,17 +54,15 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
 
-        $view->vars['attr']['id'] = $id = $view->vars['id'];
+        $this->applyFormAttributeRecursively($view, $id = $view->vars['id']);
 
-        $this->applyFormAttributeRecursively($view, $id);
+        $view->vars['attr']['id'] = $id;
 
         foreach ($view as $name => $filterFormView) {
             $filterView = $dataTableView->filters[$name];
 
-            $filterFormView->vars = array_replace($filterFormView->vars, [
-                'label' => $filterView->vars['label'],
-                'translation_domain' => $filterView->vars['translation_domain'],
-            ]);
+            $filterFormView->vars['label'] = $filterView->vars['label'];
+            $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
         }
 
         $searchFields = [];
@@ -112,9 +110,7 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
             return;
         }
 
-        $forms = iterator_to_array($forms);
-
-        foreach ($forms as $name => $form) {
+        foreach (iterator_to_array($forms) as $name => $form) {
             $form->setData($viewData->getFilterData($name));
         }
     }
@@ -125,9 +121,7 @@ class FiltrationDataType extends AbstractType implements DataMapperInterface
             $viewData = new FiltrationData();
         }
 
-        $forms = iterator_to_array($forms);
-
-        foreach ($forms as $name => $form) {
+        foreach (iterator_to_array($forms) as $name => $form) {
             $viewData->setFilterData($name, $form->getData());
         }
     }

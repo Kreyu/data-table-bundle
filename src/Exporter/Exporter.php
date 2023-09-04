@@ -45,6 +45,6 @@ class Exporter implements ExporterInterface
 
     public function export(DataTableView $view, string $filename): ExportFile
     {
-        return $this->config->getType()->getInnerType()->export($view, $filename, $this->config->getOptions());
+        return $this->config->getType()->getInnerType()->export($view, $this, $filename, $this->config->getOptions());
     }
 }

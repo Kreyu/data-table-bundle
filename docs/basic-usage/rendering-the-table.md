@@ -38,13 +38,13 @@ class ProductController extends AbstractController
 
 Now, create the missing template, and render the data table:
 
-{%{
+{% raw %}
 ```twig # templates/product/index.html.twig
 <div class="card">
     {{ data_table(data_table) }}
 </div>
 ```
-}%}
+{% endraw %}
 
 Voilà! :sparkles: The Twig helper function handles all the work and renders the data table.
 

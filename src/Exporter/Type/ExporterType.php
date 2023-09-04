@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ExporterType implements ExporterTypeInterface
 {
-    public function export(DataTableView $view, string $filename, array $options = []): ExportFile
+    public function export(DataTableView $view, ...$args): ExportFile
     {
         throw new LogicException('Base exporter type cannot be called directly');
     }

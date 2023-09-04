@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Type;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\OptionsResolver\Options;
@@ -28,6 +29,7 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
             ->setDefaults([
                 'form_type' => SearchType::class,
                 'label' => false,
+                'supported_operators' => Operator::cases(),
             ])
             ->setRequired('handler')
             ->setAllowedTypes('handler', 'callable')

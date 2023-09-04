@@ -1,25 +1,25 @@
 ---
-label: Date
-order: d
+label: DoctrineORM
+order: z
 ---
 
-# Date filter type
+# Doctrine ORM filter type
 
-The `DateFilterType` represents a filter that operates on date values.
+The `DoctrineOrmFilterType` represents a base filter used as a parent for every other Doctrine ORM filter type in the bundle.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [DoctrineOrmFilterType](doctrine-orm.md)
+| Parent type         | [FilterType](../filter)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: DateFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/DateFilterType.php)
+| Class               | [:icon-mark-github: DoctrineOrmFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/DoctrineOrmFilterType.php)
 +---------------------+--------------------------------------------------------------+
-| Form Type           | [DateType](https://symfony.com/doc/current/reference/forms/types/date.html)
+| Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
+| Supported operators | none
 +---------------------+--------------------------------------------------------------+
 
 ## Options
 
-This filter type has no additional options.
+{{ include '_doctrine_orm_filter_options' }}
 
 ## Inherited options
 
@@ -37,4 +37,3 @@ If form option `widget` equals `'choice'` or `'text'` then the normalizer change
 {% endcapture %}
 
 {{ include '../_filter_options' }}
-{{ include '_doctrine_orm_filter_options' }}

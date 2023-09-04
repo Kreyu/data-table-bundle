@@ -8,7 +8,7 @@ order: a
 The `StringFilterType` represents a filter that operates on string values.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [FilterType](../filter)
+| Parent type         | [DoctrineOrmFilterType](doctrine-orm.md)
 +---------------------+--------------------------------------------------------------+
 | Class               | [:icon-mark-github: StringFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/StringFilterType.php)
 +---------------------+--------------------------------------------------------------+
@@ -23,4 +23,5 @@ This filter type has no additional options.
 
 ## Inherited options
 
+{{ include '../_filter_options' }}
 {{ include '_doctrine_orm_filter_options' }}

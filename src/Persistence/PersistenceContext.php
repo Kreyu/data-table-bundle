@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kreyu\Bundle\DataTableBundle;
+namespace Kreyu\Bundle\DataTableBundle\Persistence;
 
 enum PersistenceContext: string
 {

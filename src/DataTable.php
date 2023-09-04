@@ -31,6 +31,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceContext;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -38,7 +39,6 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingColumnData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 
 class DataTable implements DataTableInterface
 {
@@ -691,11 +691,11 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has filtration feature disabled.');
         }
 
-        if (null === $this->config->getFiltrationFormFactory()) {
+        if (null === $formFactory = $this->config->getFiltrationFormFactory()) {
             throw new RuntimeException('The data table has no configured filtration form factory.');
         }
 
-        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+        return $formFactory->createNamedBuilder(
             name: $this->config->getFiltrationParameterName(),
             type: FiltrationDataType::class,
             options: [
@@ -711,11 +711,11 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has personalization feature disabled.');
         }
 
-        if (null === $this->config->getPersonalizationFormFactory()) {
+        if (null === $formFactory = $this->config->getPersonalizationFormFactory()) {
             throw new RuntimeException('The data table has no configured personalization form factory.');
         }
 
-        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+        return $formFactory->createNamedBuilder(
             name: $this->config->getPersonalizationParameterName(),
             type: PersonalizationDataType::class,
             options: [
@@ -730,14 +730,17 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has export feature disabled.');
         }
 
-        if (null === $this->config->getExportFormFactory()) {
+        if (null === $formFactory = $this->config->getExportFormFactory()) {
             throw new RuntimeException('The data table has no configured export form factory.');
         }
 
         $data = $this->config->getDefaultExportData();
-        $data->filename ??= $this->getName();
 
-        return $this->config->getExportFormFactory()->createNamedBuilder(
+        if (null !== $data) {
+            $data->filename ??= $this->getName();
+        }
+
+        return $formFactory->createNamedBuilder(
             name: $this->config->getExportParameterName(),
             type: ExportDataType::class,
             data: $data,

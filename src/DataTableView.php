@@ -12,9 +12,9 @@ class DataTableView
 {
     public array $vars = [];
 
-    public HeaderRowView $headerRow;
+    public ?HeaderRowView $headerRow = null;
 
-    public HeaderRowView $nonPersonalizedHeaderRow;
+    public ?HeaderRowView $nonPersonalizedHeaderRow = null;
 
     /**
      * @var iterable<ValueRowView>

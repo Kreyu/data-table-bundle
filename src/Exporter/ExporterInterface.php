@@ -17,5 +17,5 @@ interface ExporterInterface
 
     public function setDataTable(DataTableInterface $dataTable): static;
 
-    public function export(DataTableView $view, string $filename): ExportFile;
+    public function export(DataTableView $view, string $filename = 'export'): ExportFile;
 }

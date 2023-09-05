@@ -727,7 +727,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
         // TODO: Remove initialization logic from builder.
         //       Instead, add "initialized" flag to the data table itself to allow lazy initialization.
-        $dataTable->initialize();
+        // $dataTable->initialize();
 
         return $dataTable;
     }

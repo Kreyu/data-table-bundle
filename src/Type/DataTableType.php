@@ -183,7 +183,7 @@ final class DataTableType implements DataTableTypeInterface
                 'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'] ?? false,
                 'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
                 'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
-                'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? true,
+                'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? false,
                 'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
                 'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,
                 'filtration_persistence_subject_provider' => $this->defaults['filtration']['persistence_subject_provider'] ?? null,
@@ -193,7 +193,7 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'] ?? null,
                 'personalization_persistence_subject_provider' => $this->defaults['personalization']['persistence_subject_provider'] ?? null,
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
-                'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? true,
+                'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
 
                 // TODO: Remove deprecated options

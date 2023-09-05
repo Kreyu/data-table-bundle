@@ -771,9 +771,9 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
-        if (empty($this->getColumns())) {
-            throw new RuntimeException('The data table has no configured columns.');
-        }
+//        if (empty($this->getColumns())) {
+//            throw new RuntimeException('The data table has no configured columns.');
+//        }
 
         $type = $this->config->getType();
         $options = $this->config->getOptions();

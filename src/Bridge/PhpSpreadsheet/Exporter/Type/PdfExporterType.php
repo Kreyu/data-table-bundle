@@ -12,10 +12,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\Writer\Pdf\Tcpdf;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @deprecated the PhpSpreadsheet exporters are deprecated, use OpenSpout instead
- */
-class PdfExporterType extends AbstractExporterType
+class PdfExporterType extends AbstractPhpSpreadsheetExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

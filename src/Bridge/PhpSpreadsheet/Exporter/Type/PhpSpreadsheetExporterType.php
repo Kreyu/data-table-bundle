@@ -8,13 +8,9 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType as BaseExporterType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @deprecated the PhpSpreadsheet exporters are deprecated, use OpenSpout instead
- */
 final class PhpSpreadsheetExporterType extends AbstractExporterType
 {
     public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
@@ -34,10 +30,5 @@ final class PhpSpreadsheetExporterType extends AbstractExporterType
             ])
             ->setAllowedTypes('pre_calculate_formulas', 'bool')
         ;
-    }
-
-    public function getParent(): ?string
-    {
-        return BaseExporterType::class;
     }
 }

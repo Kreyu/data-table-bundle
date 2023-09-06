@@ -14,7 +14,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 use function Symfony\Component\Translation\t;
 
-class DateRangeFilterType extends AbstractFilterType
+class DateRangeFilterType extends AbstractDoctrineOrmFilterType
 {
     /**
      * @param DoctrineOrmProxyQuery $query

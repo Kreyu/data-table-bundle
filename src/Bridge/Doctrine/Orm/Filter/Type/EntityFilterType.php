@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class EntityFilterType extends AbstractFilterType
+class EntityFilterType extends AbstractDoctrineOrmFilterType
 {
     public function __construct(
         private readonly Registry $doctrineRegistry,

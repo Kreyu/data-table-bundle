@@ -9,12 +9,13 @@ use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class StringFilterType extends AbstractFilterType
+class StringFilterType extends AbstractDoctrineOrmFilterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
+                'default_operator' => Operator::Contains,
                 'supported_operators' => [
                     Operator::Equals,
                     Operator::NotEquals,

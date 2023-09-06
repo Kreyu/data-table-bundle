@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NumericFilterType extends AbstractFilterType
+class NumericFilterType extends AbstractDoctrineOrmFilterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

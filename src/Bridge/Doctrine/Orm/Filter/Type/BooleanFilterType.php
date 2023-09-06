@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function Symfony\Component\Translation\t;
 
-class BooleanFilterType extends AbstractFilterType
+class BooleanFilterType extends AbstractDoctrineOrmFilterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -16,6 +16,8 @@ The `StringFilterType` represents a filter that operates on string values.
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals, Contains, NotContains, StartsWith, EndsWith
 +---------------------+--------------------------------------------------------------+
+| Default operator    | Contains
++---------------------+--------------------------------------------------------------+
 
 ## Options
 

@@ -16,22 +16,39 @@ class DataTablePass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    private array $extensions = [
+        'kreyu_data_table.extension',
+        'kreyu_data_table.column.extension',
+        'kreyu_data_table.filter.extension',
+        'kreyu_data_table.exporter.extension',
+        'kreyu_data_table.action.extension',
+    ];
+
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('kreyu_data_table.extension')) {
+        foreach ($this->extensions as $extensionId) {
+            $this->processExtension($container, $extensionId);
+        }
+    }
+
+    private function processExtension(ContainerBuilder $container, string $extensionId): void
+    {
+        if (!$container->hasDefinition($extensionId)) {
             return;
         }
 
-        $definition = $container->getDefinition('kreyu_data_table.extension');
-        $definition->replaceArgument(0, $this->processDataTableTypes($container));
-        $definition->replaceArgument(1, $this->processDataTableTypeExtensions($container));
+        $definition = $container->getDefinition($extensionId);
+        $attributes = $definition->getTag($extensionId)[0];
+
+        $definition->replaceArgument(0, $this->processTypes($container, $attributes['type']));
+        $definition->replaceArgument(1, $this->processTypeExtensions($container, $attributes['type_extension']));
     }
 
-    private function processDataTableTypes(ContainerBuilder $container): Reference
+    private function processTypes(ContainerBuilder $container, string $tag): Reference
     {
         $servicesMap = [];
 
-        foreach ($container->findTaggedServiceIds('kreyu_data_table.type', true) as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds($tag, true) as $serviceId => $reference) {
             $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$serviceDefinition->getClass()] = new Reference($serviceId);
         }
@@ -39,15 +56,15 @@ class DataTablePass implements CompilerPassInterface
         return ServiceLocatorTagPass::register($container, $servicesMap);
     }
 
-    private function processDataTableTypeExtensions(ContainerBuilder $container): array
+    private function processTypeExtensions(ContainerBuilder $container, string $tag): array
     {
         $typeExtensions = [];
 
-        foreach ($this->findAndSortTaggedServices('kreyu_data_table.type_extension', $container) as $reference) {
+        foreach ($this->findAndSortTaggedServices($tag, $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
 
-            $tag = $serviceDefinition->getTag('kreyu_data_table.type_extension');
+            $tag = $serviceDefinition->getTag($tag);
             $typeExtensionClass = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
 
             if (isset($tag[0]['extended_type'])) {

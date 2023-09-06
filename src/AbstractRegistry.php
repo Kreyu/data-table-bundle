@@ -32,9 +32,8 @@ abstract class AbstractRegistry
      */
     public function __construct(
         private readonly iterable $extensions,
-        private readonly mixed    $resolvedTypeFactory,
-    )
-    {
+        private readonly mixed $resolvedTypeFactory,
+    ) {
         $extensionClass = $this->getExtensionClass();
 
         foreach ($extensions as $extension) {

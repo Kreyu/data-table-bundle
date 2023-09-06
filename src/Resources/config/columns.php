@@ -57,10 +57,10 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.actions', ActionsColumnType::class)
-        ->tag('kreyu_data_table.column.type')
         ->args([
             service('kreyu_data_table.action.factory'),
         ])
+        ->tag('kreyu_data_table.column.type')
     ;
 
     $services

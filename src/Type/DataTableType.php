@@ -233,10 +233,10 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
 
             // TODO: Remove deprecated options
-            ->setDeprecated('sorting_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "sorting_persistence_subject_provider" instead.')
-            ->setDeprecated('pagination_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "pagination_persistence_subject_provider" instead.')
-            ->setDeprecated('filtration_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "filtration_persistence_subject_provider" instead.')
-            ->setDeprecated('personalization_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "personalization_persistence_subject_provider" instead.')
+            ->setDeprecated('sorting_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "sorting_persistence_subject_provider" instead.')
+            ->setDeprecated('pagination_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "pagination_persistence_subject_provider" instead.')
+            ->setDeprecated('filtration_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "filtration_persistence_subject_provider" instead.')
+            ->setDeprecated('personalization_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "personalization_persistence_subject_provider" instead.')
         ;
     }
 

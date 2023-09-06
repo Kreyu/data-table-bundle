@@ -44,6 +44,6 @@ class ExportDataType extends AbstractType
 
         // TODO: Remove deprecated default filename option
         $resolver->setDefault('default_filename', null);
-        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated.');
+        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated.');
     }
 }

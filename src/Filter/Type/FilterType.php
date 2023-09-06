@@ -138,10 +138,10 @@ final class FilterType implements FilterTypeInterface
             ->setAllowedTypes('field_options', ['array'])
             ->setAllowedTypes('operator_type', ['null', 'string'])
             ->setAllowedTypes('operator_options', ['array'])
-            ->setDeprecated('field_type', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "form_type" instead.')
-            ->setDeprecated('field_options', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "form_options" instead.')
-            ->setDeprecated('operator_type', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "operator_form_type" instead.')
-            ->setDeprecated('operator_options', 'kreyu/data-table-bundle', '0.14', 'The "%s" option is deprecated, use "operator_form_options", "supported_operators", "operator_selectable" and "default_operator" instead.')
+            ->setDeprecated('field_type', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "form_type" instead.')
+            ->setDeprecated('field_options', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "form_options" instead.')
+            ->setDeprecated('operator_type', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "operator_form_type" instead.')
+            ->setDeprecated('operator_options', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "operator_form_options", "supported_operators", "operator_selectable" and "default_operator" instead.')
             ->addNormalizer('form_type', function (Options $options, mixed $value) {
                 return $options['field_type'] ?? $value;
             })

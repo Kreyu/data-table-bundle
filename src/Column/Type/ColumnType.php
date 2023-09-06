@@ -83,7 +83,7 @@ final class ColumnType implements ColumnTypeInterface
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'data' => $view->data,
             'value' => $view->value,
-            'translation_domain' => $options['value_translation_domain'] ?? $view->parent->vars['translation_domain'] ?? null,
+            'translation_domain' => $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['value_translation_parameters'] ?? [],
             'attr' => $attr,
         ]);

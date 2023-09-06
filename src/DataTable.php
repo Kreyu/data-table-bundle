@@ -734,7 +734,7 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has no configured export form factory.');
         }
 
-        $data = $this->config->getDefaultExportData();
+        $data = $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
         if (null !== $data) {
             $data->filename ??= $this->getName();

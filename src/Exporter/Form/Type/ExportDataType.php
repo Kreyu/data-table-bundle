@@ -18,7 +18,9 @@ class ExportDataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('filename', TextType::class)
+            ->add('filename', TextType::class, [
+                'empty_data' => $options['default_filename'],
+            ])
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
                     fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),

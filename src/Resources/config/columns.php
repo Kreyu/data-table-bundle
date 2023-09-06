@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
@@ -106,6 +107,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.date_time', DateTimeColumnType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.date', DateColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

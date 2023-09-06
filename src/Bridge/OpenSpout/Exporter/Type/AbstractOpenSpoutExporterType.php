@@ -119,12 +119,12 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
 
     protected function getStyle(mixed $view, string $optionName, array $options): Style
     {
-        $style = $options[$optionName] ?? new Style();
+        $style = $options[$optionName] ?? null;
 
         if (is_callable($style)) {
-            $style = $style($style, $view, $this, $options);
+            $style = $style($view, $options);
         }
 
-        return $style;
+        return $style ?? new Style();
     }
 }

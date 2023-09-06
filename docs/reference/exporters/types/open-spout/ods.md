@@ -8,14 +8,12 @@ tags:
 
 # OpenSpout ODS exporter type
 
-[!badge Requires integration bundle installed](https://github.com/kreyu/data-table-open-spout-bundle)
-
 The `OdsExporterType` represents an exporter that uses an [OpenSpout](https://github.com/openspout/openspout) ODS writer.
 
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Exporter/Type/OdsExporterType.php)
+| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/OdsExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

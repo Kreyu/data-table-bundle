@@ -12,6 +12,9 @@ links:
   - text: GitHub
     link: https://github.com/Kreyu/data-table-bundle
     icon: mark-github
+  - text: Packagist
+    link: https://packagist.org/packages/kreyu/data-table-bundle
+    icon: package
 edit:
   repo: https://github.com/Kreyu/data-table-bundle/edit/
   base: /docs

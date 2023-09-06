@@ -103,12 +103,15 @@ return static function (KreyuDataTableConfig $config) {
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -118,7 +121,7 @@ class ProductDataTableType extends AbstractDataTableType
         $resolver->setDefaults([
             'filtration_persistence_enabled' => true,
             'filtration_persistence_adapter' => $this->persistenceAdapter,
-            'filtration_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+            'filtration_persistence_subject_provider' => $this->persistenceSubjectProvider,
         ]);
     }
 }
@@ -129,6 +132,7 @@ use App\DataTable\Type\ProductDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ProductController extends AbstractController
@@ -136,7 +140,9 @@ class ProductController extends AbstractController
     use DataTableFactoryAwareTrait;
     
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -149,7 +155,7 @@ class ProductController extends AbstractController
             options: [
                 'filtration_persistence_enabled' => true,
                 'filtration_persistence_adapter' => $this->persistenceAdapter,
-                'filtration_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+                'filtration_persistence_subject_provider' => $this->persistenceSubjectProvider,
             ],
         );
     }
@@ -219,65 +225,7 @@ Optionally, the filtration form can display the operator selector, letting the u
 
 ### **Default operator**
 
-By default, each filter defines an array of supported operators. 
-Those operators are then available to select by the user in the form. 
-If operator selector is not visible, then the **first choice** is used.
-
-In case of the string filter, the default operator is `EQUALS`, because it is first in the supported operators array, 
-stored in the `operator_options.choices` option. To change the default operator to `CONTAINS`, 
-set the `choices` option to an array containing it as the first entry:
-
-```php # src/DataTable/Type/ProductDataTableType.php
-use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
-
-class ProductDataTableType extends AbstractDataTableType
-{
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->addFilter('id', NumericFilterType::class)
-            ->addFilter('name', StringFilterType::class, [
-                'operator_options' => [
-                    'choices' => [
-                        Operator::Contains,
-                    ],
-                ],
-            ])
-        ;
-    }
-}
-```
-
-### Displaying operator selector
-
-By default, the operator selector is not visible, because the `operator_options.visible` equals `false`. To change that, set the option to `true`:
-
-```php # src/DataTable/Type/ProductDataTableType.php
-use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
-
-class ProductDataTableType extends AbstractDataTableType
-{
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->addFilter('id', NumericFilterType::class)
-            ->addFilter('name', StringFilterType::class, [
-                'operator_options' => [
-                    'visible' => true,
-                ],
-            ])
-        ;
-    }
-}
-```
-
-Of course, it is possible to define both options at once, restricting operators visible to the user:
+The default operator can be configured using the `default_operator` option:
 
 ```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
@@ -293,11 +241,97 @@ class ProductDataTableType extends AbstractDataTableType
         $builder
             ->addFilter('id', NumericFilterType::class)
             ->addFilter('name', StringFilterType::class, [
-                'operator_options' => [
-                    'visible' => true,
-                    'choices' => [
-                        Operator::Contains,
-                        Operator::NotContains,
+                'default_operator' => Operator::Contains,
+            ])
+        ;
+    }
+}
+```
+
+If the operator **is** selectable by the user, the `default_operator` determines the initially selected operator.
+
+If the operator **is not** selectable by the user, the operator provided by this option will be used.
+
+### Displaying operator selector
+
+The operator can be selectable by the user by setting the `operator_selectable` option to `true`:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class, [
+                'operator_selectable' => true,
+            ])
+        ;
+    }
+}
+```
+
+Setting the `operator_selectable` to `false` (by default) changes the operator form type to `HiddenType`.
+Because of that, even if you provide a different type using the `operator_form_type` option, it will be ignored.
+
+### Restricting selectable operators
+
+The operators selectable by the user can be restricted by using the `supported_operators` option:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Operator;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class, [
+                'operator_selectable' => true,
+                'supported_operators' => [
+                    Operator::Equals,
+                    Operator::Contains,
+                ],
+            ])
+        ;
+    }
+}
+```
+
+Remember that each filter can support a different set of operators internally!
+
+## Configuring form type
+
+The filter form type can be configured using the `form_type` and `form_options` options.
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class, [
+                'form_type' => SearchType::class,
+                'form_options' => [
+                    'attr' => [
+                        'placeholder' => 'Name', 
                     ],
                 ],
             ])
@@ -305,6 +339,37 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
+
+Similar configuration can be applied to the operator form type, using the `operator_form_type` and `operator_form_options` options:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class, [
+                'operator_form_type' => ChoiceType::class,
+                'operator_form_options' => [
+                    'attr' => [
+                        'placeholder' => 'Operator', 
+                    ],
+                ],
+            ])
+        ;
+    }
+}
+```
+
+Setting the `operator_selectable` to `false` (by default) changes the operator form type to `HiddenType`.
+Because of that, even if you provide a different type using the `operator_form_type` option, it will be ignored.
 
 ## Configuring default filtration
 

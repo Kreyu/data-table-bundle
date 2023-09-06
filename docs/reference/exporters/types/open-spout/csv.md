@@ -8,14 +8,12 @@ tags:
 
 # OpenSpout CSV exporter type
 
-[!badge Requires integration bundle installed](https://github.com/kreyu/data-table-open-spout-bundle)
-
 The `CsvExporterType` represents an exporter that uses an [OpenSpout](https://github.com/openspout/openspout) CSV writer.
 
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: CsvExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Exporter/Type/CsvExporterType.php)
+| Class               | [:icon-mark-github: CsvExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/CsvExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

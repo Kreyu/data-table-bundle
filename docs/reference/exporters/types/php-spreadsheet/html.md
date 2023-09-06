@@ -10,7 +10,7 @@ The `HtmlExporterType` represents an exporter that uses a [PhpSpreadsheet Html w
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [PhpSpreadsheetType](php-spreadsheet.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: HtmlExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/HtmlExporterType.php)
+| Class               | [:icon-mark-github: HtmlExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/HtmlExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

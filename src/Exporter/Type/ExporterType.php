@@ -7,12 +7,13 @@ namespace Kreyu\Bundle\DataTableBundle\Exporter\Type;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ExporterType implements ExporterTypeInterface
 {
-    public function export(DataTableView $view, ...$args): ExportFile
+    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
     {
         throw new LogicException('Base exporter type cannot be called directly');
     }

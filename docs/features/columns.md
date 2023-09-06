@@ -1,7 +1,3 @@
----
-order: a
----
-
 # Columns
 
 Columns are the main building blocks of a data tables, split into two parts: the header and the value itself.

@@ -10,7 +10,7 @@ The `XlsxExporterType` represents an exporter that uses a [PhpSpreadsheet Xlsx w
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [PhpSpreadsheetType](php-spreadsheet.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/XlsxExporterType.php)
+| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/XlsxExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

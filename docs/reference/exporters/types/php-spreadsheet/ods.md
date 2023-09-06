@@ -10,7 +10,7 @@ The `OdsExporterType` represents an exporter that uses a [PhpSpreadsheet Ods wri
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [PhpSpreadsheetType](php-spreadsheet.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/OdsExporterType.php)
+| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/OdsExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

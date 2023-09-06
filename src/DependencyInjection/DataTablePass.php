@@ -44,11 +44,11 @@ class DataTablePass implements CompilerPassInterface
         $definition->replaceArgument(1, $this->processTypeExtensions($container, $attributes['type_extension']));
     }
 
-    private function processTypes(ContainerBuilder $container, string $tag): Reference
+    private function processTypes(ContainerBuilder $container, string $tagName): Reference
     {
         $servicesMap = [];
 
-        foreach ($container->findTaggedServiceIds($tag, true) as $serviceId => $reference) {
+        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $reference) {
             $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$serviceDefinition->getClass()] = new Reference($serviceId);
         }
@@ -56,15 +56,15 @@ class DataTablePass implements CompilerPassInterface
         return ServiceLocatorTagPass::register($container, $servicesMap);
     }
 
-    private function processTypeExtensions(ContainerBuilder $container, string $tag): array
+    private function processTypeExtensions(ContainerBuilder $container, string $tagName): array
     {
         $typeExtensions = [];
 
-        foreach ($this->findAndSortTaggedServices($tag, $container) as $reference) {
+        foreach ($this->findAndSortTaggedServices($tagName, $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
 
-            $tag = $serviceDefinition->getTag($tag);
+            $tag = $serviceDefinition->getTag($tagName);
             $typeExtensionClass = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
 
             if (isset($tag[0]['extended_type'])) {

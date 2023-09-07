@@ -21,6 +21,7 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 class DoctrineOrmProxyQuery implements ProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
+    private int $batchSize = 5000;
     private bool $entityManagerClearingEnabled = true;
 
     /**
@@ -103,19 +104,35 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->getPagination();
     }
 
-    public function getItems(int $batchSize = 1000): iterable
+    public function getItems(): iterable
     {
-        $query = (clone $this->queryBuilder)->getQuery();
+        $paginator = $this->createPaginator();
 
-        $this->applyQueryHints($query);
+        $batchSize = $this->batchSize;
 
-        foreach ($query->toIterable(hydrationMode: $this->hydrationMode) as $index => $item) {
-            yield $item;
+        $cursorPosition = 0;
 
-            if (0 === $index % $batchSize && $this->isEntityManagerClearingEnabled()) {
-                $this->getEntityManager()->clear();
+        do {
+            $hasItems = true;
+
+            if ($cursorPosition % $batchSize === 0) {
+                $hasItems = false;
+
+                $paginator->getQuery()->setMaxResults($batchSize);
+                $paginator->getQuery()->setFirstResult($cursorPosition);
+
+                foreach ($paginator->getIterator() as $item) {
+                    $hasItems = true;
+                    yield $item;
+                }
+
+                if ($this->entityManagerClearingEnabled) {
+                    $this->getEntityManager()->clear();
+                }
             }
-        }
+
+            $cursorPosition++;
+        } while (0 === $cursorPosition || $hasItems);
     }
 
     public function getUniqueParameterId(): int
@@ -144,6 +161,16 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function setEntityManagerClearingEnabled(bool $entityManagerClearingEnabled): void
     {
         $this->entityManagerClearingEnabled = $entityManagerClearingEnabled;
+    }
+
+    public function getBatchSize(): int
+    {
+        return $this->batchSize;
+    }
+
+    public function setBatchSize(int $batchSize): void
+    {
+        $this->batchSize = $batchSize;
     }
 
     private function getCurrentPageNumber(): int

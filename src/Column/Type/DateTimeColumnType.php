@@ -39,7 +39,7 @@ class DateTimeColumnType extends AbstractColumnType
                             }
 
                             return '';
-                        }
+                        },
                     ];
                 }
 

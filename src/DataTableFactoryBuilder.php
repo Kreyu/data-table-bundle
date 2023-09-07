@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Extension\DataTableExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\PreloadedDataTableExtension;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;

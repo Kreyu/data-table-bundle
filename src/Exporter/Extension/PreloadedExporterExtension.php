@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 class PreloadedExporterExtension extends AbstractColumnExtension
 {
     /**
-     * @param array<ColumnTypeInterface> $types
+     * @param array<ColumnTypeInterface>                           $types
      * @param array<string, array<ExporterTypeExtensionInterface>> $typeExtensions
      */
     public function __construct(

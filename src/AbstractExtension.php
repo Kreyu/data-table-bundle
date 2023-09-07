@@ -52,7 +52,6 @@ abstract class AbstractExtension
         return isset($this->typeExtensions[$name]) && \count($this->typeExtensions[$name]) > 0;
     }
 
-
     /**
      * @return array<TType>
      */

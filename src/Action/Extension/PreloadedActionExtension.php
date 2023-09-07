@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 class PreloadedActionExtension extends AbstractActionExtension
 {
     /**
-     * @param array<ActionTypeInterface> $types
+     * @param array<ActionTypeInterface>                         $types
      * @param array<string, array<ActionTypeExtensionInterface>> $typeExtensions
      */
     public function __construct(

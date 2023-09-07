@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 class PreloadedColumnExtension extends AbstractColumnExtension
 {
     /**
-     * @param array<ColumnTypeInterface> $types
+     * @param array<ColumnTypeInterface>                         $types
      * @param array<string, array<ColumnTypeExtensionInterface>> $typeExtensions
      */
     public function __construct(

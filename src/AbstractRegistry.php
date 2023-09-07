@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 
 /**
  * @template TType

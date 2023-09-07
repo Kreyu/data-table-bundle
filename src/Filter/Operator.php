@@ -19,53 +19,53 @@ enum Operator: string
 
     // TODO: Remove deprecated cases
 
-    /*
-     * @deprecated use {@see Operator::Equals} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::Equals} instead
      */
     case EQUALS = 'deprecated-equals';
 
-    /*
-     * @deprecated use {@see Operator::NotEquals} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::NotEquals} instead
      */
     case CONTAINS = 'deprecated-contains';
 
-    /*
-     * @deprecated use {@see Operator::Contains} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::Contains} instead
      */
     case NOT_CONTAINS = 'deprecated-not-contains';
 
-    /*
-     * @deprecated use {@see Operator::NotContains} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::NotContains} instead
      */
     case NOT_EQUALS = 'deprecated-not-equals';
 
-    /*
-     * @deprecated use {@see Operator::GreaterThan} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::GreaterThan} instead
      */
     case GREATER_THAN = 'deprecated-greater-than';
 
-    /*
-     * @deprecated use {@see Operator::GreaterThanEquals} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::GreaterThanEquals} instead
      */
     case GREATER_THAN_EQUALS = 'deprecated-greater-than-equals';
 
-    /*
-     * @deprecated use {@see Operator::LessThan} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::LessThan} instead
      */
     case LESS_THAN = 'deprecated-less-than';
 
-    /*
-     * @deprecated use {@see Operator::LessThanEquals} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::LessThanEquals} instead
      */
     case LESS_THAN_EQUALS = 'deprecated-less-than-equals';
 
-    /*
-     * @deprecated use {@see Operator::StartsWith} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::StartsWith} instead
      */
     case STARTS_WITH = 'deprecated-starts-with';
 
-    /*
-     * @deprecated use {@see Operator::EndsWith} instead
+    /**
+     * @deprecated since 0.14.0, use {@see Operator::EndsWith} instead
      */
     case ENDS_WITH = 'deprecated-ends-with';
 

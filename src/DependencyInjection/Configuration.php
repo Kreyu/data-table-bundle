@@ -14,7 +14,27 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('kreyu_data_table');
 
         $treeBuilder->getRootNode()
+            // TODO: Remove this whole validation block after removing the root "themes" node
+            //       as it works as a backwards compatibility layer
+            ->validate()
+                ->always()
+                ->then(function (array $config) {
+                    if (empty($config['defaults']['themes']) && !empty($config['themes'])) {
+                        $config['defaults']['themes'] = $config['themes'];
+                    }
+
+                    return $config;
+                })
+            ->end()
             ->children()
+                ->arrayNode('themes')
+                    ->scalarPrototype()->end()
+                    ->setDeprecated(
+                        'kreyu/data-table-bundle',
+                        '0.12.0',
+                        'The child node "%node%" at path "%path%" is deprecated, use "defaults.themes" instead.',
+                    )
+                ->end()
                 ->arrayNode('defaults')
                     ->addDefaultsIfNotSet()
                     ->children()

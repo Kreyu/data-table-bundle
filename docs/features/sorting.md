@@ -151,12 +151,15 @@ return static function (KreyuDataTableConfig $config) {
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -166,7 +169,7 @@ class ProductDataTableType extends AbstractDataTableType
         $resolver->setDefaults([
             'sorting_persistence_enabled' => true,
             'sorting_persistence_adapter' => $this->persistenceAdapter,
-            'sorting_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+            'sorting_persistence_subject_provider' => $this->persistenceSubjectProvider,
         ]);
     }
 }
@@ -178,13 +181,16 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ProductController extends AbstractController
 {
     use DataTableFactoryAwareTrait;
     
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -197,7 +203,7 @@ class ProductController extends AbstractController
             options: [
                 'sorting_persistence_enabled' => true,
                 'sorting_persistence_adapter' => $this->persistenceAdapter,
-                'sorting_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+                'sorting_persistence_subject_provider' => $this->persistenceSubjectProvider,
             ],
         );
     }

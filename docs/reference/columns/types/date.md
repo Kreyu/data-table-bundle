@@ -1,16 +1,18 @@
 ---
-label: DateTime
+label: Date
 order: e
 ---
 
-# DateTime column type
+# Date column type
 
-The `DateTimeColumnType` represents a column with value displayed as a date and time.
+The `DateColumnType` represents a column with value displayed as a date.
+
+This column type works exactly like `DateTimeColumnType`, but has a different default format.
 
 +-------------+---------------------------------------------------------------------+
-| Parent type | [ColumnType](column)
+| Parent type | [DateTimeType](date-time.md)
 +-------------+---------------------------------------------------------------------+
-| Class       | [:icon-mark-github: DateTimeColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/DateTimeColumnType.php)
+| Class       | [:icon-mark-github: DateColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/DateColumnType.php)
 +-------------+---------------------------------------------------------------------+
 
 ## Options
@@ -18,7 +20,7 @@ The `DateTimeColumnType` represents a column with value displayed as a date and 
 ### `format`
 
 - **type**: `string`
-- **default**: `'d.m.Y H:i:s'`
+- **default**: `'d.m.Y'`
 
 The format specifier is the same as supported by [date](https://www.php.net/date).
 

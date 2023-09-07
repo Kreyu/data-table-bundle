@@ -10,19 +10,19 @@ use Symfony\Component\Form\FormTypeInterface;
 interface FilterConfigBuilderInterface extends FilterConfigInterface
 {
     /**
-     * @deprecated provide the name using the factory {@see FilterFactoryInterface} "named" methods instead
+     * @deprecated since 0.14.0, provide the name using the factory {@see FilterFactoryInterface} "named" methods instead
      */
     public function setName(string $name): static;
 
     public function setType(ResolvedFilterTypeInterface $type): static;
 
     /**
-     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     * @deprecated since 0.14.0, modifying the options dynamically will be removed as it creates unexpected behaviors
      */
     public function setOptions(array $options): static;
 
     /**
-     * @deprecated modifying the options dynamically will be removed as it creates unexpected behaviors
+     * @deprecated since 0.14.0, modifying the options dynamically will be removed as it creates unexpected behaviors
      */
     public function setOption(string $name, mixed $value): static;
 

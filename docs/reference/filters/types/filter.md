@@ -1,6 +1,8 @@
 ---
 label: Filter
 order: z
+tags:
+  - filters
 ---
 
 # Filter type

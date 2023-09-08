@@ -1,6 +1,9 @@
 ---
 label: DateTime
 order: e
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # DateTime filter type
@@ -15,6 +18,8 @@ The `DateTimeFilterType` represents a filter that operates on datetime values.
 | Form Type           | [DateTimeType](https://symfony.com/doc/current/reference/forms/types/datetime.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

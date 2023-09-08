@@ -1,6 +1,9 @@
 ---
 label: String
 order: a
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # String filter type

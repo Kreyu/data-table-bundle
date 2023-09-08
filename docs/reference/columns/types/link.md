@@ -1,6 +1,8 @@
 ---
 label: Link
 order: d
+tags:
+  - columns
 ---
 
 # Link column type

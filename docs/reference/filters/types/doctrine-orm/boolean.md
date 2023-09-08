@@ -1,6 +1,9 @@
 ---
 label: Boolean
 order: c
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Boolean filter type
@@ -15,6 +18,8 @@ The `BooleanFilterType` represents a filter that operates on boolean values.
 | Form Type           | [ChoiceType](https://symfony.com/doc/current/reference/forms/types/choice.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

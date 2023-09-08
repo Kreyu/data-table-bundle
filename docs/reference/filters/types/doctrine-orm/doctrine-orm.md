@@ -1,6 +1,9 @@
 ---
-label: DoctrineORM
+label: DoctrineOrm
 order: z
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Doctrine ORM filter type
@@ -13,8 +16,6 @@ The `DoctrineOrmFilterType` represents a base filter used as a parent for every 
 | Class               | [:icon-mark-github: DoctrineOrmFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/Type/DoctrineOrmFilterType.php)
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
-+---------------------+--------------------------------------------------------------+
-| Supported operators | none
 +---------------------+--------------------------------------------------------------+
 
 ## Options

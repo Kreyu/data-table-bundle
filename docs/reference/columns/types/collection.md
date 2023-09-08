@@ -1,6 +1,8 @@
 ---
 label: Collection
 order: g
+tags:
+  - columns
 ---
 
 # Collection column type

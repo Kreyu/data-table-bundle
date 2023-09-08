@@ -1,6 +1,8 @@
 ---
 label: DatePeriod
 order: f
+tags:
+  - columns
 ---
 
 # DatePeriod column type

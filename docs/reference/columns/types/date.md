@@ -1,6 +1,8 @@
 ---
 label: Date
 order: e
+tags:
+  - columns
 ---
 
 # Date column type

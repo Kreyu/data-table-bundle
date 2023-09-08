@@ -1,6 +1,9 @@
 ---
 label: Entity
 order: f
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Entity filter type
@@ -17,6 +20,8 @@ Displayed as a selector, allows the user to select a specific entity loaded from
 | Form Type           | [EntityType](https://symfony.com/doc/current/reference/forms/types/entity.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals, Contains, NotContains
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

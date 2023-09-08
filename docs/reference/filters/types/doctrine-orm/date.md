@@ -1,6 +1,9 @@
 ---
 label: Date
 order: d
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Date filter type
@@ -15,6 +18,8 @@ The `DateFilterType` represents a filter that operates on date values.
 | Form Type           | [DateType](https://symfony.com/doc/current/reference/forms/types/date.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

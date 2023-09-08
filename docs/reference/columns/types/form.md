@@ -1,6 +1,8 @@
 ---
 label: Form
 order: h
+tags:
+  - columns
 ---
 
 # Form column type

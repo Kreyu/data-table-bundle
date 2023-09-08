@@ -2,7 +2,7 @@
 label: CSV
 order: a
 tags:
-  - exporter
+  - exporters
   - openspout
 ---
 

@@ -1,6 +1,8 @@
 ---
 label: Button
 order: b
+tags:
+  - actions
 ---
 
 # Button action type

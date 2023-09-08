@@ -1,6 +1,8 @@
 ---
 label: Template
 order: i
+tags:
+  - columns
 ---
 
 # Template column type

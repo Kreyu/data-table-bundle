@@ -1,6 +1,9 @@
 ---
 label: Callback
 order: g
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Callback filter type
@@ -17,6 +20,8 @@ Displayed as a selector, allows the user to select a specific entity loaded from
 | Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Supports all operators
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

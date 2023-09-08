@@ -2,7 +2,7 @@
 label: XLSX
 order: b
 tags:
-  - exporter
+  - exporters
   - openspout
 ---
 

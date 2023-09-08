@@ -1,5 +1,7 @@
 ---
 label: Search
+tags:
+  - filters
 ---
 
 # Search filter type

@@ -1,6 +1,9 @@
 ---
 label: Numeric
 order: b
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Numeric filter type
@@ -15,6 +18,8 @@ The `NumericFilterType` represents a filter that operates on numeric values.
 | Form Type           | [TextType](https://symfony.com/doc/current/reference/forms/types/text.html)
 +---------------------+--------------------------------------------------------------+
 | Supported operators | Equals, NotEquals, GreaterThan, GreaterThanEquals, LessThan, LessThanEquals
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options

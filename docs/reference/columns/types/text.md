@@ -1,6 +1,8 @@
 ---
 label: Text
 order: a
+tags:
+  - columns
 ---
 
 # Text column type

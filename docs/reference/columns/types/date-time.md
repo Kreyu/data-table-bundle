@@ -1,6 +1,8 @@
 ---
 label: DateTime
 order: e
+tags:
+  - columns
 ---
 
 # DateTime column type

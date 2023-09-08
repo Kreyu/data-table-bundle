@@ -1,6 +1,8 @@
 ---
 label: Actions
 order: j
+tags:
+  - columns
 ---
 
 # Actions column type

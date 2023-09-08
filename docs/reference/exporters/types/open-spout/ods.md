@@ -2,7 +2,7 @@
 label: ODS
 order: c
 tags:
-  - exporter
+  - exporters
   - openspout
 ---
 

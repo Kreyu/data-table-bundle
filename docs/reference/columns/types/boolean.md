@@ -1,6 +1,8 @@
 ---
 label: Boolean
 order: d
+tags:
+  - columns
 ---
 
 # Boolean column type

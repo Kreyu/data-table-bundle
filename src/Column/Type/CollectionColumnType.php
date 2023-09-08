@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAwareInterface
@@ -16,10 +17,50 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
 
     public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        $view->vars['value'] = implode($options['separator'] ?? '', [...$view->vars['value']]);
+        $view->value = implode($options['export']['separator'], array_map(
+            static fn (ColumnValueView $view) => $view->value,
+            $this->createChildrenColumnValueViews($view, $column, $options['export']),
+        ));
     }
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        $view->vars = array_replace($view->vars, [
+            'separator' => $options['separator'],
+            'children' => $this->createChildrenColumnValueViews($view, $column, $options),
+        ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setDefaults([
+                'entry_type' => TextColumnType::class,
+                'entry_options' => [],
+                'separator' => ', ',
+            ])
+            ->setAllowedTypes('entry_type', ['string'])
+            ->setAllowedTypes('entry_options', ['array'])
+            ->setAllowedTypes('separator', ['null', 'string'])
+            ->addNormalizer('export', function (Options $options, bool|array $value): bool|array {
+                if (true === $value) {
+                    $value = [];
+                }
+
+                if (is_array($value)) {
+                    $value += [
+                        'separator' => $options['separator'],
+                        'entry_type' => $options['entry_type'],
+                        'entry_options' => $options['entry_options'],
+                    ];
+                }
+
+                return $value;
+            })
+        ;
+    }
+
+    private function createChildrenColumnValueViews(ColumnValueView $view, ColumnInterface $column, array $options): array
     {
         $children = [];
 
@@ -41,26 +82,6 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
             $children[] = $child->createValueView($valueRowView);
         }
 
-        $view->vars = array_replace($view->vars, [
-            'separator' => $options['separator'],
-            'children' => $children,
-        ]);
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver
-            ->setDefaults([
-                'entry_type' => TextColumnType::class,
-                'entry_options' => [],
-                'separator' => ', ',
-            ])
-            ->setAllowedTypes('entry_type', ['string'])
-            ->setAllowedTypes('entry_options', ['array'])
-            ->setAllowedTypes('separator', ['null', 'string'])
-            ->setInfo('entry_type', 'A fully-qualified class name of the column type to render each entry.')
-            ->setInfo('entry_options', 'An array of options passed to the column type.')
-            ->setInfo('separator', 'A string used to visually separate each entry.')
-        ;
+        return $children;
     }
 }

@@ -52,14 +52,6 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
         return new ExportFile($path, sprintf('%s.%s', $filename, $this->getExtension()));
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver
-            ->setDefault('writer_options', new ($this->getOptionsClass())())
-            ->setAllowedTypes('writer_options', ['callable', $this->getOptionsClass()])
-        ;
-    }
-
     public function getParent(): ?string
     {
         return OpenSpoutExporterType::class;
@@ -70,20 +62,11 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
         return new ($this->getWriterClass())($this->getWriterOptions($options));
     }
 
-    protected function getWriterOptions(array $options): mixed
-    {
-        if (is_callable($writerOptions = $options['writer_options'])) {
-            $writerOptions = $writerOptions($this, $options);
-        }
-
-        return $writerOptions;
-    }
-
     abstract protected function getExtension(): string;
 
-    abstract protected function getOptionsClass(): string;
-
     abstract protected function getWriterClass(): string;
+
+    abstract protected function getWriterOptions(array $options): mixed;
 
     private function getHeaderRowCells(HeaderRowView $view, array $options): array
     {

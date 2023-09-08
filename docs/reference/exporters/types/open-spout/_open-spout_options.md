@@ -3,7 +3,7 @@
 - **type**: `null`, `callable` or `OpenSpout\Common\Entity\Style\Style`
 - **default**: `null`
 
-Style object used to style the header row.
+Represents a style object to apply to the header row.
 A callable can be used to dynamically apply styles based on the row:
 
 ```php
@@ -25,7 +25,7 @@ $builder
 - **type**: `null`, `callable` or `OpenSpout\Common\Entity\Style\Style`
 - **default**: `null`
 
-Style object used to style the value row.
+Represents a style object to apply to the value rows.
 A callable can be used to dynamically apply styles based on the row:
 
 ```php
@@ -54,7 +54,7 @@ $builder
 - **type**: `null`, `callable` or `OpenSpout\Common\Entity\Style\Style`
 - **default**: `null`
 
-Style object used to style the header cells.
+Represents a style object to apply to the header cells.
 A callable can be used to dynamically apply styles based on the column:
 
 ```php
@@ -76,7 +76,7 @@ $builder
 - **type**: `null`, `callable` or `OpenSpout\Common\Entity\Style\Style`
 - **default**: `null`
 
-Style object used to style the value cells.
+Represents a style object to apply to the value cells.
 A callable can be used to dynamically apply styles based on the column:
 
 ```php

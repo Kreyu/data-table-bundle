@@ -18,12 +18,33 @@ The `CsvExporterType` represents an exporter that uses an [OpenSpout](https://gi
 
 ## Options
 
-### `writer_options`
+### `field_delimiter`
 
-**type**: `callable` or `OpenSpout\Writer\CSV\Options`
+- **type**: `string` 
+- **default**: `','`
 
-Represents the writer options object used in the writer.
-For more information and possible configuration, see [official documentation](https://github.com/openspout/openspout/blob/4.x/docs/documentation.md).
+Represents a string that separates the values.
+
+### `field_enclosure`
+
+- **type**: `string` 
+- **default**: `'"'`
+
+Represents a string that wraps the values.
+
+### `should_add_bom`
+
+- **type**: `bool` 
+- **default**: `true`
+
+Determines whether a BOM character should be added at the beginning of the file. 
+
+### `flush_threshold`
+
+- **type**: `int` 
+- **default**: `500`
+
+Represents a number of rows after which the output should be flushed to a file.
 
 ## Inherited options
 

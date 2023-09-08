@@ -22,9 +22,9 @@ class XlsxExporterType extends AbstractOpenSpoutExporterType
             ])
             ->setAllowedTypes('default_row_style', Style::class)
             ->setAllowedTypes('should_create_new_sheets_automatically', 'bool')
+            ->setAllowedTypes('should_use_inline_strings', 'bool')
             ->setAllowedTypes('default_column_width', ['null', 'float'])
             ->setAllowedTypes('default_row_height', ['null', 'float'])
-            ->setAllowedTypes('should_use_inline_strings', 'bool')
         ;
     }
 

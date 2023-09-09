@@ -172,7 +172,8 @@ The type extensions allow to easily extend existing types. Those classes contain
 | Data tables | [:icon-mark-github:&nbsp; DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/DataTableTypeExtensionInterface.php)        | [:icon-mark-github:&nbsp; AbstractDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableExtensionType.php)        |
 | Columns     | [:icon-mark-github:&nbsp; ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/ColumnTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractColumnTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnExtensionType.php)       |
 | Filters     | [:icon-mark-github:&nbsp; FilterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Extension/FilterTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Extension/ActionTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
+| Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Extension/ActionTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractActionTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionExtensionType.php)       |
+| Exporters   | [:icon-mark-github:&nbsp; ExporterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Extension/ExporterTypeExtensionInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterExtensionType.php) |
 
 ### Setting the types to extend
 
@@ -228,6 +229,7 @@ Every type extension in the bundle is registered as a [tagged service](https://s
 | Columns     | `kreyu_data_table.column.type_extension`   |
 | Filters     | `kreyu_data_table.filter.type_extension`   |
 | Actions     | `kreyu_data_table.action.type_extension`   |
+| Exporters   | `kreyu_data_table.exporter.type_extension` |
 
 Tagged services [can be prioritized using the `priority` attribute](https://symfony.com/doc/current/service\_container/tags.html#tagged-services-with-priority) to define the order the extensions will be loaded:
 
@@ -242,7 +244,7 @@ services:
             - { name: kreyu_data_table.type_extension, priority: 2 }
 ```
 
-In the example above, the `ExtensionB` will be applied before the `Extension A`, because it has higher priority.
+In the example above, the `ExtensionB` will be applied before the `ExtensionA`, because it has higher priority.
 Without the priority specified, the extensions would be applied in the order they are registered.
 
 ## Resolving the types

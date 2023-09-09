@@ -189,3 +189,33 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
+
+## Events
+
+The following events are dispatched when [:icon-mark-github: DataTableInterface::paginate()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_PAGINATE](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the pagination data is applied to the query.
+    Can be used to modify the pagination data, e.g. to force specific page or a per-page limit.
+
+[:icon-mark-github: DataTableEvents::POST_PAGINATE](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched after the pagination data is applied to the query and saved if the pagination persistence is enabled;
+    Can be used to execute additional logic after the pagination is applied.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTablePaginationEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTablePaginationEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
+
+class DataTablePaginationListener
+{
+    public function __invoke(DataTablePaginationEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $paginationData = $event->getPaginationData();
+        
+        // for example, modify the pagination data, then save it in the event
+        $event->setPaginationData($paginationData); 
+    }
+}
+```

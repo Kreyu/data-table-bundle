@@ -311,4 +311,31 @@ class ProductDataTableType extends AbstractDataTableType
         ;
     }
 }
+
+```
+
+## Events
+
+Following events are dispatched when [:icon-mark-github: DataTableInterface::export()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_EXPORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the exporter is called.
+    Can be used to modify the exporting data, e.g. to force an export strategy or change the filename.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTableExportEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableExportEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTableExportEvent;
+
+class DataTableExportListener
+{
+    public function __invoke(DataTableExportEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $exportData = $event->getExportData();
+        
+        // for example, modify the export data, then save it in the event
+        $event->setExportData($exportData); 
+    }
+}
 ```

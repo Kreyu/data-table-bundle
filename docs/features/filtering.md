@@ -397,3 +397,17 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
+
+## Events
+
+The following events are dispatched when [:icon-mark-github: DataTableInterface::filter()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_FILTER](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the filtration data is applied to the query.
+    Can be used to modify the filtration data, e.g. to force filtration on some columns.
+
+[:icon-mark-github: DataTableEvents::POST_FILTER](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched after the filtration data is applied to the query and saved if the filtration persistence is enabled;
+    Can be used to execute additional logic after the filters are applied.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTableFiltrationEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableFiltrationEvent.php)

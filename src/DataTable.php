@@ -458,12 +458,11 @@ class DataTable implements DataTableInterface
 
         $this->originalQuery = $this->query;
 
-        $this->paginationData = $data;
-
         if ($persistence && $this->config->isPaginationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Pagination, $data);
         }
 
+        $this->setPaginationData($data);
         $this->resetPagination();
 
         $this->dispatch(DataTableEvents::POST_PAGINATE, new DataTablePaginationEvent($this, $data));

@@ -240,3 +240,33 @@ class ProductDataTableType extends AbstractDataTableType
 !!! The initial sorting can be performed on multiple columns!
 Although, with built-in themes, the user can perform sorting only by a single column.  
 !!!
+
+## Events
+
+The following events are dispatched when [:icon-mark-github: DataTableInterface::sort()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_SORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the sorting data is applied to the query.
+    Can be used to modify the sorting data, e.g. to force sorting by additional column.
+
+[:icon-mark-github: DataTableEvents::POST_SORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched after the sorting data is applied to the query and saved if the sorting persistence is enabled;
+    Can be used to execute additional logic after the sorting is applied.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTableSortingEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableSortingEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
+
+class DataTableExportListener
+{
+    public function __invoke(DataTableSortingEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $sortingData = $event->getSortingData();
+        
+        // for example, modify the sorting data, then save it in the event
+        $event->setSortingData($sortingData); 
+    }
+}
+```

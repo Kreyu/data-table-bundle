@@ -11,16 +11,8 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @template ProxyQuery of ProxyQueryInterface
- */
 interface FilterTypeInterface
 {
-    /**
-     * @param ProxyQuery $query
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void;
 
     public function buildFilter(FilterBuilderInterface $builder, array $options): void;

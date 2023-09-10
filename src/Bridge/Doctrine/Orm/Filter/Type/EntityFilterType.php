@@ -42,13 +42,21 @@ class EntityFilterType extends AbstractDoctrineOrmFilterType
                     return $value;
                 }
 
-                $identifiers = $this->doctrineRegistry
-                    ->getManagerForClass($value['class'])
-                    ?->getClassMetadata($value['class'])
-                    ->getIdentifier() ?? [];
+                // The identifier field name of the entity has to be provided in the 'choice_value' form option.
+                //
+                // This is required by the persistence system, because only the entity identifier will be persisted,
+                // and the EntityType form type needs to know how to convert it back to the entity object.
+                //
+                // If it's not provided, try to retrieve it from the entity metadata.
+                if (null === $value['choice_value'] ?? null) {
+                    $identifiers = $this->doctrineRegistry
+                        ->getManagerForClass($value['class'])
+                        ?->getClassMetadata($value['class'])
+                        ->getIdentifier() ?? [];
 
-                if (1 === count($identifiers)) {
-                    $value += ['choice_value' => reset($identifiers)];
+                    if (1 === count($identifiers)) {
+                        $value += ['choice_value' => reset($identifiers)];
+                    }
                 }
 
                 return $value;

@@ -11,7 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class DoctrineOrmProxyQueryFactory implements ProxyQueryFactoryInterface
 {
-    public function create(mixed $data): ProxyQueryInterface
+    public function create(mixed $data): DoctrineOrmProxyQueryInterface
     {
         if ($data instanceof QueryBuilder) {
             return new DoctrineOrmProxyQuery($data);

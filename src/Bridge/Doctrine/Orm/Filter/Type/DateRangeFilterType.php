@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType;
@@ -16,11 +17,12 @@ use function Symfony\Component\Translation\t;
 
 class DateRangeFilterType extends AbstractDoctrineOrmFilterType
 {
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
+        if (!$query instanceof DoctrineOrmProxyQueryInterface) {
+            throw new UnexpectedTypeException($query, DoctrineOrmProxyQueryInterface::class);
+        }
+
         $value = $data->getValue();
 
         $parameterName = $this->getUniqueParameterName($query, $filter);

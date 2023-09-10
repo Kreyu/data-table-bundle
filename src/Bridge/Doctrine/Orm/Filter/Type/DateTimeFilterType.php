@@ -31,6 +31,10 @@ class DateTimeFilterType extends AbstractDoctrineOrmFilterType
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
             ])
             ->addNormalizer('form_options', function (Options $options, array $value): array {
+                if (DateTimeType::class !== $options['form_type']) {
+                    return $value;
+                }
+
                 return $value + ['widget' => 'single_text'];
             })
             ->addNormalizer('empty_data', function (Options $options, string|array $value): string|array {

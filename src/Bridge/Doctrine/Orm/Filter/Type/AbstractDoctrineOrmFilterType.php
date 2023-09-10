@@ -5,20 +5,25 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
 use Doctrine\ORM\Query\Expr;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
+/**
+ * @extends FilterTypeInterface<DoctrineOrmProxyQueryInterface>
+ */
 abstract class AbstractDoctrineOrmFilterType extends AbstractFilterType
 {
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
-        if (!$query instanceof DoctrineOrmProxyQuery) {
-            throw new InvalidArgumentException(sprintf('Query must be an instance of "%s"', DoctrineOrmProxyQuery::class));
+        if (!$query instanceof DoctrineOrmProxyQueryInterface) {
+            throw new UnexpectedTypeException($query, DoctrineOrmProxyQueryInterface::class);
         }
 
         $operator = $this->getFilterOperator($data, $filter);
@@ -61,10 +66,7 @@ abstract class AbstractDoctrineOrmFilterType extends AbstractFilterType
         throw new InvalidArgumentException('Operator not supported');
     }
 
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    public function getUniqueParameterName(ProxyQueryInterface $query, FilterInterface $filter): string
+    public function getUniqueParameterName(DoctrineOrmProxyQueryInterface $query, FilterInterface $filter): string
     {
         return $filter->getFormName().'_'.$query->getUniqueParameterId();
     }
@@ -74,10 +76,7 @@ abstract class AbstractDoctrineOrmFilterType extends AbstractFilterType
         return $value;
     }
 
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    protected function getFilterQueryPath(ProxyQueryInterface $query, FilterInterface $filter): string
+    protected function getFilterQueryPath(DoctrineOrmProxyQueryInterface $query, FilterInterface $filter): string
     {
         $rootAlias = current($query->getRootAliases());
 

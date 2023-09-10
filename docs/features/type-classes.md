@@ -21,15 +21,19 @@ Following parts of the bundle are defined using the type classes:
 The type classes work as a blueprint that defines a configuration how its feature should work. They implement their own, feature-specific interface. 
 However, it is better to extend from the abstract classes, which already implement the interface and provide some utilities.
 
-| Component   | Interface                                                                                                                                          | Abstract class                                                                                                                                   |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableTypeInterface.php)        | [:icon-mark-github:&nbsp; AbstractDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableType.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ColumnTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnType.php)       |
-| Filters     | [:icon-mark-github:&nbsp; FilterTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/FilterTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionTypeInterface.php)       | [:icon-mark-github:&nbsp; AbstractActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ExporterTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterTypeInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterType.php) |
+{.compact}
+
+| Component   | Interface                                                                                                                                    | Abstract class                                                                                                                             |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github: DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableTypeInterface.php)        | [:icon-mark-github: AbstractDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableType.php)        |
+| Columns     | [:icon-mark-github: ColumnTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnTypeInterface.php)       | [:icon-mark-github: AbstractColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnType.php)       |
+| Filters     | [:icon-mark-github: FilterTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/FilterTypeInterface.php)       | [:icon-mark-github: AbstractFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterType.php)       |
+| Actions     | [:icon-mark-github: ActionTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionTypeInterface.php)       | [:icon-mark-github: AbstractActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php)       |
+| Exporters   | [:icon-mark-github: ExporterTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterTypeInterface.php) | [:icon-mark-github: AbstractExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterType.php) |
 
 The recommended namespaces to put the types are as follows:
+
+{.compact}
 
 | Component   | Namespace                     |
 |-------------|-------------------------------|
@@ -40,6 +44,8 @@ The recommended namespaces to put the types are as follows:
 | Exporters   | `App\DataTable\Exporter\Type` |
 
 Every type in the bundle is registered as a [tagged service](https://symfony.com/doc/current/service_container/tags.html):
+
+{.compact}
 
 | Component   | Type tag                         |
 |-------------|----------------------------------|
@@ -167,13 +173,15 @@ class UserController extends AbstractController
 
 The type extensions allow to easily extend existing types. Those classes contain methods similar as their corresponding feature type classes. They implement their own, feature-specific interface. For easier usage, there's also an abstract classes, which already implements the interface and provides some utilities.
 
-| Component   | Interface                                                                                                                                                                 | Abstract class                                                                                                                                                     |
-|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/DataTableTypeExtensionInterface.php)        | [:icon-mark-github:&nbsp; AbstractDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableExtensionType.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/ColumnTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractColumnTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnExtensionType.php)       |
-| Filters     | [:icon-mark-github:&nbsp; FilterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Extension/FilterTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Extension/ActionTypeExtensionInterface.php)       | [:icon-mark-github:&nbsp; AbstractActionTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionExtensionType.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ExporterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Extension/ExporterTypeExtensionInterface.php) | [:icon-mark-github:&nbsp; AbstractExporterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterExtensionType.php) |
+{.compact}
+
+| Component   | Interface                                                                                                                                                           | Abstract class                                                                                                                                               |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github: DataTableTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Extension/DataTableTypeExtensionInterface.php)        | [:icon-mark-github: AbstractDataTableTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableExtensionType.php)        |
+| Columns     | [:icon-mark-github: ColumnTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Extension/ColumnTypeExtensionInterface.php)       | [:icon-mark-github: AbstractColumnTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/AbstractColumnExtensionType.php)       |
+| Filters     | [:icon-mark-github: FilterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Extension/FilterTypeExtensionInterface.php)       | [:icon-mark-github: AbstractFilterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterExtensionType.php)       |
+| Actions     | [:icon-mark-github: ActionTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Extension/ActionTypeExtensionInterface.php)       | [:icon-mark-github: AbstractActionTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionExtensionType.php)       |
+| Exporters   | [:icon-mark-github: ExporterTypeExtensionInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Extension/ExporterTypeExtensionInterface.php) | [:icon-mark-github: AbstractExporterTypeExtension](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/AbstractExporterExtensionType.php) |
 
 ### Setting the types to extend
 
@@ -211,17 +219,21 @@ class ColumnTypeExtension extends AbstractColumnTypeExtension
 
 For reference, a list of each feature base type class:
 
-| Component   | Base type class                                                                                                                  |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; DataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableType.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php)       |
-| Filters     | [:icon-mark-github:&nbsp; FilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/FilterType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionType.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterType.php) |
+{.compact}
+
+| Component   | Base type class                                                                                                            |
+|-------------|----------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github: DataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableType.php)        |
+| Columns     | [:icon-mark-github: ColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ColumnType.php)       |
+| Filters     | [:icon-mark-github: FilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/FilterType.php)       |
+| Actions     | [:icon-mark-github: ActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionType.php)       |
+| Exporters   | [:icon-mark-github: ExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ExporterType.php) |
 
 ### Setting the extension order
 
 Every type extension in the bundle is registered as a [tagged service](https://symfony.com/doc/current/service_container/tags.html):
+
+{.compact}
 
 | Component   | Service tag                                |
 |-------------|--------------------------------------------|
@@ -255,13 +267,15 @@ has direct access to an instance of the parent type (also resolved), as well as 
 
 Each component that supports the type classes, contain its "resolved" counterpart:
 
-| Component   | Resolved type class                                                                                                                              |
-|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; ResolvedDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/ResolvedDataTableType.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ResolvedColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ResolvedColumnType.php)       |
-| Filters     | [:icon-mark-github:&nbsp; ResolvedFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/ResolvedFilterType.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ResolvedActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ResolvedActionType.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ResolvedExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ResolvedExporterType.php) |
+{.compact}
+
+| Component   | Resolved type class                                                                                                                        |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github: ResolvedDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/ResolvedDataTableType.php)        |
+| Columns     | [:icon-mark-github: ResolvedColumnType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/ResolvedColumnType.php)       |
+| Filters     | [:icon-mark-github: ResolvedFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/ResolvedFilterType.php)       |
+| Actions     | [:icon-mark-github: ResolvedActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ResolvedActionType.php)       |
+| Exporters   | [:icon-mark-github: ResolvedExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/Type/ResolvedExporterType.php) |
 
 Resolved type classes contain similar methods as a non-resolved types. 
 To understand how resolving process works, take a look at implementation of the resolved data table type's `buildDataTable()` method:
@@ -315,14 +329,16 @@ while only requiring a fully qualified class name of the desired type.
 
 Each component that supports the type classes contains its own registry:
 
-| Component   | Resolved type class                                                                                                                 |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| Data tables | [:icon-mark-github:&nbsp; DataTableRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableRegistry.php)        |
-| Columns     | [:icon-mark-github:&nbsp; ColumnRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/ColumnRegistry.php)       |
-| Filters     | [:icon-mark-github:&nbsp; FilterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/FilterRegistry.php)       |
-| Actions     | [:icon-mark-github:&nbsp; ActionRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/ActionRegistry.php)       |
-| Exporters   | [:icon-mark-github:&nbsp; ExporterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php) |
+{.compact}
+
+| Component   | Resolved type class                                                                                                           |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------|
+| Data tables | [:icon-mark-github: DataTableRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableRegistry.php)        |
+| Columns     | [:icon-mark-github: ColumnRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/ColumnRegistry.php)       |
+| Filters     | [:icon-mark-github: FilterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/FilterRegistry.php)       |
+| Actions     | [:icon-mark-github: ActionRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/ActionRegistry.php)       |
+| Exporters   | [:icon-mark-github: ExporterRegistry](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php) |
 
 In reality, the purpose of the registry is to:
 - hold instances of the registered types and extensions; 
-- create [resolved types](#resolving-the-types) using the [&nbsp;:icon-mark-github:&nbsp; ResolvedTypeFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php);
+- create [resolved types](#resolving-the-types) using the [&nbsp;:icon-mark-github: ResolvedTypeFactoryInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Exporter/ExporterRegistry.php);

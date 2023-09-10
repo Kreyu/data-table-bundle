@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class SortingData
 {
@@ -48,6 +49,15 @@ class SortingData
      */
     public function removeRedundantColumns(array $columns): void
     {
+        foreach ($columns as $column) {
+            if (!$column instanceof ColumnInterface) {
+                throw new UnexpectedTypeException($column, ColumnInterface::class);
+            }
+
+            // Ensure that all columns are indexed by their name
+            $columns[$column->getName()] = $column;
+        }
+
         foreach (array_diff_key($this->columns, $columns) as $sortingColumn) {
             $this->removeColumn($sortingColumn);
         }
@@ -58,6 +68,22 @@ class SortingData
             if (!$column->getConfig()->isSortable()) {
                 $this->removeColumn($sortingColumn);
             }
+        }
+    }
+
+    /**
+     * @param array<ColumnInterface> $columns
+     */
+    public function ensureValidPropertyPaths(array $columns): void
+    {
+        foreach ($this->columns as $sortingColumn) {
+            $column = $columns[$sortingColumn->getName()];
+
+            if (!$column instanceof ColumnInterface) {
+                throw new UnexpectedTypeException($column, ColumnInterface::class);
+            }
+
+            $sortingColumn->setPropertyPath($column->getSortPropertyPath());
         }
     }
 

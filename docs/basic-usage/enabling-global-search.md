@@ -4,7 +4,6 @@ order: f
 
 # Enabling global search
 
-
 ![Search filter input with the Tabler theme](./../static/global_search.png)--
 
 While the filters may be useful in many cases, they are tied to a specific fields.

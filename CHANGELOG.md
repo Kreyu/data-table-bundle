@@ -1,14 +1,16 @@
 # 0.14
 
-- **[Feature]** Data table events (see more)
-- **[Feature]** Column `priority` option to allow setting order of columns (see more)
-- **[Feature]** Column `visible` option to allow setting visibility of columns (see more)
-- **[Feature]** Column `personalizable` option to allow excluding the column from personalization (see more)
-- **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type` (see more)
-- **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query (see more)
-- **[Feature]** Data table builder's `setSearchHandler` method for easier search definition (see more)
+- **[Feature]** Data table events
+- **[Feature]** Column `priority` option to allow setting order of columns
+- **[Feature]** Column `visible` option to allow setting visibility of columns
+- **[Feature]** Column `personalizable` option to allow excluding the column from personalization
+- **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type`
+- **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query
+- **[Feature]** Data table builder's `setSearchHandler` method for easier search definition
 - **[Feature]** Collection column type default separator changed `', '` (with space after comma) instead of `','`
 - **[Feature]** Ability to create `ExportData` with exporter name string
+- **[Feature]** Ability to provide property path in the `SortingColumnData`. The data table ensures valid property path is given (backwards compatible)
+- **[Feature]** The Doctrine ORM `EntityFilterType` no longer requires `form_options.choice_value` option as the identifier field name will be retrieved from Doctrine class metadata by default
 - **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more)
 - **[Feature] [Breaking change]** Optimized exporting process - introduces breaking changes (see more)
 - **[Bugfix]** CollectionColumnType now renders without spaces around separator

@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
 use function Symfony\Component\Translation\t;
 
 class BooleanFilterType extends AbstractDoctrineOrmFilterType
@@ -21,7 +22,9 @@ class BooleanFilterType extends AbstractDoctrineOrmFilterType
         $resolver
             ->setDefaults([
                 'form_type' => ChoiceType::class,
-                'active_filter_formatter' => fn (FilterData $data) => t($data->getValue() ? 'Yes' : 'No', domain: 'KreyuDataTable'),
+                'active_filter_formatter' => function (FilterData $data): TranslatableInterface {
+                    return t($data->getValue() ? 'Yes' : 'No', domain: 'KreyuDataTable');
+                },
             ])
             ->addNormalizer('form_options', function (Options $options, mixed $value) {
                 if (ChoiceType::class !== $options['form_type']) {
@@ -30,7 +33,7 @@ class BooleanFilterType extends AbstractDoctrineOrmFilterType
 
                 return $value + [
                     'choices' => ['yes' => true, 'no' => false],
-                    'choice_label' => function (bool $choice, string $key) {
+                    'choice_label' => function (bool $choice, string $key): TranslatableInterface {
                         return t(ucfirst($key), domain: 'KreyuDataTable');
                     },
                 ];

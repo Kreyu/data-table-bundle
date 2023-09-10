@@ -481,23 +481,9 @@ class DataTable implements DataTableInterface
         $columns = $this->getColumns();
 
         $data->removeRedundantColumns($columns);
+        $data->ensureValidPropertyPaths($columns);
 
-        $sortingDataFiltered = new SortingData();
-
-        foreach ($data->getColumns() as $sortingColumnData) {
-            try {
-                $column = $this->getColumn($sortingColumnData->getName());
-            } catch (\Throwable) {
-                continue;
-            }
-
-            $sortingDataFiltered->addColumn($column->getName(), SortingColumnData::fromArray([
-                'name' => (string) $column->getSortPropertyPath(),
-                'direction' => $sortingColumnData->getDirection(),
-            ]));
-        }
-
-        $this->query->sort($sortingDataFiltered);
+        $this->query->sort($data);
 
         $this->originalQuery = $this->query;
 
@@ -782,10 +768,6 @@ class DataTable implements DataTableInterface
 
     public function createExportView(): DataTableView
     {
-        if (empty($this->getColumns())) {
-            throw new RuntimeException('The data table has no configured columns.');
-        }
-
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 

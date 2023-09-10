@@ -18,7 +18,7 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 /**
  * @mixin QueryBuilder
  */
-class DoctrineOrmProxyQuery implements ProxyQueryInterface
+class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
     private int $batchSize = 5000;
@@ -65,13 +65,13 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $this->queryBuilder->resetDQLPart('orderBy');
 
         foreach ($sortingData->getColumns() as $column) {
-            $field = $column->getName();
+            $propertyPath = (string) $column->getPropertyPath();
 
-            if ($rootAlias && !str_contains($field, '.') && !str_starts_with($field, '__')) {
-                $field = $rootAlias.'.'.$field;
+            if ($rootAlias && !str_contains($propertyPath, '.') && !str_starts_with($propertyPath, '__')) {
+                $propertyPath = $rootAlias.'.'.$propertyPath;
             }
 
-            $this->queryBuilder->addOrderBy($field, $column->getDirection());
+            $this->queryBuilder->addOrderBy($propertyPath, $column->getDirection());
         }
     }
 
@@ -145,9 +145,6 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $this->hints[$name] = $value;
     }
 
-    /**
-     * @psalm-param string|AbstractQuery::HYDRATE_* $hydrationMode
-     */
     public function setHydrationMode(int|string $hydrationMode): void
     {
         $this->hydrationMode = $hydrationMode;

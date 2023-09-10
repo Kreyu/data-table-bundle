@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryAwareTrait;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAwareInterface
+class CollectionColumnType extends AbstractColumnType
 {
-    use ColumnFactoryAwareTrait;
-
-    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
-        $view->value = implode($options['export']['separator'], array_map(
-            static fn (ColumnValueView $view) => $view->value,
-            $this->createChildrenColumnValueViews($view, $column, $options['export']),
-        ));
+        $builder->setAttribute('prototype_factory', $builder->getColumnFactory());
     }
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -31,6 +25,24 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
         ]);
     }
 
+    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        if (!is_array($options['export'])) {
+            $options['export'] = [];
+        }
+
+        $options['export'] += [
+            'entry_type' => $options['entry_type'],
+            'entry_options' => $options['entry_options'],
+            'separator' => $options['separator'],
+        ];
+
+        $view->value = implode($options['export']['separator'], array_map(
+            static fn (ColumnValueView $view) => $view->value,
+            $this->createChildrenColumnValueViews($view, $column, $options['export']),
+        ));
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
@@ -39,47 +51,29 @@ class CollectionColumnType extends AbstractColumnType implements ColumnFactoryAw
                 'entry_options' => [],
                 'separator' => ', ',
             ])
-            ->setAllowedTypes('entry_type', ['string'])
-            ->setAllowedTypes('entry_options', ['array'])
+            ->setAllowedTypes('entry_type', 'string')
+            ->setAllowedTypes('entry_options', 'array')
             ->setAllowedTypes('separator', ['null', 'string'])
-            ->addNormalizer('export', function (Options $options, bool|array $value): bool|array {
-                if (true === $value) {
-                    $value = [];
-                }
-
-                if (is_array($value)) {
-                    $value += [
-                        'separator' => $options['separator'],
-                        'entry_type' => $options['entry_type'],
-                        'entry_options' => $options['entry_options'],
-                    ];
-                }
-
-                return $value;
-            })
         ;
     }
 
     private function createChildrenColumnValueViews(ColumnValueView $view, ColumnInterface $column, array $options): array
     {
+        /** @var ColumnFactoryInterface $prototypeFactory */
+        $prototypeFactory = $column->getConfig()->getAttribute('prototype_factory');
+
+        $prototype = $prototypeFactory->createNamed('__name__', $options['entry_type'], $options['entry_options']);
+
         $children = [];
 
         foreach ($view->value ?? [] as $index => $data) {
-            $child = $this->columnFactory->createNamed(
-                name: $column->getName().'__'.($index + 1),
-                type: $options['entry_type'],
-                options: $options['entry_options'] + [
-                    'property_path' => false,
-                ],
-            );
-
             // Create a virtual row view for the child column.
             $valueRowView = clone $view->parent;
             $valueRowView->origin = $view->parent;
             $valueRowView->index = $index;
             $valueRowView->data = $data;
 
-            $children[] = $child->createValueView($valueRowView);
+            $children[] = $prototype->createValueView($valueRowView);
         }
 
         return $children;

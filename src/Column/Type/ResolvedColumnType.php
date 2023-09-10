@@ -61,7 +61,10 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the column "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return new ColumnBuilder($name, $this, $options);
+        $builder = new ColumnBuilder($name, $this, $options);
+        $builder->setColumnFactory($factory);
+
+        return $builder;
     }
 
     public function createHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView

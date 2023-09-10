@@ -40,5 +40,7 @@ interface ColumnConfigBuilderInterface extends ColumnConfigInterface
 
     public function setPersonalizable(bool $personalizable): static;
 
+    public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;
+
     public function getColumnConfig(): ColumnConfigInterface;
 }

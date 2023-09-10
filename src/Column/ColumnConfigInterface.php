@@ -34,4 +34,6 @@ interface ColumnConfigInterface
     public function isExportable(): bool;
 
     public function isPersonalizable(): bool;
+
+    public function getColumnFactory(): ColumnFactoryInterface;
 }

@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Extension\CoreColumnExtension;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\PreloadedColumnExtension;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
@@ -14,9 +15,26 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 class ColumnFactoryBuilder implements ColumnFactoryBuilderInterface
 {
     private ResolvedColumnTypeFactoryInterface $resolvedTypeFactory;
+
+    /**
+     * @var array<ColumnExtensionInterface>
+     */
     private array $extensions = [];
+
+    /**
+     * @var array<ColumnTypeInterface>
+     */
     private array $types = [];
+
+    /**
+     * @var array<string, array<ColumnTypeExtensionInterface>>
+     */
     private array $typeExtensions = [];
+
+    public function __construct(
+        private readonly bool $forceCoreExtension = false,
+    ) {
+    }
 
     public function setResolvedTypeFactory(ResolvedColumnTypeFactoryInterface $resolvedTypeFactory): static
     {
@@ -76,6 +94,21 @@ class ColumnFactoryBuilder implements ColumnFactoryBuilderInterface
     public function getColumnFactory(): ColumnFactoryInterface
     {
         $extensions = $this->extensions;
+
+        if ($this->forceCoreExtension) {
+            $hasCoreExtension = false;
+
+            foreach ($extensions as $extension) {
+                if ($extension instanceof CoreColumnExtension) {
+                    $hasCoreExtension = true;
+                    break;
+                }
+            }
+
+            if (!$hasCoreExtension) {
+                array_unshift($extensions, new CoreColumnExtension());
+            }
+        }
 
         if (\count($this->types) > 0 || \count($this->typeExtensions) > 0) {
             $extensions[] = new PreloadedColumnExtension($this->types, $this->typeExtensions);

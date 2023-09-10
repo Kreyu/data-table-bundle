@@ -19,6 +19,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private bool $sortable = false;
     private bool $exportable = false;
     private bool $personalizable = true;
+    private ColumnFactoryInterface $columnFactory;
 
     public function __construct(
         private /* readonly */ string $name,
@@ -217,6 +218,26 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         }
 
         $this->personalizable = $personalizable;
+
+        return $this;
+    }
+
+    public function getColumnFactory(): ColumnFactoryInterface
+    {
+        if (!isset($this->columnFactory)) {
+            throw new BadMethodCallException('The column factory must be set before retrieving it.');
+        }
+
+        return $this->columnFactory;
+    }
+
+    public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->columnFactory = $columnFactory;
 
         return $this;
     }

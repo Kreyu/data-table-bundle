@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
@@ -12,48 +13,54 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ColumnType implements ColumnTypeInterface
 {
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
+    }
+
+    public function buildColumn(ColumnBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->setPropertyPath($options['property_path'] ?: null)
+            ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
+            ->setPriority($options['priority'])
+            ->setVisible($options['visible'])
+            ->setPersonalizable($options['personalizable'])
+            ->setSortable(false !== $options['sort'])
+            ->setExportable(false !== $options['export'])
+        ;
+    }
+
     public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
-        if (true === $sort = $options['sort']) {
-            $sort = $column->getName();
-        }
+        $dataTable = $column->getDataTable();
+        $sortColumnData = $dataTable->getSortingData()?->getColumn($column);
 
-        $sortColumnData = $view->parent->parent->vars['sorting_data']?->getColumn($column->getName());
+        $headerRowView = $view->parent;
+        $dataTableView = $headerRowView->parent;
 
         $view->vars = array_replace($view->vars, [
             'name' => $column->getName(),
             'column' => $view,
-            'row' => $view->parent,
-            'data_table' => $view->parent->parent,
+            'row' => $headerRowView,
+            'data_table' => $dataTableView,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
+            'translation_domain' => $options['header_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['header_translation_parameters'],
-            'translation_domain' => $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
-            'sort_parameter_name' => $view->parent->parent->vars['sort_parameter_name'],
+            'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'attr' => $options['header_attr'],
             'sorted' => null !== $sortColumnData,
-            'sort_field' => $sort,
+            'sort_field' => $column->getSortPropertyPath(),
             'sort_direction' => $sortColumnData?->getDirection(),
-            'export' => false,
+            'sortable' => $column->getConfig()->isSortable(),
+            'export' => $column->getConfig()->isExportable(),
         ]);
-
-        if (true === $export = $options['export']) {
-            $export = [];
-        }
-
-        if (false !== $export) {
-            $export = array_merge($options, [
-                'label' => $export['label'] ?? $view->vars['label'],
-                'translation_parameters' => $export['translation_parameters'] ?? $view->vars['translation_parameters'] ?? null,
-                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'] ?? null,
-            ], $export);
-        }
-
-        $view->vars['export'] = $export;
     }
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -76,32 +83,84 @@ final class ColumnType implements ColumnTypeInterface
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'data' => $view->data,
             'value' => $view->value,
-            'translation_domain' => $options['value_translation_domain'] ?? $view->parent->vars['translation_domain'] ?? null,
+            'translation_domain' => $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['value_translation_parameters'] ?? [],
             'attr' => $attr,
         ]);
+    }
 
-        if (true === $export = $options['export']) {
-            $export = [];
+    public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
+    {
+        if (false === $options['export']) {
+            return;
         }
 
-        if (false !== $export) {
-            $export = array_merge($options, $export);
-
-            $export = $column->getType()->getOptionsResolver()->resolve($export);
-
-            $normData = $this->getNormDataFromRowData($rowData, $column, $export);
-            $viewData = $this->getViewDataFromNormData($normData, $column, $export);
-
-            $export = array_merge([
-                'data' => $normData,
-                'value' => $viewData,
-                'label' => $export['label'] ?? null,
-                'translation_domain' => $export['translation_domain'] ?? $view->vars['translation_domain'],
-            ], $export);
+        if (true === $options['export']) {
+            $options['export'] = [];
         }
 
-        $view->vars['export'] = $export;
+        $options['export'] += [
+            'getter' => $options['getter'],
+            'property_path' => $options['property_path'],
+            'formatter' => $options['formatter'],
+        ];
+
+        $label = $options['label'] ?? StringUtil::camelToSentence($column->getName());
+
+        if ($this->translator) {
+            $translationDomain = $options['export']['header_translation_domain']
+                ?? $options['header_translation_domain']
+                ?? $view->parent->parent->vars['translation_domain']
+                ?? false;
+
+            if ($translationDomain) {
+                $label = $this->translator->trans(
+                    id: $label,
+                    parameters: $options['header_translation_parameters'],
+                    domain: $translationDomain,
+                );
+            }
+        }
+
+        $view->vars['label'] = $label;
+    }
+
+    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
+    {
+        if (false === $options['export']) {
+            return;
+        }
+
+        if (true === $options['export']) {
+            $options['export'] = [];
+        }
+
+        $options['export'] += [
+            'getter' => $options['getter'],
+            'property_path' => $options['property_path'],
+            'property_accessor' => $options['property_accessor'],
+            'formatter' => $options['formatter'],
+        ];
+
+        $normData = $this->getNormDataFromRowData($view->parent->data, $column, $options['export']);
+        $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);
+
+        if ($this->translator && is_string($viewData)) {
+            $translationDomain = $options['export']['value_translation_domain']
+                ?? $options['value_translation_domain']
+                ?? $view->parent->parent->vars['translation_domain']
+                ?? false;
+
+            if ($translationDomain) {
+                $viewData = $this->translator->trans(
+                    id: $viewData,
+                    parameters: $options['value_translation_parameters'],
+                    domain: $translationDomain,
+                );
+            }
+        }
+
+        $view->value = $viewData;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -123,37 +182,28 @@ final class ColumnType implements ColumnTypeInterface
                 'getter' => null,
                 'header_attr' => [],
                 'value_attr' => [],
+                'priority' => 0,
+                'visible' => true,
+                'personalizable' => true,
             ])
-            ->setAllowedTypes('label', ['null', 'string', TranslatableMessage::class])
+            ->setAllowedTypes('label', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('value_translation_parameters', ['array'])
+            ->setAllowedTypes('value_translation_parameters', 'array')
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])
             ->setAllowedTypes('export', ['bool', 'array'])
             ->setAllowedTypes('formatter', ['null', 'callable'])
             ->setAllowedTypes('property_path', ['null', 'bool', 'string', PropertyPathInterface::class])
-            ->setAllowedTypes('property_accessor', [PropertyAccessorInterface::class])
+            ->setAllowedTypes('property_accessor', PropertyAccessorInterface::class)
             ->setAllowedTypes('getter', ['null', 'callable'])
-            ->setAllowedTypes('header_attr', ['array'])
+            ->setAllowedTypes('header_attr', 'array')
             ->setAllowedTypes('value_attr', ['array', 'callable'])
-            ->setInfo('label', 'A user-friendly label that describes a column.')
-            ->setInfo('header_translation_domain', 'Translation domain used to translate the column header.')
-            ->setInfo('header_translation_parameters', 'Parameters used within the column header translation.')
-            ->setInfo('value_translation_domain', 'Translation domain used to translate the column value.')
-            ->setInfo('value_translation_parameters', 'Parameters used within the column value translation.')
-            ->setInfo('block_name', 'Name of the block that renders the column.')
-            ->setInfo('block_prefix', 'A custom prefix of the block name that renders the column.')
-            ->setInfo('sort', 'Determines whether the column can be sorted (and optionally on what path).')
-            ->setInfo('export', 'Determines whether the column can be exported (and optionally with custom options).')
-            ->setInfo('formatter', 'A formatter used to format the column norm data to the view data.')
-            ->setInfo('property_path', 'Property path used to retrieve the column norm data from the row data.')
-            ->setInfo('property_accessor', 'An instance of property accessor used to retrieve column norm data from the row data.')
-            ->setInfo('getter', 'A callable data accessor used to retrieve column norm data from the row data manually, instead of property accessor.')
-            ->setInfo('header_attr', 'An array of attributes (e.g. HTML attributes) passed to the header view.')
-            ->setInfo('value_attr', 'An array of attributes (e.g. HTML attributes) passed to the column value view.')
+            ->setAllowedTypes('priority', 'int')
+            ->setAllowedTypes('visible', 'bool')
+            ->setAllowedTypes('personalizable', 'bool')
         ;
     }
 
@@ -186,7 +236,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $propertyPath = $options['property_path'] ?? $column->getName();
 
-        if (is_string($propertyPath) && (is_array($data) || is_object($data))) {
+        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($data) || is_object($data))) {
             return $options['property_accessor']->getValue($data, $propertyPath);
         }
 
@@ -219,7 +269,7 @@ final class ColumnType implements ColumnTypeInterface
      */
     private function getColumnBlockPrefixes(ColumnInterface $column, array $options): array
     {
-        $type = $column->getType();
+        $type = $column->getConfig()->getType();
 
         $blockPrefixes = [
             $type->getBlockPrefix(),

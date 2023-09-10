@@ -20,6 +20,10 @@ abstract class AbstractDataTableType implements DataTableTypeInterface
     {
     }
 
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
+    {
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
     }

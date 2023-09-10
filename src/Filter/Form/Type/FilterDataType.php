@@ -7,62 +7,87 @@ namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FilterDataType extends AbstractType
+class FilterDataType extends AbstractType implements DataMapperInterface
 {
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['operator_selectable'] = $options['operator_selectable'];
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('operator', $options['operator_type'], $options['operator_options'] + [
-                'label' => false,
-                'required' => false,
-//                'getter' => fn (FilterData $data) => $data->getOperator(),
-//                'setter' => fn (FilterData $data, Operator $operator) => $data->setOperator($operator),
-            ])
-            ->add('value', $options['field_type'], $options['field_options'] + [
-                'label' => false,
-                'required' => false,
-                'empty_data' => '',
-            ])
+            ->add('value', $options['form_type'], $options['form_options'])
+            ->add('operator', $options['operator_form_type'], $options['operator_form_options'])
+            ->setDataMapper($this)
         ;
-
-        $builder->get('value')->addModelTransformer(new CallbackTransformer(
-            fn (mixed $value) => $value,
-            fn (mixed $value) => $value ?? '',
-        ));
-
-        $builder->get('operator')->addViewTransformer(new CallbackTransformer(
-            fn (mixed $value) => $value,
-            fn (mixed $value) => $value instanceof Operator ? $value->value : $value,
-        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'required' => false,
-            'data_class' => FilterData::class,
-            'operator_type' => OperatorType::class,
-            'operator_options' => [
-                'visible' => false,
-            ],
-            'field_type' => TextType::class,
-            'field_options' => [],
-        ]);
-
-        $resolver->setAllowedTypes('operator_type', 'string');
-        $resolver->setAllowedTypes('operator_options', 'array');
-
-        $resolver->setAllowedTypes('field_type', 'string');
-        $resolver->setAllowedTypes('field_options', 'array');
+        $resolver
+            ->setDefaults([
+                'required' => false,
+                'data_class' => FilterData::class,
+                'form_type' => TextType::class,
+                'form_options' => [],
+                'operator_form_type' => OperatorType::class,
+                'operator_form_options' => [],
+                'default_operator' => Operator::Equals,
+                'supported_operators' => [],
+                'operator_selectable' => false,
+            ])
+            ->setAllowedTypes('form_type', 'string')
+            ->setAllowedTypes('form_options', 'array')
+            ->setAllowedTypes('operator_form_type', 'string')
+            ->setAllowedTypes('operator_form_options', 'array')
+            ->setAllowedTypes('operator_selectable', 'bool')
+            ->setAllowedTypes('default_operator', Operator::class)
+            ->setAllowedTypes('supported_operators', Operator::class.'[]')
+        ;
     }
 
     public function getBlockPrefix(): string
     {
         return 'kreyu_data_table_filter_data';
+    }
+
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
+    {
+        if (!$viewData instanceof FilterData) {
+            return;
+        }
+
+        $forms = iterator_to_array($forms);
+        $forms['value']->setData($viewData->hasValue() ? $viewData->getValue() : null);
+        $forms['operator']->setData($viewData->getOperator());
+    }
+
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
+    {
+        if (!$viewData instanceof FilterData) {
+            $viewData = new FilterData();
+        }
+
+        $forms = iterator_to_array($forms);
+
+        $operator = $forms['operator']->getData();
+
+        if (is_string($operator)) {
+            $operator = Operator::tryFrom($operator);
+        }
+
+        // TODO: Remove once the deprecated operators are removed.
+        $operator = $operator?->getNonDeprecatedCase();
+
+        $viewData->setValue($forms['value']->getData() ?? '');
+        $viewData->setOperator($operator);
     }
 }

@@ -1,6 +1,8 @@
 ---
 label: Link
 order: b
+tags:
+  - actions
 ---
 
 # Link action type

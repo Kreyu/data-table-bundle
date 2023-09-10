@@ -48,7 +48,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $form = $dataTable->createFiltrationFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $dataTable->filter($form->getData());
         }
     }
@@ -102,7 +102,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $form = $dataTable->createPersonalizationFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $dataTable->personalize($form->getData());
         }
     }
@@ -116,8 +116,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $form = $dataTable->createExportFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $dataTable->export($form->getData());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dataTable->setExportData($form->getData());
         }
     }
 

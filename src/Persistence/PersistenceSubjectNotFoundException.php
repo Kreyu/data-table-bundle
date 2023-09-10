@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Persistence;
 
-class PersistenceSubjectNotFoundException extends \Exception
+use Kreyu\Bundle\DataTableBundle\Exception\ExceptionInterface;
+
+class PersistenceSubjectNotFoundException extends \Exception implements ExceptionInterface
 {
     public function __construct(string $message = 'Persistence subject not found')
     {

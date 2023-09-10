@@ -12,16 +12,16 @@ class DataTableView
 {
     public array $vars = [];
 
-    public HeaderRowView $headerRow;
+    public ?HeaderRowView $headerRow = null;
 
-    public HeaderRowView $nonPersonalizedHeaderRow;
+    public ?HeaderRowView $nonPersonalizedHeaderRow = null;
 
     /**
      * @var iterable<ValueRowView>
      */
     public iterable $valueRows = [];
 
-    public PaginationView $pagination;
+    public ?PaginationView $pagination = null;
 
     /**
      * @var array<FilterView>

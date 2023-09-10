@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
-        private ActionFactoryInterface $actionFactory,
+        private readonly ActionFactoryInterface $actionFactory,
     ) {
     }
 

@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 /**
  * @mixin QueryBuilder
  */
-class DoctrineOrmProxyQuery implements ProxyQueryInterface
+class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
+    private int $batchSize = 5000;
+    private bool $entityManagerClearingEnabled = true;
 
     /**
      * @param array<string, mixed> $hints
@@ -27,6 +29,7 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function __construct(
         private QueryBuilder $queryBuilder,
         private array $hints = [],
+        private string|int $hydrationMode = AbstractQuery::HYDRATE_OBJECT,
     ) {
     }
 
@@ -61,13 +64,13 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $this->queryBuilder->resetDQLPart('orderBy');
 
         foreach ($sortingData->getColumns() as $column) {
-            $field = $column->getName();
+            $propertyPath = (string) $column->getPropertyPath();
 
-            if ($rootAlias && !str_contains($field, '.') && !str_starts_with($field, '__')) {
-                $field = $rootAlias.'.'.$field;
+            if ($rootAlias && !str_contains($propertyPath, '.') && !str_starts_with($propertyPath, '__')) {
+                $propertyPath = $rootAlias.'.'.$propertyPath;
             }
 
-            $this->queryBuilder->addOrderBy($field, $column->getDirection());
+            $this->queryBuilder->addOrderBy($propertyPath, $column->getDirection());
         }
     }
 
@@ -100,6 +103,37 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         return $this->getPagination();
     }
 
+    public function getItems(): iterable
+    {
+        $paginator = $this->createPaginator();
+
+        $batchSize = $this->batchSize;
+
+        $cursorPosition = 0;
+
+        do {
+            $hasItems = true;
+
+            if (0 === $cursorPosition % $batchSize) {
+                $hasItems = false;
+
+                $paginator->getQuery()->setMaxResults($batchSize);
+                $paginator->getQuery()->setFirstResult($cursorPosition);
+
+                foreach ($paginator->getIterator() as $item) {
+                    $hasItems = true;
+                    yield $item;
+                }
+
+                if ($this->entityManagerClearingEnabled) {
+                    $this->getEntityManager()->clear();
+                }
+            }
+
+            ++$cursorPosition;
+        } while (0 === $cursorPosition || $hasItems);
+    }
+
     public function getUniqueParameterId(): int
     {
         return $this->uniqueParameterId++;
@@ -108,6 +142,31 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
     public function setHint(string $name, mixed $value): void
     {
         $this->hints[$name] = $value;
+    }
+
+    public function setHydrationMode(int|string $hydrationMode): void
+    {
+        $this->hydrationMode = $hydrationMode;
+    }
+
+    public function isEntityManagerClearingEnabled(): bool
+    {
+        return $this->entityManagerClearingEnabled;
+    }
+
+    public function setEntityManagerClearingEnabled(bool $entityManagerClearingEnabled): void
+    {
+        $this->entityManagerClearingEnabled = $entityManagerClearingEnabled;
+    }
+
+    public function getBatchSize(): int
+    {
+        return $this->batchSize;
+    }
+
+    public function setBatchSize(int $batchSize): void
+    {
+        $this->batchSize = $batchSize;
     }
 
     private function getCurrentPageNumber(): int
@@ -134,16 +193,19 @@ class DoctrineOrmProxyQuery implements ProxyQueryInterface
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
         $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
 
-        $query = $this->queryBuilder->getQuery();
+        $query = (clone $this->queryBuilder)->getQuery();
 
-        if (!$hasJoins) {
-            $query->setHint(CountWalker::HINT_DISTINCT, false);
-        }
+        $this->applyQueryHints($query);
 
+        $query->setHydrationMode($this->hydrationMode);
+
+        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
+    }
+
+    private function applyQueryHints(Query $query): void
+    {
         foreach ($this->hints as $name => $value) {
             $query->setHint($name, $value);
         }
-
-        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
     }
 }

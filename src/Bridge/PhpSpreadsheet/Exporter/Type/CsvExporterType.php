@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CsvExporterType extends AbstractExporterType
+class CsvExporterType extends AbstractPhpSpreadsheetExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

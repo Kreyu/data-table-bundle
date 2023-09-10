@@ -198,10 +198,11 @@
 
     {% set attr = {
         'class': 'btn btn-icon btn-outline-danger',
-        'href': filter_clear_all_url(filtration_parameter_name, filters)|trim,
+        'href': filter_clear_all_url(filtration_parameter_name, filters)|trim|raw,
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
-        'title': 'Clear all filters'|trans({}, 'KreyuDataTable')
+        'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
+        'data-turbo-action': 'advance',
     }|merge(attr|default({})) %}
 
     <a {{ block('attributes') }}>{{ block('filter_clear_all_button_icon') }}</a>
@@ -212,6 +213,7 @@
 
     <a class="btn px-2"
        href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
+       data-turbo-action="advance"
        data-toggle="tooltip"
        data-placement="bottom"
        title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
@@ -219,8 +221,8 @@
         <span class="mx-1">
             <strong>{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</strong>
 
-            {% if filter.vars.operator_options.visible %}
-                <span class="text-muted">({{ filter.vars.data.operator.name|trans({}, 'KreyuDataTable') }})</span>
+            {% if filter.vars.operator_selectable %}
+                <span class="text-muted">({{ filter.vars.data.operator.label|trans({}, 'KreyuDataTable') }})</span>
             {% endif %}
         </span>
 
@@ -316,7 +318,6 @@
             </div>
 
             <ul class="p-2 mb-0"
-                role="button"
                 data-visible="1"
                 data-kreyu--data-table-bundle--personalization-target="visibleColumns"
             >
@@ -336,7 +337,6 @@
             </div>
 
             <ul class="p-2 mb-0"
-                role="button"
                 data-visible="0"
                 data-kreyu--data-table-bundle--personalization-target="hiddenColumns"
             >
@@ -539,21 +539,12 @@
     <div class="row">
         {{ form_label(form) }}
 
-        {% if form.operator.vars.visible %}
-            <div class="col-12">
-                <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} input-group">
-                    {{ form_widget(form.value) }}
-                    {{ form_widget(form.operator) }}
-                </div>
+        <div class="col-12">
+            <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} {% if form.vars.operator_selectable %}input-group{% endif %}">
+                {{ form_widget(form.value) }}
+                {{ form_widget(form.operator) }}
             </div>
-        {% else %}
-            <div class="col-12">
-                {{ form_row(form.value) }}
-                <div style="display: none;">
-                    {{ form_row(form.operator) }}
-                </div>
-            </div>
-        {% endif %}
+        </div>
     </div>
 {% endblock %}
 
@@ -565,7 +556,7 @@
     <li class="list-group-item">
         {{ form_label(form) }}
         {{ form_widget(form.name) }}
-        {{ form_widget(form.order) }}
+        {{ form_widget(form.priority) }}
         {{ form_widget(form.visible) }}
     </li>
 {% endblock %}
@@ -728,7 +719,7 @@
     </svg>
 {% endblock %}
 
-{% block kreyu_data_table_date_range_row %}
+{% block kreyu_data_table_date_range_widget %}
     <div class="input-group">
         {{ form_widget(form.from) }}
         <span class="input-group-text">-</span>

@@ -16,12 +16,14 @@ class DateRangeType extends AbstractType implements DataMapperInterface
         $builder
             ->add('from', DateType::class, [
                 'widget' => 'single_text',
+                'label' => false,
                 'attr' => [
                     'autocomplete' => 'off',
                 ],
             ])
             ->add('to', DateType::class, [
                 'widget' => 'single_text',
+                'label' => false,
                 'attr' => [
                     'autocomplete' => 'off',
                 ],
@@ -55,6 +57,8 @@ class DateRangeType extends AbstractType implements DataMapperInterface
         $to = $forms['to']->getData();
 
         if (null === $from && null === $to) {
+            $viewData = '';
+
             return;
         }
 

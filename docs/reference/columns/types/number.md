@@ -1,6 +1,8 @@
 ---
 label: Number
 order: b
+tags:
+  - columns
 ---
 
 # Number column type

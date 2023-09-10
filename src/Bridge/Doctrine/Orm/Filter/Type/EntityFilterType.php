@@ -4,80 +4,89 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\Query\Expr;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType as EntityFormType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class EntityFilterType extends AbstractFilterType
+class EntityFilterType extends AbstractDoctrineOrmFilterType
 {
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
-    {
-        $operator = $data->getOperator() ?? Operator::EQUALS;
-        $value = $data->getValue();
-
-        try {
-            $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
-        } catch (\InvalidArgumentException) {
-            return;
-        }
-
-        $parameterName = $this->getUniqueParameterName($query, $filter);
-
-        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFilterQueryPath($query, $filter), ":$parameterName");
-
-        $query
-            ->andWhere($expression)
-            ->setParameter($parameterName, $value);
+    public function __construct(
+        private readonly Registry $doctrineRegistry,
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'field_type' => EntityFormType::class,
-            'choice_label' => null,
-        ]);
-
-        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
-            $resolver->setDefaults([
-                'visible' => false,
-                'choices' => [
-                    Operator::EQUALS,
-                    Operator::NOT_EQUALS,
-                    Operator::CONTAINS,
-                    Operator::NOT_CONTAINS,
+        $resolver
+            ->setDefaults([
+                'form_type' => EntityType::class,
+                'supported_operators' => [
+                    Operator::Equals,
+                    Operator::NotEquals,
+                    Operator::Contains,
+                    Operator::NotContains,
                 ],
-            ]);
-        });
+                'choice_label' => null,
+                'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
+            ])
+            ->setAllowedTypes('choice_label', ['null', 'string', 'callable'])
+            ->addNormalizer('form_options', function (Options $options, array $value) {
+                if (EntityType::class !== $options['form_type']) {
+                    return $value;
+                }
 
-        $resolver->setDefault('active_filter_formatter', function (FilterData $data, FilterInterface $filter, array $options): mixed {
-            $choiceLabel = $options['choice_label'];
+                // The identifier field name of the entity has to be provided in the 'choice_value' form option.
+                //
+                // This is required by the persistence system, because only the entity identifier will be persisted,
+                // and the EntityType form type needs to know how to convert it back to the entity object.
+                //
+                // If it's not provided, try to retrieve it from the entity metadata.
+                if (null === $value['choice_value'] ?? null) {
+                    $identifiers = $this->doctrineRegistry
+                        ->getManagerForClass($value['class'])
+                        ?->getClassMetadata($value['class'])
+                        ->getIdentifier() ?? [];
 
-            if (is_string($choiceLabel)) {
-                return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
-            }
+                    if (1 === count($identifiers)) {
+                        $value += ['choice_value' => reset($identifiers)];
+                    }
+                }
 
-            if (is_callable($choiceLabel)) {
-                return $choiceLabel($data->getValue());
-            }
-
-            return $data->getValue();
-        });
+                return $value;
+            })
+        ;
     }
 
-    private function getExpressionBuilderMethodName(Operator $operator): string
+    protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
-        return match ($operator) {
-            Operator::EQUALS, Operator::CONTAINS => 'in',
-            Operator::NOT_EQUALS, Operator::NOT_CONTAINS => 'notIn',
-            default => throw new \InvalidArgumentException('Operator not supported'),
+        $expression = match ($operator) {
+            Operator::Equals, Operator::Contains => $expr->in(...),
+            Operator::NotEquals, Operator::NotContains => $expr->notIn(...),
+            default => throw new InvalidArgumentException('Operator not supported'),
         };
+
+        return $expression($queryPath, ":$parameterName");
+    }
+
+    private function getFormattedActiveFilterString(FilterData $data, FilterInterface $filter, array $options): string
+    {
+        $choiceLabel = $options['choice_label'];
+
+        if (is_string($choiceLabel)) {
+            return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
+        }
+
+        if (is_callable($choiceLabel)) {
+            return $choiceLabel($data->getValue());
+        }
+
+        return (string) $data->getValue();
     }
 }

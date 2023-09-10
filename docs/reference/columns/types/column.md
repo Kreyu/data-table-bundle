@@ -1,6 +1,8 @@
 ---
 label: Column
 order: z
+tags:
+  - columns
 ---
 
 # Column type

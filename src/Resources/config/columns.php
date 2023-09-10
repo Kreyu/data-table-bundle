@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
@@ -37,8 +38,7 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.column.registry', ColumnRegistry::class)
         ->args([
-            tagged_iterator('kreyu_data_table.column.type'),
-            tagged_iterator('kreyu_data_table.column.type_extension'),
+            tagged_iterator('kreyu_data_table.column.extension'),
             service('kreyu_data_table.column.resolved_type_factory'),
         ])
         ->alias(ColumnRegistryInterface::class, 'kreyu_data_table.column.registry')
@@ -52,15 +52,16 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.column', ColumnType::class)
+        ->args([service('translator')->nullOnInvalid()])
         ->tag('kreyu_data_table.column.type')
     ;
 
     $services
         ->set('kreyu_data_table.column.type.actions', ActionsColumnType::class)
-        ->tag('kreyu_data_table.column.type')
         ->args([
             service('kreyu_data_table.action.factory'),
         ])
+        ->tag('kreyu_data_table.column.type')
     ;
 
     $services
@@ -76,7 +77,6 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.column.type.collection', CollectionColumnType::class)
         ->tag('kreyu_data_table.column.type')
-        ->call('setColumnFactory', [service('kreyu_data_table.column.factory')])
     ;
 
     $services
@@ -106,6 +106,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.date_time', DateTimeColumnType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.date', DateColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

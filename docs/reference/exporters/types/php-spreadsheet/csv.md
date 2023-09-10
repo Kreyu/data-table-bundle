@@ -10,7 +10,7 @@ The `CsvExporterType` represents an exporter that uses a [PhpSpreadsheet CSV wri
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [PhpSpreadsheetType](php-spreadsheet.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: CsvExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/CsvExporterType.php)
+| Class               | [:icon-mark-github: CsvExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/CsvExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

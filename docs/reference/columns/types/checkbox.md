@@ -1,6 +1,8 @@
 ---
 label: Checkbox
 order: k
+tags:
+  - columns
 ---
 
 # Checkbox column type

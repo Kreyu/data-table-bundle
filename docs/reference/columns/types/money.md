@@ -1,6 +1,8 @@
 ---
 label: Money
 order: c
+tags:
+  - columns
 ---
 
 # Money column type

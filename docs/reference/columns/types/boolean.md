@@ -1,6 +1,8 @@
 ---
 label: Boolean
 order: d
+tags:
+  - columns
 ---
 
 # Boolean column type
@@ -17,14 +19,14 @@ The `BooleanColumnType` represents a column with value displayed as a "yes" or "
 
 ### `label_true`
 
-- **type**: `string` or `Symfony\Component\Translation\TranslatableMessage`
+- **type**: `string` or `Symfony\Component\Translation\TranslatableInterface`
 - **default**: `'Yes'`
 
 Sets the value that will be displayed if value is truthy.
 
 ### `label_false`
 
-- **type**: `string` or `Symfony\Component\Translation\TranslatableMessage`
+- **type**: `string` or `Symfony\Component\Translation\TranslatableInterface`
 - **default**: `'No'`
 
 Sets the value that will be displayed if row value is falsy.

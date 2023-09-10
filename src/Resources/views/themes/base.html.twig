@@ -291,7 +291,7 @@
     </button>
 {% endblock %}
 
-{% block kreyu_data_table_date_range_row %}
+{% block kreyu_data_table_date_range_widget %}
     {{ form_widget(form.from) }}
     {{ form_widget(form.to) }}
 {% endblock %}
@@ -301,7 +301,7 @@
 {% block column_header %}
     {% set label_attr = label_attr|default({}) %}
 
-    {% if data_table.vars.sorting_enabled and sort_field %}
+    {% if data_table.vars.sorting_enabled and sortable %}
         {% set current_sort_field = sorting_field_data.name|default(null) %}
         {% set current_sort_direction = sorting_field_data.direction|default(null) %}
 
@@ -320,6 +320,7 @@
             {% set query_params = app.request.attributes.get('_route_params')|merge(query_params) %}
 
             {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
+            {% set label_attr = { 'data-turbo-action': 'advance' }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
@@ -373,7 +374,7 @@
     {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
 
     {% if use_intl_formatter %}
-        {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
+        {#{% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}#}
     {% endif %}
 
     {{- block('column_text_value') -}}
@@ -385,7 +386,7 @@
     {# @var string  currency #}
 
     {% if use_intl_formatter %}
-        {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
+        {#{% set value = value|format_currency(currency, intl_formatter_options.attrs) %}#}
     {% endif %}
 
     {{- block('column_text_value') -}}
@@ -420,10 +421,14 @@
 {% endblock %}
 
 {% block column_collection_value %}
-    {% for child in children %}
-        {{- data_table_column_value(child) -}}
-        <span>{% if not loop.last %}{{- separator -}}{% endif %}</span>
-    {% endfor %}
+    {# Note: do **not** remove the HTML comments below, because it makes sure the separator is rendered properly. #}
+    {% apply spaceless %}
+        {% for child in children %}
+            {% if not loop.first %}-->{% endif %}
+            {{- data_table_column_value(child) -}}<!--
+            -->{% if not loop.last %}{{- separator -}}<!--{% endif %}
+        {% endfor %}
+    {% endapply %}
 {% endblock %}
 
 {% block column_template_value %}

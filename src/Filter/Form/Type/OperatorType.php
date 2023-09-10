@@ -21,10 +21,16 @@ class OperatorType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('class', Operator::class)
-            ->setDefault('placeholder', false)
-            ->setDefault('visible', false)
-            ->setDefault('choice_translation_domain', 'KreyuDataTable')
+            ->setDefaults([
+                'class' => Operator::class,
+                'choice_translation_domain' => 'KreyuDataTable',
+                'choice_label' => 'label',
+                'label' => false,
+                'placeholder' => false,
+                'visible' => false,
+                'required' => false,
+            ])
+            ->setAllowedTypes('visible', 'bool')
         ;
     }
 

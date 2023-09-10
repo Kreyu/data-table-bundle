@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType;
@@ -14,13 +15,14 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 use function Symfony\Component\Translation\t;
 
-class DateRangeFilterType extends AbstractFilterType
+class DateRangeFilterType extends AbstractDoctrineOrmFilterType
 {
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
     {
+        if (!$query instanceof DoctrineOrmProxyQueryInterface) {
+            throw new UnexpectedTypeException($query, DoctrineOrmProxyQueryInterface::class);
+        }
+
         $value = $data->getValue();
 
         $parameterName = $this->getUniqueParameterName($query, $filter);
@@ -29,7 +31,11 @@ class DateRangeFilterType extends AbstractFilterType
 
         $criteria = $query->expr()->andX();
 
-        if (null !== $dateFrom = $value['from']) {
+        if (!is_array($value)) {
+            return;
+        }
+
+        if (null !== $dateFrom = $value['from'] ?? null) {
             $parameterNameFrom = $parameterName.'_from';
 
             $dateFrom = \DateTime::createFromInterface($dateFrom);
@@ -40,7 +46,7 @@ class DateRangeFilterType extends AbstractFilterType
             $query->setParameter($parameterNameFrom, $dateFrom);
         }
 
-        if (null !== $valueTo = $value['to']) {
+        if (null !== $valueTo = $value['to'] ?? null) {
             $parameterNameTo = $parameterName.'_to';
 
             $valueTo = \DateTime::createFromInterface($valueTo)->modify('+1 day');
@@ -51,15 +57,18 @@ class DateRangeFilterType extends AbstractFilterType
             $query->setParameter($parameterNameTo, $valueTo);
         }
 
-        $query->andWhere($criteria);
+        if ($criteria->count() > 0) {
+            $query->andWhere($criteria);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'field_type' => DateRangeType::class,
+                'form_type' => DateRangeType::class,
                 'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
+                'empty_data' => ['from' => '', 'to' => ''],
             ])
         ;
     }

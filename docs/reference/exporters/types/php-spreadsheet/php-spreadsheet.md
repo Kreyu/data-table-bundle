@@ -10,7 +10,7 @@ The `PhpSpreadsheetExporterType` represents a base exporter, used as a parent fo
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [ExporterType](../exporter.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: PhpSpreadsheetExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/PhpSpreadsheetExporterType.php)
+| Class               | [:icon-mark-github: PhpSpreadsheetExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/PhpSpreadsheetExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

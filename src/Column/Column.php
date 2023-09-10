@@ -4,49 +4,131 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
-use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class Column implements ColumnInterface
 {
+    private ?DataTableInterface $dataTable = null;
+    private ?PropertyPathInterface $propertyPath = null;
+    private ?PropertyPathInterface $sortPropertyPath = null;
+    private int $priority = 0;
+    private bool $visible = true;
+
     public function __construct(
-        private string $name,
-        private ResolvedColumnTypeInterface $type,
-        private array $options = [],
+        private readonly ColumnConfigInterface $config,
     ) {
     }
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->config->getName();
     }
 
-    public function getType(): ResolvedColumnTypeInterface
+    public function getConfig(): ColumnConfigInterface
     {
-        return $this->type;
+        return $this->config;
     }
 
-    public function getOptions(): array
+    public function getDataTable(): DataTableInterface
     {
-        return $this->options;
+        if (null === $this->dataTable) {
+            throw new BadMethodCallException('Column is not attached to any data table.');
+        }
+
+        return $this->dataTable;
+    }
+
+    public function setDataTable(DataTableInterface $dataTable): static
+    {
+        $this->dataTable = $dataTable;
+
+        return $this;
+    }
+
+    public function getPropertyPath(): ?PropertyPathInterface
+    {
+        if ($this->propertyPath || $this->propertyPath = $this->config->getPropertyPath()) {
+            return $this->propertyPath;
+        }
+
+        if ('' === $name = $this->getName()) {
+            return null;
+        }
+
+        return $this->propertyPath = new PropertyPath($name);
+    }
+
+    public function getSortPropertyPath(): ?PropertyPathInterface
+    {
+        if ($this->sortPropertyPath || $this->sortPropertyPath = $this->config->getSortPropertyPath()) {
+            return $this->sortPropertyPath;
+        }
+
+        return $this->sortPropertyPath = $this->getPropertyPath();
     }
 
     public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView
     {
-        $view = $this->type->createHeaderView($this, $parent);
+        $view = $this->config->getType()->createHeaderView($this, $parent);
 
-        $this->type->buildHeaderView($view, $this, $this->options);
+        $this->config->getType()->buildHeaderView($view, $this, $this->config->getOptions());
 
         return $view;
     }
 
     public function createValueView(ValueRowView $parent = null): ColumnValueView
     {
-        $view = $this->type->createValueView($this, $parent);
+        $view = $this->config->getType()->createValueView($this, $parent);
 
-        $this->type->buildValueView($view, $this, $this->options);
+        $this->config->getType()->buildValueView($view, $this, $this->config->getOptions());
 
         return $view;
+    }
+
+    public function createExportHeaderView(HeaderRowView $parent = null): ColumnHeaderView
+    {
+        $view = $this->config->getType()->createExportHeaderView($this, $parent);
+
+        $this->config->getType()->buildExportHeaderView($view, $this, $this->config->getOptions());
+
+        return $view;
+    }
+
+    public function createExportValueView(ValueRowView $parent = null): ColumnValueView
+    {
+        $view = $this->config->getType()->createExportValueView($this, $parent);
+
+        $this->config->getType()->buildExportValueView($view, $this, $this->config->getOptions());
+
+        return $view;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function isVisible(): bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): static
+    {
+        $this->visible = $visible;
+
+        return $this;
     }
 }

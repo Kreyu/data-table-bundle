@@ -6,87 +6,67 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
-use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
-use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
-use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DataTableBuilder implements DataTableBuilderInterface
+class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilderInterface
 {
     /**
-     * Name of the data table, used to differentiate multiple data tables on the same page.
-     */
-    private string $name;
-
-    /**
-     * Resolved type class, containing instructions on how to build a data table.
-     */
-    private ResolvedDataTableTypeInterface $type;
-
-    /**
-     * Query used to retrieve and manipulate source of the data table.
-     */
-    private null|ProxyQueryInterface $query;
-
-    /**
-     * Stores an array of options, used to configure a builder behavior.
-     */
-    private array $options;
-
-    /**
-     * Stores an array of themes to used to render the data table.
+     * The column builders defined for the data table.
      *
-     * @var array<string>
-     */
-    private array $themes;
-
-    /**
-     * User-friendly title used to describe a data table.
-     */
-    private null|string|TranslatableMessage $title = null;
-
-    /**
-     * Stores an array of parameters used in translation of the user-friendly title.
-     */
-    private array $titleTranslationParameters = [];
-
-    /**
-     * Domain name used in the translation of the data table elements.
-     */
-    private null|false|string $translationDomain = null;
-
-    /**
-     * Stores an array of columns, used to display the data table to the user.
-     *
-     * @var array<ColumnInterface>
+     * @var array<ColumnBuilderInterface>
      */
     private array $columns = [];
 
     /**
-     * Stores an array of filters, used to build and handle the filtering feature.
+     * The data of columns that haven't been converted to column builders yet.
      *
-     * @var array<FilterInterface>
+     * @var array<array{0: class-string<ColumnTypeInterface>, 1: array}>
+     */
+    private array $unresolvedColumns = [];
+
+    /**
+     * The column builders defined for the data table.
+     *
+     * @var array<FilterBuilderInterface>
      */
     private array $filters = [];
+
+    /**
+     * The data of filters that haven't been converted to filter builders yet.
+     *
+     * @var array<array{0: class-string<FilterTypeInterface>, 1: array}>
+     */
+    private array $unresolvedFilters = [];
+
+    /**
+     * The search handler used to filter the data table using a single search query.
+     */
+    private ?\Closure $searchHandler = null;
+
+    /**
+     * Determines whether the builder should automatically add {@see SearchFilterType}
+     * when a search handler is defined in {@see DataTableBuilder::$searchHandler}.
+     */
+    private bool $autoAddingSearchFilter = true;
 
     /**
      * The action builders defined for the data table.
@@ -143,182 +123,27 @@ class DataTableBuilder implements DataTableBuilderInterface
     private bool $autoAddingActionsColumn = true;
 
     /**
-     * Stores an array of exporters, used to output data to various file types.
+     * The exporter builders defined for the data table.
      *
-     * @var array<ExporterInterface>
+     * @var array<ExporterBuilderInterface>
      */
     private array $exporters = [];
 
     /**
-     * Factory used to create proper column models.
+     * The data of exporters that haven't been converted to exporter builders yet.
+     *
+     * @var array<array{0: class-string<ExporterTypeInterface>, 1: array}>
      */
-    private ColumnFactoryInterface $columnFactory;
+    private array $unresolvedExporters = [];
 
-    /**
-     * Factory used to create proper filter models.
-     */
-    private FilterFactoryInterface $filterFactory;
-
-    /**
-     * Factory used to create proper action models.
-     */
-    private ActionFactoryInterface $actionFactory;
-
-    /**
-     * Factory used to create proper exporter models.
-     */
-    private ExporterFactoryInterface $exporterFactory;
-
-    /**
-     * Determines whether the data table exporting feature is enabled.
-     */
-    private bool $exportingEnabled = true;
-
-    /**
-     * Form factory used to create an export form.
-     */
-    private null|FormFactoryInterface $exportFormFactory = null;
-
-    /**
-     * Default export data, which is applied to the data table if no data is given by the user.
-     */
-    private null|ExportData $defaultExportData = null;
-
-    /**
-     * Determines whether the data table personalization feature is enabled.
-     */
-    private bool $personalizationEnabled = true;
-
-    /**
-     * Determines whether the data table personalization persistence feature is enabled.
-     */
-    private bool $personalizationPersistenceEnabled = true;
-
-    /**
-     * Persistence adapter used to read/write personalization feature data.
-     */
-    private null|PersistenceAdapterInterface $personalizationPersistenceAdapter = null;
-
-    /**
-     * Subject (e.g. logged-in user) used to associate with the personalization persistence feature data.
-     */
-    private null|PersistenceSubjectInterface $personalizationPersistenceSubject = null;
-
-    /**
-     * Form factory used to create a personalization form.
-     */
-    private null|FormFactoryInterface $personalizationFormFactory = null;
-
-    /**
-     * Default personalization data, which is applied to the data table if no data is given by the user.
-     */
-    private null|PersonalizationData $defaultPersonalizationData = null;
-
-    /**
-     * Determines whether the data table filtration feature is enabled.
-     */
-    private bool $filtrationEnabled = true;
-
-    /**
-     * Determines whether the data table filtration persistence feature is enabled.
-     */
-    private bool $filtrationPersistenceEnabled = true;
-
-    /**
-     * Persistence adapter used to read/write filtration feature data.
-     */
-    private null|PersistenceAdapterInterface $filtrationPersistenceAdapter = null;
-
-    /**
-     * Subject (e.g. logged-in user) used to associate with the filtration persistence feature data.
-     */
-    private null|PersistenceSubjectInterface $filtrationPersistenceSubject = null;
-
-    /**
-     * Form factory used to create a filtration form.
-     */
-    private null|FormFactoryInterface $filtrationFormFactory = null;
-
-    /**
-     * Default filtration data, which is applied to the data table if no data is given by the user.
-     */
-    private null|FiltrationData $defaultFiltrationData = null;
-
-    /**
-     * Determines whether the data table sorting feature is enabled.
-     */
-    private bool $sortingEnabled = true;
-
-    /**
-     * Determines whether the data table sorting persistence feature is enabled.
-     */
-    private bool $sortingPersistenceEnabled = true;
-
-    /**
-     * Persistence adapter used to read/write sorting feature data.
-     */
-    private null|PersistenceAdapterInterface $sortingPersistenceAdapter = null;
-
-    /**
-     * Subject (e.g. logged-in user) used to associate with the sorting persistence feature data.
-     */
-    private null|PersistenceSubjectInterface $sortingPersistenceSubject = null;
-
-    /**
-     * Default sorting data, which is applied to the data table if no data is given by the user.
-     */
-    private null|SortingData $defaultSortingData = null;
-
-    /**
-     * Determines whether the data table pagination feature is enabled.
-     */
-    private bool $paginationEnabled = true;
-
-    /**
-     * Determines whether the data table pagination persistence feature is enabled.
-     */
-    private bool $paginationPersistenceEnabled = true;
-
-    /**
-     * Persistence adapter used to read/write pagination feature data.
-     */
-    private null|PersistenceAdapterInterface $paginationPersistenceAdapter = null;
-
-    /**
-     * Subject (e.g. logged-in user) used to associate with the pagination persistence feature data.
-     */
-    private null|PersistenceSubjectInterface $paginationPersistenceSubject = null;
-
-    /**
-     * Default pagination data, which is applied to the data table if no data is given by the user.
-     */
-    private null|PaginationData $defaultPaginationData = null;
-
-    /**
-     * Request handler class used to automatically apply data from request to the data table.
-     */
-    private null|RequestHandlerInterface $requestHandler = null;
-
-    /**
-     * Represents HTML attributes rendered on header row.
-     */
-    private array $headerRowAttributes = [];
-
-    /**
-     * Represents HTML attributes rendered on each value row.
-     */
-    private array $valueRowAttributes = [];
-
-    /**
-     * Determines whether the builder is locked, therefore no setters can be called.
-     */
-    private bool $locked = false;
-
-    public function __construct(string $name, ProxyQueryInterface $query = null, array $options = [])
-    {
-        $this->name = $name;
-        $this->query = $query;
-        $this->options = $options;
+    public function __construct(
+        string $name,
+        ResolvedDataTableTypeInterface $type,
+        private ?ProxyQueryInterface $query = null,
+        EventDispatcherInterface $dispatcher = new EventDispatcher(),
+        array $options = [],
+    ) {
+        parent::__construct($name, $type, $dispatcher, $options);
     }
 
     public function __clone(): void
@@ -326,173 +151,210 @@ class DataTableBuilder implements DataTableBuilderInterface
         $this->query = clone $this->query;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getType(): ResolvedDataTableTypeInterface
-    {
-        return $this->type;
-    }
-
-    public function setType(ResolvedDataTableTypeInterface $type): static
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
     public function getQuery(): ?ProxyQueryInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return $this->query;
     }
 
     public function setQuery(?ProxyQueryInterface $query): static
     {
-        $this->query = $query;
-
-        return $this;
-    }
-
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
-    public function setOptions(array $options): static
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    public function getThemes(): array
-    {
-        return $this->themes;
-    }
-
-    public function setThemes(array $themes): static
-    {
-        $this->themes = $themes;
-
-        return $this;
-    }
-
-    public function addTheme(string $theme): static
-    {
-        $this->themes[] = $theme;
-
-        return $this;
-    }
-
-    public function removeTheme(string $theme): static
-    {
-        if (false !== $key = array_search($theme, $this->themes, true)) {
-            unset($this->themes[$key]);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
         }
 
-        return $this;
-    }
-
-    public function getTitle(): null|string|TranslatableMessage
-    {
-        return $this->title;
-    }
-
-    public function setTitle(null|string|TranslatableMessage $title): static
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getTitleTranslationParameters(): array
-    {
-        return $this->titleTranslationParameters;
-    }
-
-    public function setTitleTranslationParameters(array $titleTranslationParameters): static
-    {
-        $this->titleTranslationParameters = $titleTranslationParameters;
-
-        return $this;
-    }
-
-    public function getTranslationDomain(): null|bool|string
-    {
-        return $this->translationDomain;
-    }
-
-    public function setTranslationDomain(null|bool|string $translationDomain): static
-    {
-        $this->translationDomain = $translationDomain;
+        $this->query = $query;
 
         return $this;
     }
 
     public function getColumns(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->resolveColumns();
+
         return $this->columns;
     }
 
-    public function getColumn(string $name): ColumnInterface
+    public function getColumn(string $name): ColumnBuilderInterface
     {
-        return $this->columns[$name] ?? throw new \InvalidArgumentException("Column \"$name\" does not exist");
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (isset($this->unresolvedColumns[$name])) {
+            return $this->resolveColumn($name);
+        }
+
+        if (isset($this->columns[$name])) {
+            return $this->columns[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
     }
 
-    public function hasColumn(string $name): bool
+    public function addColumn(ColumnBuilderInterface|string $column, string $type = null, array $options = []): static
     {
-        return array_key_exists($name, $this->columns);
-    }
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
 
-    public function addColumn(string $name, string $type, array $options = []): static
-    {
-        $this->columns[$name] = $this->getColumnFactory()->create($name, $type, $options);
+        if ($column instanceof ColumnBuilderInterface) {
+            $this->columns[$column->getName()] = $column;
+
+            unset($this->unresolvedColumns[$column->getName()]);
+
+            return $this;
+        }
+
+        $this->columns[$column] = null;
+        $this->unresolvedColumns[$column] = [$type ?? TextColumnType::class, $options];
 
         return $this;
     }
 
+    public function hasColumn(string $name): bool
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return array_key_exists($name, $this->columns)
+            || array_key_exists($name, $this->unresolvedColumns);
+    }
+
     public function removeColumn(string $name): static
     {
-        unset($this->columns[$name]);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->unresolvedColumns[$name], $this->columns[$name]);
 
         return $this;
     }
 
     public function getFilters(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->resolveFilters();
+
         return $this->filters;
     }
 
-    public function getFilter(string $name): FilterInterface
+    public function getFilter(string $name): FilterBuilderInterface
     {
-        return $this->filters[$name] ?? throw new \InvalidArgumentException("Filter \"$name\" does not exist");
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (isset($this->unresolvedFilters[$name])) {
+            return $this->resolveFilter($name);
+        }
+
+        if (isset($this->filters[$name])) {
+            return $this->filters[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
     }
 
-    public function addFilter(string $name, string $type, array $options = []): static
+    public function addFilter(string|FilterBuilderInterface $filter, string $type = null, array $options = []): static
     {
-        $this->filters[$name] = $this->getFilterFactory()->create($name, $type, $options);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if ($filter instanceof FilterBuilderInterface) {
+            $this->filters[$filter->getName()] = $filter;
+
+            unset($this->unresolvedFilters[$filter->getName()]);
+
+            return $this;
+        }
+
+        $this->filters[$filter] = null;
+        $this->unresolvedFilters[$filter] = [$type ?? FilterType::class, $options];
 
         return $this;
     }
 
+    public function hasFilter(string $name): bool
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return array_key_exists($name, $this->filters)
+            || array_key_exists($name, $this->unresolvedFilters);
+    }
+
     public function removeFilter(string $name): static
     {
-        unset($this->filters[$name]);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->unresolvedFilters[$name], $this->filters[$name]);
+
+        return $this;
+    }
+
+    public function getSearchHandler(): ?callable
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->searchHandler;
+    }
+
+    public function setSearchHandler(?callable $searchHandler): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->searchHandler = $searchHandler;
+
+        return $this;
+    }
+
+    public function isAutoAddingSearchFilter(): bool
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->autoAddingSearchFilter;
+    }
+
+    public function setAutoAddingSearchFilter(bool $autoAddingSearchFilter): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->autoAddingSearchFilter = $autoAddingSearchFilter;
 
         return $this;
     }
 
     public function getActions(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->resolveActions();
 
         return $this->actions;
@@ -500,6 +362,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getAction(string $name): ActionBuilderInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if (isset($this->unresolvedActions[$name])) {
             return $this->resolveAction($name);
         }
@@ -513,6 +379,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function addAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if ($action instanceof ActionBuilderInterface) {
             $this->actions[$action->getName()] = $action;
 
@@ -522,19 +392,27 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->actions[$action] = null;
-        $this->unresolvedActions[$action] = [$type, $options];
+        $this->unresolvedActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
 
     public function hasAction(string $name): bool
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return array_key_exists($name, $this->actions)
             || array_key_exists($name, $this->unresolvedActions);
     }
 
     public function removeAction(string $name): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         unset($this->unresolvedActions[$name], $this->actions[$name]);
 
         return $this;
@@ -542,6 +420,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getBatchActions(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->resolveBatchActions();
 
         return $this->batchActions;
@@ -549,6 +431,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getBatchAction(string $name): ActionBuilderInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if (isset($this->unresolvedBatchActions[$name])) {
             return $this->resolveBatchAction($name);
         }
@@ -562,12 +448,20 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function hasBatchAction(string $name): bool
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return array_key_exists($name, $this->batchActions)
             || array_key_exists($name, $this->unresolvedBatchActions);
     }
 
     public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if ($action instanceof ActionBuilderInterface) {
             $this->batchActions[$action->getName()] = $action;
 
@@ -577,13 +471,17 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->batchActions[$action] = null;
-        $this->unresolvedBatchActions[$action] = [$type, $options];
+        $this->unresolvedBatchActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
 
     public function removeBatchAction(string $name): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         unset($this->unresolvedActions[$name], $this->batchActions[$name]);
 
         return $this;
@@ -591,11 +489,19 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function isAutoAddingBatchCheckboxColumn(): bool
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return $this->autoAddingBatchCheckboxColumn;
     }
 
     public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->autoAddingBatchCheckboxColumn = $autoAddingBatchCheckboxColumn;
 
         return $this;
@@ -603,6 +509,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getRowActions(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->resolveRowActions();
 
         return $this->rowActions;
@@ -610,6 +520,10 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getRowAction(string $name): ActionBuilderInterface
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if (isset($this->unresolvedRowActions[$name])) {
             return $this->resolveRowAction($name);
         }
@@ -623,12 +537,20 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function hasRowAction(string $name): bool
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return array_key_exists($name, $this->rowActions)
             || array_key_exists($name, $this->unresolvedRowActions);
     }
 
     public function addRowAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         if ($action instanceof ActionBuilderInterface) {
             $this->rowActions[$action->getName()] = $action;
 
@@ -638,13 +560,17 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
 
         $this->rowActions[$action] = null;
-        $this->unresolvedRowActions[$action] = [$type, $options];
+        $this->unresolvedRowActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
 
     public function removeRowAction(string $name): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         unset($this->unresolvedActions[$name], $this->rowActions[$name]);
 
         return $this;
@@ -652,11 +578,19 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function isAutoAddingActionsColumn(): bool
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         return $this->autoAddingActionsColumn;
     }
 
     public function setAutoAddingActionsColumn(bool $autoAddingActionsColumn): static
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
         $this->autoAddingActionsColumn = $autoAddingActionsColumn;
 
         return $this;
@@ -664,460 +598,108 @@ class DataTableBuilder implements DataTableBuilderInterface
 
     public function getExporters(): array
     {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->resolveExporters();
+
         return $this->exporters;
     }
 
-    public function getExporter(string $name): ExporterInterface
+    public function getExporter(string $name): ExporterBuilderInterface
     {
-        return $this->exporters[$name] ?? throw new \InvalidArgumentException("Exporter \"$name\" does not exist");
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (isset($this->unresolvedExporters[$name])) {
+            return $this->resolveExporter($name);
+        }
+
+        if (isset($this->exporters[$name])) {
+            return $this->exporters[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('The exporter with the name "%s" does not exist.', $name));
     }
 
-    public function addExporter(string $name, string $type, array $options = []): static
+    public function addExporter(string|ExporterBuilderInterface $exporter, string $type = null, array $options = []): static
     {
-        $this->exporters[$name] = $this->getExporterFactory()->create($name, $type, $options);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if ($exporter instanceof ColumnBuilderInterface) {
+            $this->exporters[$exporter->getName()] = $exporter;
+
+            unset($this->unresolvedExporters[$exporter->getName()]);
+
+            return $this;
+        }
+
+        $this->exporters[$exporter] = null;
+        $this->unresolvedExporters[$exporter] = [$type ?? ExporterType::class, $options];
 
         return $this;
+    }
+
+    public function hasExporter(string $name): bool
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return array_key_exists($name, $this->exporters)
+            || array_key_exists($name, $this->unresolvedExporters);
     }
 
     public function removeExporter(string $name): static
     {
-        unset($this->exporters[$name]);
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->unresolvedExporters[$name], $this->exporters[$name]);
 
         return $this;
-    }
-
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return $this->columnFactory;
-    }
-
-    public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
-    {
-        $this->columnFactory = $columnFactory;
-
-        return $this;
-    }
-
-    public function getFilterFactory(): FilterFactoryInterface
-    {
-        return $this->filterFactory;
-    }
-
-    public function setFilterFactory(FilterFactoryInterface $filterFactory): static
-    {
-        $this->filterFactory = $filterFactory;
-
-        return $this;
-    }
-
-    public function getActionFactory(): ActionFactoryInterface
-    {
-        return $this->actionFactory;
-    }
-
-    public function setActionFactory(ActionFactoryInterface $actionFactory): static
-    {
-        $this->actionFactory = $actionFactory;
-
-        return $this;
-    }
-
-    public function getExporterFactory(): ExporterFactoryInterface
-    {
-        return $this->exporterFactory;
-    }
-
-    public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static
-    {
-        $this->exporterFactory = $exporterFactory;
-
-        return $this;
-    }
-
-    public function isExportingEnabled(): bool
-    {
-        return $this->exportingEnabled;
-    }
-
-    public function setExportingEnabled(bool $exportingEnabled): static
-    {
-        $this->exportingEnabled = $exportingEnabled;
-
-        return $this;
-    }
-
-    public function getExportFormFactory(): ?FormFactoryInterface
-    {
-        return $this->exportFormFactory;
-    }
-
-    public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static
-    {
-        $this->exportFormFactory = $exportFormFactory;
-
-        return $this;
-    }
-
-    public function getDefaultExportData(): ?ExportData
-    {
-        return $this->defaultExportData;
-    }
-
-    public function setDefaultExportData(?ExportData $defaultExportData): static
-    {
-        $this->defaultExportData = $defaultExportData;
-
-        return $this;
-    }
-
-    public function isPersonalizationEnabled(): bool
-    {
-        return $this->personalizationEnabled;
-    }
-
-    public function setPersonalizationEnabled(bool $personalizationEnabled): static
-    {
-        $this->personalizationEnabled = $personalizationEnabled;
-
-        return $this;
-    }
-
-    public function isPersonalizationPersistenceEnabled(): bool
-    {
-        return $this->personalizationPersistenceEnabled;
-    }
-
-    public function setPersonalizationPersistenceEnabled(bool $personalizationPersistenceEnabled): static
-    {
-        $this->personalizationPersistenceEnabled = $personalizationPersistenceEnabled;
-
-        return $this;
-    }
-
-    public function getPersonalizationPersistenceAdapter(): ?PersistenceAdapterInterface
-    {
-        return $this->personalizationPersistenceAdapter;
-    }
-
-    public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static
-    {
-        $this->personalizationPersistenceAdapter = $personalizationPersistenceAdapter;
-
-        return $this;
-    }
-
-    public function getPersonalizationPersistenceSubject(): ?PersistenceSubjectInterface
-    {
-        return $this->personalizationPersistenceSubject;
-    }
-
-    public function setPersonalizationPersistenceSubject(?PersistenceSubjectInterface $personalizationPersistenceSubject): static
-    {
-        $this->personalizationPersistenceSubject = $personalizationPersistenceSubject;
-
-        return $this;
-    }
-
-    public function getPersonalizationFormFactory(): FormFactoryInterface
-    {
-        return $this->personalizationFormFactory;
-    }
-
-    public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static
-    {
-        $this->personalizationFormFactory = $personalizationFormFactory;
-
-        return $this;
-    }
-
-    public function getDefaultPersonalizationData(): ?PersonalizationData
-    {
-        return $this->defaultPersonalizationData;
-    }
-
-    public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static
-    {
-        $this->defaultPersonalizationData = $defaultPersonalizationData;
-
-        return $this;
-    }
-
-    public function isFiltrationEnabled(): bool
-    {
-        return $this->filtrationEnabled;
-    }
-
-    public function setFiltrationEnabled(bool $filtrationEnabled): static
-    {
-        $this->filtrationEnabled = $filtrationEnabled;
-
-        return $this;
-    }
-
-    public function isFiltrationPersistenceEnabled(): bool
-    {
-        return $this->filtrationPersistenceEnabled;
-    }
-
-    public function setFiltrationPersistenceEnabled(bool $filtrationPersistenceEnabled): static
-    {
-        $this->filtrationPersistenceEnabled = $filtrationPersistenceEnabled;
-
-        return $this;
-    }
-
-    public function getFiltrationPersistenceAdapter(): ?PersistenceAdapterInterface
-    {
-        return $this->filtrationPersistenceAdapter;
-    }
-
-    public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static
-    {
-        $this->filtrationPersistenceAdapter = $filtrationPersistenceAdapter;
-
-        return $this;
-    }
-
-    public function getFiltrationPersistenceSubject(): ?PersistenceSubjectInterface
-    {
-        return $this->filtrationPersistenceSubject;
-    }
-
-    public function setFiltrationPersistenceSubject(?PersistenceSubjectInterface $filtrationPersistenceSubject): static
-    {
-        $this->filtrationPersistenceSubject = $filtrationPersistenceSubject;
-
-        return $this;
-    }
-
-    public function getFiltrationFormFactory(): ?FormFactoryInterface
-    {
-        return $this->filtrationFormFactory;
-    }
-
-    public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static
-    {
-        $this->filtrationFormFactory = $filtrationFormFactory;
-
-        return $this;
-    }
-
-    public function getDefaultFiltrationData(): ?FiltrationData
-    {
-        return $this->defaultFiltrationData;
-    }
-
-    public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
-    {
-        $this->defaultFiltrationData = $defaultFiltrationData;
-
-        return $this;
-    }
-
-    public function isSortingEnabled(): bool
-    {
-        return $this->sortingEnabled;
-    }
-
-    public function setSortingEnabled(bool $sortingEnabled): static
-    {
-        $this->sortingEnabled = $sortingEnabled;
-
-        return $this;
-    }
-
-    public function isSortingPersistenceEnabled(): bool
-    {
-        return $this->sortingPersistenceEnabled;
-    }
-
-    public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static
-    {
-        $this->sortingPersistenceEnabled = $sortingPersistenceEnabled;
-
-        return $this;
-    }
-
-    public function getSortingPersistenceAdapter(): ?PersistenceAdapterInterface
-    {
-        return $this->sortingPersistenceAdapter;
-    }
-
-    public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static
-    {
-        $this->sortingPersistenceAdapter = $sortingPersistenceAdapter;
-
-        return $this;
-    }
-
-    public function getSortingPersistenceSubject(): ?PersistenceSubjectInterface
-    {
-        return $this->sortingPersistenceSubject;
-    }
-
-    public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static
-    {
-        $this->sortingPersistenceSubject = $sortingPersistenceSubject;
-
-        return $this;
-    }
-
-    public function getDefaultSortingData(): ?SortingData
-    {
-        return $this->defaultSortingData;
-    }
-
-    public function setDefaultSortingData(?SortingData $defaultSortingData): static
-    {
-        $this->defaultSortingData = $defaultSortingData;
-
-        return $this;
-    }
-
-    public function isPaginationEnabled(): bool
-    {
-        return $this->paginationEnabled;
-    }
-
-    public function setPaginationEnabled(bool $paginationEnabled): static
-    {
-        $this->paginationEnabled = $paginationEnabled;
-
-        return $this;
-    }
-
-    public function isPaginationPersistenceEnabled(): bool
-    {
-        return $this->paginationPersistenceEnabled;
-    }
-
-    public function setPaginationPersistenceEnabled(bool $paginationPersistenceEnabled): static
-    {
-        $this->paginationPersistenceEnabled = $paginationPersistenceEnabled;
-
-        return $this;
-    }
-
-    public function getPaginationPersistenceAdapter(): ?PersistenceAdapterInterface
-    {
-        return $this->paginationPersistenceAdapter;
-    }
-
-    public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static
-    {
-        $this->paginationPersistenceAdapter = $paginationPersistenceAdapter;
-
-        return $this;
-    }
-
-    public function getPaginationPersistenceSubject(): ?PersistenceSubjectInterface
-    {
-        return $this->paginationPersistenceSubject;
-    }
-
-    public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static
-    {
-        $this->paginationPersistenceSubject = $paginationPersistenceSubject;
-
-        return $this;
-    }
-
-    public function getDefaultPaginationData(): ?PaginationData
-    {
-        return $this->defaultPaginationData;
-    }
-
-    public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static
-    {
-        $this->defaultPaginationData = $defaultPaginationData;
-
-        return $this;
-    }
-
-    public function getRequestHandler(): ?RequestHandlerInterface
-    {
-        return $this->requestHandler;
-    }
-
-    public function setRequestHandler(?RequestHandlerInterface $requestHandler): static
-    {
-        $this->requestHandler = $requestHandler;
-
-        return $this;
-    }
-
-    public function getHeaderRowAttributes(): array
-    {
-        return $this->headerRowAttributes;
-    }
-
-    public function setHeaderRowAttributes(array $headerRowAttributes): static
-    {
-        $this->headerRowAttributes = $headerRowAttributes;
-
-        return $this;
-    }
-
-    public function getValueRowAttributes(): array
-    {
-        return $this->valueRowAttributes;
-    }
-
-    public function setValueRowAttributes(array $valueRowAttributes): static
-    {
-        $this->valueRowAttributes = $valueRowAttributes;
-
-        return $this;
-    }
-
-    public function getPageParameterName(): string
-    {
-        return $this->getParameterName(static::PAGE_PARAMETER);
-    }
-
-    public function getPerPageParameterName(): string
-    {
-        return $this->getParameterName(static::PER_PAGE_PARAMETER);
-    }
-
-    public function getSortParameterName(): string
-    {
-        return $this->getParameterName(static::SORT_PARAMETER);
-    }
-
-    public function getFiltrationParameterName(): string
-    {
-        return $this->getParameterName(static::FILTRATION_PARAMETER);
-    }
-
-    public function getPersonalizationParameterName(): string
-    {
-        return $this->getParameterName(static::PERSONALIZATION_PARAMETER);
-    }
-
-    public function getExportParameterName(): string
-    {
-        return $this->getParameterName(static::EXPORT_PARAMETER);
     }
 
     public function getDataTable(): DataTableInterface
     {
-        $this->validate();
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if (null === $this->query) {
+            throw new BadMethodCallException(sprintf('Unable to create data table without a query. Use the "%s::setQuery()" method to set a query.', $this::class));
+        }
+
+        $dataTable = new DataTable(clone $this->query, $this->getDataTableConfig());
 
         if ($this->shouldPrependBatchCheckboxColumn()) {
             $this->prependBatchCheckboxColumn();
         }
 
-        $this->resolveRowActions();
-
         if ($this->shouldAppendActionsColumn()) {
             $this->appendActionsColumn();
         }
 
-        $dataTable = new DataTable(
-            query: clone $this->query,
-            config: $this->getDataTableConfig(),
-        );
+        if ($this->shouldAddSearchFilter()) {
+            $this->addSearchFilter();
+        }
+
+        $this->resolveColumns();
+
+        foreach ($this->columns as $column) {
+            $dataTable->addColumn($column->getColumn());
+        }
+
+        $this->resolveFilters();
+
+        foreach ($this->filters as $filter) {
+            $dataTable->addFilter($filter->getFilter());
+        }
 
         $this->resolveActions();
 
@@ -1131,21 +713,55 @@ class DataTableBuilder implements DataTableBuilderInterface
             $dataTable->addBatchAction($batchAction->getAction());
         }
 
+        $this->resolveRowActions();
+
         foreach ($this->rowActions as $rowAction) {
             $dataTable->addRowAction($rowAction->getAction());
         }
 
+        $this->resolveExporters();
+
+        foreach ($this->exporters as $exporter) {
+            $dataTable->addExporter($exporter->getExporter());
+        }
+
+        // TODO: Remove initialization logic from builder.
+        //       Instead, add "initialized" flag to the data table itself to allow lazy initialization.
         $dataTable->initialize();
 
         return $dataTable;
     }
 
-    public function getDataTableConfig(): DataTableConfigInterface
+    private function resolveColumn(string $name): ColumnBuilderInterface
     {
-        $config = clone $this;
-        $config->locked = true;
+        [$type, $options] = $this->unresolvedColumns[$name];
 
-        return $config;
+        unset($this->unresolvedColumns[$name]);
+
+        return $this->columns[$name] = $this->getColumnFactory()->createNamedBuilder($name, $type, $options);
+    }
+
+    private function resolveColumns(): void
+    {
+        foreach (array_keys($this->unresolvedColumns) as $column) {
+            $this->resolveColumn($column);
+        }
+    }
+
+    private function resolveFilter(string $name): FilterBuilderInterface
+    {
+        [$type, $options] = $this->unresolvedFilters[$name];
+
+        unset($this->unresolvedFilters[$name]);
+
+        return $this->filters[$name] = $this->getFilterFactory()->createNamedBuilder($name, $type, $options);
+    }
+
+    private function resolveFilters(): void
+    {
+        foreach (array_keys($this->unresolvedFilters) as $filter) {
+            $this->resolveFilter($filter);
+        }
     }
 
     private function resolveAction(string $name): ActionBuilderInterface
@@ -1205,34 +821,20 @@ class DataTableBuilder implements DataTableBuilderInterface
         }
     }
 
-    private function validate(): void
+    private function resolveExporter(string $name): ExporterBuilderInterface
     {
-        if (null === $this->query) {
-            throw new \LogicException('The data table has no proxy query. You must provide it using either the data table factory or the builder "setQuery()" method.');
-        }
+        [$type, $options] = $this->unresolvedExporters[$name];
 
-        if (empty($this->columns)) {
-            throw new \LogicException('The data table has no configured columns. You must provide them using the builder "addColumn()" method.');
-        }
+        unset($this->unresolvedExporters[$name]);
 
-        foreach (static::PERSISTENCE_CONTEXTS as $context) {
-            if (!$this->{$context.'Enabled'} || !$this->{$context.'PersistenceEnabled'}) {
-                continue;
-            }
-
-            if (null === $this->{$context.'PersistenceAdapter'}) {
-                throw new \LogicException("The data table is configured to use $context persistence, but does not have an adapter.");
-            }
-
-            if (null === $this->{$context.'PersistenceSubject'}) {
-                throw new \LogicException("The data table is configured to use $context persistence, but does not have a subject.");
-            }
-        }
+        return $this->exporters[$name] = $this->getExporterFactory()->createNamedBuilder($name, $type, $options);
     }
 
-    private function getParameterName(string $prefix): string
+    private function resolveExporters(): void
     {
-        return implode('_', array_filter([$prefix, $this->name]));
+        foreach (array_keys($this->unresolvedExporters) as $exporter) {
+            $this->resolveExporter($exporter);
+        }
     }
 
     private function shouldPrependBatchCheckboxColumn(): bool
@@ -1249,20 +851,37 @@ class DataTableBuilder implements DataTableBuilderInterface
             && !$this->hasColumn(self::ACTIONS_COLUMN_NAME);
     }
 
+    private function shouldAddSearchFilter(): bool
+    {
+        return $this->isAutoAddingSearchFilter()
+            && null !== $this->getSearchHandler()
+            && !$this->hasFilter(self::SEARCH_FILTER_NAME);
+    }
+
     private function prependBatchCheckboxColumn(): void
     {
-        $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class);
-
-        $this->columns = [
-            self::BATCH_CHECKBOX_COLUMN_NAME => $this->getColumn(self::BATCH_CHECKBOX_COLUMN_NAME),
-            ...$this->getColumns(),
-        ];
+        $this->addColumn(self::BATCH_CHECKBOX_COLUMN_NAME, CheckboxColumnType::class, [
+            'priority' => self::BATCH_CHECKBOX_COLUMN_PRIORITY,
+        ]);
     }
 
     private function appendActionsColumn(): void
     {
         $this->addColumn(self::ACTIONS_COLUMN_NAME, ActionsColumnType::class, [
-            'actions' => $this->rowActions,
+            'priority' => self::ACTIONS_COLUMN_PRIORITY,
+            'actions' => $this->getRowActions(),
         ]);
+    }
+
+    private function addSearchFilter(): void
+    {
+        $this->addFilter(self::SEARCH_FILTER_NAME, SearchFilterType::class, [
+            'handler' => $this->getSearchHandler(),
+        ]);
+    }
+
+    private function createBuilderLockedException(): BadMethodCallException
+    {
+        return new BadMethodCallException('DataTableBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
     }
 }

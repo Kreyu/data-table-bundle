@@ -114,6 +114,27 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
+If the column should be sorted by multiple database columns (for example, to sort by amount and currency at the same time),
+when using the Doctrine ORM, provide a DQL expression as a sort property path:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addColumn('amount', TextColumnType::class, [
+                'sort' => 'CONCAT(product.amount, product.currency)',
+            ])
+        ;
+    }
+}
+```
+
 ## Configuring the feature persistence
 
 By default, the sorting feature [persistence](persistence.md) is **disabled** for every data table.
@@ -151,12 +172,15 @@ return static function (KreyuDataTableConfig $config) {
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -166,7 +190,7 @@ class ProductDataTableType extends AbstractDataTableType
         $resolver->setDefaults([
             'sorting_persistence_enabled' => true,
             'sorting_persistence_adapter' => $this->persistenceAdapter,
-            'sorting_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+            'sorting_persistence_subject_provider' => $this->persistenceSubjectProvider,
         ]);
     }
 }
@@ -178,13 +202,16 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ProductController extends AbstractController
 {
     use DataTableFactoryAwareTrait;
     
     public function __construct(
+        #[Autowire(service: 'kreyu_data_table.filtration.persistence.adapter.cache')]
         private PersistenceAdapterInterface $persistenceAdapter,
+        #[Autowire(service: 'kreyu_data_table.persistence.subject_provider.token_storage')]
         private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
     ) {
     }
@@ -197,7 +224,7 @@ class ProductController extends AbstractController
             options: [
                 'sorting_persistence_enabled' => true,
                 'sorting_persistence_adapter' => $this->persistenceAdapter,
-                'sorting_persistence_subject' => $this->persistenceSubjectProvider->provide(),
+                'sorting_persistence_subject_provider' => $this->persistenceSubjectProvider,
             ],
         );
     }
@@ -234,3 +261,33 @@ class ProductDataTableType extends AbstractDataTableType
 !!! The initial sorting can be performed on multiple columns!
 Although, with built-in themes, the user can perform sorting only by a single column.  
 !!!
+
+## Events
+
+The following events are dispatched when [:icon-mark-github: DataTableInterface::sort()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_SORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the sorting data is applied to the query.
+    Can be used to modify the sorting data, e.g. to force sorting by additional column.
+
+[:icon-mark-github: DataTableEvents::POST_SORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched after the sorting data is applied to the query and saved if the sorting persistence is enabled;
+    Can be used to execute additional logic after the sorting is applied.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTableSortingEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableSortingEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
+
+class DataTableExportListener
+{
+    public function __invoke(DataTableSortingEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $sortingData = $event->getSortingData();
+        
+        // for example, modify the sorting data, then save it in the event
+        $event->setSortingData($sortingData); 
+    }
+}
+```

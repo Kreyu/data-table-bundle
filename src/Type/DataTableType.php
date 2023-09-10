@@ -13,14 +13,16 @@ use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Form\Type\ExportDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -28,49 +30,35 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DataTableType implements DataTableTypeInterface
 {
-    public const DEFAULT_OPTIONS = [
-        'themes' => null,
-        'title' => null,
-        'title_translation_parameters' => [],
-        'translation_domain' => null,
-        'column_factory' => null,
-        'action_factory' => null,
-        'request_handler' => null,
-        'sorting_enabled' => null,
-        'sorting_persistence_enabled' => null,
-        'sorting_persistence_adapter' => null,
-        'sorting_persistence_subject' => null,
-        'pagination_enabled' => null,
-        'pagination_persistence_enabled' => null,
-        'pagination_persistence_adapter' => null,
-        'pagination_persistence_subject' => null,
-        'filtration_enabled' => null,
-        'filtration_persistence_enabled' => null,
-        'filtration_persistence_adapter' => null,
-        'filtration_persistence_subject' => null,
-        'filtration_form_factory' => null,
-        'filter_factory' => null,
-        'personalization_enabled' => null,
-        'personalization_persistence_enabled' => null,
-        'personalization_persistence_adapter' => null,
-        'personalization_persistence_subject' => null,
-        'personalization_form_factory' => null,
-        'exporting_enabled' => null,
-        'exporting_form_factory' => null,
-        'exporter_factory' => null,
-    ];
+    public function __construct(
+        private readonly array $defaults = [],
+    ) {
+    }
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
+        // TODO: Remove backwards compatibility layer
+        $deprecatedPersistenceSubjectSetters = [
+            'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubjectProvider(...),
+            'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubjectProvider(...),
+            'sorting_persistence_subject' => $builder->setSortingPersistenceSubjectProvider(...),
+            'pagination_persistence_subject' => $builder->setPaginationPersistenceSubjectProvider(...),
+        ];
+
+        foreach ($deprecatedPersistenceSubjectSetters as $option => $setter) {
+            $persistenceSubject = $options[$option];
+
+            if ($persistenceSubject instanceof PersistenceSubjectInterface) {
+                $setter(new StaticPersistenceSubjectProvider($persistenceSubject->getDataTablePersistenceIdentifier()));
+            }
+        }
+
         $setters = [
             'themes' => $builder->setThemes(...),
-            'title' => $builder->setTitle(...),
-            'title_translation_parameters' => $builder->setTitleTranslationParameters(...),
-            'translation_domain' => $builder->setTranslationDomain(...),
             'column_factory' => $builder->setColumnFactory(...),
             'filter_factory' => $builder->setFilterFactory(...),
             'action_factory' => $builder->setActionFactory(...),
@@ -78,21 +66,21 @@ final class DataTableType implements DataTableTypeInterface
             'personalization_enabled' => $builder->setPersonalizationEnabled(...),
             'personalization_persistence_enabled' => $builder->setPersonalizationPersistenceEnabled(...),
             'personalization_persistence_adapter' => $builder->setPersonalizationPersistenceAdapter(...),
-            'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubject(...),
+            'personalization_persistence_subject_provider' => $builder->setPersonalizationPersistenceSubjectProvider(...),
             'personalization_form_factory' => $builder->setPersonalizationFormFactory(...),
             'filtration_enabled' => $builder->setFiltrationEnabled(...),
             'filtration_persistence_enabled' => $builder->setFiltrationPersistenceEnabled(...),
             'filtration_persistence_adapter' => $builder->setFiltrationPersistenceAdapter(...),
-            'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubject(...),
+            'filtration_persistence_subject_provider' => $builder->setFiltrationPersistenceSubjectProvider(...),
             'filtration_form_factory' => $builder->setFiltrationFormFactory(...),
             'sorting_enabled' => $builder->setSortingEnabled(...),
             'sorting_persistence_enabled' => $builder->setSortingPersistenceEnabled(...),
             'sorting_persistence_adapter' => $builder->setSortingPersistenceAdapter(...),
-            'sorting_persistence_subject' => $builder->setSortingPersistenceSubject(...),
+            'sorting_persistence_subject_provider' => $builder->setSortingPersistenceSubjectProvider(...),
             'pagination_enabled' => $builder->setPaginationEnabled(...),
             'pagination_persistence_enabled' => $builder->setPaginationPersistenceEnabled(...),
             'pagination_persistence_adapter' => $builder->setPaginationPersistenceAdapter(...),
-            'pagination_persistence_subject' => $builder->setPaginationPersistenceSubject(...),
+            'pagination_persistence_subject_provider' => $builder->setPaginationPersistenceSubjectProvider(...),
             'exporting_enabled' => $builder->setExportingEnabled(...),
             'exporting_form_factory' => $builder->setExportFormFactory(...),
             'request_handler' => $builder->setRequestHandler(...),
@@ -107,19 +95,16 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $columns = $visibleColumns = $dataTable->getConfig()->getColumns();
-
-        if ($dataTable->getConfig()->isPersonalizationEnabled()) {
-            $visibleColumns = $dataTable->getPersonalizationData()->compute($columns);
-        }
+        $columns = $dataTable->getColumns();
+        $visibleColumns = $dataTable->getVisibleColumns();
 
         $view->vars = array_replace($view->vars, [
             'themes' => $dataTable->getConfig()->getThemes(),
+            'title' => $options['title'],
+            'title_translation_parameters' => $options['title_translation_parameters'],
+            'translation_domain' => $options['translation_domain'],
             'name' => $dataTable->getConfig()->getName(),
-            'title' => $dataTable->getConfig()->getTitle(),
-            'title_translation_parameters' => $dataTable->getConfig()->getTitleTranslationParameters(),
-            'translation_domain' => $dataTable->getConfig()->getTranslationDomain(),
-            'exporters' => $dataTable->getConfig()->getExporters(),
+            'exporters' => $dataTable->getExporters(),
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
@@ -167,39 +152,91 @@ final class DataTableType implements DataTableTypeInterface
         }
     }
 
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
+    {
+        $visibleColumns = $dataTable->getExportableColumns();
+
+        $view->vars['translation_domain'] = $dataTable->getConfig()->getOption('translation_domain');
+
+        $view->headerRow = $this->createExportHeaderRowView($view, $dataTable, $visibleColumns);
+        $view->valueRows = new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns));
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefaults(self::DEFAULT_OPTIONS)
-            ->setAllowedTypes('themes', ['null', 'string[]'])
-            ->setAllowedTypes('title', ['null', 'string', TranslatableMessage::class])
-            ->setAllowedTypes('title_translation_parameters', ['null', 'array'])
+            ->setDefaults([
+                'title' => null,
+                'title_translation_parameters' => [],
+                'translation_domain' => null,
+                'themes' => $this->defaults['themes'] ?? [],
+                'column_factory' => $this->defaults['column_factory'] ?? null,
+                'filter_factory' => $this->defaults['filtration']['filter_factory'] ?? null,
+                'action_factory' => $this->defaults['action_factory'] ?? null,
+                'exporter_factory' => $this->defaults['exporting']['exporter_factory'] ?? null,
+                'request_handler' => $this->defaults['request_handler'] ?? null,
+                'sorting_enabled' => $this->defaults['sorting']['enabled'] ?? true,
+                'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'] ?? false,
+                'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'] ?? null,
+                'sorting_persistence_subject_provider' => $this->defaults['sorting']['persistence_subject_provider'] ?? null,
+                'pagination_enabled' => $this->defaults['pagination']['enabled'] ?? true,
+                'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'] ?? false,
+                'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
+                'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
+                'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? false,
+                'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
+                'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,
+                'filtration_persistence_subject_provider' => $this->defaults['filtration']['persistence_subject_provider'] ?? null,
+                'filtration_form_factory' => $this->defaults['filtration']['form_factory'] ?? null,
+                'personalization_enabled' => $this->defaults['personalization']['enabled'] ?? false,
+                'personalization_persistence_enabled' => $this->defaults['personalization']['persistence_enabled'] ?? false,
+                'personalization_persistence_adapter' => $this->defaults['personalization']['persistence_adapter'] ?? null,
+                'personalization_persistence_subject_provider' => $this->defaults['personalization']['persistence_subject_provider'] ?? null,
+                'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
+                'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
+                'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
+
+                // TODO: Remove deprecated options
+                'sorting_persistence_subject' => null,
+                'pagination_persistence_subject' => null,
+                'filtration_persistence_subject' => null,
+                'personalization_persistence_subject' => null,
+            ])
+            ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
+            ->setAllowedTypes('title_translation_parameters', ['array'])
             ->setAllowedTypes('translation_domain', ['null', 'bool', 'string'])
+            ->setAllowedTypes('themes', ['null', 'string[]'])
             ->setAllowedTypes('column_factory', ['null', ColumnFactoryInterface::class])
-            ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])
-            ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
-            ->setAllowedTypes('sorting_enabled', ['null', 'bool'])
-            ->setAllowedTypes('sorting_persistence_enabled', ['null', 'bool'])
-            ->setAllowedTypes('sorting_persistence_adapter', ['null', PersistenceAdapterInterface::class])
-            ->setAllowedTypes('sorting_persistence_subject', ['null', PersistenceSubjectInterface::class])
-            ->setAllowedTypes('pagination_enabled', ['null', 'bool'])
-            ->setAllowedTypes('pagination_persistence_enabled', ['null', 'bool'])
-            ->setAllowedTypes('pagination_persistence_adapter', ['null', PersistenceAdapterInterface::class])
-            ->setAllowedTypes('pagination_persistence_subject', ['null', PersistenceSubjectInterface::class])
-            ->setAllowedTypes('filtration_enabled', ['null', 'bool'])
-            ->setAllowedTypes('filtration_persistence_enabled', ['null', 'bool'])
-            ->setAllowedTypes('filtration_persistence_adapter', ['null', PersistenceAdapterInterface::class])
-            ->setAllowedTypes('filtration_persistence_subject', ['null', PersistenceSubjectInterface::class])
-            ->setAllowedTypes('filtration_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('filter_factory', ['null', FilterFactoryInterface::class])
-            ->setAllowedTypes('personalization_enabled', ['null', 'bool'])
-            ->setAllowedTypes('personalization_persistence_enabled', ['null', 'bool'])
-            ->setAllowedTypes('personalization_persistence_adapter', ['null', PersistenceAdapterInterface::class])
-            ->setAllowedTypes('personalization_persistence_subject', ['null', PersistenceSubjectInterface::class])
-            ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
-            ->setAllowedTypes('exporting_enabled', ['null', 'bool'])
-            ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])
             ->setAllowedTypes('exporter_factory', ['null', ExporterFactoryInterface::class])
+            ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
+            ->setAllowedTypes('sorting_enabled', 'bool')
+            ->setAllowedTypes('sorting_persistence_enabled', 'bool')
+            ->setAllowedTypes('sorting_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('sorting_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])
+            ->setAllowedTypes('pagination_enabled', 'bool')
+            ->setAllowedTypes('pagination_persistence_enabled', 'bool')
+            ->setAllowedTypes('pagination_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('pagination_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])
+            ->setAllowedTypes('filtration_enabled', 'bool')
+            ->setAllowedTypes('filtration_persistence_enabled', 'bool')
+            ->setAllowedTypes('filtration_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('filtration_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])
+            ->setAllowedTypes('filtration_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('personalization_enabled', 'bool')
+            ->setAllowedTypes('personalization_persistence_enabled', 'bool')
+            ->setAllowedTypes('personalization_persistence_adapter', ['null', PersistenceAdapterInterface::class])
+            ->setAllowedTypes('personalization_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])
+            ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('exporting_enabled', 'bool')
+            ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+
+            // TODO: Remove deprecated options
+            ->setDeprecated('sorting_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "sorting_persistence_subject_provider" instead.')
+            ->setDeprecated('pagination_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "pagination_persistence_subject_provider" instead.')
+            ->setDeprecated('filtration_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "filtration_persistence_subject_provider" instead.')
+            ->setDeprecated('personalization_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "personalization_persistence_subject_provider" instead.')
         ;
     }
 
@@ -213,8 +250,12 @@ final class DataTableType implements DataTableTypeInterface
         return null;
     }
 
-    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): PaginationView
+    private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): ?PaginationView
     {
+        if (!$dataTable->getConfig()->isPaginationEnabled()) {
+            return null;
+        }
+
         return new PaginationView($view, $dataTable->getPagination());
     }
 
@@ -245,19 +286,17 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createFilterViews(DataTableView $view, DataTableInterface $dataTable): array
     {
-        $filters = [];
-
         if (!$dataTable->getConfig()->isFiltrationEnabled()) {
             return [];
         }
 
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $data = $dataTable->getFiltrationData()->getFilterData($filter->getName()) ?? new FilterData();
-
-            $filters[$filter->getName()] = $filter->createView($data, $view);
-        }
-
-        return $filters;
+        return array_map(
+            static fn (FilterInterface $filter) => $filter->createView(
+                $dataTable->getFiltrationData()?->getFilterData($filter) ?? new FilterData(),
+                $view,
+            ),
+            $dataTable->getFilters(),
+        );
     }
 
     /**
@@ -286,7 +325,13 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        foreach ($dataTable->getPagination()->getItems() as $index => $data) {
+        if ($dataTable->getConfig()->isPaginationEnabled()) {
+            $items = $dataTable->getPagination()->getItems();
+        } else {
+            $items = $dataTable->getQuery()->getItems();
+        }
+
+        foreach ($items as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);
             $valueRowView->vars['row'] = $valueRowView;
 
@@ -298,10 +343,41 @@ final class DataTableType implements DataTableTypeInterface
                 $valueRowView->vars['attr'][$key] = $value;
             }
 
-            $valueRowView->vars['attr']['data-index'] = $index;
-
             foreach ($columns as $column) {
                 $valueRowView->children[$column->getName()] = $column->createValueView($valueRowView);
+            }
+
+            yield $valueRowView;
+        }
+
+        yield from [];
+    }
+
+    /**
+     * @param array<ColumnInterface> $columns
+     */
+    private function createExportHeaderRowView(DataTableView $view, DataTableInterface $dataTable, array $columns): HeaderRowView
+    {
+        $headerRowView = new HeaderRowView($view);
+
+        foreach ($columns as $column) {
+            if ($column->getConfig()->isExportable()) {
+                $headerRowView->children[$column->getName()] = $column->createExportHeaderView($headerRowView);
+            }
+        }
+
+        return $headerRowView;
+    }
+
+    private function createExportValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
+    {
+        $items = $dataTable->getQuery()->getItems();
+
+        foreach ($items as $index => $data) {
+            $valueRowView = new ValueRowView($view, $index, $data);
+
+            foreach ($columns as $column) {
+                $valueRowView->children[$column->getName()] = $column->createExportValueView($valueRowView);
             }
 
             yield $valueRowView;
@@ -328,19 +404,7 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createExportFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $formFactory = $dataTable->getConfig()->getExportFormFactory();
-
-        $formBuilder = $formFactory->createNamedBuilder(
-            name: $dataTable->getConfig()->getExportParameterName(),
-            type: ExportDataType::class,
-            options: [
-                'method' => 'POST',
-                'exporters' => $dataTable->getConfig()->getExporters(),
-                'default_filename' => $dataTable->getConfig()->getName(),
-            ],
-        );
-
-        $form = $formBuilder->getForm();
+        $form = $dataTable->createExportFormBuilder()->getForm();
         $form->setData($dataTable->getExportData());
 
         return $this->createFormView($form, $view, $dataTable);

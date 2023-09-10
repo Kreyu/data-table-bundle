@@ -17,7 +17,7 @@ The next step is... voilà! ✨ You don't have to configure anything extra, your
 The magic comes from the [:icon-mark-github: base template](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig), 
 which wraps the whole table in the `<turbo-frame>` tag:
 
-{%{
+{% raw %}
 ```twig # @KreyuDataTable/themes/base.html.twig
 {% block kreyu_data_table %}
     <turbo-frame id="kreyu_data_table_{{ name }}">
@@ -25,7 +25,7 @@ which wraps the whole table in the `<turbo-frame>` tag:
     </turbo-frame>
 {% endblock %}
 ```
-}%}
+{% endraw %}
 
 This ensures every data table is wrapped in its own frame, making them work asynchronously.
 

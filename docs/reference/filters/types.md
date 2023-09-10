@@ -14,5 +14,7 @@ The following filter types are natively available in the bundle:
     - [DateTime](types/doctrine-orm/date-time.md)
     - [Entity](types/doctrine-orm/entity.md)
     - [Callback](types/doctrine-orm/callback.md)
+- Special filters
+    - [Search](types/search.md)
 - Base filters
     - [Filter](types/filter.md)

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class SortingData
 {
@@ -18,8 +19,8 @@ class SortingData
      */
     public function __construct(array $columns = [])
     {
-        foreach ($columns as $name => $column) {
-            $this->addColumn($name, $column);
+        foreach ($columns as $column) {
+            $this->addColumn($column);
         }
     }
 
@@ -44,6 +45,49 @@ class SortingData
     }
 
     /**
+     * @param array<ColumnInterface> $columns
+     */
+    public function removeRedundantColumns(array $columns): void
+    {
+        foreach ($columns as $column) {
+            if (!$column instanceof ColumnInterface) {
+                throw new UnexpectedTypeException($column, ColumnInterface::class);
+            }
+
+            // Ensure that all columns are indexed by their name
+            $columns[$column->getName()] = $column;
+        }
+
+        foreach (array_diff_key($this->columns, $columns) as $sortingColumn) {
+            $this->removeColumn($sortingColumn);
+        }
+
+        foreach ($this->columns as $sortingColumn) {
+            $column = $columns[$sortingColumn->getName()];
+
+            if (!$column->getConfig()->isSortable()) {
+                $this->removeColumn($sortingColumn);
+            }
+        }
+    }
+
+    /**
+     * @param array<ColumnInterface> $columns
+     */
+    public function ensureValidPropertyPaths(array $columns): void
+    {
+        foreach ($this->columns as $sortingColumn) {
+            $column = $columns[$sortingColumn->getName()];
+
+            if (!$column instanceof ColumnInterface) {
+                throw new UnexpectedTypeException($column, ColumnInterface::class);
+            }
+
+            $sortingColumn->setPropertyPath($column->getSortPropertyPath());
+        }
+    }
+
+    /**
      * @return array<SortingColumnData>
      */
     public function getColumns(): array
@@ -60,13 +104,22 @@ class SortingData
         return $this->columns[$column] ?? null;
     }
 
-    public function addColumn(string $name, SortingColumnData $column): void
+    public function hasColumn(string|ColumnInterface $column): bool
     {
-        $this->columns[$name] = $column;
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return array_key_exists($column, $this->columns);
     }
 
-    public function removeColumn(string $name): void
+    public function addColumn(SortingColumnData $column): void
     {
-        unset($this->columns[$name]);
+        $this->columns[$column->getName()] = $column;
+    }
+
+    public function removeColumn(SortingColumnData $column): void
+    {
+        unset($this->columns[$column->getName()]);
     }
 }

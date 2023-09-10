@@ -23,10 +23,10 @@ class PaginationData
         ($resolver = new OptionsResolver())
             ->setDefault('page', null)
             ->setDefault('perPage', null)
-            ->setNormalizer('page', function (Options $options, mixed $value) {
+            ->addNormalizer('page', function (Options $options, mixed $value) {
                 return null !== $value ? (int) $value : null;
             })
-            ->setNormalizer('perPage', function (Options $options, mixed $value) {
+            ->addNormalizer('perPage', function (Options $options, mixed $value) {
                 return null !== $value ? (int) $value : null;
             })
             ->setAllowedValues('page', function (int $value): bool {

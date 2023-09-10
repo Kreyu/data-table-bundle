@@ -1,56 +1,27 @@
+### `use_headers`
+
+- **type**: `bool` 
+- **default**: `true`
+
+Determines whether the exporter should add headers to the output file.
+
 ### `label`
 
-- **type**: `string` or `Symfony\Component\Translation\TranslatableMessage` 
-- **default**: the label is "guessed" from the filter name
-
-Sets the label that will be used when rendering the filter.
-
-### `label_translation_parameters`
-
-- **type**: `array` 
-- **default**: `[]`
-
-Sets the parameters used when translating the `label` option.
-
-### `translation_domain`
-
-- **type**: `false` or `string`
-- **default**: the default `KreyuDataTable` is used
-
-Sets the translation domain used when translating the translatable filter values.  
-Setting the option to `false` disables translation for the filter.
-
-### `query_path`
-
 - **type**: `null` or `string` 
-- **default**: `null` the query path is "guessed" from the filter name
+- **default**: `null` the label is "guessed" from the exporter name
 
-Sets the path used in the proxy query to perform the filtering on.
+Sets the label of the exporter, visible in the export action modal.
 
-### `field_type`
+### `tempnam_dir`
 
-- **type**: `string` 
-- **default**: `'Symfony\Component\Form\Extension\Core\Type\TextType`
+- **type**: `string`
+- **default**: the value returned by the `sys_get_temp_dir()` function
 
-This is the form type used to render the filter field.
+Sets the directory used to store temporary file during the export process.
 
-### `field_options`
-
-- **type**: `array`
-- **default**: `[]`
-
-This is the array that's passed to the form type specified in the `field_type` option.
-
-### `operator_type`
+### `tempnam_prefix`
 
 - **type**: `string` 
-- **default**: `Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType`
+- **default**: `exporter_`
 
-This is the form type used to render the operator field.
-
-### `operator_options`
-
-- **type**: `array` 
-- **default**: `[]`
-
-This is the array that's passed to the form type specified in the `operator_type` option.
+Sets the prefix used to generate temporary file names during the export process.

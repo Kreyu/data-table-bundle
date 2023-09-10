@@ -57,8 +57,8 @@ class FiltrationData
     {
         $filters = [];
 
-        foreach ($dataTable->getConfig()->getFilters() as $filter) {
-            $filters[$filter->getName()] = new FilterData();
+        foreach ($dataTable->getFilters() as $filter) {
+            $filters[$filter->getName()] = new FilterData(operator: $filter->getConfig()->getDefaultOperator());
         }
 
         return new self($filters);
@@ -121,9 +121,9 @@ class FiltrationData
      */
     public function appendMissingFilters(array $filters, FilterData $data = new FilterData()): void
     {
-        foreach ($filters as $column) {
-            if (null === $this->getFilterData($column)) {
-                $this->setFilterData($column, $data);
+        foreach ($filters as $filter) {
+            if (null === $this->getFilterData($filter)) {
+                $this->setFilterData($filter, $data);
             }
         }
     }

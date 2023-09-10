@@ -8,10 +8,10 @@ order: d
 
 The data tables can be _personalized_, which can be helpful when working with many columns, by giving the user ability to:
 
-- set the order of the columns;
+- set the priority (order) of the columns;
 - show or hide specific columns;
 
-### Prerequisites
+## Prerequisites
 
 To begin with, make sure the [Symfony UX integration is enabled](../installation.md#enable-the-symfony-ux-integration).
 Then, enable the **personalization** controller:
@@ -30,7 +30,7 @@ Then, enable the **personalization** controller:
 ```
 :::
 
-### Toggling the feature
+## Toggling the feature
 
 By default, the personalization feature is **disabled** for every data table.
 
@@ -91,7 +91,7 @@ class ProductController extends AbstractController
 ```
 +++
 
-### Configuring the feature persistence
+## Configuring the feature persistence
 
 By default, the personalization feature [persistence](persistence.md) is **disabled** for every data table.
 
@@ -182,9 +182,12 @@ class ProductController extends AbstractController
 ```
 +++
 
-## Configuring default pagination
+## Configuring default personalization
 
-The default personalization data can be overridden using the data table builder's `setDefaultPersonalizationData()` method:
+There are two ways to configure the default personalization data for the data table:
+
+- using the columns [`priority`](../reference/columns/types/column.md#priority), [`visible`](../reference/columns/types/column.md#visible) and [`personalizable`](../reference/columns/types/column.md#personalizable) options (recommended);
+- using the data table builder's `setDefaultPersonalizationData()` method;
 
 ```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
@@ -196,17 +199,61 @@ class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
+        // using the columns options:
+        $builder
+            ->addColumn('id', NumberColumnType::class, [
+                'priority' => -1,
+            ])
+            ->addColumn('name', TextColumnType::class, [
+                'visible' => false,
+            ])
+            ->addColumn('createdAt', DateTimeColumnType::class, [
+                'personalizable' => false,
+            ])
+        ;
+        
+        // or using the data table builder's method:
         $builder->setDefaultPersonalizationData(new PersonalizationData([
-            new PersonalizationColumnData(name: 'id', order: 0, visible: false),
-            new PersonalizationColumnData(name: 'name', order: 1, visible: true),
+            new PersonalizationColumnData(name: 'id', priority: -1),
+            new PersonalizationColumnData(name: 'name', visible: false),
         ]));
         
         // or by creating the personalization data from an array:
         $builder->setDefaultPersonalizationData(PersonalizationData::fromArray([
-            // each entry default values: name = from key, order = 0, visible = false
-            'id' => ['visible' => false],
-            'name' => ['order' => 1, 'visible' => true],
+            // each entry default values: name = from key, priority = 0, visible = false
+            'id' => ['priority' => -1],
+            'name' => ['visible' => false],
         ]));
+    }
+}
+```
+
+## Events
+
+The following events are dispatched when [:icon-mark-github: DataTableInterface::personalize()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_PERSONALIZE](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the personalization data is applied to the data table.
+    Can be used to modify the personalization data, e.g. to dynamically specify priority or visibility of the columns.
+
+[:icon-mark-github: DataTableEvents::POST_PERSONALIZE](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched after the personalization data is applied to the data table and saved if the personalization persistence is enabled;
+    Can be used to execute additional logic after the personalization is applied.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTablePersonalizationEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTablePersonalizationEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePersonalizationEvent;
+
+class DataTablePersonalizationListener
+{
+    public function __invoke(DataTablePersonalizationEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $personalizationData = $event->getPersonalizationData();
+        
+        // for example, modify the personalization data, then save it in the event
+        $event->setPersonalizationData($personalizationData); 
     }
 }
 ```

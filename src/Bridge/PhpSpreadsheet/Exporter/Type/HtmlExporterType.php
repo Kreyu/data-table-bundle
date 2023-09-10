@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Html;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class HtmlExporterType extends AbstractExporterType
+class HtmlExporterType extends AbstractPhpSpreadsheetExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

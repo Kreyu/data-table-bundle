@@ -12,38 +12,12 @@ Sometimes all the user needs is a single text input, to quickly search through m
 To handle that, there's a built-in special filter, which allows doing exactly that.
 The uniqueness of this filter shines in the way it is rendered - in the built-in themes, instead of showing up in the filter form, it gets displayed above, always visible, easily accessible.
 
-## Adding the search filter
+## Adding the search handler
 
-To start, define a filter of search type — its name doesn't really matter:
+To define a search handler, use the builder's `setSearchHandler()` method to provide a callable,
+which gets an instance of query, and a search string as its arguments:
 
 ```php # src/DataTable/Type/ProductDataTableType.php
-use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-
-class ProductDataTableType extends AbstractDataTableType
-{
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-        // Columns and filters added before...
-        
-        $builder
-            ->addFilter('search', SearchFilterType::class)
-        ;
-    }
-}
-```
-
-Trying to display the data table with this filter configuration will result in an error:
-
-> The required option "handler" is missing.
-
-This is because the search filter type requires a `handler` option, which contains all the logic required for the data table search capabilities.
-
-## Writing the search handler
-
-The option accepts a callable, which gets an instance of query, and a search string as its arguments:
-
-```php #12 src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
@@ -52,28 +26,33 @@ class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        // Columns and filters added before...
-        
         $builder
-            ->addFilter('search', SearchFilterType::class, [
-                'handler' => $this->handleSearchFilter(...),
-            ])
+            ->setSearchHandler($this->handleSearchFilter(...))
         ;
     }
     
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    private function handleSearchFilter(ProxyQueryInterface $query, string $search): void
+    private function handleSearchFilter(DoctrineOrmProxyQuery $query, string $search): void
     {
+        $alias = current($query->getRootAliases());
+
+        // Remember to use parameters to prevent SQL Injection!
+        // To help with that, DoctrineOrmProxyQuery has a special method "getUniqueParameterId",
+        // that will generate a unique parameter name (inside its query context), handy!
+        $parameter = $query->getUniqueParameterId(); 
+        
+        $query
+            ->andWhere($query->expr()->eq("$alias.type", ":$parameter"))
+            ->setParameter($parameter, $data->getValue())
+        ;
+        
         $criteria = $query->expr()->orX(
-            $query->expr()->like('product.id', ':search'),
-            $query->expr()->like('product.name', ':search'),
+            $query->expr()->like("$alias.id", ":$parameter"),
+            $query->expr()->like("$alias.name", ":$parameter"),
         );
         
         $query
             ->andWhere($criteria)
-            ->setParameter('search', '%' . $search . '%')
+            ->setParameter($parameter, "%$search%")
         ;
     }
 }

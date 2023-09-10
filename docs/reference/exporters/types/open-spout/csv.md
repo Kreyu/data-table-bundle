@@ -1,6 +1,9 @@
 ---
 label: CSV
 order: a
+tags:
+  - exporters
+  - openspout
 ---
 
 # OpenSpout CSV exporter type
@@ -8,7 +11,7 @@ order: a
 The `CsvExporterType` represents an exporter that uses an [OpenSpout](https://github.com/openspout/openspout) CSV writer.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [ExporterType](../exporter.md)
+| Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
 | Class               | [:icon-mark-github: CsvExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/CsvExporterType.php)
 +---------------------+--------------------------------------------------------------+
@@ -17,20 +20,33 @@ The `CsvExporterType` represents an exporter that uses an [OpenSpout](https://gi
 
 ### `field_delimiter`
 
-**type**: `string` **default**: `','`
+- **type**: `string` 
+- **default**: `','`
 
-Represents a string that separates the CSV files values.
+Represents a string that separates the values.
 
 ### `field_enclosure`
 
-**type**: `string` **default**: `'"'`
+- **type**: `string` 
+- **default**: `'"'`
 
-Represents a string that wraps all CSV fields.
+Represents a string that wraps the values.
 
 ### `should_add_bom`
 
-**type**: `bool` **default**: `true`
+- **type**: `bool` 
+- **default**: `true`
+
+Determines whether a BOM character should be added at the beginning of the file. 
 
 ### `flush_threshold`
 
-**type**: `int` **default**: `500`
+- **type**: `int` 
+- **default**: `500`
+
+Represents a number of rows after which the output should be flushed to a file.
+
+## Inherited options
+
+{{ include '_open-spout_options.md' }}
+{{ include '../_exporter_options.md' }}

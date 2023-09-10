@@ -265,3 +265,78 @@ services:
     tags:
       - { name: kreyu_data_table.persistence.subject_provider }
 ```
+
+The data tables can now be configured to use the new persistence subject provider for any feature (for example, personalization):
+
++++ Globally (YAML)
+```yaml # config/packages/kreyu_data_table.yaml
+kreyu_data_table:
+  defaults:
+    personalization:
+      persistence_subject_provider: app.data_table.persistence.subject_provider.custom
+```
++++ Globally (PHP)
+```php # config/packages/kreyu_data_table.php
+use Symfony\Config\KreyuDataTableConfig;
+
+return static function (KreyuDataTableConfig $config) {
+    $defaults = $config->defaults();
+    $defaults->personalization()
+        ->persistenceSubjectProvider('app.data_table.persistence.subject_provider.custom')
+    ;
+};
+```
++++ For data table type
+```php # src/DataTable/Type/ProductDataTable.php
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function __construct(
+        #[Autowire(service: 'app.data_table.persistence.subject_provider.custom')]
+        private PersistenceSubjectProviderInterface $persistenceSubjectProvider,
+    ) {
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'personalization_persistence_subject_provider' => $this->persistenceSubjectProvider,
+        ]);
+    }
+}
+```
++++ For specific data table
+```php # src/Controller/ProductController.php
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function __construct(
+        #[Autowire(service: 'app.data_table.personalization.persistence.database')]
+        private PersistenceAdapterInterface $persistenceAdapter,
+    ) {
+    }
+    
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'personalization_persistence_adapter' => $this->persistenceAdapter,
+            ],
+        );
+    }
+}
+```
++++

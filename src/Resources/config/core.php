@@ -15,12 +15,12 @@ use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvi
 use Kreyu\Bundle\DataTableBundle\Query\ChainProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
-use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -34,14 +34,14 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.type.data_table', DataTableType::class)
+        ->arg('$defaults', abstract_arg('Default options, provided by KreyuDataTableExtension and DefaultConfigurationPass'))
         ->tag('kreyu_data_table.type')
     ;
 
     $services
         ->set('kreyu_data_table.registry', DataTableRegistry::class)
         ->args([
-            tagged_iterator('kreyu_data_table.type'),
-            tagged_iterator('kreyu_data_table.type_extension'),
+            tagged_iterator('kreyu_data_table.extension'),
             service('kreyu_data_table.resolved_type_factory'),
         ])
         ->alias(DataTableRegistryInterface::class, 'kreyu_data_table.registry')
@@ -67,7 +67,6 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.request_handler.http_foundation', HttpFoundationRequestHandler::class)
-        ->alias(RequestHandlerInterface::class, 'kreyu_data_table.request_handler.http_foundation')
     ;
 
     $services

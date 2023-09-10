@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Translation\TranslatableMessage;
 
 interface DataTableConfigInterface
 {
@@ -28,12 +29,7 @@ interface DataTableConfigInterface
     public const PERSONALIZATION_PARAMETER = 'personalization';
     public const EXPORT_PARAMETER = 'export';
 
-    public const PERSISTENCE_CONTEXTS = [
-        'sorting',
-        'pagination',
-        'filtration',
-        'personalization',
-    ];
+    public function getEventDispatcher(): EventDispatcherInterface;
 
     public function getName(): string;
 
@@ -41,45 +37,19 @@ interface DataTableConfigInterface
 
     public function getOptions(): array;
 
+    public function hasOption(string $name): bool;
+
+    public function getOption(string $name, mixed $default = null): mixed;
+
     public function getThemes(): array;
 
-    public function getTitle(): null|string|TranslatableMessage;
+    public function getColumnFactory(): ColumnFactoryInterface;
 
-    public function getTitleTranslationParameters(): array;
+    public function getFilterFactory(): FilterFactoryInterface;
 
-    public function getTranslationDomain(): null|bool|string;
+    public function getActionFactory(): ActionFactoryInterface;
 
-    /**
-     * @return array<ColumnInterface>
-     */
-    public function getColumns(): array;
-
-    /**
-     * @throws \InvalidArgumentException if column of given name does not exist
-     */
-    public function getColumn(string $name): ColumnInterface;
-
-    public function hasColumn(string $name): bool;
-
-    /**
-     * @return array<FilterInterface>
-     */
-    public function getFilters(): array;
-
-    /**
-     * @throws \InvalidArgumentException if filter of given name does not exist
-     */
-    public function getFilter(string $name): FilterInterface;
-
-    /**
-     * @return array<ExporterInterface>
-     */
-    public function getExporters(): array;
-
-    /**
-     * @throws \InvalidArgumentException if exporter of given name does not exist
-     */
-    public function getExporter(string $name): ExporterInterface;
+    public function getExporterFactory(): ExporterFactoryInterface;
 
     public function isExportingEnabled(): bool;
 
@@ -93,7 +63,7 @@ interface DataTableConfigInterface
 
     public function getPersonalizationPersistenceAdapter(): ?PersistenceAdapterInterface;
 
-    public function getPersonalizationPersistenceSubject(): ?PersistenceSubjectInterface;
+    public function getPersonalizationPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;
 
     public function getPersonalizationFormFactory(): ?FormFactoryInterface;
 
@@ -105,7 +75,7 @@ interface DataTableConfigInterface
 
     public function getFiltrationPersistenceAdapter(): ?PersistenceAdapterInterface;
 
-    public function getFiltrationPersistenceSubject(): ?PersistenceSubjectInterface;
+    public function getFiltrationPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;
 
     public function getFiltrationFormFactory(): ?FormFactoryInterface;
 
@@ -117,7 +87,7 @@ interface DataTableConfigInterface
 
     public function getSortingPersistenceAdapter(): ?PersistenceAdapterInterface;
 
-    public function getSortingPersistenceSubject(): ?PersistenceSubjectInterface;
+    public function getSortingPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;
 
     public function getDefaultSortingData(): ?SortingData;
 
@@ -127,7 +97,7 @@ interface DataTableConfigInterface
 
     public function getPaginationPersistenceAdapter(): ?PersistenceAdapterInterface;
 
-    public function getPaginationPersistenceSubject(): ?PersistenceSubjectInterface;
+    public function getPaginationPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;
 
     public function getDefaultPaginationData(): ?PaginationData;
 
@@ -135,7 +105,15 @@ interface DataTableConfigInterface
 
     public function getHeaderRowAttributes(): array;
 
+    public function hasHeaderRowAttribute(string $name): bool;
+
+    public function getHeaderRowAttribute(string $name, mixed $default = null): mixed;
+
     public function getValueRowAttributes(): array;
+
+    public function hasValueRowAttribute(string $name): bool;
+
+    public function getValueRowAttribute(string $name, mixed $default = null): mixed;
 
     public function getPageParameterName(): string;
 

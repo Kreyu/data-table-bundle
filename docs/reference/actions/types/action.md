@@ -1,6 +1,8 @@
 ---
 label: Action
 order: z
+tags:
+  - actions
 ---
 
 # Action type

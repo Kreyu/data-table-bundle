@@ -6,77 +6,48 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
-use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Translation\TranslatableMessage;
 
 interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 {
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static;
+
+    public function addEventSubscriber(EventSubscriberInterface $subscriber): static;
+
+    /**
+     * @deprecated since 0.14.0, provide the name using the factory {@see DataTableFactoryInterface} "named" methods instead
+     */
     public function setName(string $name): static;
 
     public function setType(ResolvedDataTableTypeInterface $type): static;
 
+    /**
+     * @deprecated since 0.14.0, modifying the options dynamically will be removed as it creates unexpected behaviors
+     */
     public function setOptions(array $options): static;
 
-    public function setThemes(array $themes): static;
-
-    public function addTheme(string $theme): static;
-
-    public function removeTheme(string $theme): static;
-
-    public function setTitle(null|string|TranslatableMessage $title): static;
-
-    public function setTitleTranslationParameters(array $titleTranslationParameters): static;
-
-    public function setTranslationDomain(null|bool|string $translationDomain): static;
-
     /**
-     * @param class-string<ColumnTypeInterface> $type
+     * @deprecated since 0.14.0, modifying the options dynamically will be removed as it creates unexpected behaviors
      */
-    public function addColumn(string $name, string $type, array $options = []): static;
-
-    public function removeColumn(string $name): static;
-
-    public function getColumnFactory(): ColumnFactoryInterface;
+    public function setOption(string $name, mixed $value): static;
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static;
 
-    /**
-     * @param class-string<FilterTypeInterface> $type
-     */
-    public function addFilter(string $name, string $type, array $options = []): static;
-
-    public function removeFilter(string $name): static;
-
-    public function getFilterFactory(): FilterFactoryInterface;
-
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static;
 
-    public function getActionFactory(): ActionFactoryInterface;
-
     public function setActionFactory(ActionFactoryInterface $actionFactory): static;
-
-    /**
-     * @param class-string<ExporterTypeInterface> $type
-     */
-    public function addExporter(string $name, string $type, array $options = []): static;
-
-    public function removeExporter(string $name): static;
-
-    public function getExporterFactory(): ExporterFactoryInterface;
 
     public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static;
 
@@ -92,7 +63,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static;
 
-    public function setPersonalizationPersistenceSubject(?PersistenceSubjectInterface $personalizationPersistenceSubject): static;
+    public function setPersonalizationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $personalizationPersistenceSubjectProvider): static;
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static;
 
@@ -104,7 +75,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static;
 
-    public function setFiltrationPersistenceSubject(?PersistenceSubjectInterface $filtrationPersistenceSubject): static;
+    public function setFiltrationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider): static;
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
 
@@ -116,7 +87,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static;
 
-    public function setSortingPersistenceSubject(?PersistenceSubjectInterface $sortingPersistenceSubject): static;
+    public function setSortingPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $sortingPersistenceSubjectProvider): static;
 
     public function setDefaultSortingData(?SortingData $defaultSortingData): static;
 
@@ -126,13 +97,21 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static;
 
-    public function setPaginationPersistenceSubject(?PersistenceSubjectInterface $paginationPersistenceSubject): static;
+    public function setPaginationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $paginationPersistenceSubjectProvider): static;
 
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static;
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
 
+    public function addTheme(string $theme): static;
+
+    public function setThemes(array $themes): static;
+
+    public function setHeaderRowAttribute(string $name, mixed $value): static;
+
     public function setHeaderRowAttributes(array $headerRowAttributes): static;
+
+    public function setValueRowAttribute(string $name, mixed $value): static;
 
     public function setValueRowAttributes(array $valueRowAttributes): static;
 

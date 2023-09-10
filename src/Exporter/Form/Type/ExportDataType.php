@@ -6,11 +6,9 @@ namespace Kreyu\Bundle\DataTableBundle\Exporter\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,20 +18,14 @@ class ExportDataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('filename', TextType::class, [
-                'data' => $options['default_filename'],
-            ])
+            ->add('filename', TextType::class)
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
-                    fn (ExporterInterface $exporter) => $exporter->getOption('label', $exporter->getName()),
+                    fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),
                     $options['exporters'],
                 )),
-                'getter' => fn (ExportData $data) => $data->exporter->getName(),
-                'setter' => fn (ExportData $data, mixed $exporter) => $data->exporter = $options['exporters'][$exporter],
             ])
-            ->add('strategy', EnumType::class, [
-                'class' => ExportStrategy::class,
-            ])
+            ->add('strategy', ExportStrategyType::class)
             ->add('includePersonalization', CheckboxType::class, [
                 'required' => false,
             ])
@@ -45,11 +37,13 @@ class ExportDataType extends AbstractType
         $resolver->setDefaults([
             'data_class' => ExportData::class,
             'translation_domain' => 'KreyuDataTable',
-            'default_filename' => null,
             'exporters' => [],
         ]);
 
         $resolver->setAllowedTypes('exporters', ExporterInterface::class.'[]');
-        $resolver->setAllowedTypes('default_filename', ['null', 'string']);
+
+        // TODO: Remove deprecated default filename option
+        $resolver->setDefault('default_filename', null);
+        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated.');
     }
 }

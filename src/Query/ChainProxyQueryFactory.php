@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Query;
 
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class ChainProxyQueryFactory implements ProxyQueryFactoryInterface
@@ -12,7 +13,7 @@ class ChainProxyQueryFactory implements ProxyQueryFactoryInterface
      * @param array<ProxyQueryFactoryInterface> $factories
      */
     public function __construct(
-        private iterable $factories,
+        private readonly iterable $factories,
     ) {
     }
 
@@ -25,6 +26,6 @@ class ChainProxyQueryFactory implements ProxyQueryFactoryInterface
             }
         }
 
-        throw new \InvalidArgumentException('Unable to create ProxyQuery class for given data');
+        throw new InvalidArgumentException(sprintf('Unable to create proxy query for data of type "%s"', get_debug_type($data)));
     }
 }

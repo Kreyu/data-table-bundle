@@ -1,6 +1,8 @@
 ---
 label: Form
 order: c
+tags:
+  - actions
 ---
 
 # Form action type

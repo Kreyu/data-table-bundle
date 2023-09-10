@@ -1,11 +1,13 @@
 ---
 label: DateTime
 order: e
+tags:
+  - columns
 ---
 
 # DateTime column type
 
-The `DateTimeColumnType` represents a column with value displayed as a date (and with time by default).
+The `DateTimeColumnType` represents a column with value displayed as a date and time.
 
 +-------------+---------------------------------------------------------------------+
 | Parent type | [ColumnType](column)
@@ -21,13 +23,6 @@ The `DateTimeColumnType` represents a column with value displayed as a date (and
 - **default**: `'d.m.Y H:i:s'`
 
 The format specifier is the same as supported by [date](https://www.php.net/date).
-
-### `format`
-
-- **type**: `null` or `string`
-- **default**: `null`
-
-Sets the timezone passed to the date formatter.
 
 ## Inherited options
 

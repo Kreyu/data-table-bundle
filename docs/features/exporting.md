@@ -10,11 +10,14 @@ The data tables can be _exported_, with use of the [exporters](../reference/expo
 
 ## Prerequisites
 
-The built-in exporter types require [PhpSpreadsheet](https://phpspreadsheet.readthedocs.io/en/latest/).
-This library is not included as a bundle dependency, therefore, make sure it is installed:
+To start with, you have to install integration of some exporter library.
+
+The recommended exporter library is [OpenSpout](https://github.com/openspout/openspout).
+
+You can install the integration with the following command:
 
 ```bash
-$ composer require phpoffice/phpspreadsheet
+$ composer require kreyu/data-table-open-spout-bundle
 ```
 
 ## Toggling the feature
@@ -133,8 +136,8 @@ To add exporter, use the builder's `addExporter()` method on the data table buil
 ```php # src/DataTable/Type/ProductDataTableType.php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvExporterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\XlsxExporterType;
+use Kreyu\Bundle\DataTableOpenSpoutBundle\Exporter\Type\CsvExporterType;
+use Kreyu\Bundle\DataTableOpenSpoutBundle\Exporter\Type\XlsxExporterType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
@@ -156,39 +159,35 @@ The builder's `addExporter()` method accepts _three_ arguments:
 
 For reference, see [built-in exporter types](../reference/exporters/types.md).
 
-## Adding multiple exporters of the same type
+## Configuring default export data
 
-Let's think of a scenario where the user wants to export the data table to CSV format,
-but there's a catch — it must be possible to export as either comma or semicolon separated file.
+The default export data, such as filename, exporter, strategy and a flag to include personalization,
+can be configured using the data table builder's `setDefaultExportData()` method:
 
 ```php # src/DataTable/Type/ProductDataTableType.php
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addExporter('csv_comma', CsvExporterType::class, [
-                'label' => 'CSV (separated by comma)',
-                'delimiter' => ',',
-            ])
-            ->addExporter('csv_semicolon', CsvExporterType::class, [
-                'label' => 'CSV (separated by semicolon)',
-                'delimiter' => ';',
-            ])
-            ->addExporter('xlsx', XlsxExporterType::class)
+            ->setDefaultExportData(ExportData::fromArray([
+                'filename' => sprintf('products_%s', date('Y-m-d')),
+                'exporter' => 'xlsx',
+                'strategy' => ExportStrategy::IncludeAll,
+                'include_personalization' => true,
+            ]))
         ;
     }
 }
 ```
 
-## Downloading the file
+## Handling the export form
 
-To download an export file, use the `export()` method on the data table.
-
-If you're using data tables in controllers, use it in combination with `isExporting()` method:
+In the controller, use the `isExporting()` method to make sure the request should be handled as an export:
 
 ```php #15-17 src/Controller/ProductController.php
 use App\DataTable\Type\ProductDataTableType;
@@ -241,37 +240,8 @@ class ProductController extends AbstractController
 }
 ```
 
-If the data table has no specified exporters, this will result in an exception:
-
-> Unable to create export data from data table without exporters
-
-By default, the export will contain records from **all pages**.
-Also, if enabled, the personalization will be **included**.
-To change this behaviour, either configure the data table type's default export data:
-
-```php # src/DataTable/Type/ProductDataTableType.php
-use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
-use Kreyu\Bundle\DataTableBundle\Exporter\ExportStrategy;
-
-class ProductDataTableType extends AbstractDataTableType
-{
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-        $exporters = $builder->getExporters();
-
-        $builder->setDefaultExportData(ExportData::fromArray([
-            'filename' => 'products',
-            'exporter' => $exporters[0],
-            'strategy' => ExportStrategy::INCLUDE_CURRENT_PAGE,
-            'include_personalization' => false,
-        ]));
-    }
-}
-```
-
-or pass the export data directly to the `export()` method:
+The export data such as filename, exporter, strategy and a flag to include personalization,
+can be included by passing it directly to the `export()` method:
 
 ```php #13-14,16 src/Controller/ProductController.php
 use App\DataTable\Type\ProductDataTableType;
@@ -287,11 +257,85 @@ class ProductController extends AbstractController
         $dataTable = $this->createDataTable(ProductDataTableType::class);
 
         $exportData = ExportData::fromDataTable($dataTable);
-        $exportData->includePersonalization = false; 
+        $exportData->filename = sprintf('products_%s', date('Y-m-d'));
+        $exportData->includePersonalization = false;
         
         $file = $dataTable->export($exportData);
         
         // ...
+    }
+}
+```
+
+## Exporting optimization
+
+The exporting process including all pages of the large datasets can take a very long time. 
+To optimize this process, when using Doctrine ORM, change the hydration mode to array during the export:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Doctrine\ORM\AbstractQuery;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_EXPORT, function (DataTableEvent $event) {
+            $event->getDataTable()->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY);
+        });
+    }
+}
+```
+
+This will prevent the Doctrine ORM from hydrating the entities, which is not needed for the export.
+Unfortunately, this means each exportable column property path has to be changed to array (wrapped in square brackets):
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addColumn('id', NumberColumnType::class, [
+                'export' => [
+                    'property_path' => '[id]',
+                ],
+            ])
+        ;
+    }
+}
+
+```
+
+## Events
+
+Following events are dispatched when [:icon-mark-github: DataTableInterface::export()](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:
+
+[:icon-mark-github: DataTableEvents::PRE_EXPORT](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableEvents.php)
+:   Dispatched before the exporter is called.
+    Can be used to modify the exporting data, e.g. to force an export strategy or change the filename.
+
+The listeners and subscribers will receive an instance of the [:icon-mark-github: DataTableExportEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTableExportEvent.php):
+
+```php
+use Kreyu\Bundle\DataTableBundle\Event\DataTableExportEvent;
+
+class DataTableExportListener
+{
+    public function __invoke(DataTableExportEvent $event): void
+    {
+        $dataTable = $event->getDataTable();
+        $exportData = $event->getExportData();
+        
+        // for example, modify the export data, then save it in the event
+        $event->setExportData($exportData); 
     }
 }
 ```

@@ -1,6 +1,6 @@
 ### `label`
 
-- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableMessage`
+- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableInterface`
 - **default**: {{ option_label_default_value ?? '`null` - the label is "guessed" from the column name' }}
 
 Sets the label that will be used when rendering the column header.
@@ -173,3 +173,33 @@ $builder
     ])
 ;
 ``` 
+
+### `priority`
+
+- **type**: `integer`
+- **default**: `0`
+
+Columns are rendered in the same order as they are included in the data table.
+This option changes the column rendering priority, allowing you to display columns earlier or later than their original order.
+
+The higher this priority, the earlier the column will be rendered.
+Priority can albo be negative and columns with the same priority will keep their original order.
+
+**Note**: column priority can be changed by the [personalization feature](../../../features/personalization.md).
+
+### `visible`
+
+- **type**: `bool`
+- **default**: `true`
+
+Determines whether the column is visible to the user.
+
+**Note**: column visibility can be changed by the [personalization feature](../../../features/personalization.md).
+
+### `personalizable`
+
+- **type**: `bool`
+- **default**: `true`
+
+Determines whether the column is personalizable.
+The non-personalizable columns are not modifiable by the [personalization feature](../../../features/personalization.md).

@@ -4,72 +4,49 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Doctrine\ORM\Query\Expr;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class StringFilterType extends AbstractFilterType
+class StringFilterType extends AbstractDoctrineOrmFilterType
 {
-    /**
-     * @param DoctrineOrmProxyQuery $query
-     */
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
-    {
-        $operator = $data->getOperator() ?? Operator::EQUALS;
-        $value = $data->getValue();
-
-        try {
-            $expressionBuilderMethodName = $this->getExpressionBuilderMethodName($operator);
-        } catch (\InvalidArgumentException) {
-            return;
-        }
-
-        $parameterName = $this->getUniqueParameterName($query, $filter);
-
-        $expression = $query->expr()->{$expressionBuilderMethodName}($this->getFilterQueryPath($query, $filter), ":$parameterName");
-
-        $query
-            ->andWhere($expression)
-            ->setParameter($parameterName, $this->getParameterValue($operator, $value));
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('operator_options', function (OptionsResolver $resolver) {
-            $resolver->setDefaults([
-                'visible' => false,
-                'choices' => [
-                    Operator::EQUALS,
-                    Operator::NOT_EQUALS,
-                    Operator::CONTAINS,
-                    Operator::NOT_CONTAINS,
-                    Operator::STARTS_WITH,
-                    Operator::ENDS_WITH,
+        $resolver
+            ->setDefaults([
+                'default_operator' => Operator::Contains,
+                'supported_operators' => [
+                    Operator::Equals,
+                    Operator::NotEquals,
+                    Operator::Contains,
+                    Operator::NotContains,
+                    Operator::StartsWith,
+                    Operator::EndsWith,
                 ],
-            ]);
-        });
+            ])
+        ;
     }
 
-    private function getExpressionBuilderMethodName(Operator $operator): string
+    protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
     {
-        return match ($operator) {
-            Operator::EQUALS => 'eq',
-            Operator::NOT_EQUALS => 'neq',
-            Operator::CONTAINS, Operator::STARTS_WITH, Operator::ENDS_WITH => 'like',
-            Operator::NOT_CONTAINS => 'notLike',
-            default => throw new \InvalidArgumentException('Operator not supported'),
+        $expression = match ($operator) {
+            Operator::Equals => $expr->eq(...),
+            Operator::NotEquals => $expr->neq(...),
+            Operator::Contains, Operator::StartsWith, Operator::EndsWith => $expr->like(...),
+            Operator::NotContains => $expr->notLike(...),
+            default => throw new InvalidArgumentException('Operator not supported'),
         };
+
+        return $expression($queryPath, ":$parameterName");
     }
 
-    private function getParameterValue(Operator $operator, mixed $value): string
+    protected function getParameterValue(Operator $operator, mixed $value): string
     {
         return (string) match ($operator) {
-            Operator::CONTAINS, Operator::NOT_CONTAINS => "%$value%",
-            Operator::STARTS_WITH => "$value%",
-            Operator::ENDS_WITH => "%$value",
+            Operator::Contains, Operator::NotContains => "%$value%",
+            Operator::StartsWith => "$value%",
+            Operator::EndsWith => "%$value",
             default => $value,
         };
     }

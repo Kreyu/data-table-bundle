@@ -1,14 +1,14 @@
 # Operators
-EQUALS: equals
-CONTAINS: contains
-NOT_CONTAINS: not contains
-NOT_EQUALS: not equals
-GREATER_THAN_EQUALS: greater or equal
-LESS_THAN_EQUALS: lesser or equal
-GREATER_THAN: greater than
-LESS_THAN: lesser than
-STARTS_WITH: starts with
-ENDS_WITH: ends with
+Equals: equals
+Not equals: not equals
+Contains: contains
+Not contains: not contains
+Greater than: greater than
+Greater than or equals: greater than or equals
+Less than: less than
+Less than or equals: less than or equals
+Starts with: starts with
+Ends with: ends with
 
 # Boolean type
 Yes: Yes
@@ -35,8 +35,8 @@ Strategy: Strategy
 Include personalization: Include personalization
 
 # Export strategy
-INCLUDE_CURRENT_PAGE: Include current page
-INCLUDE_ALL: From all pages
+Include current page: Include current page
+Include all: From all pages
 
 # Misc
 Selected: Selected

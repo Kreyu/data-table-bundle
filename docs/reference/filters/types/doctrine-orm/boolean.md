@@ -1,6 +1,9 @@
 ---
 label: Boolean
 order: c
+tags:
+  - filters
+  - doctrine orm
 ---
 
 # Boolean filter type
@@ -8,13 +11,15 @@ order: c
 The `BooleanFilterType` represents a filter that operates on boolean values.
 
 +---------------------+--------------------------------------------------------------+
-| Parent type         | [FilterType](../filter)
+| Parent type         | [DoctrineOrmFilterType](doctrine-orm.md)
 +---------------------+--------------------------------------------------------------+
 | Class               | [:icon-mark-github: BooleanFilterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/BooleanFilterType.php)
 +---------------------+--------------------------------------------------------------+
 | Form Type           | [ChoiceType](https://symfony.com/doc/current/reference/forms/types/choice.html)
 +---------------------+--------------------------------------------------------------+
-| Supported operators | EQUALS, NOT_EQUALS
+| Supported operators | Equals, NotEquals
++---------------------+--------------------------------------------------------------+
+| Default operator    | Equals
 +---------------------+--------------------------------------------------------------+
 
 ## Options
@@ -23,4 +28,7 @@ This filter type has no additional options.
 
 ## Inherited options
 
-{{ include '_filter_options' }}
+{{ option_form_type_default_value = '`\'Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType\'`' }}
+
+{{ include '../_filter_options' }}
+{{ include '_doctrine_orm_filter_options' }}

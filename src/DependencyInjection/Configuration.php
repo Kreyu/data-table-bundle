@@ -40,8 +40,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('themes')
                             ->scalarPrototype()->end()
-                            // TODO: Uncomment after removing the root "themes" node
-                            // ->defaultValue(['@KreyuDataTable/themes/base.html.twig'])
+                            ->defaultValue(['@KreyuDataTable/themes/base.html.twig'])
                         ->end()
                         ->scalarNode('column_factory')
                             ->defaultValue('kreyu_data_table.column.factory')

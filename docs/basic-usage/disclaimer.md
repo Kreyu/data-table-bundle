@@ -16,19 +16,36 @@ Instead, they contain links to the reference section, where you can about each f
 The articles assume, that the project uses [Doctrine ORM](https://www.doctrine-project.org/projects/orm.html) and contains a Product entity:
 
 ```php # src/Entity/Product.php
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
 class Product
 {
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private int $id;
+    
+    #[ORM\Column]
     private string $name;
+    
+    #[ORM\Column]
     private \DateTimeInterface $createdAt;
     
-    public function getId(): int {}
-    public function getName(): string {}
-    public function getCreatedAt(): \DateTimeInterface {}
+    public function getId(): int 
+    {
+        return $this->id;
+    }
+    
+    public function getName(): string 
+    {
+        return $this->name;
+    }
+    
+    public function getCreatedAt(): \DateTimeInterface 
+    {
+        return $this->createdAt;
+    }
 }
 ```
-
-For the sake of simplicity, the Doctrine mapping is skipped in the code block above.
 
 ## Frontend
 

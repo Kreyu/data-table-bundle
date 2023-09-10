@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DependencyInjection;
 
-use Kreyu\Bundle\DataTableBundle\DataTableConfigInterface;
+use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -15,11 +15,13 @@ class DefaultConfigurationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $extension = $container->getDefinition('kreyu_data_table.type_extension.default_configuration');
+        $extension = $container->getDefinition('kreyu_data_table.type.data_table');
 
         $defaults = $extension->getArgument('$defaults');
 
-        foreach (DataTableConfigInterface::PERSISTENCE_CONTEXTS as $context) {
+        foreach (PersistenceContext::cases() as $context) {
+            $context = $context->value;
+
             if (!$defaults[$context]['persistence_enabled']) {
                 continue;
             }

@@ -10,7 +10,7 @@ The `XlsExporterType` represents an exporter that uses a [PhpSpreadsheet Xls wri
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [PhpSpreadsheetType](php-spreadsheet.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: XlsExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/XlsExporterType.php)
+| Class               | [:icon-mark-github: XlsExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/PhpSpreadsheet/Exporter/Type/XlsExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

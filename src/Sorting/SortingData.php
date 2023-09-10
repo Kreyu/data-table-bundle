@@ -19,8 +19,8 @@ class SortingData
      */
     public function __construct(array $columns = [])
     {
-        foreach ($columns as $name => $column) {
-            $this->addColumn($name, $column);
+        foreach ($columns as $column) {
+            $this->addColumn($column);
         }
     }
 
@@ -104,14 +104,18 @@ class SortingData
         return $this->columns[$column] ?? null;
     }
 
-    public function hasColumn(ColumnInterface $column): bool
+    public function hasColumn(string|ColumnInterface $column): bool
     {
-        return array_key_exists($column->getName(), $this->columns);
+        if ($column instanceof ColumnInterface) {
+            $column = $column->getName();
+        }
+
+        return array_key_exists($column, $this->columns);
     }
 
-    public function addColumn(string $name, SortingColumnData $column): void
+    public function addColumn(SortingColumnData $column): void
     {
-        $this->columns[$name] = $column;
+        $this->columns[$column->getName()] = $column;
     }
 
     public function removeColumn(SortingColumnData $column): void

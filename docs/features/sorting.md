@@ -114,6 +114,27 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
+If the column should be sorted by multiple database columns (for example, to sort by amount and currency at the same time),
+when using the Doctrine ORM, provide a DQL expression as a sort property path:
+
+```php # src/DataTable/Type/ProductDataTableType.php
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addColumn('amount', TextColumnType::class, [
+                'sort' => 'CONCAT(product.amount, product.currency)',
+            ])
+        ;
+    }
+}
+```
+
 ## Configuring the feature persistence
 
 By default, the sorting feature [persistence](persistence.md) is **disabled** for every data table.

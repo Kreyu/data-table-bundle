@@ -16,7 +16,7 @@ class SortingColumnData
     public function __construct(
         private readonly string $name,
         private string $direction = 'asc',
-        null|string|PropertyPathInterface $propertyPath = null,
+        string|PropertyPathInterface $propertyPath = null,
     ) {
         $this->setPropertyPath($propertyPath);
     }

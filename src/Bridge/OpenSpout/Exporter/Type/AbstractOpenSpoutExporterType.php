@@ -18,7 +18,6 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Writer\Exception\WriterNotOpenedException;
 use OpenSpout\Writer\WriterInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
 {

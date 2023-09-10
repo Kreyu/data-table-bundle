@@ -36,7 +36,6 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
-use Kreyu\Bundle\DataTableBundle\Sorting\SortingColumnData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 

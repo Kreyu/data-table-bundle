@@ -12,7 +12,6 @@ use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 /**
@@ -115,7 +114,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         do {
             $hasItems = true;
 
-            if ($cursorPosition % $batchSize === 0) {
+            if (0 === $cursorPosition % $batchSize) {
                 $hasItems = false;
 
                 $paginator->getQuery()->setMaxResults($batchSize);
@@ -131,7 +130,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
                 }
             }
 
-            $cursorPosition++;
+            ++$cursorPosition;
         } while (0 === $cursorPosition || $hasItems);
     }
 

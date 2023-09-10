@@ -6,13 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
@@ -199,7 +199,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
     }
 
-    public function addColumn(ColumnBuilderInterface|string $column, string $type = ColumnType::class, array $options = []): static
+    public function addColumn(ColumnBuilderInterface|string $column, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -214,7 +214,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->columns[$column] = null;
-        $this->unresolvedColumns[$column] = [$type, $options];
+        $this->unresolvedColumns[$column] = [$type ?? TextColumnType::class, $options];
 
         return $this;
     }
@@ -268,7 +268,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
     }
 
-    public function addFilter(string|FilterBuilderInterface $filter, string $type = FilterType::class, array $options = []): static
+    public function addFilter(string|FilterBuilderInterface $filter, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -283,7 +283,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->filters[$filter] = null;
-        $this->unresolvedFilters[$filter] = [$type, $options];
+        $this->unresolvedFilters[$filter] = [$type ?? FilterType::class, $options];
 
         return $this;
     }
@@ -377,7 +377,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The action with the name "%s" does not exist.', $name));
     }
 
-    public function addAction(string|ActionBuilderInterface $action, string $type = ActionType::class, array $options = []): static
+    public function addAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -392,7 +392,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->actions[$action] = null;
-        $this->unresolvedActions[$action] = [$type, $options];
+        $this->unresolvedActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
@@ -456,7 +456,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             || array_key_exists($name, $this->unresolvedBatchActions);
     }
 
-    public function addBatchAction(string|ActionBuilderInterface $action, string $type = ActionType::class, array $options = []): static
+    public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -471,7 +471,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->batchActions[$action] = null;
-        $this->unresolvedBatchActions[$action] = [$type, $options];
+        $this->unresolvedBatchActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
@@ -545,7 +545,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             || array_key_exists($name, $this->unresolvedRowActions);
     }
 
-    public function addRowAction(string|ActionBuilderInterface $action, string $type = ActionType::class, array $options = []): static
+    public function addRowAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -560,7 +560,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->rowActions[$action] = null;
-        $this->unresolvedRowActions[$action] = [$type, $options];
+        $this->unresolvedRowActions[$action] = [$type ?? ButtonActionType::class, $options];
 
         return $this;
     }
@@ -624,7 +624,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The exporter with the name "%s" does not exist.', $name));
     }
 
-    public function addExporter(string|ExporterBuilderInterface $exporter, string $type = ExporterType::class, array $options = []): static
+    public function addExporter(string|ExporterBuilderInterface $exporter, string $type = null, array $options = []): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -639,7 +639,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         $this->exporters[$exporter] = null;
-        $this->unresolvedExporters[$exporter] = [$type, $options];
+        $this->unresolvedExporters[$exporter] = [$type ?? ExporterType::class, $options];
 
         return $this;
     }

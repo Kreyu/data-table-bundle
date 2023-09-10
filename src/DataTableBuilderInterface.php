@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
@@ -44,9 +40,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasColumn(string $name): bool;
 
     /**
-     * @param class-string<ColumnTypeInterface> $type
+     * @param class-string<ColumnTypeInterface>|null $type
      */
-    public function addColumn(ColumnBuilderInterface|string $column, string $type = ColumnType::class, array $options = []): static;
+    public function addColumn(ColumnBuilderInterface|string $column, string $type = null, array $options = []): static;
 
     public function removeColumn(string $name): static;
 
@@ -63,9 +59,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasFilter(string $name): bool;
 
     /**
-     * @param class-string<FilterTypeInterface> $type
+     * @param class-string<FilterTypeInterface>|null $type
      */
-    public function addFilter(FilterBuilderInterface|string $filter, string $type = FilterType::class, array $options = []): static;
+    public function addFilter(FilterBuilderInterface|string $filter, string $type = null, array $options = []): static;
 
     public function removeFilter(string $name): static;
 
@@ -90,9 +86,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasAction(string $name): bool;
 
     /**
-     * @param class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
-    public function addAction(ActionBuilderInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
     public function removeAction(string $name): static;
 
@@ -109,9 +105,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasBatchAction(string $name): bool;
 
     /**
-     * @param class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
-    public function addBatchAction(ActionBuilderInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addBatchAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
     public function removeBatchAction(string $name): static;
 
@@ -132,9 +128,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasRowAction(string $name): bool;
 
     /**
-     * @param class-string<ActionTypeInterface> $type
+     * @param class-string<ActionTypeInterface>|null $type
      */
-    public function addRowAction(ActionBuilderInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addRowAction(ActionBuilderInterface|string $action, string $type = null, array $options = []): static;
 
     public function removeRowAction(string $name): static;
 
@@ -155,9 +151,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function hasExporter(string $name): bool;
 
     /**
-     * @param class-string<ExporterTypeInterface> $type
+     * @param class-string<ExporterTypeInterface>|null $type
      */
-    public function addExporter(ExporterBuilderInterface|string $exporter, string $type = ExporterType::class, array $options = []): static;
+    public function addExporter(ExporterBuilderInterface|string $exporter, string $type = null, array $options = []): static;
 
     public function removeExporter(string $name): static;
 

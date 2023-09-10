@@ -7,13 +7,16 @@
 - **[Feature]** More verbose filter type form-related options such as `form_type`, `operator_form_type`
 - **[Feature]** Ability to set hydration mode of the Doctrine ORM proxy query
 - **[Feature]** Data table builder's `setSearchHandler` method for easier search definition
-- **[Feature]** Collection column type default separator changed `', '` (with space after comma) instead of `','`
+- **[Feature]** The `CollectionColumnType` default separator changed `', '` (with space after comma) instead of `','`
 - **[Feature]** Ability to create `ExportData` with exporter name string
 - **[Feature]** Ability to provide property path in the `SortingColumnData`. The data table ensures valid property path is given (backwards compatible)
 - **[Feature]** The Doctrine ORM `EntityFilterType` no longer requires `form_options.choice_value` option as the identifier field name will be retrieved from Doctrine class metadata by default
-- **[Feature] [Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more)
-- **[Feature] [Breaking change]** Optimized exporting process - introduces breaking changes (see more)
-- **[Bugfix]** CollectionColumnType now renders without spaces around separator
+- **[Feature]** The `DateColumnType` that works exactly like `DateTimeColumnType`, but with date-only format by default
+- **[Breaking change]** The data table type persistence subject options are removed in favor of subject provider options (see more)
+- **[Breaking change]** Optimized exporting process - introduces breaking changes (see more)
+- **[Breaking change]** The `DataTableBuilder` methods to add columns, filters, actions and exporters has changed definition - the `type` argument is now nullable to prepare for future implementation of type guessers
+- **[Bugfix]** Fixed a bug in personalization form where changing the column visibility resulted in an exception
+- **[Bugfix]** The `CollectionColumnType` now renders without spaces around separator
 - **[Bugfix]** Default export data is now properly used within the export form 
 
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.

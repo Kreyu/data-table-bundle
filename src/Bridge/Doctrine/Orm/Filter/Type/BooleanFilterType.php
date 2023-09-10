@@ -11,8 +11,8 @@ use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Symfony\Contracts\Translation\TranslatableInterface;
+
 use function Symfony\Component\Translation\t;
 
 class BooleanFilterType extends AbstractDoctrineOrmFilterType

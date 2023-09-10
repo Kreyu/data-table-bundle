@@ -122,7 +122,7 @@ For reference, see [built-in action types](../components/actions/types.md).
 Let's assume that the application has an `app_product_show` route for showing details about specific product.
 This route requires a product identifier, therefore it has to be a row action.
 
-To add batch action, use the builder's `addRowAction()` method:
+To add row action, use the builder's `addRowAction()` method:
 
 ```php # src/DataTable/Type/ProductDataTableType.php
 use App\Entity\Product;

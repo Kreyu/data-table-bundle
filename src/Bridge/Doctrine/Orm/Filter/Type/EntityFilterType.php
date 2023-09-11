@@ -48,7 +48,7 @@ class EntityFilterType extends AbstractDoctrineOrmFilterType
                 // and the EntityType form type needs to know how to convert it back to the entity object.
                 //
                 // If it's not provided, try to retrieve it from the entity metadata.
-                if (null === $value['choice_value'] ?? null) {
+                if (null === ($value['choice_value'] ?? null)) {
                     $identifiers = $this->doctrineRegistry
                         ->getManagerForClass($value['class'])
                         ?->getClassMetadata($value['class'])

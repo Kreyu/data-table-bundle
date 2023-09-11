@@ -59,6 +59,11 @@ class PersonalizationColumnData
 
     public function getPriority(): int
     {
+        // TODO: Remove BC layer made for easier update to version 0.14
+        if (isset($this->order)) {
+            $this->priority = (int) $this->order;
+        }
+
         return $this->priority;
     }
 

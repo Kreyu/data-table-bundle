@@ -37,7 +37,7 @@ export default class extends Controller {
     }
 
     #onPriorityChange(event) {
-        const priorityInputs = this.#getPriorityInputs(event.from);
+        const priorityInputs = this.#getPriorityInputs(event.to);
 
         const changes = {};
 
@@ -68,7 +68,10 @@ export default class extends Controller {
         return new Sortable(target, {
             group: 'shared',
             animation: 150,
-            onAdd: this.#onVisibilityChange.bind(this),
+            onAdd: (event) => {
+                this.#onVisibilityChange(event);
+                this.#onPriorityChange(event);
+            },
             onChange: this.#onPriorityChange.bind(this),
         })
     }

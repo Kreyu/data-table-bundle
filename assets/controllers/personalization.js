@@ -17,26 +17,71 @@ export default class extends Controller {
         this.#hiddenColumnSortable.destroy();
     }
 
+    #onVisibilityChange(event) {
+        if (this.context.application.debug) {
+            console.groupCollapsed(this.identifier + ' #onVisibilityChange');
+        }
+
+        const visibilityInput = this.#getVisibilityInput(event.item);
+        const visibilityBefore = visibilityInput.value;
+        const visibilityAfter = event.to.dataset.visible;
+
+        visibilityInput.value = visibilityAfter;
+
+        if (this.context.application.debug) {
+            const columnName = this.#getNameInput(event.item).value;
+
+            console.log(`Column "${columnName}" visibility changed from ${visibilityBefore} to ${visibilityAfter}`);
+            console.groupEnd();
+        }
+    }
+
+    #onPriorityChange(event) {
+        const priorityInputs = this.#getPriorityInputs(event.from);
+
+        const changes = {};
+
+        if (this.context.application.debug) {
+            console.groupCollapsed(this.identifier + ' #onPriorityChange');
+        }
+
+        for (const [index, item] of Object.entries(priorityInputs)) {
+            const priorityAfter = priorityInputs.length - index - 1;
+
+            if (this.context.application.debug) {
+                const columnName = this.#getNameInput(item.parentElement).value;
+                const priorityBefore = Number(item.value);
+
+                changes[columnName] = { priorityBefore, priorityAfter };
+            }
+
+            item.value = priorityAfter;
+        }
+
+        if (this.context.application.debug) {
+            console.table(changes);
+            console.groupEnd();
+        }
+    }
+
     #initializeSortable(target) {
         return new Sortable(target, {
             group: 'shared',
             animation: 150,
-            onAdd: event => {
-                const input = event.item.querySelector('[name$="[visible]"]')
-
-                input.value = event.to.dataset.visible
-            },
-            onChange: event => {
-                const priorityInput = event.item.querySelector('[name$="[priority]"]')
-                const originalPriorityInput = event.originalEvent.target.querySelector('[name$="[priority]"]')
-
-                priorityInput.value = this.#calculatePriority(target, event.newIndex)
-                originalPriorityInput.value = this.#calculatePriority(target, event.oldIndex)
-            }
+            onAdd: this.#onVisibilityChange.bind(this),
+            onChange: this.#onPriorityChange.bind(this),
         })
     }
 
-    #calculatePriority(target, index) {
-        return target.childElementCount - index - 1;
+    #getNameInput(target) {
+        return target.querySelector('[name$="[name]"]');
+    }
+
+    #getVisibilityInput(target) {
+        return target.querySelector('[name$="[visible]"]');
+    }
+
+    #getPriorityInputs(target) {
+        return target.querySelectorAll('[name$="[priority]"]');
     }
 }

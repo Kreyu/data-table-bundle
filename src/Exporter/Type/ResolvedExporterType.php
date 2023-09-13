@@ -80,6 +80,10 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
             }
 
             $this->innerType->configureOptions($this->optionsResolver);
+
+            foreach ($this->typeExtensions as $extension) {
+                $extension->configureOptions($this->optionsResolver);
+            }
         }
 
         return $this->optionsResolver;

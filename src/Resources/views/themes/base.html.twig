@@ -374,7 +374,7 @@
     {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
 
     {% if use_intl_formatter %}
-        {#{% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}#}
+        {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
     {% endif %}
 
     {{- block('column_text_value') -}}
@@ -386,7 +386,7 @@
     {# @var string  currency #}
 
     {% if use_intl_formatter %}
-        {#{% set value = value|format_currency(currency, intl_formatter_options.attrs) %}#}
+        {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
     {% endif %}
 
     {{- block('column_text_value') -}}

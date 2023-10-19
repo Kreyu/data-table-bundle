@@ -62,11 +62,11 @@ Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json
 
 ## Install front-end dependencies and rebuild
 
-The build process obviously depends on the configuration of your project. 
+If you're using WebpackEncore, install your assets and restart Encore (not needed if you're using AssetMapper):
 
 +++ yarn
 ```shell
-$ yarn install
+$ yarn install --force
 $ yarn watch
 ```
 +++ npm

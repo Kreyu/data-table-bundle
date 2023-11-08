@@ -371,7 +371,11 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createExportValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        $items = $dataTable->getQuery()->getItems();
+        if ($dataTable->getConfig()->isPaginationEnabled()) {
+            $items = $dataTable->getPagination()->getItems();
+        } else {
+            $items = $dataTable->getQuery()->getItems();
+        }
 
         foreach ($items as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);

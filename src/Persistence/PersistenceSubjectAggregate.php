@@ -17,7 +17,7 @@ class PersistenceSubjectAggregate implements PersistenceSubjectInterface
 
     public function getDataTablePersistenceIdentifier(): string
     {
-        return $this->identifier;
+        return str_replace(['{','}','(',')','/','\\','@',':'], '_', $this->identifier);
     }
 
     public function getSubject(): mixed

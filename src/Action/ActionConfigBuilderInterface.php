@@ -33,5 +33,7 @@ interface ActionConfigBuilderInterface extends ActionConfigInterface
 
     public function setConfirmable(bool $confirmable): static;
 
+    public function setActionFactory(ActionFactoryInterface $actionFactory): static;
+
     public function getActionConfig(): ActionConfigInterface;
 }

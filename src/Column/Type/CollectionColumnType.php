@@ -62,7 +62,9 @@ class CollectionColumnType extends AbstractColumnType
         /** @var ColumnFactoryInterface $prototypeFactory */
         $prototypeFactory = $column->getConfig()->getAttribute('prototype_factory');
 
-        $prototype = $prototypeFactory->createNamed('__name__', $options['entry_type'], $options['entry_options']);
+        $prototype = $prototypeFactory->createNamed('__name__', $options['entry_type'], $options['entry_options'] + [
+            'property_path' => false,
+        ]);
 
         $children = [];
 

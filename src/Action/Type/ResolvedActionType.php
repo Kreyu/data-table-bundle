@@ -75,7 +75,10 @@ class ResolvedActionType implements ResolvedActionTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the action "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return new ActionBuilder($name, $this, $options);
+        $builder = new ActionBuilder($name, $this, $options);
+        $builder->setActionFactory($factory);
+
+        return $builder;
     }
 
     public function createView(ActionInterface $action, DataTableView|ColumnValueView $parent): ActionView

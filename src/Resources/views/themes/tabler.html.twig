@@ -111,8 +111,8 @@
 {% endblock %}
 
 {% block column_boolean_value %}
-    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green-lt' : 'bg-red-lt') } } %}
-        {{ parent() }}
+    {% with { attr: { class: 'badge ' ~ (value ? 'bg-green-lt' : 'bg-red-lt') }|merge(attr|default({})) } %}
+        {{- parent() -}}
     {% endwith %}
 {% endblock %}
 
@@ -134,7 +134,7 @@
 
 {% block column_checkbox_header %}
     {% with { attr: { class: 'w-0' } } %}
-        {{ parent() }}
+        {{~ parent() -}}
     {% endwith %}
 {% endblock %}
 

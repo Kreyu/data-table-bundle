@@ -27,4 +27,6 @@ interface ActionConfigInterface
     public function getContext(): ActionContext;
 
     public function isConfirmable(): bool;
+
+    public function getActionFactory(): ActionFactoryInterface;
 }

@@ -23,7 +23,7 @@ class NumberColumnType extends AbstractColumnType
     {
         $resolver
             ->setDefaults([
-                'use_intl_formatter' => class_exists(IntlFormatter::class),
+                'use_intl_formatter' => false,
                 'intl_formatter_options' => function (OptionsResolver $resolver) {
                     $resolver
                         ->setDefaults([

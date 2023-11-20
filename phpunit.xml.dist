@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
+         backupGlobals="false" colors="true" bootstrap="vendor/autoload.php" failOnRisky="true" failOnWarning="true"
+         printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
+>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <server name="KERNEL_CLASS" value="Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Kernel"/>
+    <server name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+  </php>
+  <testsuites>
+    <testsuite name="Bundle Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <listeners>
+    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+  </listeners>
+</phpunit>

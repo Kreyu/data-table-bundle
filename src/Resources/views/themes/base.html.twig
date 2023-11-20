@@ -70,7 +70,7 @@
 
 {% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        <tr{% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
     {% endfor %}
 {% endblock %}
 
@@ -85,7 +85,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_header_row %}
-    <tr {% with { attr: row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
+    <tr{% with { attr: row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
         {% for column_header in row %}
             {{- data_table_column_header(column_header) -}}
         {% endfor %}
@@ -311,7 +311,7 @@
         {% set attr = attr|default({}) %}
         {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
 
-        <th {{ block('attributes') }}>
+        <th{{ block('attributes') }}>
             {% set query_params = app.request.query.all %}
             {% set query_params = query_params|merge({ (sort_parameter_name): {
                 (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
@@ -322,7 +322,7 @@
             {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
             {% set label_attr = { 'data-turbo-action': 'advance' }|merge(label_attr) %}
 
-            <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
+            <a{% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
 
                 {% if sorted %}
@@ -337,8 +337,8 @@
             </a>
         </th>
     {% else %}
-        <th {{ block('attributes') }}>
-            <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
+        <th{{ block('attributes') }}>
+            <span{% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
             </span>
         </th>
@@ -356,7 +356,7 @@
 {# Column type value templates #}
 
 {% block column_value %}
-    <span {{- block('attributes') -}}>
+    <span{{ block('attributes') }}>
         {%- if translation_domain is not same as false -%}
             {{- value|trans({}, translation_domain) -}}
         {%- else -%}
@@ -370,35 +370,16 @@
 {% endblock %}
 
 {% block column_number_value %}
-    {# @var bool  use_intl_formatter - Determines whether the Intl formatter should be used #}
-    {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
-
-    {% if use_intl_formatter %}
-        {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
-    {% endif %}
-
     {{- block('column_text_value') -}}
 {% endblock %}
 
 {% block column_money_value %}
-    {# @var bool    use_intl_formatter - Determines whether the Intl formatter should be used #}
-    {# @var array   intl_formatter_options - Options used to configure the Intl formatter #}
-    {# @var string  currency #}
-
-    {% if use_intl_formatter %}
-        {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
-    {% endif %}
-
     {{- block('column_text_value') -}}
-
-    {% if not use_intl_formatter %}
-        {{ currency }}
-    {% endif %}
 {% endblock %}
 
 {% block column_link_value %}
-    <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {{- block('column_text_value') -}}
+    <a{% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+        {{~ block('column_text_value') -}}
     </a>
 {% endblock %}
 
@@ -421,14 +402,16 @@
 {% endblock %}
 
 {% block column_collection_value %}
-    {# Note: do **not** remove the HTML comments below, because it makes sure the separator is rendered properly. #}
-    {% apply spaceless %}
-        {% for child in children %}
-            {% if not loop.first %}-->{% endif %}
-            {{- data_table_column_value(child) -}}<!--
-            -->{% if not loop.last %}{{- separator -}}<!--{% endif %}
-        {% endfor %}
-    {% endapply %}
+    {%- apply spaceless %}
+        {%- for child in children %}
+            {{- data_table_column_value(child) -}}
+            {%- if not loop.last %}{{ block('column_collection_separator', theme) }}{% endif -%}
+        {% endfor -%}
+    {% endapply -%}
+{% endblock %}
+
+{% block column_collection_separator %}
+    <span>{{ separator }}</span>
 {% endblock %}
 
 {% block column_template_value %}
@@ -436,9 +419,9 @@
 {% endblock %}
 
 {% block column_actions_value %}
-    {% for action in actions %}
-        {{ data_table_action(action) }}
-    {% endfor %}
+    {%- for action in actions -%}
+        {{- data_table_action(action) -}}
+    {%- endfor -%}
 {% endblock %}
 
 {% block column_form_value %}
@@ -467,7 +450,7 @@
             'data-action': 'input->kreyu--data-table-bundle--batch#selectAll'
         }|merge(input_attr|default({})) %}
 
-        <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
+        <input{% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}/>
     </th>
 {% endblock %}
 
@@ -481,18 +464,17 @@
         'data-kreyu--data-table-bundle--batch-target': 'selectRowCheckbox',
         'data-action': 'input->kreyu--data-table-bundle--batch#selectRow'
     }|merge(input_attr|default({})) %}
-
-    <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
+    <input{% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}/>
 {% endblock %}
 
 {# Action type templates #}
 
 {% block action_value_icon %}{% endblock %}
 
-{% block action_value %}
+{%- block action_value -%}
     {% if icon_attr %}{{ block('action_value_icon', theme, _context) }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
-{% endblock %}
+{%- endblock -%}
 
 {% block action_link_value %}
     <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
@@ -536,6 +518,6 @@
 
 {% block sort_arrow_desc %}↓{% endblock %}
 
-{% block attributes %}
-    {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
-{% endblock %}
+{%- block attributes %}
+    {%- for key, value in attr|default({}) %} {{ key }}="{{ value }}"{% endfor -%}
+{% endblock -%}

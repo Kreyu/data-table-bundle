@@ -20,6 +20,12 @@
     {% endwith %}
 {% endblock %}
 
+{% block column_boolean_value %}
+    {% with { attr: { class: 'badge ' ~ (value ? 'bg-success' : 'bg-danger') }|merge(attr|default({})) } %}
+        {{- parent() -}}
+    {% endwith %}
+{% endblock %}
+
 {% block action_bar %}
     {% set display_filter_action = filtration_enabled and filters|length > 0 and filtration_form.children|length > 0 %}
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
@@ -562,7 +568,7 @@
 {% endblock %}
 
 {% block action_value_icon %}
-    <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
+    <i{% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
 {% block action_confirmation_modal %}
@@ -628,7 +634,7 @@
 
 {% block action_value %}
     <div class="d-inline-block" {{ block('attributes') }}>
-        {{ parent() }}
+        {{~ parent() -}}
     </div>
 {% endblock %}
 
@@ -728,11 +734,15 @@
 {% endblock %}
 
 {% block column_number_value %}
-    <div class="text-end">{{ parent() }}</div>
+    <div class="text-end">
+        {{~ parent() -}}
+    </div>
 {% endblock %}
 
 {% block column_money_value %}
-    <div class="text-end">{{ parent() }}</div>
+    <div class="text-end">
+        {{~ parent() -}}
+    </div>
 {% endblock %}
 
 {% block column_checkbox_header %}
@@ -745,8 +755,7 @@
 
 {% block column_checkbox_value %}
     {% set wrapper_attr = { class: 'w-100 h-100 text-center' }|merge(wrapper_attr|default({})) %}
-
-    <div {% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
+    <div{% with { attr: wrapper_attr } %}{{ block('attributes') }}{% endwith %}>
         {% with { input_attr: { class: 'form-check-input' } } %}
             {{ parent() }}
         {% endwith %}

@@ -14,6 +14,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
     private ActionContext $context = ActionContext::Global;
     private array $attributes = [];
     private bool $confirmable = false;
+    private ActionFactoryInterface $actionFactory;
 
     public function __construct(
         private string $name,
@@ -156,6 +157,26 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
         }
 
         $this->confirmable = $confirmable;
+
+        return $this;
+    }
+
+    public function getActionFactory(): ActionFactoryInterface
+    {
+        if (!isset($this->actionFactory)) {
+            throw new BadMethodCallException('The action factory must be set before retrieving it.');
+        }
+
+        return $this->actionFactory;
+    }
+
+    public function setActionFactory(ActionFactoryInterface $actionFactory): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->actionFactory = $actionFactory;
 
         return $this;
     }

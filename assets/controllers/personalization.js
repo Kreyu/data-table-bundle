@@ -15,6 +15,16 @@ export default class extends Controller {
     disconnect() {
         this.#visibleColumnsSortable.destroy();
         this.#hiddenColumnSortable.destroy();
+
+        // If personalization form is stored in the Bootstrap modal,
+        // close it programmatically after submit to properly hide the backdrop.
+        if (bootstrap && bootstrap.Modal) {
+            const modalElement = this.element.closest('.modal');
+
+            if (modalElement) {
+                bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+            }
+        }
     }
 
     #onVisibilityChange(event) {
@@ -73,7 +83,8 @@ export default class extends Controller {
                 this.#onPriorityChange(event);
             },
             onChange: this.#onPriorityChange.bind(this),
-        })
+            emptyInsertThreshold: 10,
+        });
     }
 
     #getNameInput(target) {

@@ -10,13 +10,14 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
-        private readonly ActionFactoryInterface $actionFactory,
+        private readonly ?ActionFactoryInterface $actionFactory = null
     ) {
     }
 
@@ -25,7 +26,7 @@ class ActionsColumnType extends AbstractColumnType
         $actions = [];
 
         foreach ($options['actions'] as $name => $action) {
-            $actions[$name] = $this->resolveAction($name, $action, $view)?->createView($view);
+            $actions[$name] = $this->resolveAction($name, $action, $view, $column)?->createView($view);
         }
 
         $view->vars['actions'] = array_filter($actions);
@@ -74,6 +75,7 @@ class ActionsColumnType extends AbstractColumnType
         string $name,
         array|ActionBuilderInterface|ActionInterface $action,
         ColumnHeaderView|ColumnValueView $view,
+        ColumnInterface $column,
     ): ?ActionInterface {
         if ($action instanceof ActionInterface) {
             return $action;
@@ -91,6 +93,10 @@ class ActionsColumnType extends AbstractColumnType
 
         if (!$visible) {
             return null;
+        }
+
+        if (null === $this->actionFactory) {
+            throw new LogicException(sprintf('The %s has no access to the action factory!', __CLASS__));
         }
 
         return $this->actionFactory->createNamed($name, $action['type'], $action['type_options']);

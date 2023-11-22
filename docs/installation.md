@@ -12,8 +12,12 @@ This bundle can be installed at any moment during a project’s lifecycle.
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
 ```shell
-$ composer require kreyu/data-table-bundle
+$ composer require kreyu/data-table-bundle 0.15.*
 ```
+
+!!! Warning
+It is recommended to lock the minor version, as minor versions can provide breaking changes until the stable release!
+!!!
 
 If your application is using [Symfony Flex](https://github.com/symfony/flex), you can skip to [installing the front-end dependencies](#install-front-end-dependencies-and-rebuild).
 

@@ -7,7 +7,7 @@ url: https://data-table-bundle.swroblewski.pl/
 favicon: static/favicon.png
 branding:
   title: DataTableBundle
-  label: v0.14
+  label: Docs
 links:
   - text: GitHub
     link: https://github.com/Kreyu/data-table-bundle

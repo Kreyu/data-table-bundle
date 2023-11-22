@@ -87,14 +87,16 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
      */
     public function getPagination(): PaginationInterface
     {
-        $paginator = $this->createPaginator();
+        $maxResults = $this->queryBuilder->getMaxResults();
+
+        $paginator = $this->createPaginator(forceDisabledFetchJoinCollection: null === $maxResults);
 
         try {
             return new Pagination(
                 items: $paginator->getIterator(),
                 currentPageNumber: $this->getCurrentPageNumber(),
                 totalItemCount: $paginator->count(),
-                itemNumberPerPage: $this->queryBuilder->getMaxResults(),
+                itemNumberPerPage: $maxResults,
             );
         } catch (CurrentPageOutOfRangeException) {
             $this->queryBuilder->setFirstResult(null);
@@ -105,7 +107,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 
     public function getItems(): iterable
     {
-        $paginator = $this->createPaginator();
+        $paginator = $this->createPaginator(forceDisabledFetchJoinCollection: true);
 
         $batchSize = $this->batchSize;
 
@@ -177,7 +179,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         return (int) ($firstResult / $maxResults) + 1;
     }
 
-    private function createPaginator(): Paginator
+    private function createPaginator(bool $forceDisabledFetchJoinCollection = false): Paginator
     {
         $rootEntity = current($this->queryBuilder->getRootEntities());
 
@@ -199,7 +201,13 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 
         $query->setHydrationMode($this->hydrationMode);
 
-        return new Paginator($query, $hasSingleIdentifierName && $hasJoins);
+        $fetchJoinCollection = $hasSingleIdentifierName && $hasJoins;
+
+        if ($forceDisabledFetchJoinCollection) {
+            $fetchJoinCollection = false;
+        }
+
+        return new Paginator($query, $fetchJoinCollection);
     }
 
     private function applyQueryHints(Query $query): void

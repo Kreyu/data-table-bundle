@@ -166,7 +166,7 @@ class DataTable implements DataTableInterface
         $columns = $this->columns;
 
         uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB) {
-            return $columnA->getPriority() < $columnB->getPriority();
+            return $columnB->getPriority() <=> $columnA->getPriority();
         });
 
         return $columns;

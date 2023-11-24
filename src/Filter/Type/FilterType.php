@@ -59,10 +59,11 @@ final class FilterType implements FilterTypeInterface
             'label_translation_parameters' => $options['label_translation_parameters'],
             'translation_domain' => $options['translation_domain'] ?? $view->parent->vars['translation_domain'],
             'query_path' => $options['query_path'] ?? $filter->getName(),
-            'field_Type' => $options['field_type'],
-            'field_options' => $options['field_options'],
-            'operator_type' => $options['operator_type'],
-            'operator_options' => $options['operator_options'],
+            'field_Type' => $options['field_type'] ?? $options['form_type'],
+            'field_type' => $options['field_type'] ?? $options['form_type'],
+            'field_options' => $options['field_options'] ?? $options['form_options'],
+            'operator_type' => $options['operator_type'] ?? $options['operator_form_type'],
+            'operator_options' => $options['operator_options'] ?? $options['operator_form_options'],
             'active_filter_formatter' => $options['active_filter_formatter'],
             'data' => $view->data,
             'value' => $view->value,
@@ -95,15 +96,23 @@ final class FilterType implements FilterTypeInterface
                 'empty_data' => '',
 
                 // TODO: Remove deprecated options
-                'auto_alias_resolving' => true,
-                'field_type' => null,
-                'field_options' => [],
-                'operator_type' => null,
-                'operator_options' => [
-                    'visible' => null,
-                    'choices' => [],
-                ],
+//                'auto_alias_resolving' => true,
+//                'field_type' => null,
+//                'field_options' => [],
+//                'operator_type' => null,
+//                'operator_options' => [
+//                    'visible' => null,
+//                    'choices' => [],
+//                ],
             ])
+            ->setDefined([
+                'auto_alias_resolving',
+                'field_type',
+                'field_options',
+                'operator_type',
+                'operator_options',
+            ])
+
             ->addNormalizer('form_options', function (Options $options, array $value): array {
                 return $value + ['required' => false];
             })
@@ -143,15 +152,31 @@ final class FilterType implements FilterTypeInterface
             ->setDeprecated('operator_type', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "operator_form_type" instead.')
             ->setDeprecated('operator_options', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "operator_form_options", "supported_operators", "operator_selectable" and "default_operator" instead.')
             ->addNormalizer('form_type', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('field_type')) {
+                    return $value;
+                }
+
                 return $options['field_type'] ?? $value;
             })
             ->addNormalizer('form_options', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('field_options')) {
+                    return $value;
+                }
+
                 return $options['field_options'] ?: $value;
             })
             ->addNormalizer('operator_form_type', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('operator_type')) {
+                    return $value;
+                }
+
                 return $options['operator_type'] ?? $value;
             })
             ->addNormalizer('operator_form_options', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('operator_options')) {
+                    return $value;
+                }
+
                 if ($deprecatedValue = $options['operator_options']) {
                     unset($deprecatedValue['visible'], $deprecatedValue['choices']);
                 }
@@ -159,14 +184,26 @@ final class FilterType implements FilterTypeInterface
                 return $deprecatedValue ?: $value;
             })
             ->addNormalizer('supported_operators', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('operator_options')) {
+                    return $value;
+                }
+
                 return ($options['operator_options']['choices'] ?? []) ?: $value;
             })
             ->addNormalizer('default_operator', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('operator_options')) {
+                    return $value;
+                }
+
                 $deprecatedChoices = $options['operator_options']['choices'] ?? [];
 
                 return reset($deprecatedChoices) ?: $value;
             })
             ->addNormalizer('operator_selectable', function (Options $options, mixed $value) {
+                if (!$options->offsetExists('operator_options')) {
+                    return $value;
+                }
+
                 return ($options['operator_options']['visible'] ?? null) ?: $value;
             })
         ;

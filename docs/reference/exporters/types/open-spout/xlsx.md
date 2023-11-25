@@ -13,7 +13,7 @@ The `XlsxExporterType` represents an exporter that uses an [OpenSpout](https://g
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/XlsxExporterType.php)
+| Class               | [:icon-mark-github: XlsxExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/XlsxExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

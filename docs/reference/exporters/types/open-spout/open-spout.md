@@ -13,7 +13,7 @@ The `OpenSpoutExporterType` represents base exporter type used for all OpenSpout
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [ExporterType](../exporter.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: OpenSpoutExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/OpenSpoutExporterType.php)
+| Class               | [:icon-mark-github: OpenSpoutExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/OpenSpoutExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

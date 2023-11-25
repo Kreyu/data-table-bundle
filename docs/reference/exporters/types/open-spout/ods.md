@@ -13,7 +13,7 @@ The `OdsExporterType` represents an exporter that uses an [OpenSpout](https://gi
 +---------------------+--------------------------------------------------------------+
 | Parent type         | [OpenSpoutExporterType](open-spout.md)
 +---------------------+--------------------------------------------------------------+
-| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-open-spout-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/OdsExporterType.php)
+| Class               | [:icon-mark-github: OdsExporterType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/OpenSpout/Exporter/Type/OdsExporterType.php)
 +---------------------+--------------------------------------------------------------+
 
 ## Options

@@ -8,18 +8,6 @@ The data tables can be _exported_, with use of the [exporters](../reference/expo
 
 ![Export modal with the Tabler theme](./../static/export_modal.png)
 
-## Prerequisites
-
-To start with, you have to install integration of some exporter library.
-
-The recommended exporter library is [OpenSpout](https://github.com/openspout/openspout).
-
-You can install the integration with the following command:
-
-```bash
-$ composer require kreyu/data-table-open-spout-bundle
-```
-
 ## Toggling the feature
 
 By default, the exporting feature is **enabled** for every data table.

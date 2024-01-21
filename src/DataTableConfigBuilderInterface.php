@@ -77,7 +77,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setFiltrationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider): static;
 
-    public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static;
+    public function setFiltrationFormFactory(FormFactoryInterface $filtrationFormFactory): static;
 
     public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static;
 

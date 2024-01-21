@@ -3,12 +3,15 @@ Equals: równa się
 Not equals: różne od
 Contains: zawiera
 Not contains: nie zawiera
+In: zawiera się w
+Not in: nie zawiera się w
 Greater than: większe od
 Greater than or equals: większe lub równe
 Less than: mniejsze od
 Less than or equals: mniejsze lub równe
 Starts with: zaczyna się od
 Ends with: kończy się z
+Between: między
 
 # Boolean type
 Yes: Tak

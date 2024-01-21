@@ -9,11 +9,6 @@ interface PaginationInterface
     public const DEFAULT_PAGE = 1;
     public const DEFAULT_PER_PAGE = 25;
 
-    /**
-     * @return iterable<object>
-     */
-    public function getItems(): iterable;
-
     public function getCurrentPageNumber(): int;
 
     public function getCurrentPageItemCount(): int;

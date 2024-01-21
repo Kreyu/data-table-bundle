@@ -1,6 +1,0 @@
-parameters:
-    level: 5
-    checkGenericClassInNonGenericObjectType: false
-    excludePaths:
-        - src/Resources/skeleton/*
-        - src/DependencyInjection/Configuration.php

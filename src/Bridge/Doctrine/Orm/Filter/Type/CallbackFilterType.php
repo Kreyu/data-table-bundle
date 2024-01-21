@@ -12,6 +12,9 @@ use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated since 0.15, use {@see \Kreyu\Bundle\DataTableBundle\Filter\Type\CallbackFilterType} instead
+ */
 class CallbackFilterType extends AbstractDoctrineOrmFilterType
 {
     public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void

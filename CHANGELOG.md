@@ -1,3 +1,14 @@
+# 0.16
+
+- **[Feature]** French translation (https://github.com/Kreyu/data-table-bundle/pull/53)
+- **[Feature]** Doctrine ORM expression transformers with built-in `lower`, `upper` and `trim` options (https://github.com/Kreyu/data-table-bundle/issues/50)
+- **[Feature]** Filter handler events
+- **[Docs]** New documentation, written using [VitePress](https://vitepress.dev/)
+
+# 0.15
+
+- **[Feature]** Integration with AssetMapper (https://github.com/Kreyu/data-table-bundle/issues/42)
+
 # 0.14
 
 - **[Feature]** Data table events
@@ -22,7 +33,7 @@
 Internally, the columns, filters and exporters are now utilizing the builder pattern similar to data tables.
 Please note that this is a **breaking change** for applications using internal bundle classes!
 
-For a list of all breaking changes and deprecations, see the [upgrade guide](docs/upgrade-guide/0.14.md).
+For a list of all breaking changes and deprecations, see the [upgrade guide](../../../docs/upgrade-guide/0.14.md).
 
 # 0.13
 

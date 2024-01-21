@@ -32,6 +32,8 @@ interface ResolvedDataTableTypeInterface
 
     public function createView(DataTableInterface $dataTable): DataTableView;
 
+    public function createExportView(DataTableInterface $dataTable): DataTableView;
+
     /**
      * @param array<string, mixed> $options
      */
@@ -41,6 +43,11 @@ interface ResolvedDataTableTypeInterface
      * @param array<string, mixed> $options
      */
     public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void;
 
     public function getOptionsResolver(): OptionsResolver;
 }

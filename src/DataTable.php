@@ -28,6 +28,8 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
+use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -36,38 +38,39 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class DataTable implements DataTableInterface
 {
     /**
-     * @var array<ColumnInterface>
+     * @var array<string, ColumnInterface>
      */
     private array $columns = [];
 
     /**
-     * @var array<FilterInterface>
+     * @var array<string, FilterInterface>
      */
     private array $filters = [];
 
     /**
-     * @var array<ActionInterface>
+     * @var array<string, ActionInterface>
      */
     private array $actions = [];
 
     /**
-     * @var array<ActionInterface>
+     * @var array<string, ActionInterface>
      */
     private array $batchActions = [];
 
     /**
-     * @var array<ActionInterface>
+     * @var array<string, ActionInterface>
      */
     private array $rowActions = [];
 
     /**
-     * @var array<ExporterInterface>
+     * @var array<string, ExporterInterface>
      */
     private array $exporters = [];
 
@@ -105,6 +108,8 @@ class DataTable implements DataTableInterface
      * The copy of a query used to retrieve the data, without any filters applied.
      */
     private ProxyQueryInterface $originalQuery;
+
+    private ?ResultSetInterface $resultSet = null;
 
     private bool $initialized = false;
 
@@ -165,7 +170,7 @@ class DataTable implements DataTableInterface
     {
         $columns = $this->columns;
 
-        uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB) {
+        uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB): int {
             return $columnB->getPriority() <=> $columnA->getPriority();
         });
 
@@ -517,7 +522,7 @@ class DataTable implements DataTableInterface
             $filterData = $data->getFilterData($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
-                $filter->apply($this->query, $filterData);
+                $filter->handle($this->query, $filterData);
             }
         }
 
@@ -593,11 +598,7 @@ class DataTable implements DataTableInterface
 
     public function getItems(): iterable
     {
-        if ($this->getConfig()->isPaginationEnabled()) {
-            return $this->getPagination()->getItems();
-        }
-
-        return $this->query->getItems();
+        return $this->getResultSet()->getIterator();
     }
 
     public function getPagination(): PaginationInterface
@@ -606,7 +607,33 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has pagination feature disabled.');
         }
 
-        return $this->pagination ??= $this->query->getPagination();
+        return $this->pagination ??= $this->createPagination();
+    }
+
+    private function getResultSet(): ResultSetInterface
+    {
+        return $this->resultSet ??= $this->query->getResult();
+    }
+
+    private function createPagination(): PaginationInterface
+    {
+        $resultSet = $this->getResultSet();
+
+        try {
+            return new Pagination(
+                currentPageNumber: $this->paginationData?->getPage() ?? 1,
+                currentPageItemCount: $resultSet->getCurrentPageItemCount(),
+                totalItemCount: $resultSet->getTotalItemCount(),
+                itemNumberPerPage: $this->paginationData?->getPerPage(),
+            );
+        } catch (CurrentPageOutOfRangeException) {
+            $this->paginationData ??= new PaginationData();
+            $this->paginationData->setPage(1);
+
+            $this->resultSet = null;
+
+            return $this->createPagination();
+        }
     }
 
     public function getSortingData(): ?SortingData
@@ -675,11 +702,7 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has filtration feature disabled.');
         }
 
-        if (null === $formFactory = $this->config->getFiltrationFormFactory()) {
-            throw new RuntimeException('The data table has no configured filtration form factory.');
-        }
-
-        return $formFactory->createNamedBuilder(
+        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
             name: $this->config->getFiltrationParameterName(),
             type: FiltrationDataType::class,
             options: [

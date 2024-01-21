@@ -23,9 +23,9 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
      * @param array<DataTableTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private DataTableTypeInterface $innerType,
-        private array $typeExtensions = [],
-        private ?ResolvedDataTableTypeInterface $parent = null,
+        private readonly DataTableTypeInterface $innerType,
+        private readonly array $typeExtensions = [],
+        private readonly ?ResolvedDataTableTypeInterface $parent = null,
     ) {
     }
 
@@ -60,9 +60,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the data table "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        $builder = new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
-
-        return $builder;
+        return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
     }
 
     public function createView(DataTableInterface $dataTable): DataTableView
@@ -100,7 +98,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
         if ($this->parent && method_exists($this->parent, 'buildExportView')) {
-            $this->parent?->buildExportView($view, $dataTable, $options);
+            $this->parent->buildExportView($view, $dataTable, $options);
         }
 
         if (method_exists($this->innerType, 'buildExportView')) {

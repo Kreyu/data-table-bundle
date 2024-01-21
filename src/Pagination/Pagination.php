@@ -12,19 +12,14 @@ class Pagination implements PaginationInterface
      * @throws CurrentPageOutOfRangeException
      */
     public function __construct(
-        private iterable $items,
-        private int $currentPageNumber,
-        private int $totalItemCount,
-        private ?int $itemNumberPerPage = null,
+        private readonly int $currentPageNumber,
+        private readonly int $currentPageItemCount,
+        private readonly int $totalItemCount,
+        private readonly ?int $itemNumberPerPage = null,
     ) {
         if ($totalItemCount > 0 && $this->isCurrentPageNumberOutOfRange()) {
             throw new CurrentPageOutOfRangeException();
         }
-    }
-
-    public function getItems(): iterable
-    {
-        return $this->items;
     }
 
     public function getCurrentPageNumber(): int
@@ -34,11 +29,7 @@ class Pagination implements PaginationInterface
 
     public function getCurrentPageItemCount(): int
     {
-        if ($this->items instanceof \Traversable) {
-            return iterator_count($this->items);
-        }
-
-        return count((array) $this->items);
+        return $this->currentPageItemCount;
     }
 
     public function getTotalItemCount(): int

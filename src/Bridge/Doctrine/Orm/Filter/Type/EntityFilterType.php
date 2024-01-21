@@ -4,22 +4,29 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\Query\Expr;
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\EntityActiveFilterFormatter;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityFilterType extends AbstractDoctrineOrmFilterType
 {
     public function __construct(
-        private readonly Registry $doctrineRegistry,
+        private readonly ?ManagerRegistry $managerRegistry = null,
     ) {
+    }
+
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void
+    {
+        $builder->setSupportedOperators([
+            Operator::Equals,
+            Operator::NotEquals,
+            Operator::In,
+            Operator::NotIn,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -27,66 +34,31 @@ class EntityFilterType extends AbstractDoctrineOrmFilterType
         $resolver
             ->setDefaults([
                 'form_type' => EntityType::class,
-                'supported_operators' => [
-                    Operator::Equals,
-                    Operator::NotEquals,
-                    Operator::Contains,
-                    Operator::NotContains,
-                ],
                 'choice_label' => null,
-                'active_filter_formatter' => $this->getFormattedActiveFilterString(...),
+                'active_filter_formatter' => new EntityActiveFilterFormatter(),
             ])
             ->setAllowedTypes('choice_label', ['null', 'string', 'callable'])
-            ->addNormalizer('form_options', function (Options $options, array $value) {
-                if (EntityType::class !== $options['form_type']) {
-                    return $value;
-                }
-
-                // The identifier field name of the entity has to be provided in the 'choice_value' form option.
-                //
-                // This is required by the persistence system, because only the entity identifier will be persisted,
-                // and the EntityType form type needs to know how to convert it back to the entity object.
-                //
-                // If it's not provided, try to retrieve it from the entity metadata.
-                if (null === ($value['choice_value'] ?? null)) {
-                    $identifiers = $this->doctrineRegistry
-                        ->getManagerForClass($value['class'])
-                        ?->getClassMetadata($value['class'])
-                        ->getIdentifier() ?? [];
-
-                    if (1 === count($identifiers)) {
-                        $value += ['choice_value' => reset($identifiers)];
-                    }
-                }
-
-                return $value;
-            })
         ;
-    }
 
-    protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
-    {
-        $expression = match ($operator) {
-            Operator::Equals, Operator::Contains => $expr->in(...),
-            Operator::NotEquals, Operator::NotContains => $expr->notIn(...),
-            default => throw new InvalidArgumentException('Operator not supported'),
-        };
+        // The persistence feature is saving the identifier of the entity, not the entire selected entity.
+        // Therefore, the EntityType requires "choice_value" option with a name of the entity identifier field.
+        if (null !== $this->managerRegistry) {
+            $resolver->addNormalizer('form_options', function (Options $options, array $formOptions) {
+                if (EntityType::class !== $options['form_type'] || null === $class = $formOptions['class'] ?? null) {
+                    return $formOptions;
+                }
 
-        return $expression($queryPath, ":$parameterName");
-    }
+                $identifiers = $this->managerRegistry
+                    ->getManagerForClass($class)
+                    ?->getClassMetadata($class)
+                    ->getIdentifier() ?? [];
 
-    private function getFormattedActiveFilterString(FilterData $data, FilterInterface $filter, array $options): string
-    {
-        $choiceLabel = $options['choice_label'];
+                if (1 === count($identifiers)) {
+                    $formOptions += ['choice_value' => reset($identifiers)];
+                }
 
-        if (is_string($choiceLabel)) {
-            return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
+                return $formOptions;
+            });
         }
-
-        if (is_callable($choiceLabel)) {
-            return $choiceLabel($data->getValue());
-        }
-
-        return (string) $data->getValue();
     }
 }

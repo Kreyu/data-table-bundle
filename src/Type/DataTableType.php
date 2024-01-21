@@ -154,12 +154,12 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        $visibleColumns = $dataTable->getExportableColumns();
-
         $view->vars['translation_domain'] = $dataTable->getConfig()->getOption('translation_domain');
 
-        $view->headerRow = $this->createExportHeaderRowView($view, $dataTable, $visibleColumns);
-        $view->valueRows = new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $visibleColumns));
+        $columns = $dataTable->getExportableColumns();
+
+        $view->headerRow = $this->createExportHeaderRowView($view, $dataTable, $columns);
+        $view->valueRows = new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $columns));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -315,6 +315,8 @@ final class DataTableType implements DataTableTypeInterface
             $headerRowView->children[$column->getName()] = $column->createHeaderView($headerRowView);
         }
 
+        $headerRowView->vars['children'] = $headerRowView->children;
+
         return $headerRowView;
     }
 
@@ -325,11 +327,7 @@ final class DataTableType implements DataTableTypeInterface
      */
     private function createValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        if ($dataTable->getConfig()->isPaginationEnabled()) {
-            $items = $dataTable->getPagination()->getItems();
-        } else {
-            $items = $dataTable->getQuery()->getItems();
-        }
+        $items = $dataTable->getItems();
 
         foreach ($items as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);
@@ -369,13 +367,12 @@ final class DataTableType implements DataTableTypeInterface
         return $headerRowView;
     }
 
+    /**
+     * @param array<ColumnInterface> $columns
+     */
     private function createExportValueRowsViews(DataTableView $view, DataTableInterface $dataTable, array $columns): iterable
     {
-        if ($dataTable->getConfig()->isPaginationEnabled()) {
-            $items = $dataTable->getPagination()->getItems();
-        } else {
-            $items = $dataTable->getQuery()->getItems();
-        }
+        $items = $dataTable->getItems();
 
         foreach ($items as $index => $data) {
             $valueRowView = new ValueRowView($view, $index, $data);

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter\Extension;
 
-use Kreyu\Bundle\DataTableBundle\Column\Extension\AbstractColumnExtension;
-use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 
-class PreloadedExporterExtension extends AbstractColumnExtension
+class PreloadedExporterExtension extends AbstractExporterExtension
 {
     /**
-     * @param array<ColumnTypeInterface>                           $types
-     * @param array<string, array<ExporterTypeExtensionInterface>> $typeExtensions
+     * @param array<ExporterTypeInterface> $types
+     * @param array<ExporterTypeExtensionInterface>|array<string, array<ExporterTypeExtensionInterface>> $typeExtensions
      */
     public function __construct(
         private readonly array $types = [],

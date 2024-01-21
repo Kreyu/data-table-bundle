@@ -77,7 +77,7 @@ interface DataTableConfigInterface
 
     public function getFiltrationPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;
 
-    public function getFiltrationFormFactory(): ?FormFactoryInterface;
+    public function getFiltrationFormFactory(): FormFactoryInterface;
 
     public function getDefaultFiltrationData(): ?FiltrationData;
 

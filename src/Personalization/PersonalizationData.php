@@ -28,7 +28,7 @@ class PersonalizationData
 
     public static function fromArray(array $data): self
     {
-        $resolver = static::$optionsResolver ??= (new OptionsResolver())
+        $resolver = self::$optionsResolver ??= (new OptionsResolver())
             ->setDefaults([
                 'columns' => function (OptionsResolver $resolver) {
                     $resolver
@@ -38,7 +38,6 @@ class PersonalizationData
                             'priority' => 0,
                             'visible' => true,
                         ])
-                        ->setDeprecated('order')
                         ->setAllowedTypes('name', ['null', 'string'])
                         ->setAllowedTypes('priority', 'int')
                         ->setAllowedTypes('visible', 'bool')

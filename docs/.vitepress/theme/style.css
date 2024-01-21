@@ -1,0 +1,30 @@
+.VPContent.is-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root {
+    --vp-button-brand-bg: #7986CB;
+    --vp-button-brand-hover-bg: #9FA8DA;
+
+    --vp-c-brand-1: #7986CB;
+    --vp-c-brand-2: #9FA8DA;
+
+    --vp-home-hero-name-color: transparent;
+    --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #32bffc 10%, #7986CB);
+
+    --vp-home-hero-image-background-image: -webkit-linear-gradient(120deg, rgba(68, 113, 210, 1), 30%, rgba(50, 191, 252, 1));
+}
+
+@media (min-width: 640px) {
+    :root {
+        --vp-home-hero-image-filter: blur(56px);
+    }
+}
+
+@media (min-width: 960px) {
+    :root {
+        --vp-home-hero-image-filter: blur(65px);
+    }
+}

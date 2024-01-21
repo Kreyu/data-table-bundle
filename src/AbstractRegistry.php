@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exception\ExceptionInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
@@ -40,6 +41,29 @@ abstract class AbstractRegistry
                 throw new UnexpectedTypeException($extension, $extensionClass);
             }
         }
+    }
+
+    public function hasType(string $name): bool
+    {
+        if (isset($this->types[$name])) {
+            return true;
+        }
+
+        try {
+            $this->doGetType($name);
+        } catch (ExceptionInterface) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return iterable<TExtension>
+     */
+    public function getExtensions(): iterable
+    {
+        return $this->extensions;
     }
 
     /**
@@ -108,6 +132,11 @@ abstract class AbstractRegistry
             unset($this->checkedTypes[$fqcn]);
         }
     }
+
+    /**
+     * @return TResolvedType
+     */
+    abstract public function getType(string $name);
 
     /**
      * @return class-string<TType>

@@ -194,11 +194,9 @@
 {% endblock %}
 
 {% block filter_clear_all_button %}
-    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_all_url %}
-
     {% set attr = {
         'class': 'btn btn-icon btn-outline-danger',
-        'href': filter_clear_all_url(filtration_parameter_name, filters)|trim|raw,
+        'href': data_table_filter_clear_url(filters),
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
         'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
@@ -209,10 +207,8 @@
 {% endblock %}
 
 {% block filter_clear_button %}
-    {% from '@KreyuDataTable/macros.html.twig' import filter_clear_url %}
-
     <a class="btn px-2"
-       href="{{- filter_clear_url(filtration_parameter_name, filter)|trim|raw -}}"
+       href="{{ data_table_filter_clear_url(filter) }}"
        data-turbo-action="advance"
        data-toggle="tooltip"
        data-placement="bottom"
@@ -222,7 +218,7 @@
             <strong>{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</strong>
 
             {% if filter.vars.operator_selectable %}
-                <span class="text-muted">({{ filter.vars.data.operator.label|trans({}, 'KreyuDataTable') }})</span>
+                <span class="text-muted">{{ filter.vars.data.operator.label|trans({}, 'KreyuDataTable') }}</span>
             {% endif %}
         </span>
 
@@ -540,9 +536,11 @@
         {{ form_label(form) }}
 
         <div class="col-12">
-            <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} {% if form.vars.operator_selectable %}input-group{% endif %}">
+            <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} input-group">
+                {% if form.operator is defined %}
+                    {{ form_widget(form.operator) }}
+                {% endif %}
                 {{ form_widget(form.value) }}
-                {{ form_widget(form.operator) }}
             </div>
         </div>
     </div>

@@ -97,7 +97,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             $container->prependExtensionConfig('framework', [
                 'asset_mapper' => [
                     'paths' => [
-                        __DIR__ . '/../../assets/controllers' => '@kreyu/data-table-bundle',
+                        __DIR__.'/../../assets/controllers' => '@kreyu/data-table-bundle',
                     ],
                 ],
             ]);
@@ -141,6 +141,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             return false;
         }
 
-        return is_file($bundlesMetadata['FrameworkBundle']['path'] . '/Resources/config/asset_mapper.php');
+        return is_file($bundlesMetadata['FrameworkBundle']['path'].'/Resources/config/asset_mapper.php');
     }
 }

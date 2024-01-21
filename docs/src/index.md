@@ -32,7 +32,7 @@ features:
     details: Every template part of the bundle is customizable using Twig
   - title: Data source agnostic
     details: With Doctrine ORM supported out of the box
-  - title: Asynchronous
+  - title: Asynchronicity
     details: Thanks to integration with Hotwire Turbo, data tables are asynchronous
 ---
 

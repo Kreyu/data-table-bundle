@@ -13,13 +13,13 @@ Just want to try it out? Skip to the [installation](installation.md).
 ## Features
 
 - [Type classes](#similarity-to-form-component) for a class-based configuration, like in a Symfony Form component
-- [Sorting](features/sorting.md), [filtering](features/filtering.md) and [pagination](features/pagination.md) - triforce of the data tables
+- [Sorting](features/sorting.md), [filtering](features/filtering.md) and [pagination](features/pagination.md) - classic triforce of the data tables
 - [Personalization](features/personalization.md) where the user decides the order and visibility of columns
 - [Persistence](features/persistence.md) to save applied data (e.g. filters) between requests
 - [Exporting](features/exporting.md) with or without applied pagination, filters and personalization 
 - [Theming](features/theming.md) of every part of the bundle using Twig
-- [Data source agnostic](features/extensibility.md) with optional Doctrine ORM integration bundle
-- [Integration with Hotwire Turbo](features/asynchronicity.md) for asynchronicity
+- [Data source agnostic](features/extensibility.md) with Doctrine ORM supported out of the box
+- [Asynchronicity](features/asynchronicity.md) thanks to integration with Hotwire Turbo
 
 ## Use cases
 

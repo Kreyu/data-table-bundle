@@ -78,7 +78,7 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
     protected function getHeaderCell(ColumnHeaderView $view, array $options): Cell
     {
         return Cell::fromValue(
-            value: $view->vars['label'],
+            value: $view->vars['label'] ?? 'a',
             style: $this->getStyle($view, 'header_cell_style', $options),
         );
     }
@@ -94,7 +94,7 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
     protected function getValueCell(ColumnValueView $view, array $options): Cell
     {
         return Cell::fromValue(
-            value: $view->value,
+            value: $view->vars['value'] ?? 'a',
             style: $this->getStyle($view, 'value_cell_style', $options),
         );
     }

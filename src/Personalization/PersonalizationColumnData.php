@@ -23,7 +23,7 @@ class PersonalizationColumnData
      */
     public static function fromArray(array $data): self
     {
-        $resolver = static::$optionsResolver ??= (new OptionsResolver())
+        $resolver = self::$optionsResolver ??= (new OptionsResolver())
             ->setRequired('name')
             ->setDefaults([
                 'priority' => 0,

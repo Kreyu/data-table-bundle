@@ -7,12 +7,16 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FilterConfigBuilder implements FilterConfigBuilderInterface
 {
     protected bool $locked = false;
 
+    private FilterHandlerInterface $handler;
     private string $formType = TextType::class;
     private array $formOptions = [];
     private string $operatorFormType = OperatorType::class;
@@ -20,28 +24,42 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
     private array $supportedOperators = [];
     private Operator $defaultOperator = Operator::Equals;
     private bool $operatorSelectable = false;
+    private FilterData $emptyData;
 
     public function __construct(
-        private string $name,
+        private readonly string $name,
         private ResolvedFilterTypeInterface $type,
-        private array $options = [],
+        private EventDispatcherInterface $dispatcher,
+        private readonly array $options = [],
     ) {
+    }
+
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
+    {
+        $this->dispatcher->addListener($eventName, $listener, $priority);
+
+        return $this;
+    }
+
+    public function addEventSubscriber(EventSubscriberInterface $subscriber): static
+    {
+        $this->dispatcher->addSubscriber($subscriber);
+
+        return $this;
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        if (!$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
+        return $this->dispatcher;
     }
 
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getType(): ResolvedFilterTypeInterface
@@ -75,24 +93,22 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         return $this->options[$name] ?? $default;
     }
 
-    public function setOptions(array $options): static
+    public function getHandler(): FilterHandlerInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        if (!isset($this->handler)) {
+            throw new BadMethodCallException('Filter has no handler set');
         }
 
-        $this->options = $options;
-
-        return $this;
+        return $this->handler;
     }
 
-    public function setOption(string $name, mixed $value): static
+    public function setHandler(FilterHandlerInterface $handler): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
 
-        $this->options[$name] = $value;
+        $this->handler = $handler;
 
         return $this;
     }
@@ -179,8 +195,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function getDefaultOperator(): Operator
     {
-        // TODO: Remove "getNonDeprecatedCase()" call once the deprecated operators are removed.
-        return $this->defaultOperator->getNonDeprecatedCase();
+        return $this->defaultOperator;
     }
 
     public function setDefaultOperator(Operator $defaultOperator): static
@@ -206,6 +221,22 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         }
 
         $this->operatorSelectable = $operatorSelectable;
+
+        return $this;
+    }
+
+    public function getEmptyData(): FilterData
+    {
+        return $this->emptyData ??= new FilterData();
+    }
+
+    public function setEmptyData(FilterData $emptyData): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->emptyData = $emptyData;
 
         return $this;
     }

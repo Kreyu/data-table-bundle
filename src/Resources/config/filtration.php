@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\BooleanFilterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\CallbackFilterType as DoctrineOrmCallbackFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateRangeFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeFilterType;
@@ -11,16 +11,20 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DoctrineOrmFilt
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGenerator;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\CallbackFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Persistence\CachePersistenceAdapter;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -72,6 +76,20 @@ return static function (ContainerConfigurator $configurator) {
         ->tag('kreyu_data_table.filter.type')
     ;
 
+    $services
+        ->set('kreyu_data_table.filter.type.callback', CallbackFilterType::class)
+        ->tag('kreyu_data_table.filter.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.filter.filter_clear_url_generator', FilterClearUrlGenerator::class)
+        ->args([
+            service('request_stack'),
+            service(UrlGeneratorInterface::class),
+        ])
+        ->alias(FilterClearUrlGeneratorInterface::class, 'kreyu_data_table.filter.filter_clear_url_generator')
+    ;
+
     // Doctrine ORM
 
     $services
@@ -96,7 +114,7 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.filter.type.doctrine_orm_callback', CallbackFilterType::class)
+        ->set('kreyu_data_table.filter.type.doctrine_orm_callback', DoctrineOrmCallbackFilterType::class)
         ->tag('kreyu_data_table.filter.type')
     ;
 

@@ -18,12 +18,12 @@ abstract class AbstractExtension
     /**
      * @var array<TType>
      */
-    private array $types = [];
+    private array $types;
 
     /**
      * @var array<string, array<TTypeExtension>>
      */
-    private array $typeExtensions = [];
+    private array $typeExtensions;
 
     public function hasType(string $name): bool
     {
@@ -114,13 +114,19 @@ abstract class AbstractExtension
 
         $typeExtensionClass = $this->getTypeExtensionClass();
 
-        foreach ($this->loadTypeExtensions() as $extension) {
-            if (!$extension instanceof $typeExtensionClass) {
-                throw new UnexpectedTypeException($extension, $typeExtensionClass);
+        foreach ($this->loadTypeExtensions() as $extensions) {
+            if (!is_array($extensions)) {
+                $extensions = [$extensions];
             }
 
-            foreach ($extension::getExtendedTypes() as $extendedType) {
-                $this->typeExtensions[$extendedType][] = $extension;
+            foreach ($extensions as $extension) {
+                if (!$extension instanceof $typeExtensionClass) {
+                    throw new UnexpectedTypeException($extension, $typeExtensionClass);
+                }
+
+                foreach ($extension::getExtendedTypes() as $extendedType) {
+                    $this->typeExtensions[$extendedType][] = $extension;
+                }
             }
         }
     }

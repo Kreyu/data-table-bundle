@@ -46,7 +46,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider = null;
     private ?PersistenceSubjectProviderInterface $personalizationPersistenceSubjectProvider = null;
 
-    private ?FormFactoryInterface $filtrationFormFactory = null;
+    private FormFactoryInterface $filtrationFormFactory;
     private ?FormFactoryInterface $personalizationFormFactory = null;
     private ?FormFactoryInterface $exportFormFactory = null;
 
@@ -456,8 +456,12 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         return $this;
     }
 
-    public function getFiltrationFormFactory(): ?FormFactoryInterface
+    public function getFiltrationFormFactory(): FormFactoryInterface
     {
+        if (!isset($this->filtrationFormFactory)) {
+            throw new BadMethodCallException('The filtration form factory must be set before retrieving it.');
+        }
+
         return $this->filtrationFormFactory;
     }
 

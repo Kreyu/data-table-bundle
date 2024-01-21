@@ -179,9 +179,9 @@
 
 {% block pagination_counters_message %}
     {{- 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
-        '%current_page_first_item_index%': current_page_first_item_index,
-        '%current_page_last_item_index%': current_page_last_item_index,
-        '%total_item_count%': total_item_count
+        '%current_page_first_item_index%': current_page_first_item_index|number_format(0, '', ' '),
+        '%current_page_last_item_index%': current_page_last_item_index|number_format(0, '', ' '),
+        '%total_item_count%': total_item_count|number_format(0, '', ' ')
     }, 'KreyuDataTable') -}}
 {% endblock %}
 

@@ -37,6 +37,7 @@ class SortingData
                 $fields[$key] = SortingColumnData::fromArray([
                     'name' => $key,
                     'direction' => $value,
+                    'property_path' => null,
                 ]);
             }
         }

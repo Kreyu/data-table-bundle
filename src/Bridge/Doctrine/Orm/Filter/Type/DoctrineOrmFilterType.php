@@ -4,23 +4,34 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\EventListener\ApplyExpressionTransformers;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\DoctrineOrmFilterHandler;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\ExpressionTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DoctrineOrmFilterType extends AbstractFilterType
+final class DoctrineOrmFilterType extends AbstractFilterType
 {
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {
+        $builder->setHandler(new DoctrineOrmFilterHandler());
+        $builder->addEventSubscriber(new ApplyExpressionTransformers());
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('auto_alias_resolving', true)
-            ->setAllowedTypes('auto_alias_resolving', 'bool')
+            ->setDefaults([
+                'trim' => false,
+                'lower' => false,
+                'upper' => false,
+                'expression_transformers' => [],
+            ])
+            ->setAllowedTypes('trim', 'bool')
+            ->setAllowedTypes('lower', 'bool')
+            ->setAllowedTypes('upper', 'bool')
+            ->setAllowedTypes('expression_transformers', ExpressionTransformerInterface::class.'[]')
         ;
     }
 }

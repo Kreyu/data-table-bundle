@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FilterData
 {
     public function __construct(
-        private mixed $value = '',
+        private mixed $value = null,
         private ?Operator $operator = null,
     ) {
     }
@@ -24,9 +24,9 @@ class FilterData
             ])
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
             ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
-                // TODO: Remove call to "getNonDeprecatedCase()"
-                return is_string($value) ? Operator::from($value)->getNonDeprecatedCase() : $value;
+                return is_string($value) ? Operator::from($value) : $value;
             })
+            ->setIgnoreUndefined()
         ;
 
         $data = $resolver->resolve($data);
@@ -35,16 +35,6 @@ class FilterData
             value: $data['value'],
             operator: $data['operator'],
         );
-    }
-
-    public function getOperator(): ?Operator
-    {
-        return $this->operator;
-    }
-
-    public function setOperator(mixed $operator): void
-    {
-        $this->operator = $operator;
     }
 
     public function getValue(): mixed
@@ -57,8 +47,18 @@ class FilterData
         $this->value = $value;
     }
 
+    public function getOperator(): ?Operator
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(mixed $operator): void
+    {
+        $this->operator = $operator;
+    }
+
     public function hasValue(): bool
     {
-        return '' !== $this->value;
+        return null !== $this->value && '' !== $this->value;
     }
 }

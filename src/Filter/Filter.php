@@ -7,11 +7,15 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
+use Kreyu\Bundle\DataTableBundle\Filter\Event\FilterEvent;
+use Kreyu\Bundle\DataTableBundle\Filter\Event\FilterEvents;
+use Kreyu\Bundle\DataTableBundle\Filter\Event\PostHandleEvent;
+use Kreyu\Bundle\DataTableBundle\Filter\Event\PreHandleEvent;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class Filter implements FilterInterface
 {
-    private ?DataTableInterface $dataTable = null;
+    private DataTableInterface $dataTable;
 
     public function __construct(
         private readonly FilterConfigInterface $config,
@@ -30,7 +34,7 @@ class Filter implements FilterInterface
 
     public function getDataTable(): DataTableInterface
     {
-        if (null === $this->dataTable) {
+        if (!isset($this->dataTable)) {
             throw new BadMethodCallException('Filter is not attached to any data table.');
         }
 
@@ -53,7 +57,7 @@ class Filter implements FilterInterface
     {
         return [
             'form_type' => $this->config->getFormType(),
-            'form_options' => $this->config->getFormOptions(),
+            'form_options' => $this->config->getFormOptions() + ['required' => false],
             'operator_form_type' => $this->config->getOperatorFormType(),
             'operator_form_options' => $this->config->getOperatorFormOptions(),
             'default_operator' => $this->config->getDefaultOperator(),
@@ -67,16 +71,39 @@ class Filter implements FilterInterface
         return $this->config->getOption('query_path', $this->getName());
     }
 
+    public function handle(ProxyQueryInterface $query, FilterData $data): void
+    {
+        $this->dispatch(FilterEvents::PRE_HANDLE, $event = new PreHandleEvent($query, $data, $this));
+
+        $this->config->getHandler()->handle($query, $data = $event->getData(), $this);
+
+        $this->dispatch(FilterEvents::POST_HANDLE, new PostHandleEvent($query, $data, $this));
+    }
+
+    public function createView(FilterData $data, DataTableView $parent): FilterView
+    {
+        $view = $this->config->getType()->createView($this, $data, $parent);
+
+        $this->config->getType()->buildView($view, $this, $data, $this->config->getOptions());
+
+        return $view;
+    }
+
+    private function dispatch(string $eventName, FilterEvent $event): void
+    {
+        $dispatcher = $this->config->getEventDispatcher();
+
+        if ($dispatcher->hasListeners($eventName)) {
+            $dispatcher->dispatch($event, $eventName);
+        }
+    }
+
+    /**
+     * @deprecated since 0.15, use {@see Filter::handle()} instead
+     */
     public function apply(ProxyQueryInterface $query = null, FilterData $data = null): void
     {
         $query ??= $this->getDataTable()->getQuery();
-
-        if (null === $query) {
-            $error = 'Unable to apply filter without a query.';
-            $error .= ' Either ensure the related data table has a query or pass one explicitly.';
-
-            throw new BadMethodCallException($error);
-        }
 
         $data ??= $this->getDataTable()->getFiltrationData()->getFilterData($this);
 
@@ -87,15 +114,14 @@ class Filter implements FilterInterface
             throw new BadMethodCallException($error);
         }
 
-        $this->config->getType()->apply($query, $data, $this, $this->config->getOptions());
-    }
+        $type = $this->config->getType();
 
-    public function createView(FilterData $data, DataTableView $parent): FilterView
-    {
-        $view = $this->config->getType()->createView($this, $data, $parent);
+        if (method_exists($type, 'apply')) {
+            $type->apply($query, $data, $this, $this->config->getOptions());
 
-        $this->config->getType()->buildView($view, $this, $data, $this->config->getOptions());
+            return;
+        }
 
-        return $view;
+        $this->handle($query, $data);
     }
 }

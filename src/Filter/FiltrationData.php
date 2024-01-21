@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 
-class FiltrationData
+class FiltrationData implements \ArrayAccess
 {
     /**
      * @var array<string, FilterData> filter name as key, filter data as value
@@ -49,10 +49,6 @@ class FiltrationData
         return new self($filters);
     }
 
-    /**
-     * Creates a new instance from a {@see DataTableInterface}.
-     * The filters are be initialized with empty values.
-     */
     public static function fromDataTable(DataTableInterface $dataTable): self
     {
         $filters = [];
@@ -119,11 +115,11 @@ class FiltrationData
     /**
      * @param array<FilterInterface> $filters
      */
-    public function appendMissingFilters(array $filters, FilterData $data = new FilterData()): void
+    public function appendMissingFilters(array $filters): void
     {
         foreach ($filters as $filter) {
             if (null === $this->getFilterData($filter)) {
-                $this->setFilterData($filter, $data);
+                $this->setFilterData($filter, new FilterData(operator: $filter->getConfig()->getDefaultOperator()));
             }
         }
     }
@@ -152,5 +148,25 @@ class FiltrationData
     public function isEmpty(): bool
     {
         return empty($this->filters);
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return array_key_exists($offset, $this->filters);
+    }
+
+    public function offsetGet(mixed $offset): FilterData
+    {
+        return $this->filters[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->setFilterData($offset, $value);
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $this->removeFilter($offset);
     }
 }

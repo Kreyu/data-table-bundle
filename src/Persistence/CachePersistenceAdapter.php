@@ -51,13 +51,11 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
 
     private function getCacheKey(DataTableInterface $dataTable, PersistenceSubjectInterface $subject): string
     {
-        $parts = [
-            $dataTable->getConfig()->getName(),
+        return urlencode(implode('_', array_filter([
+            $dataTable->getName(),
             $this->prefix,
             $subject->getDataTablePersistenceIdentifier(),
-        ];
-
-        return u(implode('_', array_filter($parts)))->snake()->toString();
+        ])));
     }
 
     /**

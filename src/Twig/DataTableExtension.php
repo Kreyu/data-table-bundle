@@ -6,8 +6,11 @@ namespace Kreyu\Bundle\DataTableBundle\Twig;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -21,6 +24,12 @@ use Twig\TwigFunction;
 
 class DataTableExtension extends AbstractExtension
 {
+    public function __construct(
+        private readonly ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
+        private readonly FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
+    ) {
+    }
+
     public function getFunctions(): array
     {
         $definitions = [
@@ -40,7 +49,10 @@ class DataTableExtension extends AbstractExtension
             'data_table_export_form' => $this->renderExportForm(...),
         ];
 
-        $functions = [];
+        $functions = [
+            new TwigFunction('data_table_filter_clear_url', $this->generateFilterClearUrl(...)),
+            new TwigFunction('data_table_column_sort_url', $this->generateColumnSortUrl(...)),
+        ];
 
         foreach ($definitions as $name => $callable) {
             $functions[] = new TwigFunction($name, $callable, [
@@ -277,6 +289,24 @@ class DataTableExtension extends AbstractExtension
                 'form' => $form,
             ],
         );
+    }
+
+    public function generateFilterClearUrl(FilterView|array $filterViews): string
+    {
+        if ($filterViews instanceof FilterView) {
+            $filterViews = [$filterViews];
+        }
+
+        return $this->filterClearUrlGenerator->generate(...$filterViews);
+    }
+
+    public function generateColumnSortUrl(ColumnHeaderView|array $columnHeaderViews): string
+    {
+        if ($columnHeaderViews instanceof ColumnHeaderView) {
+            $columnHeaderViews = [$columnHeaderViews];
+        }
+
+        return $this->columnSortUrlGenerator->generate(...$columnHeaderViews);
     }
 
     /**

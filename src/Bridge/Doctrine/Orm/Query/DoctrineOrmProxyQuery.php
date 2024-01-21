@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
-use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
-use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator\PaginatorFactory;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator\PaginatorFactoryInterface;
 
 /**
  * @mixin QueryBuilder
@@ -21,7 +20,9 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 {
     private int $uniqueParameterId = 0;
     private int $batchSize = 5000;
-    private bool $entityManagerClearingEnabled = true;
+    private PaginatorFactoryInterface $paginatorFactory;
+    private AliasResolverInterface $aliasResolver;
+    private DoctrineOrmResultSetFactoryInterface $resultSetFactory;
 
     /**
      * @param array<string, mixed> $hints
@@ -38,39 +39,20 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         return $this->queryBuilder->$name(...$args);
     }
 
-    public function __get(string $name): mixed
-    {
-        return $this->queryBuilder->{$name};
-    }
-
     public function __clone(): void
     {
         $this->queryBuilder = clone $this->queryBuilder;
     }
 
-    public function getQueryBuilder(): QueryBuilder
-    {
-        return $this->queryBuilder;
-    }
-
     public function sort(SortingData $sortingData): void
     {
-        $rootAlias = current($this->queryBuilder->getRootAliases());
-
-        if (false === $rootAlias) {
-            throw new \RuntimeException('There are no root aliases defined in the query.');
-        }
-
         $this->queryBuilder->resetDQLPart('orderBy');
 
-        foreach ($sortingData->getColumns() as $column) {
-            $propertyPath = (string) $column->getPropertyPath();
-
-            if ($rootAlias && !str_contains($propertyPath, '.') && !str_starts_with($propertyPath, '__')) {
-                $propertyPath = $rootAlias.'.'.$propertyPath;
-            }
-
-            $this->queryBuilder->addOrderBy($propertyPath, $column->getDirection());
+        foreach ($sortingData->getColumns() as $sortCriterion) {
+            $this->queryBuilder->addOrderBy(
+                $this->getAliasResolver()->resolve((string) $sortCriterion->getPropertyPath(), $this->queryBuilder),
+                $sortCriterion->getDirection(),
+            );
         }
     }
 
@@ -82,58 +64,17 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         ;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getPagination(): PaginationInterface
+    public function getResult(): ResultSetInterface
     {
-        $maxResults = $this->queryBuilder->getMaxResults();
+        $paginator = $this->getPaginatorFactory()->create($this->queryBuilder, $this->hints);
+        $paginator->getQuery()->setHydrationMode($this->hydrationMode);
 
-        $paginator = $this->createPaginator(forceDisabledFetchJoinCollection: null === $maxResults);
-
-        try {
-            return new Pagination(
-                items: $paginator->getIterator(),
-                currentPageNumber: $this->getCurrentPageNumber(),
-                totalItemCount: $paginator->count(),
-                itemNumberPerPage: $maxResults,
-            );
-        } catch (CurrentPageOutOfRangeException) {
-            $this->queryBuilder->setFirstResult(null);
-        }
-
-        return $this->getPagination();
+        return $this->getResultSetFactory()->create($paginator, $this->batchSize);
     }
 
-    public function getItems(): iterable
+    public function getQueryBuilder(): QueryBuilder
     {
-        $paginator = $this->createPaginator(forceDisabledFetchJoinCollection: true);
-
-        $batchSize = $this->batchSize;
-
-        $cursorPosition = 0;
-
-        do {
-            $hasItems = true;
-
-            if (0 === $cursorPosition % $batchSize) {
-                $hasItems = false;
-
-                $paginator->getQuery()->setMaxResults($batchSize);
-                $paginator->getQuery()->setFirstResult($cursorPosition);
-
-                foreach ($paginator->getIterator() as $item) {
-                    $hasItems = true;
-                    yield $item;
-                }
-
-                if ($this->entityManagerClearingEnabled) {
-                    $this->getEntityManager()->clear();
-                }
-            }
-
-            ++$cursorPosition;
-        } while (0 === $cursorPosition || $hasItems);
+        return $this->queryBuilder;
     }
 
     public function getUniqueParameterId(): int
@@ -141,24 +82,24 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         return $this->uniqueParameterId++;
     }
 
+    public function getHints(): array
+    {
+        return $this->hints;
+    }
+
     public function setHint(string $name, mixed $value): void
     {
         $this->hints[$name] = $value;
     }
 
+    public function getHydrationMode(): int|string
+    {
+        return $this->hydrationMode;
+    }
+
     public function setHydrationMode(int|string $hydrationMode): void
     {
         $this->hydrationMode = $hydrationMode;
-    }
-
-    public function isEntityManagerClearingEnabled(): bool
-    {
-        return $this->entityManagerClearingEnabled;
-    }
-
-    public function setEntityManagerClearingEnabled(bool $entityManagerClearingEnabled): void
-    {
-        $this->entityManagerClearingEnabled = $entityManagerClearingEnabled;
     }
 
     public function getBatchSize(): int
@@ -168,52 +109,40 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 
     public function setBatchSize(int $batchSize): void
     {
+        if ($batchSize <= 0) {
+            throw new InvalidArgumentException('The batch size must be positive.');
+        }
+
         $this->batchSize = $batchSize;
     }
 
-    private function getCurrentPageNumber(): int
+    public function getPaginatorFactory(): PaginatorFactoryInterface
     {
-        $firstResult = $this->queryBuilder->getFirstResult();
-        $maxResults = $this->queryBuilder->getMaxResults() ?? 1;
-
-        return (int) ($firstResult / $maxResults) + 1;
+        return $this->paginatorFactory ??= new PaginatorFactory();
     }
 
-    private function createPaginator(bool $forceDisabledFetchJoinCollection = false): Paginator
+    public function setPaginatorFactory(PaginatorFactoryInterface $paginatorFactory): void
     {
-        $rootEntity = current($this->queryBuilder->getRootEntities());
-
-        if (false === $rootEntity) {
-            throw new \RuntimeException('There are no root entities defined in the query.');
-        }
-
-        $identifierFieldNames = $this->queryBuilder
-            ->getEntityManager()
-            ->getClassMetadata($rootEntity)
-            ->getIdentifierFieldNames();
-
-        $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
-        $hasJoins = \count($this->queryBuilder->getDQLPart('join')) > 0;
-
-        $query = (clone $this->queryBuilder)->getQuery();
-
-        $this->applyQueryHints($query);
-
-        $query->setHydrationMode($this->hydrationMode);
-
-        $fetchJoinCollection = $hasSingleIdentifierName && $hasJoins;
-
-        if ($forceDisabledFetchJoinCollection) {
-            $fetchJoinCollection = false;
-        }
-
-        return new Paginator($query, $fetchJoinCollection);
+        $this->paginatorFactory = $paginatorFactory;
     }
 
-    private function applyQueryHints(Query $query): void
+    public function getAliasResolver(): AliasResolverInterface
     {
-        foreach ($this->hints as $name => $value) {
-            $query->setHint($name, $value);
-        }
+        return $this->aliasResolver ??= new AliasResolver();
+    }
+
+    public function setAliasResolver(AliasResolverInterface $aliasResolver): void
+    {
+        $this->aliasResolver = $aliasResolver;
+    }
+
+    public function getResultSetFactory(): DoctrineOrmResultSetFactoryInterface
+    {
+        return $this->resultSetFactory ??= new DoctrineOrmResultSetFactory();
+    }
+
+    public function setResultSetFactory(DoctrineOrmResultSetFactoryInterface $resultSetFactory): void
+    {
+        $this->resultSetFactory = $resultSetFactory;
     }
 }

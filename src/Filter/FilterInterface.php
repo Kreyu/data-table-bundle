@@ -24,11 +24,7 @@ interface FilterInterface
 
     public function getQueryPath(): string;
 
-    /**
-     * @param ProxyQueryInterface|null $query if not given, filter will be applied to the related data table query
-     * @param FilterData|null          $data  if not given, filter will be applied using filter data from the related data table
-     */
-    public function apply(ProxyQueryInterface $query = null, FilterData $data = null): void;
+    public function handle(ProxyQueryInterface $query, FilterData $data): void;
 
     public function createView(FilterData $data, DataTableView $parent): FilterView;
 }

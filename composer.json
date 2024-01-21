@@ -31,11 +31,19 @@
         "phpoffice/phpspreadsheet": "^1.28",
         "doctrine/orm": "^2.15",
         "doctrine/doctrine-bundle": "^2.9",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.4",
+        "dg/bypass-finals": "dev-master",
+        "openspout/openspout": "^4.23"
     },
     "autoload": {
         "psr-4": {
             "Kreyu\\Bundle\\DataTableBundle\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kreyu\\Bundle\\DataTableBundle\\Tests\\": "tests"
         }
     }
 }

@@ -12,7 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -24,9 +24,9 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
      * @param array<FilterTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private FilterTypeInterface $innerType,
-        private array $typeExtensions = [],
-        private ?ResolvedFilterTypeInterface $parent = null,
+        private readonly FilterTypeInterface $innerType,
+        private readonly array $typeExtensions = [],
+        private readonly ?ResolvedFilterTypeInterface $parent = null,
     ) {
     }
 
@@ -61,7 +61,7 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the filter "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return new FilterBuilder($name, $this, $options);
+        return new FilterBuilder($name, $this, new EventDispatcher(), $options);
     }
 
     public function createView(FilterInterface $filter, FilterData $data, DataTableView $parent): FilterView
@@ -88,17 +88,6 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
 
         foreach ($this->typeExtensions as $extension) {
             $extension->buildView($view, $filter, $options);
-        }
-    }
-
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
-    {
-        $this->parent?->apply($query, $data, $filter, $options);
-
-        $this->innerType->apply($query, $data, $filter, $options);
-
-        foreach ($this->typeExtensions as $extension) {
-            $extension->apply($query, $data, $filter, $options);
         }
     }
 

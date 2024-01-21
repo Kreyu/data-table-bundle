@@ -4,43 +4,29 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Doctrine\ORM\Query\Expr;
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumericFilterType extends AbstractDoctrineOrmFilterType
 {
-    public function configureOptions(OptionsResolver $resolver): void
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {
-        $resolver
-            ->setDefaults([
-                'form_type' => NumberType::class,
-                'supported_operators' => [
-                    Operator::Equals,
-                    Operator::NotEquals,
-                    Operator::GreaterThanEquals,
-                    Operator::GreaterThan,
-                    Operator::LessThanEquals,
-                    Operator::LessThan,
-                ],
-            ])
-        ;
+        $builder->setSupportedOperators([
+            Operator::Equals,
+            Operator::NotEquals,
+            Operator::Contains,
+            Operator::NotContains,
+            Operator::StartsWith,
+            Operator::EndsWith,
+        ]);
     }
 
-    protected function getOperatorExpression(string $queryPath, string $parameterName, Operator $operator, Expr $expr): object
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $expression = match ($operator) {
-            Operator::Equals => $expr->eq(...),
-            Operator::NotEquals => $expr->neq(...),
-            Operator::GreaterThanEquals => $expr->gte(...),
-            Operator::GreaterThan => $expr->gt(...),
-            Operator::LessThanEquals => $expr->lte(...),
-            Operator::LessThan => $expr->lt(...),
-            default => throw new InvalidArgumentException('Operator not supported'),
-        };
-
-        return $expression($queryPath, ":$parameterName");
+        $resolver->setDefaults([
+            'form_type' => NumberType::class,
+        ]);
     }
 }

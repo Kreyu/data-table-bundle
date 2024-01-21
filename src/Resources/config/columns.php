@@ -6,6 +6,8 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGenerator;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
@@ -24,6 +26,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -122,5 +125,14 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.column.type.text', TextColumnType::class)
         ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.column_sort_url_generator', ColumnSortUrlGenerator::class)
+        ->args([
+            service('request_stack'),
+            service(UrlGeneratorInterface::class),
+        ])
+        ->alias(ColumnSortUrlGeneratorInterface::class, 'kreyu_data_table.column.column_sort_url_generator')
     ;
 };

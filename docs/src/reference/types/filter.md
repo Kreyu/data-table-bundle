@@ -2,9 +2,9 @@
 
 The following filter types are natively available in the bundle:
 
-- [Callback](types/callback.md)
-- [Search](types/search.md)
-- [Filter](types/filter.md)
+- [Callback](filter/callback.md)
+- [Search](filter/search.md)
+- [Filter](filter/filter.md)
 
 ## Doctrine ORM
 

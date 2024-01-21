@@ -36,7 +36,7 @@ For reference, see [available filter types](../../reference/types/filter.md).
 
 ## Creating filter types
 
-This bundle and integrations, such as [Doctrine ORM integration bundle](../integrations/doctrine-orm/installation.md), come with plenty of the [filter types](../../reference/types/filter.md). 
+This bundle comes with plenty of the [built-in filter types](../../reference/types/filter.md). 
 However, those may not cover complex cases. Luckily, creating custom filter types are easy.
 
 Filter types are classes that implement [`FilterTypeInterface`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/FilterTypeInterface.php). However, it's better to extend from the [`AbstractFilterType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Type/AbstractFilterType.php):

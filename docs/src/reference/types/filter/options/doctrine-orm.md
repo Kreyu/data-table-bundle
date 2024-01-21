@@ -50,4 +50,4 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-For more information about expression transformers, [read here](../../../../../docs/integrations/doctrine-orm/expression-transformers.md).
+For more information about expression transformers, [read here](../../../../docs/integrations/doctrine-orm/expression-transformers.md).

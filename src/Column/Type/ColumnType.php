@@ -161,6 +161,8 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         $view->value = $viewData;
+
+        $view->vars['value'] = $viewData;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

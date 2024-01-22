@@ -93,8 +93,14 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
 
     protected function getValueCell(ColumnValueView $view, array $options): Cell
     {
+        $value = $view->vars['value'];
+
+        if ($value instanceof \Stringable) {
+            $value = (string) $value;
+        }
+
         return Cell::fromValue(
-            value: $view->vars['value'],
+            value: $value,
             style: $this->getStyle($view, 'value_cell_style', $options),
         );
     }

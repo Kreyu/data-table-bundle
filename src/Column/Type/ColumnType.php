@@ -108,17 +108,21 @@ final class ColumnType implements ColumnTypeInterface
         $label = $options['label'] ?? StringUtil::camelToSentence($column->getName());
 
         if ($this->translator) {
-            $translationDomain = $options['export']['header_translation_domain']
-                ?? $options['header_translation_domain']
-                ?? $view->parent->parent->vars['translation_domain']
-                ?? false;
+            if ($label instanceof TranslatableInterface) {
+                $label = $label->trans($this->translator, $this->translator->getLocale());
+            } else {
+                $translationDomain = $options['export']['header_translation_domain']
+                    ?? $options['header_translation_domain']
+                    ?? $view->parent->parent->vars['translation_domain']
+                    ?? false;
 
-            if ($translationDomain) {
-                $label = $this->translator->trans(
-                    id: $label,
-                    parameters: $options['header_translation_parameters'],
-                    domain: $translationDomain,
-                );
+                if ($translationDomain) {
+                    $label = $this->translator->trans(
+                        id: $label,
+                        parameters: $options['header_translation_parameters'],
+                        domain: $translationDomain,
+                    );
+                }
             }
         }
 

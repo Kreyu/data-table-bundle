@@ -225,8 +225,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->columns)
-            || array_key_exists($name, $this->unresolvedColumns);
+        return isset($this->columns[$name]) || isset($this->unresolvedColumns[$name]);
     }
 
     public function removeColumn(string $name): static
@@ -294,8 +293,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->filters)
-            || array_key_exists($name, $this->unresolvedFilters);
+        return isset($this->filters[$name]) || isset($this->unresolvedFilters[$name]);
     }
 
     public function removeFilter(string $name): static
@@ -403,8 +401,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->actions)
-            || array_key_exists($name, $this->unresolvedActions);
+        return isset($this->actions[$name]) || isset($this->unresolvedActions[$name]);
     }
 
     public function removeAction(string $name): static
@@ -452,8 +449,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->batchActions)
-            || array_key_exists($name, $this->unresolvedBatchActions);
+        return isset($this->batchActions[$name]) || isset($this->unresolvedBatchActions[$name]);
     }
 
     public function addBatchAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
@@ -541,8 +537,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->rowActions)
-            || array_key_exists($name, $this->unresolvedRowActions);
+        return isset($this->rowActions[$name]) || isset($this->unresolvedRowActions[$name]);
     }
 
     public function addRowAction(string|ActionBuilderInterface $action, string $type = null, array $options = []): static
@@ -650,8 +645,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return array_key_exists($name, $this->exporters)
-            || array_key_exists($name, $this->unresolvedExporters);
+        return isset($this->exporters[$name]) || isset($this->unresolvedExporters[$name]);
     }
 
     public function removeExporter(string $name): static

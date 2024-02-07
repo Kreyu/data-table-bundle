@@ -1,0 +1,52 @@
+# Operators
+Equals: igual
+Not equals: no igual
+Contains: contiene
+Not contains: no contiene
+Greater than: mayor que
+Greater than or equals: mayor que o igual
+Less than: menor que
+Less than or equals: menor que o igual
+Starts with: empieza por
+Ends with: acaba en
+
+# Boolean type
+Yes: Sí
+No: No
+
+# Date range filter type
+Before %date%: antes de %date%
+After %date%: después de %date%
+
+# Personalization
+Personalization: Personalización
+Drag items between columns to show/hide relevant data in the list or change their order: Arrastra los elementos entre las columnas para mostrar u ocultar los datos relevantes en la lista o cambiar su orden
+Visible columns: Columnas visibles
+Hidden columns: Columnas ocultas
+
+# Pagination
+Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Mostrando %current_page_first_item_index% - %current_page_last_item_index% de %total_item_count%
+
+# Export
+Export: Exportar
+Filename: Nombre del archivo
+Exporter: Exportador
+Strategy: Estrategia
+Include personalization: Incluir personalización
+
+# Export strategy
+Include current page: Incluir la página actual
+Include all: De todas las páginas
+
+# Misc
+Selected: Seleccionado
+Filter: Filtro
+Apply: Aplicar
+No results found: No se encontraron resultados
+Try adjusting your search or filter to find what you're looking for: Intenta ajustar tu búsqueda o filtro para encontrar lo que buscas
+Clear filter: Limpiar filtro
+Clear all filters: Limpiar todos los filtros
+Action confirmation: Confirmación de ejecución de acción
+Are you sure you want to execute this action?: ¿Estás seguro de que quieres ejecutar esta acción?
+Confirm: Confirmar
+Cancel: Cancelar

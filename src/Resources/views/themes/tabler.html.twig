@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block action_filter %}
-    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -47,7 +47,7 @@
 {% endblock %}
 
 {% block action_export %}
-    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Export'|trans({}, 'KreyuDataTable') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -64,7 +64,7 @@
 {% endblock %}
 
 {% block action_personalize %}
-    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Personalize'|trans({}, 'KreyuDataTable') } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

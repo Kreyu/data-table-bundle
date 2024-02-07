@@ -30,7 +30,7 @@ For more information, consider reading:
 ## Exporting is enabled but exported files are empty
 
 Enabling the exporting feature for the data table does not mean that any column will be exportable by itself.
-By default, columns **are not** sortable. To make a column exportable, use its `export` option.
+By default, columns **are not** exportable. To make a column exportable, use its `export` option.
 
 For more information, consider reading:
 

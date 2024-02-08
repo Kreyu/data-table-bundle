@@ -1,0 +1,52 @@
+# Operators
+Equals: igual
+Not equals: no és igual
+Contains: conté
+Not contains: no conté
+Greater than: major que
+Greater than or equals: major o igual que
+Less than: menor que
+Less than or equals: menor o igual que
+Starts with: comença amb
+Ends with: acaba amb
+
+# Boolean type
+Yes: Si
+No: No
+
+# Date range filter type
+Before %date%: abans de %date%
+After %date%: després %date%
+
+# Personalization
+Personalization: Personalització
+Drag items between columns to show/hide relevant data in the list or change their order: Arrossega els elements entre columnes per a mostrar o ocultar les dades rellevants a la llista o canviar-ne l'ordre
+Visible columns: Columnes visibles
+Hidden columns: Columnes amagades
+
+# Pagination
+Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Mostrant %current_page_first_item_index% - %current_page_last_item_index% de %total_item_count%
+
+# Export
+Export: Exportar
+Filename: Nom de l'arxiu
+Exporter: Exportador
+Strategy: Estratègia
+Include personalization: Incloure personalització
+
+# Export strategy
+Include current page: Incloure la pàgina actual
+Include all: De totes les pàgines
+
+# Misc
+Selected: Seleccionat
+Filter: Filtrar
+Apply: Aplicar
+No results found: No s'han trobat resultats
+Try adjusting your search or filter to find what you're looking for: Prova d'ajustar la teva cerca o filtre per trobar el que busques
+Clear filter: Esborrar el filtre
+Clear all filters: Esborrar tots els filtres
+Action confirmation: Confirmació d'execució de l'acció
+Are you sure you want to execute this action?: Estàs segur que vols executar aquesta acció?
+Confirm: Confirmar
+Cancel: Cancel·lar

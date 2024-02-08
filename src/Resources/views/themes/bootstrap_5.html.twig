@@ -138,6 +138,7 @@
         'data-bs-target': '#' ~ filtration_form.vars.id ~ '__collapse',
         'aria-expanded': 'false',
         'aria-controls': filtration_form.vars.id ~ '__collapse',
+        'title': 'Filter'|trans({}, 'KreyuDataTable'),
     }|merge(attr|default({})) %}
 
     <button {{ block('attributes') }}>{{ block('action_filter_icon') }}</button>
@@ -155,6 +156,7 @@
         'type': 'button',
         'data-bs-toggle': 'modal',
         'data-bs-target': '#' ~ export_form.vars.id ~ '__modal',
+        'title': 'Export'|trans({}, 'KreyuDataTable'),
     }|merge(attr|default({})) %}
 
     <button {{ block('attributes') }}>{{ block('action_export_icon') }}</button>
@@ -172,6 +174,7 @@
         'type': 'button',
         'data-bs-toggle': 'modal',
         'data-bs-target': '#' ~ personalization_form.vars.id ~ '__modal',
+        'title': 'Personalize'|trans({}, 'KreyuDataTable'),
     }|merge(attr|default({})) %}
 
     <button {{ block('attributes') }}>{{ block('action_personalize_icon') }}</button>

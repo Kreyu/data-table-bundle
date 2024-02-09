@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Query;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryFactory;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +19,17 @@ class DoctrineOrmProxyQueryFactoryTest extends TestCase
         $this->factory = new DoctrineOrmProxyQueryFactory();
     }
 
-    public function testCreatingWithSupportedData(): void
+    public function testSupportsQueryBuilder()
+    {
+        $this->assertTrue($this->factory->supports($this->createStub(QueryBuilder::class)));
+    }
+
+    public function testNotSupportsQuery(): void
+    {
+        $this->assertFalse($this->factory->supports($this->createStub(Query::class)));
+    }
+
+    public function testCreate(): void
     {
         $queryBuilder = $this->createStub(QueryBuilder::class);
 
@@ -28,14 +37,5 @@ class DoctrineOrmProxyQueryFactoryTest extends TestCase
 
         $this->assertInstanceOf(DoctrineOrmProxyQuery::class, $data);
         $this->assertEquals($queryBuilder, $data->getQueryBuilder());
-    }
-
-    public function testCreatingWithNotSupportedData(): void
-    {
-        $data = $this->createStub(Query::class);
-
-        $this->expectExceptionObject(new UnexpectedTypeException($data, QueryBuilder::class));
-
-        $this->factory->create($data);
     }
 }

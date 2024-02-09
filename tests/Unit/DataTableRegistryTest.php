@@ -35,6 +35,7 @@ class DataTableRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
+        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -101,6 +102,7 @@ class DataTableRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
+        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 

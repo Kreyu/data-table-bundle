@@ -13,7 +13,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Extension\DataTableExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
@@ -32,7 +31,6 @@ use Symfony\Component\DependencyInjection\Reference;
 class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {
     private array $autoconfiguration = [
-        DataTableExtensionInterface::class => 'kreyu_data_table.extension',
         DataTableTypeInterface::class => 'kreyu_data_table.type',
         DataTableTypeExtensionInterface::class => 'kreyu_data_table.type_extension',
         ColumnExtensionInterface::class => 'kreyu_data_table.column.extension',

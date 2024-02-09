@@ -13,10 +13,11 @@ class DoctrineOrmProxyQueryFactory implements ProxyQueryFactoryInterface
 {
     public function create(mixed $data): ProxyQueryInterface
     {
-        if ($data instanceof QueryBuilder) {
-            return new DoctrineOrmProxyQuery($data);
-        }
+        return new DoctrineOrmProxyQuery($data);
+    }
 
-        throw new UnexpectedTypeException($data, QueryBuilder::class);
+    public function supports(mixed $data): bool
+    {
+        return $data instanceof QueryBuilder;
     }
 }

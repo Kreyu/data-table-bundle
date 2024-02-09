@@ -41,22 +41,6 @@ final class DataTableType implements DataTableTypeInterface
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        // TODO: Remove backwards compatibility layer
-        $deprecatedPersistenceSubjectSetters = [
-            'personalization_persistence_subject' => $builder->setPersonalizationPersistenceSubjectProvider(...),
-            'filtration_persistence_subject' => $builder->setFiltrationPersistenceSubjectProvider(...),
-            'sorting_persistence_subject' => $builder->setSortingPersistenceSubjectProvider(...),
-            'pagination_persistence_subject' => $builder->setPaginationPersistenceSubjectProvider(...),
-        ];
-
-        foreach ($deprecatedPersistenceSubjectSetters as $option => $setter) {
-            $persistenceSubject = $options[$option];
-
-            if ($persistenceSubject instanceof PersistenceSubjectInterface) {
-                $setter(new StaticPersistenceSubjectProvider($persistenceSubject->getDataTablePersistenceIdentifier()));
-            }
-        }
-
         $setters = [
             'themes' => $builder->setThemes(...),
             'column_factory' => $builder->setColumnFactory(...),
@@ -195,12 +179,6 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
-
-                // TODO: Remove deprecated options
-                'sorting_persistence_subject' => null,
-                'pagination_persistence_subject' => null,
-                'filtration_persistence_subject' => null,
-                'personalization_persistence_subject' => null,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
@@ -231,12 +209,6 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
-
-            // TODO: Remove deprecated options
-            ->setDeprecated('sorting_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "sorting_persistence_subject_provider" instead.')
-            ->setDeprecated('pagination_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "pagination_persistence_subject_provider" instead.')
-            ->setDeprecated('filtration_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "filtration_persistence_subject_provider" instead.')
-            ->setDeprecated('personalization_persistence_subject', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated, use "personalization_persistence_subject_provider" instead.')
         ;
     }
 

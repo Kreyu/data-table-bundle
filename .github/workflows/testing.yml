@@ -12,8 +12,9 @@ jobs:
       with:
         php_extensions: dom fileinfo filter libxml xmlreader zip gd
     - uses: php-actions/phpstan@v3
-    - uses: php-actions/phpunit@v10.5.8
+    - uses: php-actions/phpunit@v3
       with:
+        version: 10.5.8
         php_extensions: xdebug dom fileinfo filter libxml xmlreader zip gd
         args: --coverage-text
       env:

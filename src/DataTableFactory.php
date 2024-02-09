@@ -4,42 +4,43 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 
 class DataTableFactory implements DataTableFactoryInterface
 {
     public function __construct(
-        private DataTableRegistryInterface $registry,
-        private ?ProxyQueryFactoryInterface $proxyQueryFactory = null,
+        private readonly DataTableRegistryInterface $registry,
     ) {
     }
 
-    public function create(string $type = DataTableType::class, mixed $query = null, array $options = []): DataTableInterface
+    public function create(string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableInterface
     {
-        return $this->createBuilder($type, $query, $options)->getDataTable();
+        return $this->createBuilder($type, $data, $options)->getDataTable();
     }
 
-    public function createNamed(string $name, string $type = DataTableType::class, mixed $query = null, array $options = []): DataTableInterface
+    public function createNamed(string $name, string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableInterface
     {
-        return $this->createNamedBuilder($name, $type, $query, $options)->getDataTable();
+        return $this->createNamedBuilder($name, $type, $data, $options)->getDataTable();
     }
 
-    public function createBuilder(string $type = DataTableType::class, mixed $query = null, array $options = []): DataTableBuilderInterface
+    public function createBuilder(string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableBuilderInterface
     {
-        return $this->createNamedBuilder($this->registry->getType($type)->getName(), $type, $query, $options);
+        return $this->createNamedBuilder($this->registry->getType($type)->getName(), $type, $data, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = DataTableType::class, mixed $query = null, array $options = []): DataTableBuilderInterface
+    public function createNamedBuilder(string $name, string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableBuilderInterface
     {
-        if (null !== $query && !$query instanceof ProxyQueryInterface) {
-            if (null === $this->proxyQueryFactory) {
-                throw new InvalidArgumentException(sprintf('Expected query of type %s, %s given', ProxyQueryInterface::class, get_debug_type($query)));
+        $query = $data;
+
+        if (null !== $data && !$data instanceof ProxyQueryInterface) {
+            foreach ($this->registry->getProxyQueryFactories() as $proxyQueryFactory) {
+                if ($proxyQueryFactory->supports($data)) {
+                    $query = $proxyQueryFactory->create($data);
+                }
+
+                break;
             }
-
-            $query = $this->proxyQueryFactory->create($query);
         }
 
         $type = $this->registry->getType($type);

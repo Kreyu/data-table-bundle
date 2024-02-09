@@ -12,8 +12,6 @@ use Kreyu\Bundle\DataTableBundle\Persistence\CachePersistenceClearer;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceClearerInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
-use Kreyu\Bundle\DataTableBundle\Query\ChainProxyQueryFactory;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
@@ -41,7 +39,9 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.registry', DataTableRegistry::class)
         ->args([
-            tagged_iterator('kreyu_data_table.extension'),
+            tagged_iterator('kreyu_data_table.type'),
+            tagged_iterator('kreyu_data_table.type_extension'),
+            tagged_iterator('kreyu_data_table.proxy_query.factory'),
             service('kreyu_data_table.resolved_type_factory'),
         ])
         ->alias(DataTableRegistryInterface::class, 'kreyu_data_table.registry')
@@ -51,7 +51,6 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.factory', DataTableFactory::class)
         ->args([
             service('kreyu_data_table.registry'),
-            service('kreyu_data_table.proxy_query.factory.chain'),
         ])
         ->alias(DataTableFactoryInterface::class, 'kreyu_data_table.factory')
     ;
@@ -67,14 +66,6 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.request_handler.http_foundation', HttpFoundationRequestHandler::class)
-    ;
-
-    $services
-        ->set('kreyu_data_table.proxy_query.factory.chain', ChainProxyQueryFactory::class)
-        ->args([
-            tagged_iterator('kreyu_data_table.proxy_query.factory'),
-        ])
-        ->alias(ProxyQueryFactoryInterface::class, 'kreyu_data_table.query.proxy_query_factory.chain')
     ;
 
     $services

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
-use Kreyu\Bundle\DataTableBundle\Extension\DataTableExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 
@@ -16,7 +16,12 @@ interface DataTableRegistryInterface
     public function getType(string $name): ResolvedDataTableTypeInterface;
 
     /**
-     * @return iterable<DataTableExtensionInterface>
+     * @param class-string<DataTableTypeInterface> $name
      */
-    public function getExtensions(): iterable;
+    public function hasType(string $name): bool;
+
+    /**
+     * @return array<ProxyQueryFactoryInterface>
+     */
+    public function getProxyQueryFactories(): array;
 }

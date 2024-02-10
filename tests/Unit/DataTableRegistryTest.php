@@ -8,13 +8,13 @@ use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\FooDataTableTypeBarExtension;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\FooDataTableTypeBazExtension;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTableTypeBarExtension;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTableTypeBazExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\BarProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\FooProxyQueryFactory;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\BarDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleSubDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\FooDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo;
@@ -26,9 +26,9 @@ class DataTableRegistryTest extends TestCase
 {
     public function testGetType()
     {
-        $resolvedType = $this->createRegistry()->getType(FooDataTableType::class);
+        $resolvedType = $this->createRegistry()->getType(SimpleDataTableType::class);
 
-        $this->assertInstanceOf(FooDataTableType::class, $resolvedType->getInnerType());
+        $this->assertInstanceOf(SimpleDataTableType::class, $resolvedType->getInnerType());
     }
 
     public function testGetTypeWithNonExistentType()
@@ -42,31 +42,31 @@ class DataTableRegistryTest extends TestCase
     public function testGetTypeWithTypeExtensions()
     {
         $typeExtensions = [
-            new FooDataTableTypeBarExtension(),
-            new FooDataTableTypeBazExtension(),
+            new SimpleDataTableTypeBarExtension(),
+            new SimpleDataTableTypeBazExtension(),
         ];
 
-        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(FooDataTableType::class);
+        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleDataTableType::class);
 
         $this->assertSame($typeExtensions, $resolvedType->getTypeExtensions());
     }
 
     public function testGetTypeWithParent()
     {
-        $resolvedType = $this->createRegistry()->getType(BarDataTableType::class);
+        $resolvedType = $this->createRegistry()->getType(SimpleSubDataTableType::class);
 
-        $this->assertInstanceOf(BarDataTableType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(FooDataTableType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertInstanceOf(SimpleSubDataTableType::class, $resolvedType->getInnerType());
+        $this->assertInstanceOf(SimpleDataTableType::class, $resolvedType->getParent()->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
     {
         $typeExtensions = [
-            new FooDataTableTypeBarExtension(),
-            new FooDataTableTypeBazExtension(),
+            new SimpleDataTableTypeBarExtension(),
+            new SimpleDataTableTypeBazExtension(),
         ];
 
-        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(BarDataTableType::class);
+        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubDataTableType::class);
 
         $this->assertEmpty($resolvedType->getTypeExtensions());
         $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
@@ -97,7 +97,7 @@ class DataTableRegistryTest extends TestCase
 
     public function testHasType()
     {
-        $this->assertTrue($this->createRegistry()->hasType(FooDataTableType::class));
+        $this->assertTrue($this->createRegistry()->hasType(SimpleDataTableType::class));
     }
 
     public function testHasTypeWithNonExistentType()
@@ -141,8 +141,8 @@ class DataTableRegistryTest extends TestCase
         return new DataTableRegistry(
             types: $types ?: [
                 new DataTableType(),
-                new FooDataTableType(),
-                new BarDataTableType(),
+                new SimpleDataTableType(),
+                new SimpleSubDataTableType(),
             ],
             typeExtensions: $typeExtensions,
             proxyQueryFactories: $proxyQueryFactories,

@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\CustomQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\ConfigurableDataTableType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\FooDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use PHPUnit\Framework\TestCase;
@@ -49,9 +49,9 @@ class DataTableFactoryTest extends TestCase
 
     public function testCreateBuilderUsesDataTableName()
     {
-        $builder = $this->createFactory()->createBuilder(FooDataTableType::class);
+        $builder = $this->createFactory()->createBuilder(SimpleDataTableType::class);
 
-        $this->assertSame('foo', $builder->getName());
+        $this->assertSame('simple', $builder->getName());
     }
 
     public function testCreate()
@@ -94,7 +94,7 @@ class DataTableFactoryTest extends TestCase
         $registry = new DataTableRegistry(
             types: [
                 new DataTableType(),
-                new FooDataTableType(),
+                new SimpleDataTableType(),
                 new ConfigurableDataTableType(),
             ],
             typeExtensions: [],

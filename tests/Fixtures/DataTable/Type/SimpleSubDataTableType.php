@@ -6,10 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type;
 
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class BarDataTableType extends AbstractDataTableType
+class SimpleSubDataTableType extends AbstractDataTableType
 {
     public function getParent(): string
     {
-        return FooDataTableType::class;
+        return SimpleDataTableType::class;
     }
 }

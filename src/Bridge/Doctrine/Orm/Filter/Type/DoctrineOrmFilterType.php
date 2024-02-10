@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\EventListener\ApplyExpressionTransformers;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\DoctrineOrmFilterHandler;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\ExpressionTransformerInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class DoctrineOrmFilterType extends AbstractFilterType

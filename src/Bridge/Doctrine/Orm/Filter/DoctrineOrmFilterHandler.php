@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterHandlerInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\DoctrineOrmFilterEvent;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\DoctrineOrmFilterEvents;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\PreApplyExpressionEvent;
@@ -18,6 +13,11 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionFactory\Ex
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ParameterFactory\ParameterFactory;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ParameterFactory\ParameterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class DoctrineOrmFilterHandler implements FilterHandlerInterface
 {

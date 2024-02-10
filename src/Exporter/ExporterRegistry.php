@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class ExporterRegistry implements ExporterRegistryInterface
 {
@@ -35,7 +35,7 @@ class ExporterRegistry implements ExporterRegistryInterface
     private array $checkedTypes;
 
     /**
-     * @param iterable<ExporterTypeInterface> $types
+     * @param iterable<ExporterTypeInterface>          $types
      * @param iterable<ExporterTypeExtensionInterface> $typeExtensions
      */
     public function __construct(

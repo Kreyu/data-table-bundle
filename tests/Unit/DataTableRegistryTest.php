@@ -12,12 +12,12 @@ use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTa
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTableTypeBazExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\BarProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\FooProxyQueryFactory;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleSubDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleSubDataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use PHPUnit\Framework\TestCase;

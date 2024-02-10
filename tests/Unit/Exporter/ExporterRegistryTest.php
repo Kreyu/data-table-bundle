@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Exporter;
 
-use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
-use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Extension\SimpleExporterTypeFooExtension;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Extension\SimpleExporterTypeBarExtension;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\SimpleSubExporterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Extension\SimpleExporterTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\SimpleExporterType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\SimpleExporterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\SimpleSubExporterType;
 use PHPUnit\Framework\TestCase;
 
 class ExporterRegistryTest extends TestCase

@@ -7,8 +7,8 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Kreyu\Bundle\DataTableBundle\Util\RewindableGeneratorIterator;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmResultSetFactory;
+use Kreyu\Bundle\DataTableBundle\Util\RewindableGeneratorIterator;
 use PHPUnit\Framework\TestCase;
 
 class DoctrineOrmResultSetFactoryTest extends TestCase

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Filter\Formatter;
 
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\DateActiveFilterFormatter;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterConfigInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\DateActiveFilterFormatter;
 use PHPUnit\Framework\TestCase;
 
 class DateActiveFilterFormatterTest extends TestCase

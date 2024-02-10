@@ -25,8 +25,8 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 

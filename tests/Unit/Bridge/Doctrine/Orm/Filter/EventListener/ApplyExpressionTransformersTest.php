@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Filter\EventListener;
 
 use Doctrine\ORM\Query\Expr;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterConfigInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\PreApplyExpressionEvent;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\EventListener\ApplyExpressionTransformers;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\DoctrineOrmProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterConfigInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Fixtures\Filter\ExpressionTransformer\CustomExpressionTransformer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;

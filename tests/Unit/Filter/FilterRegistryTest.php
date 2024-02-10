@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Filter;
 
-use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeFooExtension;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeBarExtension;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleSubFilterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleFilterType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleFilterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleSubFilterType;
 use PHPUnit\Framework\TestCase;
 
 class FilterRegistryTest extends TestCase

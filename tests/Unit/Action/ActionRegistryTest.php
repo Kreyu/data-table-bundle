@@ -10,14 +10,14 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Extension\SimpleActionTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Extension\SimpleActionTypeBarExtension;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\SimpleSubActionType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Extension\SimpleActionTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\SimpleActionType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\SimpleActionType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\SimpleSubActionType;
 use PHPUnit\Framework\TestCase;
 
 class ActionRegistryTest extends TestCase

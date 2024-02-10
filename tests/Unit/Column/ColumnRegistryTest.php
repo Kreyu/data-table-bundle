@@ -10,14 +10,14 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Extension\SimpleColumnTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Extension\SimpleColumnTypeBarExtension;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\SimpleSubColumnType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Extension\SimpleColumnTypeFooExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\SimpleColumnType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBaz;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\SimpleColumnType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\SimpleSubColumnType;
 use PHPUnit\Framework\TestCase;
 
 class ColumnRegistryTest extends TestCase

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class FilterRegistry implements FilterRegistryInterface
 {
@@ -35,7 +35,7 @@ class FilterRegistry implements FilterRegistryInterface
     private array $checkedTypes;
 
     /**
-     * @param iterable<FilterTypeInterface> $types
+     * @param iterable<FilterTypeInterface>          $types
      * @param iterable<FilterTypeExtensionInterface> $typeExtensions
      */
     public function __construct(

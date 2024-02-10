@@ -35,7 +35,7 @@ class ActionRegistry implements ActionRegistryInterface
     private array $checkedTypes;
 
     /**
-     * @param iterable<ActionTypeInterface> $types
+     * @param iterable<ActionTypeInterface>          $types
      * @param iterable<ActionTypeExtensionInterface> $typeExtensions
      */
     public function __construct(

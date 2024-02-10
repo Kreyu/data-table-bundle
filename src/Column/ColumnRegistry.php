@@ -35,7 +35,7 @@ class ColumnRegistry implements ColumnRegistryInterface
     private array $checkedTypes;
 
     /**
-     * @param iterable<ColumnTypeInterface> $types
+     * @param iterable<ColumnTypeInterface>          $types
      * @param iterable<ColumnTypeExtensionInterface> $typeExtensions
      */
     public function __construct(

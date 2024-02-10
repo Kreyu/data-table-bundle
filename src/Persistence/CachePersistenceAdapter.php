@@ -10,8 +10,6 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-use function Symfony\Component\String\u;
-
 class CachePersistenceAdapter implements PersistenceAdapterInterface
 {
     public const TAG_PREFIX = 'kreyu_data_table_persistence_';

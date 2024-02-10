@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Filter\ExpressionTransformer;
 
 use Doctrine\ORM\Query\Expr\Comparison;
-use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\AbstractComparisonExpressionTransformer;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use PHPUnit\Framework\TestCase;
 
 class ComparisonExpressionTransformerTest extends TestCase

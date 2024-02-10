@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\EventListener\TransformDateRangeFilterData;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\DateRangeActiveFilterFormatter;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\EventListener\TransformDateRangeFilterData;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\DateRangeActiveFilterFormatter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeFilterType extends AbstractDoctrineOrmFilterType

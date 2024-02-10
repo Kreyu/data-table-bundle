@@ -42,9 +42,9 @@ class DataTableRegistry implements DataTableRegistryInterface
     private array $checkedTypes;
 
     /**
-     * @param iterable<DataTableTypeInterface> $types
+     * @param iterable<DataTableTypeInterface>          $types
      * @param iterable<DataTableTypeExtensionInterface> $typeExtensions
-     * @param iterable<ProxyQueryInterface> $proxyQueryFactories
+     * @param iterable<ProxyQueryInterface>             $proxyQueryFactories
      */
     public function __construct(
         iterable $types,

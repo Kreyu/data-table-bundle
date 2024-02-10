@@ -7,9 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryBuilder;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryBuilder;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryBuilder;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -19,11 +16,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 
 final class DataTables
 {
-    public static function createColumnFactory(): ColumnFactoryInterface
-    {
-        return self::createColumnFactoryBuilder()->getColumnFactory();
-    }
-
     public static function createFilterFactory(): FilterFactoryInterface
     {
         return self::createFilterFactoryBuilder()->getFilterFactory();
@@ -37,11 +29,6 @@ final class DataTables
     public static function createExporterFactory(): ExporterFactoryInterface
     {
         return self::createExporterFactoryBuilder()->getExporterFactory();
-    }
-
-    public static function createColumnFactoryBuilder(): ColumnFactoryBuilderInterface
-    {
-        return new ColumnFactoryBuilder();
     }
 
     public static function createFilterFactoryBuilder(): FilterFactoryBuilderInterface

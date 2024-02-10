@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Test\Filter;
 
-use Kreyu\Bundle\DataTableBundle\DataTables;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use PHPUnit\Framework\TestCase;

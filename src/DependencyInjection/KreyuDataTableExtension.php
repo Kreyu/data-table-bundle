@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Action\Extension\ActionTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
@@ -36,7 +35,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         FilterTypeExtensionInterface::class => 'kreyu_data_table.filter.type_extension',
         ActionTypeInterface::class => 'kreyu_data_table.action.type',
         ActionTypeExtensionInterface::class => 'kreyu_data_table.action.type_extension',
-        ExporterExtensionInterface::class => 'kreyu_data_table.exporter.extension',
         ExporterTypeInterface::class => 'kreyu_data_table.exporter.type',
         ExporterTypeExtensionInterface::class => 'kreyu_data_table.exporter.type_extension',
         PersistenceAdapterInterface::class => 'kreyu_data_table.persistence.adapter',
@@ -53,7 +51,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader->load('core.php');
         $loader->load('actions.php');
         $loader->load('exporter.php');
-        $loader->load('extensions.php');
         $loader->load('filtration.php');
         $loader->load('personalization.php');
         $loader->load('twig.php');

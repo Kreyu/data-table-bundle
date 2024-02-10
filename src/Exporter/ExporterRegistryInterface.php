@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
-use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
 
@@ -16,7 +15,7 @@ interface ExporterRegistryInterface
     public function getType(string $name): ResolvedExporterTypeInterface;
 
     /**
-     * @return iterable<ExporterExtensionInterface>
+     * @param class-string<ExporterTypeInterface> $name
      */
-    public function getExtensions(): iterable;
+    public function hasType(string $name): bool;
 }

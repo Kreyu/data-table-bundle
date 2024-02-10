@@ -28,7 +28,8 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.action.registry', ActionRegistry::class)
         ->args([
-            tagged_iterator('kreyu_data_table.action.extension'),
+            tagged_iterator('kreyu_data_table.action.type'),
+            tagged_iterator('kreyu_data_table.action.type_extension'),
             service('kreyu_data_table.action.resolved_type_factory'),
         ])
         ->alias(ActionRegistryInterface::class, 'kreyu_data_table.action.registry')

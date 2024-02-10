@@ -4,33 +4,108 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
-use Kreyu\Bundle\DataTableBundle\AbstractRegistry;
-use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
-/**
- * @extends AbstractRegistry<ExporterTypeInterface, ResolvedExporterTypeInterface, ExporterExtensionInterface>
- */
-class ExporterRegistry extends AbstractRegistry implements ExporterRegistryInterface
+class ExporterRegistry implements ExporterRegistryInterface
 {
+    /**
+     * @var array<ExporterTypeInterface>
+     */
+    private array $types;
+
+    /**
+     * @var array<ExporterTypeExtensionInterface>
+     */
+    private array $typeExtensions;
+
+    /**
+     * @var array<ResolvedExporterTypeFactoryInterface>
+     */
+    private array $resolvedTypes;
+
+    /**
+     * @var array<class-string<ExporterTypeInterface>, bool>
+     */
+    private array $checkedTypes;
+
+    /**
+     * @param iterable<ExporterTypeInterface> $types
+     * @param iterable<ExporterTypeExtensionInterface> $typeExtensions
+     */
+    public function __construct(
+        iterable $types,
+        iterable $typeExtensions,
+        private readonly ResolvedExporterTypeFactoryInterface $resolvedTypeFactory,
+    ) {
+        $this->setTypes($types);
+        $this->setTypeExtensions($typeExtensions);
+    }
+
     public function getType(string $name): ResolvedExporterTypeInterface
     {
-        return $this->doGetType($name);
+        return $this->resolvedTypes[$name] ??= $this->resolveType($name);
     }
 
-    final protected function getErrorContextName(): string
+    public function hasType(string $name): bool
     {
-        return 'exporter';
+        return isset($this->types[$name]);
     }
 
-    final protected function getTypeClass(): string
+    private function resolveType(string $name): ResolvedExporterTypeInterface
     {
-        return ExporterTypeInterface::class;
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The exporter type %s does not exist', $name));
+
+        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+            $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
+            throw new LogicException(sprintf('Circular reference detected for exporter type "%s" (%s).', $fqcn, $types));
+        }
+
+        $this->checkedTypes[$fqcn] = true;
+
+        $parentType = $type->getParent();
+
+        try {
+            return $this->resolvedTypeFactory->createResolvedType(
+                type: $type,
+                typeExtensions: $this->typeExtensions[$type::class] ?? [],
+                parent: $parentType ? $this->getType($parentType) : null,
+            );
+        } finally {
+            unset($this->checkedTypes[$fqcn]);
+        }
     }
 
-    final protected function getExtensionClass(): string
+    private function setTypes(iterable $types): void
     {
-        return ExporterExtensionInterface::class;
+        $this->types = [];
+
+        foreach ($types as $type) {
+            if (!$type instanceof ExporterTypeInterface) {
+                throw new UnexpectedTypeException($type, ExporterTypeInterface::class);
+            }
+
+            $this->types[$type::class] = $type;
+        }
+    }
+
+    private function setTypeExtensions(iterable $typeExtensions): void
+    {
+        $this->typeExtensions = [];
+
+        foreach ($typeExtensions as $typeExtension) {
+            if (!$typeExtension instanceof ExporterTypeExtensionInterface) {
+                throw new UnexpectedTypeException($typeExtension, ExporterTypeExtensionInterface::class);
+            }
+
+            foreach ($typeExtension::getExtendedTypes() as $extendedType) {
+                $this->typeExtensions[$extendedType][] = $typeExtension;
+            }
+        }
     }
 }

@@ -13,7 +13,6 @@ use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
@@ -34,7 +33,6 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         DataTableTypeExtensionInterface::class => 'kreyu_data_table.type_extension',
         ColumnTypeInterface::class => 'kreyu_data_table.column.type',
         ColumnTypeExtensionInterface::class => 'kreyu_data_table.column.type_extension',
-        FilterExtensionInterface::class => 'kreyu_data_table.filter.extension',
         FilterTypeInterface::class => 'kreyu_data_table.filter.type',
         FilterTypeExtensionInterface::class => 'kreyu_data_table.filter.type_extension',
         ActionExtensionInterface::class => 'kreyu_data_table.action.extension',

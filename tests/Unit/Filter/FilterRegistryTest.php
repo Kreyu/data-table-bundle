@@ -4,113 +4,128 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Filter;
 
-use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
-use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\CustomFilterType;
-use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\CustomFilterTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeFooExtension;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeBarExtension;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleSubFilterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleFilterType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo;
 use PHPUnit\Framework\TestCase;
 
 class FilterRegistryTest extends TestCase
 {
-    private function createRegistry(array $extensions = [], ?ResolvedFilterTypeFactoryInterface $resolvedTypeFactory = null): FilterRegistry
+    public function testGetType()
     {
-        return new FilterRegistry($extensions, $resolvedTypeFactory ?? $this->createMock(ResolvedFilterTypeFactoryInterface::class));
+        $resolvedType = $this->createRegistry()->getType(SimpleFilterType::class);
+
+        $this->assertInstanceOf(SimpleFilterType::class, $resolvedType->getInnerType());
     }
 
-    public function testCallingGetTypeWithNonExistentClassThrowsException(): void
+    public function testGetTypeWithNonExistentType()
     {
-        $this->expectExceptionObject(new InvalidArgumentException('Could not load filter type "App\\InvalidFilterType": class does not exist.'));
+        $this->expectException(InvalidArgumentException::class);
 
         // @phpstan-ignore-next-line
-        $this->createRegistry()->getType('App\\InvalidFilterType');
+        $this->createRegistry()->getType('stdClass');
     }
 
-    public function testCallingGetTypeWithInvalidClassThrowsException(): void
+    public function testGetTypeWithTypeExtensions()
     {
-        $this->expectExceptionObject(new InvalidArgumentException(sprintf('Could not load filter type "%s": class does not implement "%s".', FilterRegistry::class, FilterTypeInterface::class)));
+        $typeExtensions = [
+            new SimpleFilterTypeFooExtension(),
+            new SimpleFilterTypeBarExtension(),
+        ];
 
+        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleFilterType::class);
+
+        $this->assertSame($typeExtensions, $resolvedType->getTypeExtensions());
+    }
+
+    public function testGetTypeWithParent()
+    {
+        $resolvedType = $this->createRegistry()->getType(SimpleSubFilterType::class);
+
+        $this->assertInstanceOf(SimpleSubFilterType::class, $resolvedType->getInnerType());
+        $this->assertInstanceOf(SimpleFilterType::class, $resolvedType->getParent()->getInnerType());
+    }
+
+    public function testGetTypeWithParentTypeExtensions()
+    {
+        $typeExtensions = [
+            new SimpleFilterTypeFooExtension(),
+            new SimpleFilterTypeBarExtension(),
+        ];
+
+        $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubFilterType::class);
+
+        $this->assertEmpty($resolvedType->getTypeExtensions());
+        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+    }
+
+    public function testTypeCannotHaveItselfAsParent()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType).');
+
+        $registry = $this->createRegistry(types: [new FilterTypeWithSameParentType()]);
+        $registry->getType(FilterTypeWithSameParentType::class);
+    }
+
+    public function testRecursiveTypeReferences()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo).');
+
+        $registry = $this->createRegistry(types: [
+            new RecursiveFilterTypeFoo(),
+            new RecursiveFilterTypeBar(),
+            new RecursiveFilterTypeBaz(),
+        ]);
+
+        $registry->getType(RecursiveFilterTypeFoo::class);
+    }
+
+    public function testHasType()
+    {
+        $this->assertTrue($this->createRegistry()->hasType(SimpleFilterType::class));
+    }
+
+    public function testHasTypeWithNonExistentType()
+    {
         // @phpstan-ignore-next-line
-        $this->createRegistry()->getType(FilterRegistry::class);
+        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
-    public function testGetTypeResolvesParentUsingExtension(): void
+    public function testCreatingRegistryWithInvalidType()
     {
-        $filterType = new CustomFilterType();
-        $filterTypeExtension = new CustomFilterTypeExtension();
-        $parentFilterType = new FilterType();
+        $this->expectException(UnexpectedTypeException::class);
+        $this->createRegistry(types: [new \stdClass()]);
+    }
 
-        $extension = $this->createMock(FilterExtensionInterface::class);
+    public function testCreatingRegistryWithInvalidTypeExtension()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->createRegistry(typeExtensions: [new \stdClass()]);
+    }
 
-        $extension
-            ->expects($this->exactly(2))
-            ->method('hasType')
-            ->willReturnCallback(function (string $name) {
-                return match ($name) {
-                    CustomFilterType::class, FilterType::class => true,
-                    default => false,
-                };
-            });
-
-        $extension
-            ->expects($this->exactly(2))
-            ->method('getType')
-            ->willReturnCallback(function (string $name) use ($filterType, $parentFilterType) {
-                // @phpstan-ignore-next-line
-                return match ($name) {
-                    CustomFilterType::class => $filterType,
-                    FilterType::class => $parentFilterType,
-                };
-            });
-
-        $extension
-            ->expects($this->exactly(2))
-            ->method('getTypeExtensions')
-            ->willReturnCallback(function (string $name) use ($filterTypeExtension) {
-                return match ($name) {
-                    CustomFilterType::class => [$filterTypeExtension],
-                    default => [],
-                };
-            });
-
-        $resolvedFilterTypeFactory = $this->createMock(ResolvedFilterTypeFactoryInterface::class);
-
-        $resolvedFilterTypeFactory
-            ->expects($matcher = $this->exactly(2))
-            ->method('createResolvedType')
-            ->willReturnCallback(function ($type, $typeExtensions, $parent) use ($matcher, $filterTypeExtension) {
-                // @phpstan-ignore-next-line
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertInstanceOf(FilterType::class, $type),
-                    2 => $this->assertInstanceOf(CustomFilterType::class, $type),
-                };
-
-                // @phpstan-ignore-next-line
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertEmpty($typeExtensions),
-                    2 => $this->assertEquals([$filterTypeExtension], $typeExtensions),
-                };
-
-                // @phpstan-ignore-next-line
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertNull($parent),
-                    2 => $this->assertInstanceOf(FilterTypeInterface::class, $parent->getInnerType()),
-                };
-
-                $resolvedFilterType = $this->createMock(ResolvedFilterTypeInterface::class);
-                $resolvedFilterType->method('getInnerType')->willReturn($type);
-                $resolvedFilterType->method('getParent')->willReturn($parent);
-
-                return $resolvedFilterType;
-            });
-
-        $registry = $this->createRegistry([$extension], $resolvedFilterTypeFactory);
-
-        $this->assertEquals($filterType, $registry->getType(CustomFilterType::class)->getInnerType());
-        $this->assertEquals($parentFilterType, $registry->getType(CustomFilterType::class)->getParent()->getInnerType());
+    private function createRegistry(array $types = [], array $typeExtensions = []): FilterRegistry
+    {
+        return new FilterRegistry(
+            types: $types ?: [
+                new FilterType(),
+                new SimpleFilterType(),
+                new SimpleSubFilterType(),
+            ],
+            typeExtensions: $typeExtensions,
+            resolvedTypeFactory: new ResolvedFilterTypeFactory(),
+        );
     }
 }

@@ -11,6 +11,9 @@ jobs:
     - uses: php-actions/composer@v6
       with:
         php_extensions: dom fileinfo filter libxml xmlreader zip gd
+    - uses: docker://oskarstark/php-cs-fixer-ga
+      with:
+        args: --dry-run
     - uses: php-actions/phpstan@v3
     - uses: php-actions/phpunit@v3
       with:

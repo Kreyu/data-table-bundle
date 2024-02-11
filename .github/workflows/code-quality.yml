@@ -1,0 +1,21 @@
+name: Code Quality
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  php-cs-fixer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+      - name: php-cs-fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
+
+  phpstan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+      - uses: php-actions/phpstan@v3

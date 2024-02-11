@@ -21,7 +21,7 @@ jobs:
         uses: ramsey/composer-install@v2
 
       - name: Run php-cs-fixer
-        run: ./vendor/bin/php-cs-fixer --dry-run --diff
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
   phpstan:
     runs-on: ubuntu-latest

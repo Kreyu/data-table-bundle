@@ -35,7 +35,7 @@ Reusing the data tables (and its components) is as easy, as reusing the forms us
 However, if your application is using an admin panel generator, like a SonataAdminBundle or EasyAdminBundle, you definitely **don't** need this bundle.
 Those generators already cover the definition of data tables in their own way.
 
-Sometimes applications are complex enough, that a simple admin panel generator is not enough.
+Sometimes applications are complex enough, that an admin generator would be either too simple, or too limiting.
 This is a case where this bundle shines - you can build a fully customized application, while delegating all the data table oriented work to the bundle.
 
 ## Similarity to form component

@@ -10,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
+        with:
+          php_extensions: dom fileinfo filter libxml xmlreader zip gd
       - name: php-cs-fixer
         run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
@@ -18,4 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
+        with:
+          php_extensions: dom fileinfo filter libxml xmlreader zip gd
       - uses: php-actions/phpstan@v3

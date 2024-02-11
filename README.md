@@ -4,12 +4,6 @@
 
 [![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
 
-<div style="float: right">
-![Logo](http://localhost:5173/logo.png)
-</div>
-
-![Logo](./docs/src/public/logo.png)
-
 Streamlines the creation process of the data tables in Symfony applications.
 
 > [!WARNING]

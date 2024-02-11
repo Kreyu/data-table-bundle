@@ -1,5 +1,7 @@
 # DataTableBundle
 
+<img align="right" width="200px" src="./docs/src/public/logo.png"/>
+
 [![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
 
 Streamlines the creation process of the data tables in Symfony applications.

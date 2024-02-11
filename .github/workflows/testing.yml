@@ -25,7 +25,6 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: dom fileinfo filter libxml xmlreader zip gd
-          tools: phpunit:10.5.8
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2

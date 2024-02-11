@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class XlsxExporterType extends AbstractPhpSpreadsheetExporterType
+final class XlsxExporterType extends AbstractPhpSpreadsheetExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

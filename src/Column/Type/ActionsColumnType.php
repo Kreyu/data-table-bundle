@@ -13,7 +13,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ActionsColumnType extends AbstractColumnType
+final class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
         private readonly ActionFactoryInterface $actionFactory,

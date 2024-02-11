@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use PhpOffice\PhpSpreadsheet\Writer\Ods;
 
-class OdsExporterType extends AbstractPhpSpreadsheetExporterType
+final class OdsExporterType extends AbstractPhpSpreadsheetExporterType
 {
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter
     {

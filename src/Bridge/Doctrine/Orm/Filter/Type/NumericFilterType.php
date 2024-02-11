@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NumericFilterType extends AbstractDoctrineOrmFilterType
+final class NumericFilterType extends AbstractDoctrineOrmFilterType
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

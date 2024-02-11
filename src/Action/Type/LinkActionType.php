@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LinkActionType extends AbstractActionType
+final class LinkActionType extends AbstractActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {

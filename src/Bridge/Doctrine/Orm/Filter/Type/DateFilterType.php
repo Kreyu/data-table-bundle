@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateFilterType extends AbstractDoctrineOrmFilterType
+final class DateFilterType extends AbstractDoctrineOrmFilterType
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

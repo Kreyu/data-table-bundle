@@ -8,7 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class StringFilterType extends AbstractDoctrineOrmFilterType
+final class StringFilterType extends AbstractDoctrineOrmFilterType
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

@@ -11,7 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CallbackFilterType extends AbstractFilterType implements FilterHandlerInterface
+final class CallbackFilterType extends AbstractFilterType implements FilterHandlerInterface
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

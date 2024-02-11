@@ -11,7 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateRangeFilterType extends AbstractDoctrineOrmFilterType
+final class DateRangeFilterType extends AbstractDoctrineOrmFilterType
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

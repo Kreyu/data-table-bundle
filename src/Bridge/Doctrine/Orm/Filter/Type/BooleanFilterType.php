@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
-class BooleanFilterType extends AbstractDoctrineOrmFilterType
+final class BooleanFilterType extends AbstractDoctrineOrmFilterType
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {

@@ -7,7 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type;
 use OpenSpout\Writer\CSV;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CsvExporterType extends AbstractOpenSpoutExporterType
+final class CsvExporterType extends AbstractOpenSpoutExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -8,7 +8,7 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class XlsxExporterType extends AbstractOpenSpoutExporterType
+final class XlsxExporterType extends AbstractOpenSpoutExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

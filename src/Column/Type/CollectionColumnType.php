@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionColumnType extends AbstractColumnType
+final class CollectionColumnType extends AbstractColumnType
 {
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {

@@ -10,7 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FormActionType extends AbstractActionType
+final class FormActionType extends AbstractActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {

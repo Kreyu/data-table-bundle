@@ -12,7 +12,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EntityFilterType extends AbstractDoctrineOrmFilterType
+final class EntityFilterType extends AbstractDoctrineOrmFilterType
 {
     public function __construct(
         private readonly ?ManagerRegistry $managerRegistry = null,

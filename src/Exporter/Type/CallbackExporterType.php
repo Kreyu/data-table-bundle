@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CallbackExporterType extends AbstractExporterType
+final class CallbackExporterType extends AbstractExporterType
 {
     public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
     {

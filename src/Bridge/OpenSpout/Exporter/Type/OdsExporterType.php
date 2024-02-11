@@ -8,7 +8,7 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\ODS;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OdsExporterType extends AbstractOpenSpoutExporterType
+final class OdsExporterType extends AbstractOpenSpoutExporterType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

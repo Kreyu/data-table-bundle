@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateColumnType extends AbstractColumnType
+final class DateColumnType extends AbstractColumnType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

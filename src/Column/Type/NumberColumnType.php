@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\Formatter\IntlFormatter;
 
-class NumberColumnType extends AbstractColumnType
+final class NumberColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {

@@ -1,3 +1,21 @@
+# 0.17
+
+## Breaking changes
+
+### Type classes are now final
+
+Built-in data table, column, filter, action and exporter types are now marked as "final".
+This promotes the usage of `getParent()` method instead of PHP inheritance.
+
+### Removed extension mechanisms
+
+The extensions (not *type* extensions!) were a mechanisms copied from Symfony Form component.
+Their main purpose was to provide a way to load type and type extension classes manually.
+In most cases, that would be used only outside the framework, which is out of scope of this bundle.
+
+Everything related with extensions is now completely removed.
+Every type and type extension class defined in the container is now passed directly to the registry classes.
+
 # 0.16
 
 - **[Feature]** French translation (https://github.com/Kreyu/data-table-bundle/pull/53)

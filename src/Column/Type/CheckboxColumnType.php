@@ -9,7 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CheckboxColumnType extends AbstractColumnType
+final class CheckboxColumnType extends AbstractColumnType
 {
     public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {

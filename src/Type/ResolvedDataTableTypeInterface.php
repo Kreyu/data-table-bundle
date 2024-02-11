@@ -28,7 +28,7 @@ interface ResolvedDataTableTypeInterface
     /**
      * @param array<string, mixed> $options
      */
-    public function createBuilder(DataTableFactoryInterface $factory, string $name, ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface;
+    public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface;
 
     public function createView(DataTableInterface $dataTable): DataTableView;
 

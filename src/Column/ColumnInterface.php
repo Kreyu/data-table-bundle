@@ -23,13 +23,13 @@ interface ColumnInterface
 
     public function getSortPropertyPath(): ?PropertyPathInterface;
 
-    public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
+    public function createHeaderView(?HeaderRowView $parent = null): ColumnHeaderView;
 
-    public function createValueView(ValueRowView $parent = null): ColumnValueView;
+    public function createValueView(?ValueRowView $parent = null): ColumnValueView;
 
-    public function createExportHeaderView(HeaderRowView $parent = null): ColumnHeaderView;
+    public function createExportHeaderView(?HeaderRowView $parent = null): ColumnHeaderView;
 
-    public function createExportValueView(ValueRowView $parent = null): ColumnValueView;
+    public function createExportValueView(?ValueRowView $parent = null): ColumnValueView;
 
     public function getPriority(): int;
 

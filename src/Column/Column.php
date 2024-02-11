@@ -72,7 +72,7 @@ class Column implements ColumnInterface
         return $this->sortPropertyPath = $this->getPropertyPath();
     }
 
-    public function createHeaderView(HeaderRowView $parent = null): ColumnHeaderView
+    public function createHeaderView(?HeaderRowView $parent = null): ColumnHeaderView
     {
         $view = $this->config->getType()->createHeaderView($this, $parent);
 
@@ -81,7 +81,7 @@ class Column implements ColumnInterface
         return $view;
     }
 
-    public function createValueView(ValueRowView $parent = null): ColumnValueView
+    public function createValueView(?ValueRowView $parent = null): ColumnValueView
     {
         $view = $this->config->getType()->createValueView($this, $parent);
 
@@ -90,7 +90,7 @@ class Column implements ColumnInterface
         return $view;
     }
 
-    public function createExportHeaderView(HeaderRowView $parent = null): ColumnHeaderView
+    public function createExportHeaderView(?HeaderRowView $parent = null): ColumnHeaderView
     {
         $view = $this->config->getType()->createExportHeaderView($this, $parent);
 
@@ -99,7 +99,7 @@ class Column implements ColumnInterface
         return $view;
     }
 
-    public function createExportValueView(ValueRowView $parent = null): ColumnValueView
+    public function createExportValueView(?ValueRowView $parent = null): ColumnValueView
     {
         $view = $this->config->getType()->createExportValueView($this, $parent);
 

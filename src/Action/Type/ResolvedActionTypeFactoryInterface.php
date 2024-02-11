@@ -11,5 +11,5 @@ interface ResolvedActionTypeFactoryInterface
     /**
      * @param array<ActionTypeExtensionInterface> $typeExtensions
      */
-    public function createResolvedType(ActionTypeInterface $type, array $typeExtensions = [], ResolvedActionTypeInterface $parent = null): ResolvedActionTypeInterface;
+    public function createResolvedType(ActionTypeInterface $type, array $typeExtensions = [], ?ResolvedActionTypeInterface $parent = null): ResolvedActionTypeInterface;
 }

@@ -139,7 +139,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         return $this->propertyPath;
     }
 
-    public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static
+    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
@@ -159,7 +159,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         return $this->sortPropertyPath;
     }
 
-    public function setSortPropertyPath(null|string|PropertyPathInterface $sortPropertyPath): static
+    public function setSortPropertyPath(string|PropertyPathInterface|null $sortPropertyPath): static
     {
         if ($this->locked) {
             throw $this->createBuilderLockedException();

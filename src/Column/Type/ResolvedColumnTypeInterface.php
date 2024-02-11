@@ -29,13 +29,13 @@ interface ResolvedColumnTypeInterface
 
     public function createBuilder(ColumnFactoryInterface $factory, string $name, array $options): ColumnBuilderInterface;
 
-    public function createHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView;
+    public function createHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView;
 
-    public function createValueView(ColumnInterface $column, ValueRowView $parent = null): ColumnValueView;
+    public function createValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView;
 
-    public function createExportHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView;
+    public function createExportHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView;
 
-    public function createExportValueView(ColumnInterface $column, ValueRowView $parent = null): ColumnValueView;
+    public function createExportValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView;
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void;
 

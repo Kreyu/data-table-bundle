@@ -35,6 +35,7 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
 
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->urlGenerator->method('generate')->willReturn('');
     }
 
     public function testItGeneratesUrlWithOppositeDirection(): void

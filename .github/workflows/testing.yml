@@ -32,6 +32,6 @@ jobs:
         with:
           dependency-versions: ${{ matrix.dependency-version }}
 
-      - name: PHPUnit
+      - name: Run PHPUnit
         run: vendor/bin/phpunit
 

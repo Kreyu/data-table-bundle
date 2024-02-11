@@ -23,16 +23,36 @@ Just want to try it out? Skip to the [installation](installation.md).
 
 ## Use cases
 
-If your application uses an admin panel generator, like a SonataAdminBundle or EasyAdminBundle, you won't need this bundle.
+Imagine an application, that contains many listings - a list of products, categories, tags, clients, etc.
+In most cases, we're returning a list of data to the view, and rendering it directly in the Twig.
+Now, imagine, that the category details view should display a listing of its own products.
+Some time later, the client requires a way to sort and filter the tables. 
+
+This quickly becomes less and less maintainable as the system grows.
+With this bundle, you could define a data table for each entity, with their columns, filters, actions and exporters.
+Reusing the data tables (and its components) is as easy, as reusing the forms using the Symfony Form component.
+
+However, if your application is using an admin panel generator, like a SonataAdminBundle or EasyAdminBundle, you definitely **don't** need this bundle.
 Those generators already cover the definition of data tables in their own way.
 
-However, if your application is complex enough that a simple panel generator is not enough, for example, a very specific B2B or CRM platform,
-you may consider DataTableBundle, which focuses solely on the data tables, like a Form component focuses solely on the forms.
-It can save a lot of time when compared to rendering tables manually (especially with filters), and helps with keeping visual homogeneity.
+Sometimes applications are complex enough, that a simple admin panel generator is not enough.
+This is a case where this bundle shines - you can build a fully customized application, while delegating all the data table oriented work to the bundle.
 
 ## Similarity to form component
 
-Everything is designed to be friendly to a Symfony developers that used the Symfony Form component before.
+Everything is designed to be friendly to a Symfony developers that used the [Symfony Form component](https://github.com/symfony/form/) before.
+
+::: tip Note
+There are **many** similarities between those components - even in the source code!
+Thanks to that, it should be easy to work with the bundle, and contribute as well.
+
+Credits to all the creators and contributors of the [Symfony Form component](https://github.com/symfony/form/),
+as they are the ones that came up with the idea of this type-based configuration, and this bundle only follows its principles.
+
+Although, because Form component can be used outside a framework, and this bundle works only as a Symfony bundle,
+the core is simplified as much as possible.
+::: 
+
 Data tables and their components - [columns](components/columns.md), [filters](components/filters.md), [actions](components/actions.md) and [exporters](components/exporters.md), are defined using type classes, like a forms:
 
 ```php
@@ -45,8 +65,8 @@ class ProductDataTableType extends AbstractDataTableType
             ->addColumn('name', TextColumnType::class);
         
         $builder
-            ->addFilter('id', NumberFilterType::class)
-            ->addFilter('name', TextFilterType::class);
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class);
         
         $builder    
             ->addAction('create', ButtonActionType::class)

@@ -11,5 +11,5 @@ interface ResolvedColumnTypeFactoryInterface
     /**
      * @param array<ColumnTypeExtensionInterface> $typeExtensions
      */
-    public function createResolvedType(ColumnTypeInterface $type, array $typeExtensions = [], ResolvedColumnTypeInterface $parent = null): ResolvedColumnTypeInterface;
+    public function createResolvedType(ColumnTypeInterface $type, array $typeExtensions = [], ?ResolvedColumnTypeInterface $parent = null): ResolvedColumnTypeInterface;
 }

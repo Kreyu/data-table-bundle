@@ -11,5 +11,5 @@ interface ResolvedDataTableTypeFactoryInterface
     /**
      * @param array<DataTableTypeExtensionInterface> $typeExtensions
      */
-    public function createResolvedType(DataTableTypeInterface $type, array $typeExtensions, ResolvedDataTableTypeInterface $parent = null): ResolvedDataTableTypeInterface;
+    public function createResolvedType(DataTableTypeInterface $type, array $typeExtensions, ?ResolvedDataTableTypeInterface $parent = null): ResolvedDataTableTypeInterface;
 }

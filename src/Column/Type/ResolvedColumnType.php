@@ -67,22 +67,22 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         return $builder;
     }
 
-    public function createHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView
+    public function createHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView
     {
         return new ColumnHeaderView($parent);
     }
 
-    public function createValueView(ColumnInterface $column, ValueRowView $parent = null): ColumnValueView
+    public function createValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView
     {
         return new ColumnValueView($parent);
     }
 
-    public function createExportHeaderView(ColumnInterface $column, HeaderRowView $parent = null): ColumnHeaderView
+    public function createExportHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView
     {
         return new ColumnHeaderView($parent);
     }
 
-    public function createExportValueView(ColumnInterface $column, ValueRowView $parent = null): ColumnValueView
+    public function createExportValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView
     {
         return new ColumnValueView($parent);
     }

@@ -174,7 +174,7 @@ interface DataTableInterface
 
     public function personalize(PersonalizationData $data): void;
 
-    public function export(ExportData $data = null): ExportFile;
+    public function export(?ExportData $data = null): ExportFile;
 
     public function getItems(): iterable;
 
@@ -200,11 +200,11 @@ interface DataTableInterface
 
     public function getExportData(): ?ExportData;
 
-    public function createFiltrationFormBuilder(DataTableView $view = null): FormBuilderInterface;
+    public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
-    public function createPersonalizationFormBuilder(DataTableView $view = null): FormBuilderInterface;
+    public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
-    public function createExportFormBuilder(DataTableView $view = null): FormBuilderInterface;
+    public function createExportFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
     public function isExporting(): bool;
 

@@ -101,7 +101,7 @@ class Filter implements FilterInterface
     /**
      * @deprecated since 0.15, use {@see Filter::handle()} instead
      */
-    public function apply(ProxyQueryInterface $query = null, FilterData $data = null): void
+    public function apply(?ProxyQueryInterface $query = null, ?FilterData $data = null): void
     {
         $query ??= $this->getDataTable()->getQuery();
 

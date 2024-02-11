@@ -11,7 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Test\ExpressionTransformerT
 
 class CallbackExpressionTransformerTest extends ExpressionTransformerTestCase
 {
-    public static function createTransformer(callable $callback = null): ExpressionTransformerInterface
+    public static function createTransformer(?callable $callback = null): ExpressionTransformerInterface
     {
         return new CallbackExpressionTransformer($callback);
     }

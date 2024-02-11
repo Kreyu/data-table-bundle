@@ -562,7 +562,7 @@ class DataTable implements DataTableInterface
         $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }
 
-    public function export(ExportData $data = null): ExportFile
+    public function export(?ExportData $data = null): ExportFile
     {
         if (!$this->config->isExportingEnabled()) {
             throw new RuntimeException('The data table has exporting feature disabled.');
@@ -696,7 +696,7 @@ class DataTable implements DataTableInterface
         return $this;
     }
 
-    public function createFiltrationFormBuilder(DataTableView $view = null): FormBuilderInterface
+    public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isFiltrationEnabled()) {
             throw new RuntimeException('The data table has filtration feature disabled.');
@@ -712,7 +712,7 @@ class DataTable implements DataTableInterface
         );
     }
 
-    public function createPersonalizationFormBuilder(DataTableView $view = null): FormBuilderInterface
+    public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isPersonalizationEnabled()) {
             throw new RuntimeException('The data table has personalization feature disabled.');
@@ -731,7 +731,7 @@ class DataTable implements DataTableInterface
         );
     }
 
-    public function createExportFormBuilder(DataTableView $view = null): FormBuilderInterface
+    public function createExportFormBuilder(?DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isExportingEnabled()) {
             throw new RuntimeException('The data table has export feature disabled.');

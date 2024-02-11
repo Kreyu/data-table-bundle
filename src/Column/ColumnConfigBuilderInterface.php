@@ -30,9 +30,9 @@ interface ColumnConfigBuilderInterface extends ColumnConfigInterface
 
     public function setAttribute(string $name, mixed $value): static;
 
-    public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static;
+    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static;
 
-    public function setSortPropertyPath(null|string|PropertyPathInterface $sortPropertyPath): static;
+    public function setSortPropertyPath(string|PropertyPathInterface|null $sortPropertyPath): static;
 
     public function setSortable(bool $sortable): static;
 

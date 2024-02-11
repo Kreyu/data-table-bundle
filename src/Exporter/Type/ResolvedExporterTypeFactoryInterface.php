@@ -11,5 +11,5 @@ interface ResolvedExporterTypeFactoryInterface
     /**
      * @param array<ExporterTypeExtensionInterface> $typeExtensions
      */
-    public function createResolvedType(ExporterTypeInterface $type, array $typeExtensions = [], ResolvedExporterTypeInterface $parent = null): ResolvedExporterTypeInterface;
+    public function createResolvedType(ExporterTypeInterface $type, array $typeExtensions = [], ?ResolvedExporterTypeInterface $parent = null): ResolvedExporterTypeInterface;
 }

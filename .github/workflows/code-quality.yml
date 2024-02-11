@@ -8,18 +8,35 @@ jobs:
   php-cs-fixer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php_extensions: dom fileinfo filter libxml xmlreader zip gd
-      - name: php-cs-fixer
+          php-version: 8.1
+          extensions: dom fileinfo filter libxml xmlreader zip gd
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: Run php-cs-fixer
         run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
   phpstan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php_extensions: dom fileinfo filter libxml xmlreader zip gd
-      - uses: php-actions/phpstan@v3
+          php-version: 8.1
+          extensions: dom fileinfo filter libxml xmlreader zip gd
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: Run php-cs-fixer
+        run: ./vendor/bin/phpstan analyse

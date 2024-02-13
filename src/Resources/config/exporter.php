@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Bridge\OpenSpout\Exporter\Type as OpenSpout;
-use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\AbstractExporterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\AbstractPhpSpreadsheetExporterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\CsvExporterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\HtmlExporterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type\OdsExporterType;
@@ -59,11 +59,16 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.exporter.type.open_spout.abstract', OpenSpout\AbstractExporterType::class)
+        ->set('kreyu_data_table.exporter.type.open_spout.abstract', OpenSpout\AbstractOpenSpoutExporterType::class)
         ->abstract()
         ->args([
             service('translator')->nullOnInvalid(),
         ])
+    ;
+
+    $services
+        ->set('kreyu_data_table.exporter.type.open_spout', OpenSpout\OpenSpoutExporterType::class)
+        ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
@@ -85,7 +90,7 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set(AbstractExporterType::class)
+        ->set(AbstractPhpSpreadsheetExporterType::class)
         ->abstract()
         ->args([
             service('translator')->nullOnInvalid(),
@@ -94,43 +99,43 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet', PhpSpreadsheetExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_csv', CsvExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_xls', XlsExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_xlsx', XlsxExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_ods', OdsExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_html', HtmlExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 
     $services
         ->set('kreyu_data_table.exporter.type.phpspreadsheet_pdf', PdfExporterType::class)
-        ->parent(AbstractExporterType::class)
+        ->parent(AbstractPhpSpreadsheetExporterType::class)
         ->tag('kreyu_data_table.exporter.type')
     ;
 };

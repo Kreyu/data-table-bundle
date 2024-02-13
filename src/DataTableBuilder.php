@@ -153,10 +153,6 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getQuery(): ?ProxyQueryInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         return $this->query;
     }
 

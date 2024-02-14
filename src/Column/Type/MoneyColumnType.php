@@ -16,6 +16,10 @@ final class MoneyColumnType extends AbstractColumnType
             $currency = $currency($view->parent->data);
         }
 
+        if (1 !== $options['divisor']) {
+            $view->vars['value'] /= $options['divisor'];
+        }
+
         $view->vars = array_merge($view->vars, [
             'currency' => $currency,
         ]);
@@ -24,9 +28,13 @@ final class MoneyColumnType extends AbstractColumnType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setRequired('currency')
+            ->setRequired(['currency', 'divisor'])
             ->setAllowedTypes('currency', ['string', 'callable'])
+            ->setAllowedTypes('divisor', 'int')
         ;
+        $resolver->setDefaults([
+            'divisor' => 1,
+        ]);
     }
 
     public function getParent(): ?string

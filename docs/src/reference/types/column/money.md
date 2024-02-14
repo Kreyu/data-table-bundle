@@ -38,6 +38,25 @@ $builder
 ;
 ```
 
+### `divisor`
+
+- **type**: `integer`
+- **default**: `1`
+
+If you need to divide your starting value by a number before rendering it to the user, 
+you can use the `divisor` option. For example if you need to show amounts as integer in order to avoid 
+rounding errors, you can transform values in cents automatically:
+
+```php
+$builder
+    ->addColumn('price', MoneyColumnType::class, [
+        'divisor' => 100,
+    ])
+;
+```
+
+In this case, if the price field is set to 9950, then the value 99.5 will actually be rendered to the user.
+
 ### `use_intl_formatter`
 
 - **type**: `bool`

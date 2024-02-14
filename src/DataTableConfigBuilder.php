@@ -25,16 +25,16 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 {
-    private bool $paginationEnabled = true;
-    private bool $sortingEnabled = true;
-    private bool $filtrationEnabled = true;
-    private bool $personalizationEnabled = true;
-    private bool $exportingEnabled = true;
+    private bool $paginationEnabled = false;
+    private bool $sortingEnabled = false;
+    private bool $filtrationEnabled = false;
+    private bool $personalizationEnabled = false;
+    private bool $exportingEnabled = false;
 
-    private bool $paginationPersistenceEnabled = true;
-    private bool $sortingPersistenceEnabled = true;
-    private bool $filtrationPersistenceEnabled = true;
-    private bool $personalizationPersistenceEnabled = true;
+    private bool $paginationPersistenceEnabled = false;
+    private bool $sortingPersistenceEnabled = false;
+    private bool $filtrationPersistenceEnabled = false;
+    private bool $personalizationPersistenceEnabled = false;
 
     private ?PersistenceAdapterInterface $paginationPersistenceAdapter = null;
     private ?PersistenceAdapterInterface $sortingPersistenceAdapter = null;
@@ -143,7 +143,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getOption(string $name, mixed $default = null): mixed
     {
-        return $this->options[$name] ?? $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     public function setOptions(array $options): static
@@ -707,7 +707,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getHeaderRowAttribute(string $name, mixed $default = null): mixed
     {
-        return $this->headerRowAttributes[$name] ?? $default;
+        return array_key_exists($name, $this->headerRowAttributes) ? $this->headerRowAttributes[$name] : $default;
     }
 
     public function setHeaderRowAttribute(string $name, mixed $value): static
@@ -744,7 +744,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getValueRowAttribute(string $name, mixed $default = null): mixed
     {
-        return $this->valueRowAttributes[$name] ?? $default;
+        return array_key_exists($name, $this->valueRowAttributes) ? $this->valueRowAttributes[$name] : $default;
     }
 
     public function setValueRowAttribute(string $name, mixed $value): static

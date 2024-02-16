@@ -41,6 +41,7 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
 class DataTable implements DataTableInterface
 {
@@ -727,6 +728,17 @@ class DataTable implements DataTableInterface
             type: PersonalizationDataType::class,
             options: [
                 'data_table_view' => $view,
+            ],
+        );
+    }
+
+    public function getExportForm(): FormInterface
+    {
+        return $this->exportForm ??= $this->config->getExportFormFactory()->createNamed(
+            name: $this->config->getExportParameterName(),
+            type: ExportDataType::class,
+            options: [
+                'exporters' => $this->getExporters(),
             ],
         );
     }

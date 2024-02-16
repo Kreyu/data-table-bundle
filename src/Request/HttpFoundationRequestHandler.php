@@ -113,6 +113,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
+        $dataTable->getExportForm()->handleRequest($request);
+
         $form = $dataTable->createExportFormBuilder()->getForm();
         $form->handleRequest($request);
 

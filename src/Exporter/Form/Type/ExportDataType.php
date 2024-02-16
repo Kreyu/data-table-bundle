@@ -12,13 +12,22 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class ExportDataType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('filename', TextType::class)
+            ->add('filename', TextType::class, [
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback(function (string $filename): bool {
+                        // TODO: return str_contains($filename, '');
+                    })
+                ],
+            ])
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
                     fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),
@@ -34,16 +43,13 @@ class ExportDataType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => ExportData::class,
-            'translation_domain' => 'KreyuDataTable',
-            'exporters' => [],
-        ]);
-
-        $resolver->setAllowedTypes('exporters', ExporterInterface::class.'[]');
-
-        // TODO: Remove deprecated default filename option
-        $resolver->setDefault('default_filename', null);
-        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated.');
+        $resolver
+            ->setDefaults([
+                'data_class' => ExportData::class,
+                'translation_domain' => 'KreyuDataTable',
+                'exporters' => [],
+            ])
+            ->setAllowedTypes('exporters', ExporterInterface::class.'[]')
+        ;
     }
 }

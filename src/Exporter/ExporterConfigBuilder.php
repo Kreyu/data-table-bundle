@@ -62,7 +62,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function getOption(string $name, mixed $default = null): mixed
     {
-        return $this->options[$name] ?? $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     public function setOptions(array $options): static

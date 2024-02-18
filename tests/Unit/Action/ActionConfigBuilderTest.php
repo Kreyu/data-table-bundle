@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Action;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionConfigBuilder;
+use Kreyu\Bundle\DataTableBundle\Action\ActionConfigInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Action\ActionConfigInterface;
 use Kreyu\Bundle\DataTableBundle\Tests\ReflectionTrait;
 use PHPUnit\Framework\TestCase;
 
 class ActionConfigBuilderTest extends TestCase
 {
-
     use ReflectionTrait;
 
     public function testGetName()
@@ -92,7 +91,7 @@ class ActionConfigBuilderTest extends TestCase
     {
         $builder = $this->createBuilder();
         $builder->setContext(ActionContext::Row);
-        
+
         $this->assertSame(ActionContext::Row, $builder->getContext());
     }
 

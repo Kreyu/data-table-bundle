@@ -91,7 +91,7 @@ class FilterConfigBuilderTest extends TestCase
 
     public function testGetHandlerWithoutHandlerSet()
     {
-        $this->expectException( BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
 
         $this->createBuilder()->getHandler();
     }

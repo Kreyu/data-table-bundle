@@ -72,7 +72,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getOption(string $name, mixed $default = null): mixed
     {
-        return $this->options[$name] ?? $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     public function setOptions(array $options): static
@@ -109,7 +109,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getAttribute(string $name, mixed $default = null): mixed
     {
-        return $this->attributes[$name] ?? $default;
+        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     public function setAttributes(array $attributes): static

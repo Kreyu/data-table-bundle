@@ -4,7 +4,7 @@ The Doctrine ORM filter handler dispatches two events, which can be used to modi
 
 ## PreSetParametersEvent
 
-The [PreSetParametersEvent](../src/Event/PreSetParametersEvent.php) is dispatched before `$queryBuilder->setParameter()`
+The [PreSetParametersEvent](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Event/PreSetParametersEvent.php) is dispatched before `$queryBuilder->setParameter()`
 is called for every parameter required by the filter. It can be used to modify the parameters, before they are passed to the query builder.
 
 ```php

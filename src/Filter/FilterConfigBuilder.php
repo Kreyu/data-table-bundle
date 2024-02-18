@@ -90,7 +90,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function getOption(string $name, mixed $default = null): mixed
     {
-        return $this->options[$name] ?? $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     public function getHandler(): FilterHandlerInterface

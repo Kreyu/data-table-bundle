@@ -4,12 +4,12 @@
 
 ## Creating data tables
 
-Data tables are defined using a _type classes_. Those classes implement [DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableTypeInterface.php), although, it is recommended to extend from the [AbstractDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/AbstractDataTableType.php) class:
+Data tables are defined using a _type classes_. Those classes implement [DataTableTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/DataTableTypeInterface.php), although, it is recommended to extend from the [AbstractDataTableType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Type/AbstractDataTableType.php) class:
 
 ```php
 namespace App\DataTable\Type;
 
-use Kreyu\Bundle\DataTableBundle\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 
 class ProductDataTableType extends AbstractDataTableType

@@ -72,6 +72,21 @@ class ProductController extends AbstractController
 By default, columns **are not** exportable.
 :::
 
+::: tip Exporting is enabled, but submitting an export form does nothing?
+Ensure that the `handleRequest()` method of the data table is called:
+
+```php
+class ProductController
+{
+    public function index(Request $request)
+    {
+        $dataTable = $this->createDataTable(...);
+        $dataTable->handleRequest($request); // [!code ++]
+    }
+}
+```
+:::
+
 ## Making the columns exportable
 
 To make any column exportable, use its `export` option:

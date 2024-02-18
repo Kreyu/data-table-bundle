@@ -70,6 +70,21 @@ Built-in themes display pagination controls only when the data table contains mo
 Also, remember that you can [change the default pagination data](#default-pagination), reducing the per-page limit.
 :::
 
+::: tip Pagination is enabled, but changing the page does nothing?
+Ensure that the `handleRequest()` method of the data table is called:
+
+```php
+class ProductController
+{
+    public function index(Request $request)
+    {
+        $dataTable = $this->createDataTable(...);
+        $dataTable->handleRequest($request); // [!code ++]
+    }
+}
+```
+:::
+
 ## Saving applied pagination
 
 By default, the pagination feature [persistence](persistence.md) is **disabled** for every data table.

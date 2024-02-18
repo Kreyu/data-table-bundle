@@ -16,19 +16,20 @@ By default, the [`@KreyuDataTable/themes/base.html.twig`](https://github.com/Kre
 
 ## Selecting a theme
 
-To select a theme, use `themes` option.
-
-For example, in order to use the [Bootstrap 5](https://getbootstrap.com/docs/5.0/) theme:
+There are many ways to configure a theme for the data table.
+In most cases, you will want to use the same theme for all data tables, so it is recommended to configure the theme globally:
 
 ::: code-group
-```yaml [Globally (YAML)]
+```yaml [YAML]
+# config/packages/kreyu_data_table.yaml
 kreyu_data_table:
   defaults:
     themes:
       - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
 
-```php [Globally (PHP)]
+```php [PHP]
+// config/packages/kreyu_data_table.php
 use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
@@ -37,34 +38,36 @@ return static function (KreyuDataTableConfig $config) {
     ]);
 };
 ```
+:::
 
-```php [For data table type]
-use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+Because the bundle configuration `defaults` key defines _default_ options for the data tables, you can still overwrite the option for a specific data table type:
+
+```php
+namespace App\DataTable\Type;
+
+use Kreyu\Bundle\DataTableBundle\AbstractDataTableType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'themes' => [
-                '@KreyuDataTable/themes/bootstrap_5.html.twig',
-            ],
+        $resolver->setDefault('themes', [
+            '@KreyuDataTable/themes/bootstrap_5.html.twig',
         ]);
     }
 }
 ```
 
-```php [For specific data table]
-use App\DataTable\Type\ProductDataTableType;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+Because the data table type defines _default_ options for the data table _type_, you can still overwrite the option for a specific data table:
+
+```php
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProductController extends AbstractController
 {
-    use DataTableFactoryAwareTrait;
-    
-    public function index()
+    public function index(Request $request)
     {
         $dataTable = $this->createDataTable(
             type: ProductDataTableType::class, 
@@ -73,12 +76,19 @@ class ProductController extends AbstractController
                 'themes' => [
                     '@KreyuDataTable/themes/bootstrap_5.html.twig',
                 ],
-            ],
+            ]
         );
     }
 }
 ```
-:::
+
+Last but not least, you can also overwrite the themes of the data table inside a template:
+
+```twig
+<div class="card">
+    {{ data_table(products, { themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig'] }) }}
+</div>
+```
 
 ## Customizing existing theme
 
@@ -104,6 +114,7 @@ using the built-in themes as a fallback, for example:
 kreyu_data_table:
   defaults:
     themes:
+      - 'templates/data_table/theme.html.twig',
       - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
 
@@ -136,7 +147,7 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-```php [For specific data table]
+```php [For specific data table (PHP)]
 use App\DataTable\Type\ProductDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -159,5 +170,16 @@ class ProductController extends AbstractController
         );
     }
 }
+```
+
+```php [For specific data table (Twig)]
+<div class="card">
+    {{ data_table(products, { 
+        themes: [
+            'templates/data_table/theme.html.twig',
+            '@KreyuDataTable/themes/bootstrap_5.html.twig',
+        ]
+    }) }}
+</div>
 ```
 :::

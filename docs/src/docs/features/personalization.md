@@ -89,6 +89,21 @@ class ProductController extends AbstractController
 ```
 :::
 
+::: tip Personalization is enabled, but submitting the personalization form does nothing?
+Ensure that the `handleRequest()` method of the data table is called:
+
+```php
+class ProductController
+{
+    public function index(Request $request)
+    {
+        $dataTable = $this->createDataTable(...);
+        $dataTable->handleRequest($request); // [!code ++]
+    }
+}
+```
+:::
+
 ## Saving applied personalization
 
 By default, the personalization feature [persistence](persistence.md) is **disabled** for every data table.

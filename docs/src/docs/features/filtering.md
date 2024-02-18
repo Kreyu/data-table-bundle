@@ -64,6 +64,21 @@ class ProductController extends AbstractController
 ```
 :::
 
+::: tip Filtering is enabled, but submitting a filtration form does nothing? 
+Ensure that the `handleRequest()` method of the data table is called:
+
+```php
+class ProductController
+{
+    public function index(Request $request)
+    {
+        $dataTable = $this->createDataTable(...);
+        $dataTable->handleRequest($request); // [!code ++]
+    }
+}
+```
+:::
+
 ## Saving applied filters
 
 By default, the filtration feature [persistence](persistence.md) is **disabled** for every data table.

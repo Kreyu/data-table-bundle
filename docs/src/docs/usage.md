@@ -16,7 +16,7 @@ class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
-        // Define column, filers, actions, exporters, etc...
+        // Define column, filters, actions, exporters, etc...
     }
 }
 ```

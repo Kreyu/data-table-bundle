@@ -54,7 +54,7 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
 
         foreach ($view->valueRows as $valueRow) {
             $this->appendRow($worksheet, array_map(
-                static fn (ColumnValueView $view) => $view->value,
+                static fn (ColumnValueView $view) => $view->vars['value'],
                 $valueRow->children,
             ));
         }

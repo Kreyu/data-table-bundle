@@ -632,6 +632,8 @@ class DataTable implements DataTableInterface
 
             $this->resultSet = null;
 
+            $this->paginate($this->paginationData, false);
+
             return $this->createPagination();
         }
     }

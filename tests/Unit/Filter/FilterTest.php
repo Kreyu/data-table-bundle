@@ -44,14 +44,8 @@ class FilterTest extends TestCase
     public function testQueryPathDefaultsToFilterName()
     {
         $this->filterConfig->method('getName')->willReturn('foo');
-        $this->filterConfig->method('getOption')->willReturnCallback(function (string $name, string $default) {
-            $this->assertEquals('query_path', $name);
-            $this->assertEquals('foo', $default);
 
-            return $default;
-        });
-
-        $this->createFilter()->getQueryPath();
+        $this->assertEquals('foo', $this->createFilter()->getQueryPath());
     }
 
     public function testHandleDispatchesEvents(): void

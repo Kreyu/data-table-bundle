@@ -68,7 +68,7 @@ class Filter implements FilterInterface
 
     public function getQueryPath(): string
     {
-        return $this->config->getOption('query_path', $this->getName());
+        return $this->config->getOption('query_path') ?? $this->getName();
     }
 
     public function handle(ProxyQueryInterface $query, FilterData $data): void

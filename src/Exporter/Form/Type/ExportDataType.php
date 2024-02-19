@@ -21,7 +21,7 @@ class ExportDataType extends AbstractType
             ->add('filename', TextType::class)
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
-                    fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label', $exporter->getName()),
+                    fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label') ?? $exporter->getName(),
                     $options['exporters'],
                 )),
             ])

@@ -37,8 +37,8 @@ final class CollectionColumnType extends AbstractColumnType
             'separator' => $options['separator'],
         ];
 
-        $view->value = implode($options['export']['separator'], array_map(
-            static fn (ColumnValueView $view) => $view->value,
+        $view->value = $view->vars['value'] = implode($options['export']['separator'], array_map(
+            static fn (ColumnValueView $view) => $view->vars['value'],
             $this->createChildrenColumnValueViews($view, $column, $options['export']),
         ));
     }
@@ -66,7 +66,7 @@ final class CollectionColumnType extends AbstractColumnType
 
         $children = [];
 
-        foreach ($view->value ?? [] as $index => $data) {
+        foreach ($view->vars['value'] ?? [] as $index => $data) {
             // Create a virtual row view for the child column.
             $valueRowView = clone $view->parent;
             $valueRowView->origin = $view->parent;

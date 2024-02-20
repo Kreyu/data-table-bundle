@@ -59,9 +59,12 @@ In order to be able to paginate, sort, filter, personalize or export the data ta
 ```php
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 
 class ProductController extends AbstractController
 {
+    use DataTableFactoryAwareTrait;
+    
     public function index(Request $request)
     {
         $dataTable = $this->createDataTable(ProductDataTableType::class);
@@ -77,9 +80,12 @@ In order to render the data table, create the data table view and pass it to the
 ```php
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 
 class ProductController extends AbstractController
 {
+    use DataTableFactoryAwareTrait;
+    
     public function index(Request $request)
     {
         $dataTable = $this->createDataTable(ProductDataTableType::class);

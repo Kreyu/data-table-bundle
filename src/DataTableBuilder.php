@@ -621,7 +621,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        if ($exporter instanceof ColumnBuilderInterface) {
+        if ($exporter instanceof ExporterBuilderInterface) {
             $this->exporters[$exporter->getName()] = $exporter;
 
             unset($this->unresolvedExporters[$exporter->getName()]);

@@ -33,7 +33,7 @@ In most cases, the data tables are created in the controller, using the `createD
 
 ```php
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait; [!code ++]
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait; // [!code ++]
 
 class ProductController extends AbstractController
 {

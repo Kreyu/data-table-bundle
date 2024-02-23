@@ -14,6 +14,8 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
@@ -30,6 +32,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\SimpleExporterType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\SimpleFilterType;
@@ -215,6 +218,53 @@ class DataTableBuilderTest extends TestCase
         $this->assertFalse($builder->hasFilter('foo'));
     }
 
+    public function testGetSearchHandler()
+    {
+        $handler = fn () => null;
+
+        $builder = $this->createBuilder();
+        $builder->setSearchHandler($handler);
+
+        $this->assertSame($handler, $builder->getSearchHandler());
+    }
+
+    public function testSearchHandlerAddsSearchFilter()
+    {
+        $builder = $this->createBuilder();
+        $builder->setFilterFactory($this->createFilterFactory());
+        $builder->setSearchHandler(fn () => null);
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertCount(1, $dataTable->getFilters());
+        $this->assertTrue($dataTable->hasFilter('__search'));
+        $this->assertInstanceOf(SearchFilterType::class, $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType());
+    }
+
+    public function testSearchHandlerWithAutoAddingSearchFilterDisabled()
+    {
+        $builder = $this->createBuilder();
+        $builder->setFilterFactory($this->createFilterFactory());
+        $builder->setAutoAddingSearchFilter(false);
+        $builder->setSearchHandler(fn () => null);
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertEmpty($dataTable->getFilters());
+    }
+
+    public function testSearchHandlerWithSearchFilterAlreadyDefined()
+    {
+        $builder = $this->createBuilder();
+        $builder->setFilterFactory($this->createFilterFactory());
+        $builder->setSearchHandler(fn () => null);
+        $builder->addFilter('__search', SimpleFilterType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertInstanceOf(SimpleFilterType::class, $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType());
+    }
+
     public function testGetActions()
     {
         $builder = $this->createBuilder();
@@ -289,6 +339,182 @@ class DataTableBuilderTest extends TestCase
         $builder->removeAction('foo');
 
         $this->assertFalse($builder->hasAction('foo'));
+    }
+
+    public function testGetBatchAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addBatchAction('foo');
+
+        $action = $builder->getBatchAction('foo');
+
+        $this->assertInstanceOf(ActionBuilderInterface::class, $action);
+        $this->assertSame('foo', $action->getName());
+        $this->assertInstanceOf(ButtonActionType::class, $action->getActionConfig()->getType()->getInnerType());
+    }
+
+    public function testAddBatchActionWithBatchActionBuilder()
+    {
+        $actionFactory = $this->createActionFactory();
+
+        $action = $actionFactory->createNamedBuilder('foo');
+
+        $builder = $this->createBuilder();
+        $builder->addBatchAction($action);
+
+        $this->assertSame($action, $builder->getBatchAction('foo'));
+    }
+
+    public function testHasBatchAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $this->assertFalse($builder->hasBatchAction('foo'));
+
+        $builder->addBatchAction('foo');
+
+        $this->assertTrue($builder->hasBatchAction('foo'));
+    }
+
+    public function testRemoveBatchAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $builder->addBatchAction('foo');
+        $builder->removeBatchAction('foo');
+
+        $this->assertFalse($builder->hasBatchAction('foo'));
+    }
+
+    public function testBatchActionAddsCheckboxColumn()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addBatchAction('foo');
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertCount(1, $dataTable->getColumns());
+        $this->assertTrue($dataTable->hasColumn('__batch'));
+        $this->assertInstanceOf(CheckboxColumnType::class, $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType());
+    }
+
+    public function testBatchActionWithAutoAddingBatchCheckboxColumnDisabled()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->setAutoAddingBatchCheckboxColumn(false);
+        $builder->addBatchAction('foo');
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertEmpty($dataTable->getColumns());
+    }
+
+    public function testBatchActionWithBatchCheckboxColumnAlreadyDefined()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addBatchAction('foo');
+        $builder->addColumn('__batch', TextColumnType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertInstanceOf(TextColumnType::class, $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType());
+    }
+
+    public function testGetRowAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addRowAction('foo');
+
+        $action = $builder->getRowAction('foo');
+
+        $this->assertInstanceOf(ActionBuilderInterface::class, $action);
+        $this->assertSame('foo', $action->getName());
+        $this->assertInstanceOf(ButtonActionType::class, $action->getActionConfig()->getType()->getInnerType());
+    }
+
+    public function testAddRowActionWithRowActionBuilder()
+    {
+        $actionFactory = $this->createActionFactory();
+
+        $action = $actionFactory->createNamedBuilder('foo');
+
+        $builder = $this->createBuilder();
+        $builder->addRowAction($action);
+
+        $this->assertSame($action, $builder->getRowAction('foo'));
+    }
+
+    public function testHasRowAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $this->assertFalse($builder->hasRowAction('foo'));
+
+        $builder->addRowAction('foo');
+
+        $this->assertTrue($builder->hasRowAction('foo'));
+    }
+
+    public function testRemoveRowAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $builder->addRowAction('foo');
+        $builder->removeRowAction('foo');
+
+        $this->assertFalse($builder->hasRowAction('foo'));
+    }
+
+    public function testRowActionAddsActionsColumn()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addRowAction('foo');
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertCount(1, $dataTable->getColumns());
+        $this->assertTrue($dataTable->hasColumn('__actions'));
+        $this->assertInstanceOf(ActionsColumnType::class, $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType());
+        $this->assertSame($builder->getRowActions(), $dataTable->getColumn('__actions')->getConfig()->getOption('actions'));
+    }
+
+    public function testRowActionWithAutoAddingActionsColumnDisabled()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->setAutoAddingActionsColumn(false);
+        $builder->addRowAction('foo');
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertEmpty($dataTable->getColumns());
+    }
+
+    public function testRowActionWithActionsColumnAlreadyDefined()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addRowAction('foo');
+        $builder->addColumn('__actions', TextColumnType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $this->assertInstanceOf(TextColumnType::class, $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType());
     }
 
     public function testGetExporters()
@@ -367,6 +593,77 @@ class DataTableBuilderTest extends TestCase
         $this->assertFalse($builder->hasExporter('foo'));
     }
 
+    public function testGetDataTableResolvesColumns()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+        $builder->addColumn('foo');
+        $builder->addColumn('bar', NumberColumnType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $expectedColumns = array_map(function (ColumnBuilderInterface $columnBuilder) use ($dataTable) {
+            return $columnBuilder->getColumn()->setDataTable($dataTable);
+        }, $builder->getColumns());
+
+        $this->assertEquals($expectedColumns, $dataTable->getColumns());
+    }
+
+    public function testGetDataTableResolvesFilters()
+    {
+        $builder = $this->createBuilder();
+        $builder->setFilterFactory($this->createFilterFactory());
+        $builder->addFilter('foo');
+        $builder->addFilter('bar', SimpleFilterType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $expectedFilters = array_map(function (FilterBuilderInterface $columnBuilder) use ($dataTable) {
+            return $columnBuilder->getFilter()->setDataTable($dataTable);
+        }, $builder->getFilters());
+
+        $this->assertEquals($expectedFilters, $dataTable->getFilters());
+    }
+
+    public function testGetDataTableResolvesActions()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+        $builder->addAction('foo');
+        $builder->addAction('bar', LinkActionType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $expectedActions = array_map(function (ActionBuilderInterface $columnBuilder) use ($dataTable) {
+            return $columnBuilder->getAction()->setDataTable($dataTable);
+        }, $builder->getActions());
+
+        $this->assertEquals($expectedActions, $dataTable->getActions());
+    }
+
+    public function testGetDataTableResolvesExporters()
+    {
+        $builder = $this->createBuilder();
+        $builder->setExporterFactory($this->createExporterFactory());
+        $builder->addExporter('foo');
+        $builder->addExporter('bar', SimpleExporterType::class);
+
+        $dataTable = $builder->getDataTable();
+
+        $expectedExporters = array_map(function (ExporterBuilderInterface $columnBuilder) use ($dataTable) {
+            return $columnBuilder->getExporter()->setDataTable($dataTable);
+        }, $builder->getExporters());
+
+        $this->assertEquals($expectedExporters, $dataTable->getExporters());
+    }
+
+    public function testGetDataTableInitializesDataTable()
+    {
+        $dataTable = $this->createBuilder()->getDataTable();
+
+        $this->assertTrue($this->getPrivatePropertyValue($dataTable, 'initialized'));
+    }
+
     private function createBuilder(): DataTableBuilder
     {
         return new DataTableBuilder(
@@ -386,6 +683,8 @@ class DataTableBuilderTest extends TestCase
                     new ColumnType(),
                     new TextColumnType(),
                     new NumberColumnType(),
+                    new CheckboxColumnType(),
+                    new ActionsColumnType($this->createActionFactory()),
                 ],
                 typeExtensions: [],
                 resolvedTypeFactory: new ResolvedColumnTypeFactory(),
@@ -400,6 +699,7 @@ class DataTableBuilderTest extends TestCase
                 types: [
                     new FilterType(),
                     new SimpleFilterType(),
+                    new SearchFilterType(),
                 ],
                 typeExtensions: [],
                 resolvedTypeFactory: new ResolvedFilterTypeFactory(),

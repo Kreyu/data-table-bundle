@@ -474,7 +474,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        unset($this->unresolvedActions[$name], $this->batchActions[$name]);
+        unset($this->unresolvedBatchActions[$name], $this->batchActions[$name]);
 
         return $this;
     }
@@ -562,7 +562,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        unset($this->unresolvedActions[$name], $this->rowActions[$name]);
+        unset($this->unresolvedRowActions[$name], $this->rowActions[$name]);
 
         return $this;
     }

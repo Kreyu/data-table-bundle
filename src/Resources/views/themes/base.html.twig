@@ -520,6 +520,9 @@
     {% endif %}
 
     <form id="{{ form_id }}" {{- block('attributes') -}}>
+        {# Reset attributes to prevent bubbling #}
+        {% set attr = {} %}
+
         <input type="hidden" name="_method" value="{{ method }}"/>
 
         {% set button_tag = button_tag|default('button') %}

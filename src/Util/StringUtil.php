@@ -36,9 +36,9 @@ class StringUtil
     public static function camelToSentence(string $string): string
     {
         return ucfirst(strtolower(preg_replace_callback(
-            '/(([A-Z]{1}))/',
-            function ($matches) {return ' '.$matches[0]; },
-            $string,
+            pattern: '/([A-Z]|\d+)/',
+            callback: fn (array $matches) => ' '.$matches[0],
+            subject: $string,
         )));
     }
 }

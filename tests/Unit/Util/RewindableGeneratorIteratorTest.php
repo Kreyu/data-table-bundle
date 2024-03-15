@@ -14,7 +14,7 @@ class RewindableGeneratorIteratorTest extends TestCase
         $calls = 0;
 
         $callable = function () use (&$calls) {
-            $calls++;
+            ++$calls;
             yield from [1, 2, 3];
         };
 

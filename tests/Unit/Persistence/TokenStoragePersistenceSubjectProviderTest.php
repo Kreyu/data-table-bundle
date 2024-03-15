@@ -55,5 +55,3 @@ class TokenStoragePersistenceSubjectProviderTest extends TestCase
         return new TokenStoragePersistenceSubjectProvider($tokenStorage);
     }
 }
-
-

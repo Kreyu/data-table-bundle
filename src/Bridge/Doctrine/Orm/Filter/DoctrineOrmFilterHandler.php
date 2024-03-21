@@ -42,7 +42,11 @@ class DoctrineOrmFilterHandler implements FilterHandlerInterface
         $queryBuilder = $query->getQueryBuilder();
 
         foreach ($event->getParameters() as $parameter) {
-            $queryBuilder->setParameter($parameter->getName(), $parameter->getValue(), $parameter->getType());
+            $queryBuilder->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->typeWasSpecified() ? $parameter->getType() : null,
+            );
         }
 
         $expression = $this->expressionFactory->create($query, $data, $filter, $event->getParameters());

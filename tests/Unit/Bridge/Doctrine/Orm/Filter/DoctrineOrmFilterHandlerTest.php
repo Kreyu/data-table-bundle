@@ -69,19 +69,36 @@ class DoctrineOrmFilterHandlerTest extends TestCase
         $this->createHandler(expression: 'expression')->handle($this->query, $this->data, $this->filter);
     }
 
-    public function testItSetsParameter(): void
+    public function testItSetsParameterWithoutTypeSpecified(): void
     {
         ($queryBuilder = $this->createQueryBuilderMock())
             ->expects($this->once())
             ->method('setParameter')
-            ->willReturnCallback(function ($name, $value) {
+            ->willReturnCallback(function ($name, $value, $type) {
                 $this->assertEquals('foo', $name);
                 $this->assertEquals('bar', $value);
+                $this->assertNull($type);
             });
 
         $this->query->method('getQueryBuilder')->willReturn($queryBuilder);
 
         $this->createHandler(parameters: [new Parameter('foo', 'bar')])->handle($this->query, $this->data, $this->filter);
+    }
+
+    public function testItSetsParameterWithTypeSpecified()
+    {
+        ($queryBuilder = $this->createQueryBuilderMock())
+            ->expects($this->once())
+            ->method('setParameter')
+            ->willReturnCallback(function ($name, $value, $type) {
+                $this->assertEquals('foo', $name);
+                $this->assertEquals('bar', $value);
+                $this->assertEquals('date_immutable', $type);
+            });
+
+        $this->query->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        $this->createHandler(parameters: [new Parameter('foo', 'bar', 'date_immutable')])->handle($this->query, $this->data, $this->filter);
     }
 
     public function testItDispatchesEvents(): void

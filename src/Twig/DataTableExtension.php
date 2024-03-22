@@ -344,7 +344,11 @@ class DataTableExtension extends AbstractExtension
         $context['block_name'] = $prefix.'_'.$suffix;
 
         foreach ($view->vars['block_prefixes'] as $blockPrefix) {
-            $blockName = $prefix.'_'.$blockPrefix.'_'.$suffix;
+            $blockName = $blockPrefix.'_'.$suffix;
+
+            if ($prefix !== $blockPrefix) {
+                $blockName = $prefix.'_'.$blockName;
+            }
 
             foreach ($dataTable->vars['themes'] as $theme) {
                 $wrapper = $environment->load($theme);

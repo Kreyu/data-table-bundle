@@ -350,8 +350,8 @@ class DataTableExtension extends AbstractExtension
                 $wrapper = $environment->load($theme);
 
                 if ($wrapper->hasBlock($blockName, $context)) {
-                    $context['theme'] = $theme;
                     $context['block_name'] = $blockName;
+                    $context['block_theme'] = $theme;
 
                     break 2;
                 }

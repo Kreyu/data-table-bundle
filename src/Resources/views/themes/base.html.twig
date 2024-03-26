@@ -373,7 +373,7 @@
     {# @var bool  use_intl_formatter - Determines whether the Intl formatter should be used #}
     {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
 
-    {% if use_intl_formatter %}
+    {% if value is not null and use_intl_formatter %}
         {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
     {% endif %}
 
@@ -385,13 +385,13 @@
     {# @var array   intl_formatter_options - Options used to configure the Intl formatter #}
     {# @var string  currency #}
 
-    {% if use_intl_formatter %}
+    {% if value is not null and use_intl_formatter %}
         {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
     {% endif %}
 
     {{- block('column_text_value') -}}
 
-    {% if not use_intl_formatter %}
+    {% if value is not null and not use_intl_formatter %}
         {{ currency }}
     {% endif %}
 {% endblock %}

@@ -495,7 +495,13 @@
 {% endblock %}
 
 {% block action_link_value %}
-    <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+    {% set attr = { href, target }|merge(attr|default({})) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
         {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}

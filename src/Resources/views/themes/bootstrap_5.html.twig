@@ -634,17 +634,23 @@
 {% endblock %}
 
 {% block action_link_value %}
-    {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') } %}
+    {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
 
     {% if confirmation %}
         {% set attr = {
             'data-bs-toggle': 'modal',
             'data-bs-target': '#' ~ confirmation.identifier,
-        }|merge(attr|default({})) %}
+        }|merge(attr) %}
 
-        {% with { attr: action_confirmation_modal_attr|default({}) } %}
-            {{ block('action_confirmation_modal') }}
-        {% endwith %}
+        {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
+
+        {% if batch %}
+            {% set confirm_button_attr = {
+                'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+            }|merge(confirm_button_attr) %}
+        {% endif %}
+
+        {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
     {{ parent() }}

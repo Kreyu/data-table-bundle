@@ -46,15 +46,18 @@ class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterfac
                 ->setMaxResults($maxResults)
                 ->setFirstResult($firstResult);
 
+            $itemCount = 0;
+
             foreach ($paginator as $item) {
                 yield $item;
 
                 $hasItems = true;
 
                 ++$cursorPosition;
+                ++$itemCount;
             }
 
-            $firstResult += $cursorPosition;
+            $firstResult += $itemCount;
 
             $paginator->getQuery()->getEntityManager()->clear();
         }

@@ -54,7 +54,7 @@ class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterfac
                 ++$cursorPosition;
             }
 
-            $firstResult = $cursorPosition;
+            $firstResult += $cursorPosition;
 
             $paginator->getQuery()->getEntityManager()->clear();
         }

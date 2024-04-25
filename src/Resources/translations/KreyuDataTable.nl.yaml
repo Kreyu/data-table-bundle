@@ -1,0 +1,52 @@
+# Operators
+Equals: gelijk aan
+Not equals: niet gelijk aan
+Contains: bevat
+Not contains: bevat niet
+Greater than: groter dan
+Greater than or equals: groter dan of gelijk aan
+Less than: kleiner dan
+Less than or equals: kleiner dan of gelijk aan
+Starts with: begint met
+Ends with: eindigt met
+
+# Boolean type
+Yes: ja
+No: nee
+
+# Date range filter type
+Before %date%: voor %date%
+After %date%: na %date%
+
+# Personalization
+Personalization: Personalisatie
+Drag items between columns to show/hide relevant data in the list or change their order: Sleep items tussen kolommen om relevante gegevens in de lijst te tonen/verbergen of de volgorde ervan te wijzigen
+Visible columns: Zichtbare kolommen
+Hidden columns: Verborgen kolommen
+
+# Pagination
+Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Toon %current_page_first_item_index% - %current_page_last_item_index% van %total_item_count%
+
+# Export
+Export: Exporteer
+Filename: Bestandsnaam
+Exporter: Exporteerder
+Strategy: Strategie
+Include personalization: Inclusief personalisatie
+
+# Export strategy
+Include current page: Huidige pagina
+Include all: Alle pagina's
+
+# Misc
+Selected: Geselecteerd
+Filter: Filter
+Apply: Toepassen
+No results found: Geen resultaten
+Try adjusting your search or filter to find what you're looking for: Probeer uw zoekopdracht of filter aan te passen om te vinden wat u zoekt
+Clear filter: Wis filter
+Clear all filters: Wis alle filters
+Action confirmation: Bevestiging uitvoering actie
+Are you sure you want to execute this action?: Weet u zeker dat u deze actie wilt uitvoeren?
+Confirm: Bevestig
+Cancel: Annuleer

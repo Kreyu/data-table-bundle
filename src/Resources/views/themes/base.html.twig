@@ -76,7 +76,7 @@
 
 {% block table_body_row_no_results %}
     <tr>
-        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{ 'No results'|trans({}, 'KreyuDataTable') }}</td>
+        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{ 'No results found'|trans({}, 'KreyuDataTable') }}</td>
     </tr>
 {% endblock %}
 

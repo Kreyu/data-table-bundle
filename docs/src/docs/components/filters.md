@@ -44,7 +44,7 @@ Filter types are classes that implement [`FilterTypeInterface`](https://github.c
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 
-class PhoneNumericFilterType extends AbstractFilterType
+class PhoneNumberFilterType extends AbstractFilterType
 {
 }
 ```
@@ -64,7 +64,7 @@ This is the type that defines all the required options, such as `label`, `form_t
 ```php
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
-class PhoneNumericFilterType extends StringFilterType
+class PhoneNumberFilterType extends StringFilterType
 {
 }
 ```
@@ -75,7 +75,7 @@ class PhoneNumericFilterType extends StringFilterType
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
-class PhoneNumericFilterType extends AbstractFilterType
+class PhoneNumberFilterType extends AbstractFilterType
 {
     public function getParent(): ?string
     {

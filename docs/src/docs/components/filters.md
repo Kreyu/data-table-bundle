@@ -9,8 +9,8 @@ To add a filter, use the data table builder's `addFilter()` method:
 ```php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumberFilterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\NumericFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DateTimeFilterType;
 
 class UserDataTableType extends AbstractDataTableType
@@ -18,8 +18,8 @@ class UserDataTableType extends AbstractDataTableType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('id', NumberFilterType::class)
-            ->addFilter('name', TextFilterType::class)
+            ->addFilter('id', NumericFilterType::class)
+            ->addFilter('name', StringFilterType::class)
             ->addFilter('createdAt', DateTimeFilterType::class)
         ;
     }
@@ -44,7 +44,7 @@ Filter types are classes that implement [`FilterTypeInterface`](https://github.c
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 
-class PhoneNumberFilterType extends AbstractFilterType
+class PhoneNumericFilterType extends AbstractFilterType
 {
 }
 ```
@@ -62,9 +62,9 @@ This is the type that defines all the required options, such as `label`, `form_t
 
 ::: danger This is not recommended: do _not_ use PHP inheritance!
 ```php
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
-class PhoneNumberFilterType extends TextFilterType
+class PhoneNumericFilterType extends StringFilterType
 {
 }
 ```
@@ -73,13 +73,13 @@ class PhoneNumberFilterType extends TextFilterType
 ::: tip This is recommended: provide parent using the `getParent()` method
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
-class PhoneNumberFilterType extends AbstractFilterType
+class PhoneNumericFilterType extends AbstractFilterType
 {
     public function getParent(): ?string
     {
-        return TextFilterType::class;
+        return StringFilterType::class;
     }
 }
 ```
@@ -182,7 +182,7 @@ class CustomFilterType extends AbstractFilterType implements FilterHandlerInterf
 ## Filter type extensions
 
 Filter type extensions allows modifying configuration of the existing filter types, even the built-in ones.
-Let's assume, that we want to [change default operator](#changing-default-operator) of [`TextFilterType`](#)
+Let's assume, that we want to [change default operator](#changing-default-operator) of [`StringFilterType`](#)
 to `Operator::Equals`, so it is not necessary to pass `default_operator` option for each filter using this type.
 
 Filter type extensions are classes that implement [`FilterTypeExtensionInterface`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Filter/Extension/FilterTypeExtensionInterface.php).
@@ -190,11 +190,11 @@ However, it's better to extend from the [`AbstractFilterTypeExtension`](https://
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Extension\AbstractFilterTypeExtension;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DefaultOperatorTextFilterTypeExtension extends AbstractFilterTypeExtension
+class DefaultOperatorStringFilterTypeExtension extends AbstractFilterTypeExtension
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -203,7 +203,7 @@ class DefaultOperatorTextFilterTypeExtension extends AbstractFilterTypeExtension
     
     public static function getExtendedTypes(): iterable
     {
-        return [TextFilterType::class];
+        return [StringFilterType::class];
     }
 }
 ```
@@ -309,14 +309,14 @@ readonly class Book
 }
 ```
 
-If we use a [TextFilterType](#) on the `isbn` column, the filter will perform partial matching (`LIKE %value%`),
+If we use a [StringFilterType](#) on the `isbn` column, the filter will perform partial matching (`LIKE %value%`),
 because the filter type has `default_operator` option set to `Operator::Contains`. 
 In this case, we want to perform exact matching, therefore, we have to change this option value to `Operator::Equals`:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 
 class ProductDataTableType extends AbstractDataTableType
@@ -324,7 +324,7 @@ class ProductDataTableType extends AbstractDataTableType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('isbn', TextFilterType::class, [
+            ->addFilter('isbn', StringFilterType::class, [
                 'default_operator' => Operator::Equals,
             ])
         ;
@@ -353,7 +353,7 @@ By default, operator selector is **not** visible. To change that, use `operator_
 ```php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 
 class ProductDataTableType extends AbstractDataTableType
@@ -361,7 +361,7 @@ class ProductDataTableType extends AbstractDataTableType
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('isbn', TextFilterType::class, [
+            ->addFilter('isbn', StringFilterType::class, [
                 'operator_visible' => true,
             ])
         ;

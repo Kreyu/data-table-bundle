@@ -44,7 +44,7 @@ $builder
 
 ### `button_attr`
 
-- **type**: `array`
+- **type**: `array` or `callable`
 - **default**: `[]`
 
 An array of attributes used to render the form submit button.
@@ -54,7 +54,7 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
     ->addAction('remove', ButtonActionType::class, [
-        'attr' => [
+        'button_attr' => [
             'class' => 'btn btn-danger',
         ],
     ])

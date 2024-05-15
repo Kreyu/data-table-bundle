@@ -55,6 +55,10 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader->load('personalization.php');
         $loader->load('twig.php');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.php');
+        }
+
         $config = $this->resolveConfiguration($configs, $container);
 
         foreach ($this->autoconfiguration as $interface => $tag) {

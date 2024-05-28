@@ -8,7 +8,7 @@
 
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>Number of dataTables</b>
+            <b>Number of data tables</b>
             <span class="sf-toolbar-status">{{ collector.dataTables|length }}</span>
         </div>
     {% endset %}
@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>DataTable displayed in this request</h2>
+    <h2>Data tables displayed in this request</h2>
 
     <div class="sf-serializer sf-reset">
         {% for dataTable in collector.dataTables %}

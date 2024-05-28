@@ -9,14 +9,14 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('debug.kreyu_data_table.factory', TraceableDataTableFactory::class)
+        ->set('kreyu_data_table.debug.factory', TraceableDataTableFactory::class)
         ->decorate('kreyu_data_table.factory')
         ->args([
             service('.inner'),
-            service('serializer.data_collector'),
+            service('kreyu_data_table.debug.data_collector'),
         ])
 
-        ->set('serializer.data_collector', DataTableDataCollector::class)
+        ->set('kreyu_data_table.debug.data_collector', DataTableDataCollector::class)
         ->tag('data_collector')
     ;
 };

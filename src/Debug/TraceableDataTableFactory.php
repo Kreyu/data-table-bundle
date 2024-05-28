@@ -28,7 +28,11 @@ class TraceableDataTableFactory implements DataTableFactoryInterface
 
     public function createNamed(string $name, string $type, mixed $data = null, array $options = []): DataTableInterface
     {
-        return $this->dataTableFactory->create($type, $data, $options);
+        $dataTable = $this->dataTableFactory->create($type, $data, $options);
+
+        $this->dataCollector->collectDataTable($dataTable);
+
+        return $dataTable;
     }
 
     public function createBuilder(string $type, mixed $data = null, array $options = []): DataTableBuilderInterface

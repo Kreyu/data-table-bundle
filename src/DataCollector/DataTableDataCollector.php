@@ -32,6 +32,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
     public function collectDataTable(DataTable $dataTable): void
     {
         $this->data[$dataTable->getConfig()->getName()] = [
+            'filters' => [],
             'columns' => array_map(function (Column $column) {
                 return [
                     'name' => $column->getName(),

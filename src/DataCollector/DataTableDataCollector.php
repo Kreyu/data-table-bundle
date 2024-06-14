@@ -37,6 +37,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
                 return [
                     'name' => $column->getName(),
                     'type' => $column->getConfig()->getType()->getInnerType()::class,
+                    'options' => $this->cloneVar($column->getConfig()->getOptions()),
                 ];
             }, array_filter($dataTable->getColumns(), function (Column $column) {
                 return !str_contains($column->getName(), '__');
@@ -46,27 +47,21 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
                 return [
                     'name' => $action->getName(),
                     'type' => $action->getConfig()->getType()->getInnerType()::class,
-                    'options' => array_map(function (mixed $value) {
-                        return is_callable($value) ? 'Closure' : $value;
-                    }, $action->getConfig()->getOptions()),
+                    'options' => $this->cloneVar($action->getConfig()->getOptions()),
                 ];
             }, $dataTable->getActions()),
             'batch_actions' => array_map(function (Action $action) {
                 return [
                     'name' => $action->getName(),
                     'type' => $action->getConfig()->getType()->getInnerType()::class,
-                    'options' => array_map(function (mixed $value) {
-                        return is_callable($value) ? 'Closure' : $value;
-                    }, $action->getConfig()->getOptions()),
+                    'options' => $this->cloneVar($action->getConfig()->getOptions()),
                 ];
             }, $dataTable->getBatchActions()),
             'row_actions' => array_map(function (Action $action) {
                 return [
                     'name' => $action->getName(),
                     'type' => $action->getConfig()->getType()->getInnerType()::class,
-                    'options' => array_map(function (mixed $value) {
-                        return is_callable($value) ? 'Closure' : $value;
-                    }, $action->getConfig()->getOptions()),
+                    'options' => $this->cloneVar($action->getConfig()->getOptions()),
                 ];
             }, $dataTable->getRowActions()),
         ];

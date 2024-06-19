@@ -1,3 +1,89 @@
+# 0.18
+
+## [Breaking change] The data transfer objects are now immutable
+
+Every mutable method got removed, and replaced (if possible) with `with*` method, 
+that creates a new instance of the object with a given value. Those objects are:
+
+- `FiltrationData` and `FilterData`
+- `PersonalizationData` and `PersonalizationColumnData`
+- `SortingData` and `SortingColumnData`
+- `ExportData`
+
+This is a breaking change if your application is modifying those objects in a mutable matter.
+
+
+## [Breaking change] [Deprecation] The `DataTableInterface` is now traversable
+
+This means that the data tables are now `Traversable`, and contain a `getIterator()` method.
+Because of that, the `getItems()` method is now deprecated, and will be removed in next version.
+
+This is a breaking change if your application is using its own implementation of the `DataTableInterface`.
+
+
+## [Breaking change] The integration with Symfony Form has been reworked
+
+Previously, filtration, personalization and export forms were unnecessarily complicated, 
+sometimes buggy, and even prevented proper validation.
+
+Now, this integration got reworked, and following methods got **replaced** in the `DataTableInterface`:
+
+| Before                             | After                    |
+|------------------------------------|--------------------------|
+| `createFiltrationFormBuilder`      | `getFiltrationForm`      |
+| `createPersonalizationFormBuilder` | `getPersonalizationForm` |
+| `createExportFormBuilder`          | `getExportForm`          |
+
+Those methods return the `FormInterface`, in oppose to previous `FormBuilderInterface`.
+
+The filtration form field can now be properly validated. To define validation constraints, 
+use the [`constraints` form option](https://symfony.com/doc/current/reference/forms/types/form.html#constraints), for example:
+
+```php
+namespace App\DataTable\Type;
+
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->addFilter('name', ..., [
+                'form_options' => [
+                    'constraints' => [
+                        new Assert\Length(max: 32),
+                    ],
+                ],
+            ])
+        ;
+
+    }
+}
+```
+
+This is a breaking change if your application is either:
+
+- using its own implementation of the `DataTableInterface`;
+- directly using the removed methods, for example, in your own request handler;
+
+
+## [Deprecation] The data table events data getters and setters
+
+The data table event objects have their data-related getters and setters deprecated: 
+
+| Class                           | Deprecated getter          | Deprecated setter          |
+|---------------------------------|----------------------------|----------------------------|
+| `DataTableSortingEvent`         | `getSortingData()`         | `setSortingData()`         |
+| `DataTablePaginationEvent`      | `getPaginationData()`      | `setPaginationData()`      |
+| `DataTableFiltrationEvent`      | `getFiltrationData()`      | `setFiltrationData()`      |
+| `DataTablePersonalizationEvent` | `getPersonalizationData()` | `setPersonalizationData()` |
+
+Please use `getData()` and `setData()` instead.
+
+
 # 0.17
 
 ## Breaking changes

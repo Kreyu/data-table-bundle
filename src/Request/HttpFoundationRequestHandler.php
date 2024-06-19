@@ -15,7 +15,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
-    private readonly PropertyAccessorInterface $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct()
     {
@@ -32,42 +32,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             throw new UnexpectedTypeException($request, Request::class);
         }
 
-        $this->filter($dataTable, $request);
-        $this->sort($dataTable, $request);
-        $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
+        $this->sort($dataTable, $request);
+        $this->filter($dataTable, $request);
+        $this->personalize($dataTable, $request);
         $this->export($dataTable, $request);
-    }
-
-    private function filter(DataTableInterface $dataTable, Request $request): void
-    {
-        if (!$dataTable->getConfig()->isFiltrationEnabled()) {
-            return;
-        }
-
-        $form = $dataTable->createFiltrationFormBuilder()->getForm();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dataTable->filter($form->getData());
-        }
-    }
-
-    private function sort(DataTableInterface $dataTable, Request $request): void
-    {
-        if (!$dataTable->getConfig()->isSortingEnabled()) {
-            return;
-        }
-
-        $parameterName = $dataTable->getConfig()->getSortParameterName();
-
-        $sortingData = $this->extractQueryParameter($request, "[$parameterName]");
-
-        if (empty($sortingData)) {
-            return;
-        }
-
-        $dataTable->sort(SortingData::fromArray($sortingData));
     }
 
     private function paginate(DataTableInterface $dataTable, Request $request): void
@@ -93,13 +62,44 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $dataTable->paginate(new PaginationData((int) $page, (int) $perPage));
     }
 
+    private function sort(DataTableInterface $dataTable, Request $request): void
+    {
+        if (!$dataTable->getConfig()->isSortingEnabled()) {
+            return;
+        }
+
+        $parameterName = $dataTable->getConfig()->getSortParameterName();
+
+        $sortingData = $this->extractQueryParameter($request, "[$parameterName]");
+
+        if (empty($sortingData)) {
+            return;
+        }
+
+        $dataTable->sort(SortingData::fromArray($sortingData));
+    }
+
+    private function filter(DataTableInterface $dataTable, Request $request): void
+    {
+        if (!$dataTable->getConfig()->isFiltrationEnabled()) {
+            return;
+        }
+
+        $form = $dataTable->getFiltrationForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dataTable->filter($form->getData());
+        }
+    }
+
     private function personalize(DataTableInterface $dataTable, Request $request): void
     {
         if (!$dataTable->getConfig()->isPersonalizationEnabled()) {
             return;
         }
 
-        $form = $dataTable->createPersonalizationFormBuilder()->getForm();
+        $form = $dataTable->getPersonalizationForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -113,11 +113,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        $form = $dataTable->createExportFormBuilder()->getForm();
+        $form = $dataTable->getExportForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $dataTable->setExportData($form->getData());
+            $dataTable->export($form->getData());
         }
     }
 

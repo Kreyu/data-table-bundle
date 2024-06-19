@@ -81,27 +81,35 @@ final class DataTableType implements DataTableTypeInterface
         $visibleColumns = $dataTable->getVisibleColumns();
 
         $view->vars = array_replace($view->vars, [
+            'name' => $dataTable->getConfig()->getName(),
             'themes' => $dataTable->getConfig()->getThemes(),
+
             'title' => $options['title'],
             'title_translation_parameters' => $options['title_translation_parameters'],
             'translation_domain' => $options['translation_domain'],
-            'name' => $dataTable->getConfig()->getName(),
-            'exporters' => $dataTable->getExporters(),
+
             'pagination_enabled' => $dataTable->getConfig()->isPaginationEnabled(),
             'sorting_enabled' => $dataTable->getConfig()->isSortingEnabled(),
             'filtration_enabled' => $dataTable->getConfig()->isFiltrationEnabled(),
             'exporting_enabled' => $dataTable->getConfig()->isExportingEnabled(),
             'personalization_enabled' => $dataTable->getConfig()->isPersonalizationEnabled(),
+
             'page_parameter_name' => $dataTable->getConfig()->getPageParameterName(),
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
+
             'has_active_filters' => $dataTable->hasActiveFilters(),
-            'filtration_data' => $dataTable->getFiltrationData(),
+            'pagination_data' => $dataTable->getPaginationData(),
             'sorting_data' => $dataTable->getSortingData(),
+            'filtration_data' => $dataTable->getFiltrationData(),
+            'personalization_data' => $dataTable->getPersonalizationData(),
+
+            // TODO: remove
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
+            'exporters' => $dataTable->getExporters(),
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -113,11 +121,13 @@ final class DataTableType implements DataTableTypeInterface
 
         $view->vars = array_replace($view->vars, [
             'header_row' => $view->headerRow,
+            'non_personalized_header_row' => $view->nonPersonalizedHeaderRow,
             'value_rows' => $view->valueRows,
             'pagination' => $view->pagination,
             'filters' => $view->filters,
             'actions' => $view->actions,
             'batch_actions' => $this->createBatchActionViews($view, $dataTable),
+            // todo: remove
             'column_count' => count($view->headerRow),
         ]);
 
@@ -359,22 +369,62 @@ final class DataTableType implements DataTableTypeInterface
 
     private function createFiltrationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $form = $dataTable->createFiltrationFormBuilder($view)->getForm();
-        $form->setData($dataTable->getFiltrationData());
+        $formView = $dataTable->getFiltrationForm()->createView();
 
-        return $this->createFormView($form, $view, $dataTable);
+        foreach ($formView as $name => $filterFormView) {
+            $filterView = $view->vars['filters'][$name] ?? null;
+
+            if (null === $filterView) {
+                continue;
+            }
+
+            $filterFormView->vars = array_replace($filterFormView->vars, [
+                'label' => $filterView->vars['label'],
+                'label_translation_parameters' => $filterView->vars['label_translation_parameters'],
+                'translation_domain' => $filterView->vars['translation_domain'],
+            ]);
+        }
+
+        // TODO: remove
+        $formView->vars['data_table_view'] = $view;
+
+        return $formView;
     }
 
     private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
-        $form = $dataTable->createPersonalizationFormBuilder($view)->getForm();
-        $form->setData($dataTable->getPersonalizationData());
+        $formView = $dataTable->getPersonalizationForm()->createView();
 
-        return $this->createFormView($form, $view, $dataTable);
+        foreach ($formView['columns'] as $name => $columnFormView) {
+            $columnHeaderView = $view->vars['non_personalized_header_row'][$name] ?? null;
+
+            if (null === $columnHeaderView) {
+                continue;
+            }
+
+            $columnFormView->vars = array_replace($columnFormView->vars, [
+                'label' => $columnHeaderView->vars['label'],
+                'translation_domain' => $columnHeaderView->vars['translation_domain'],
+                'translation_parameters' => $columnHeaderView->vars['translation_parameters'],
+            ]);
+        }
+
+        // TODO: remove
+        $formView->vars['data_table_view'] = $view;
+
+        return $formView;
     }
 
     private function createExportFormView(DataTableView $view, DataTableInterface $dataTable): FormView
     {
+        $formView = $dataTable->getExportForm()->createView();
+
+        $formView->vars['data_table_view'] = $view;
+
+        return $formView;
+
+        dd($dataTable->getExportForm());
+
         $form = $dataTable->createExportFormBuilder()->getForm();
         $form->setData($dataTable->getExportData());
 

@@ -50,7 +50,7 @@ final class ColumnType implements ColumnTypeInterface
             'row' => $headerRowView,
             'data_table' => $dataTableView,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
-            'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
+            'label' => $options['label'] ?? str_replace('.', ' ', StringUtil::camelToSentence($column->getName())),
             'translation_domain' => $options['header_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['header_translation_parameters'],
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),

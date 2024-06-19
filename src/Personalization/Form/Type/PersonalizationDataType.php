@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -19,37 +21,15 @@ class PersonalizationDataType extends AbstractType
     {
         $builder->add('columns', CollectionType::class, [
             'entry_type' => PersonalizationColumnDataType::class,
-            'allow_add' => true,
         ]);
-    }
-
-    public function finishView(FormView $view, FormInterface $form, array $options): void
-    {
-        $dataTableView = $options['data_table_view'];
-
-        if (!$dataTableView instanceof DataTableView) {
-            throw new \LogicException('Unable to create personalization form view without the data table view.');
-        }
-
-        foreach ($view['columns'] as $name => $columnFormView) {
-            $columnView = $dataTableView->nonPersonalizedHeaderRow[$name];
-
-            $columnFormView->vars = array_replace($columnFormView->vars, [
-                'label' => $columnView->vars['label'],
-                'translation_domain' => $columnView->vars['translation_domain'],
-                'translation_parameters' => $columnView->vars['translation_parameters'],
-            ]);
-        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefaults([
-                'data_class' => PersonalizationData::class,
-                'data_table_view' => null,
-            ])
-            ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
+            ->setDefault('data_class', PersonalizationData::class)
+            ->setRequired('columns')
+            ->setAllowedTypes('columns', ColumnInterface::class.'[]')
         ;
     }
 

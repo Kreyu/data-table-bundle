@@ -47,6 +47,14 @@ class PaginationData
         return $this->page;
     }
 
+    public function withPage(int $page): self
+    {
+        $clone = clone $this;
+        $clone->page = $page;
+
+        return $clone;
+    }
+
     public function setPage(int $page): void
     {
         $this->page = $page;
@@ -60,6 +68,14 @@ class PaginationData
     public function setPerPage(?int $perPage): void
     {
         $this->perPage = $perPage;
+    }
+
+    public function withPerPage(int $perPage): self
+    {
+        $clone = clone $this;
+        $clone->perPage = $perPage;
+
+        return $clone;
     }
 
     public function getOffset(): int

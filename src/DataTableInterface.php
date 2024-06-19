@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
+use Kreyu\Bundle\DataTableBundle\Exception\RuntimeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
@@ -26,8 +27,9 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
-interface DataTableInterface
+interface DataTableInterface extends \IteratorAggregate
 {
     public function initialize(): void;
 
@@ -166,6 +168,9 @@ interface DataTableInterface
 
     public function removeExporter(string $name): static;
 
+    /**
+     * @throws RuntimeException if sorting is not enabled for the data table
+     */
     public function sort(SortingData $data): void;
 
     public function filter(FiltrationData $data): void;
@@ -176,35 +181,29 @@ interface DataTableInterface
 
     public function export(?ExportData $data = null): ExportFile;
 
+    /**
+     * @deprecated since 0.18, as the {@see DataTableInterface} now implements {@see \IteratorIterator},
+     *             and can be used as an iterable or with {@see getIterator()} method
+     */
     public function getItems(): iterable;
 
     public function getPagination(): PaginationInterface;
 
     public function getSortingData(): ?SortingData;
 
-    public function setSortingData(?SortingData $sortingData): static;
-
-    public function setPaginationData(?PaginationData $paginationData): static;
-
     public function getPaginationData(): ?PaginationData;
-
-    public function setFiltrationData(?FiltrationData $filtrationData): static;
 
     public function getFiltrationData(): ?FiltrationData;
 
-    public function setPersonalizationData(?PersonalizationData $personalizationData): static;
-
     public function getPersonalizationData(): ?PersonalizationData;
-
-    public function setExportData(?ExportData $exportData): static;
 
     public function getExportData(): ?ExportData;
 
-    public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
+    public function getFiltrationForm(): FormInterface;
 
-    public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
+    public function getPersonalizationForm(): FormInterface;
 
-    public function createExportFormBuilder(?DataTableView $view = null): FormBuilderInterface;
+    public function getExportForm(): FormInterface;
 
     public function isExporting(): bool;
 

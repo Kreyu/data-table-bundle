@@ -72,7 +72,7 @@
         </div>
 
         {% if filtration_enabled and filtration_form and filters|length > 0 %}
-            <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
+            <div class="border-bottom collapse{% if not filtration_form.vars.valid %} show{% endif %}" id="{{ filtration_form.vars.id }}__collapse">
                 <div class="card-body">
                     {{ data_table_filters_form(filtration_form) }}
                 </div>
@@ -218,14 +218,14 @@
        title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
     >
         <span class="mx-1">
-            <strong>{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</strong>
+            <span class="strong">{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</span>
 
             {% if filter.vars.operator_selectable %}
                 <span class="text-muted">{{ filter.vars.data.operator.label|trans({}, 'KreyuDataTable') }}</span>
             {% endif %}
         </span>
 
-        <span class="">{{ filter.vars.value|trans({}, filter.vars.translation_domain) }}</span>
+        <span class="fw-normal">{{ filter.vars.value|trans({}, filter.vars.translation_domain) }}</span>
         <span class="mx-2" aria-hidden="true">{{ block('filter_clear_button_icon') }}</span>
     </a>
 {% endblock %}
@@ -408,7 +408,13 @@
 {% endblock %}
 
 {% block export_modal %}
-    <div class="modal modal-blur fade" id="{{ export_form.vars.name ~ '__modal' }}" tabindex="-1" style="display: none;" aria-hidden="true" data-turbo="false">
+    <div id="{{ export_form.vars.name ~ '__modal' }}"
+         class="modal modal-blur fade"
+         style="display: none;"
+         aria-hidden="true"
+         tabindex="-1"
+         data-turbo="false"
+    >
         {% block export_modal_dialog %}
             <div class="modal-dialog modal-dialog-centered" role="document">
                 {% block export_modal_content %}
@@ -425,6 +431,7 @@
                                 {% endblock %}
                             </div>
                         {% endblock %}
+
                         {% block export_modal_body %}
                             <div class="modal-body">
                                 {{ data_table_export_form(export_form) }}
@@ -536,14 +543,27 @@
 
 {% block kreyu_data_table_filter_data_row %}
     <div class="row">
-        {{ form_label(form) }}
+        {% if translation_domain is not same as false %}
+            {{ form_label(form, label|trans(label_translation_parameters, translation_domain)) }}
+        {% else %}
+            {{ form_label(form, label) }}
+        {% endif %}
 
         <div class="col-12">
-            <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }} input-group">
+            <div class="{{ row_class|default(row_attr.class|default('mb-3')|trim) }}{% if form.operator is defined %} input-group{% endif %}">
                 {% if form.operator is defined %}
-                    {{ form_widget(form.operator) }}
+                    <div>
+                        {{ form_widget(form.operator) }}
+                        {{ form_errors(form.operator) }}
+                        {{ form_help(form.operator) }}
+                    </div>
                 {% endif %}
-                {{ form_widget(form.value) }}
+
+                <div>
+                    {{ form_widget(form.value) }}
+                    {{ form_errors(form.value) }}
+                    {{ form_help(form.value) }}
+                </div>
             </div>
         </div>
     </div>

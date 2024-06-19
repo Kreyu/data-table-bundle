@@ -4,23 +4,33 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
-use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Traversable;
 
-class FiltrationData implements \ArrayAccess
+/**
+ * @extends \IteratorAggregate<string, FilterData>
+ */
+readonly class FiltrationData implements \IteratorAggregate
 {
-    /**
-     * @var array<string, FilterData> filter name as key, filter data as value
-     */
-    private array $filters = [];
+    private array $filters;
 
     /**
      * @param array<string, FilterData> $filters filter name as key, filter data as value
      */
     public function __construct(array $filters = [])
     {
-        foreach ($filters as $name => $data) {
-            $this->setFilterData($name, $data);
+        foreach ($filters as $filter) {
+            if (!$filter instanceof FilterData) {
+                throw new UnexpectedTypeException($filter, FilterData::class);
+            }
         }
+
+        $this->filters = $filters;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new \ArrayIterator($this->filters);
     }
 
     /**
@@ -49,20 +59,7 @@ class FiltrationData implements \ArrayAccess
         return new self($filters);
     }
 
-    public static function fromDataTable(DataTableInterface $dataTable): self
-    {
-        $filters = [];
-
-        foreach ($dataTable->getFilters() as $filter) {
-            $filters[$filter->getName()] = new FilterData(operator: $filter->getConfig()->getDefaultOperator());
-        }
-
-        return new self($filters);
-    }
-
     /**
-     * Retrieves every defined filter data.
-     *
      * @return array<string, FilterData> filter name as key, filter data as value
      */
     public function getFilters(): array
@@ -71,8 +68,6 @@ class FiltrationData implements \ArrayAccess
     }
 
     /**
-     * Retrieves the filter data for a given filter.
-     *
      * @param string|FilterInterface $filter either the filter name or the filter instance
      */
     public function getFilterData(string|FilterInterface $filter): ?FilterData
@@ -82,56 +77,6 @@ class FiltrationData implements \ArrayAccess
         }
 
         return $this->filters[$filter] ?? null;
-    }
-
-    /**
-     * Updates the filter data for a given filter.
-     *
-     * @param string|FilterInterface $filter either the filter name or the filter instance
-     */
-    public function setFilterData(string|FilterInterface $filter, FilterData $data): void
-    {
-        if ($filter instanceof FilterInterface) {
-            $filter = $filter->getName();
-        }
-
-        $this->filters[$filter] = $data;
-    }
-
-    /**
-     * Completely removes the filter data for a given filter.
-     *
-     * @param string|FilterInterface $filter either the filter name or the filter instance
-     */
-    public function removeFilter(string|FilterInterface $filter): void
-    {
-        if ($filter instanceof FilterInterface) {
-            $filter = $filter->getName();
-        }
-
-        unset($this->filters[$filter]);
-    }
-
-    /**
-     * @param array<FilterInterface> $filters
-     */
-    public function appendMissingFilters(array $filters): void
-    {
-        foreach ($filters as $filter) {
-            if (null === $this->getFilterData($filter)) {
-                $this->setFilterData($filter, new FilterData(operator: $filter->getConfig()->getDefaultOperator()));
-            }
-        }
-    }
-
-    /**
-     * @param array<FilterInterface> $filters
-     */
-    public function removeRedundantFilters(array $filters): void
-    {
-        foreach (array_diff_key($this->filters, $filters) as $name => $filter) {
-            $this->removeFilter($name);
-        }
     }
 
     public function hasActiveFilters(): bool
@@ -162,11 +107,9 @@ class FiltrationData implements \ArrayAccess
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->setFilterData($offset, $value);
     }
 
     public function offsetUnset(mixed $offset): void
     {
-        $this->removeFilter($offset);
     }
 }

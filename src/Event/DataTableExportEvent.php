@@ -11,18 +11,34 @@ class DataTableExportEvent extends DataTableEvent
 {
     public function __construct(
         DataTableInterface $dataTable,
-        private ExportData $exportData,
+        private ExportData $data,
     ) {
         parent::__construct($dataTable);
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function getExportData(): ExportData
     {
-        return $this->exportData;
+        return $this->data;
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function setExportData(ExportData $exportData): void
     {
-        $this->exportData = $exportData;
+        $this->data = $exportData;
+    }
+
+    public function getData(): ExportData
+    {
+        return $this->data;
+    }
+
+    public function setData(ExportData $data): void
+    {
+        $this->data = $data;
     }
 }

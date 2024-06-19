@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Personalization;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\DataTable;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
@@ -71,6 +72,8 @@ class PersonalizationData
 
     /**
      * @param array<ColumnInterface> $columns
+     *
+     * @deprecated since 0.18, the {@see DataTable::personalize()} is applying personalization itself
      */
     public function apply(array $columns): void
     {

@@ -10,19 +10,35 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 class DataTablePaginationEvent extends DataTableEvent
 {
     public function __construct(
-        DataTableInterface $dataTable,
-        private PaginationData $paginationData,
+        DataTableInterface     $dataTable,
+        private PaginationData $data,
     ) {
         parent::__construct($dataTable);
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function getPaginationData(): PaginationData
     {
-        return $this->paginationData;
+        return $this->data;
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function setPaginationData(PaginationData $paginationData): void
     {
-        $this->paginationData = $paginationData;
+        $this->data = $paginationData;
+    }
+
+    public function getData(): PaginationData
+    {
+        return $this->data;
+    }
+
+    public function setData(PaginationData $data): void
+    {
+        $this->data = $data;
     }
 }

@@ -6,13 +6,15 @@ namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Traversable;
 
-class SortingData
+/**
+ * @extends \IteratorAggregate<SortingColumnData>
+ */
+class SortingData implements \IteratorAggregate
 {
-    /**
-     * @var array<SortingColumnData>
-     */
-    private array $columns = [];
+    private array $columns;
 
     /**
      * @param array<SortingColumnData> $columns
@@ -114,6 +116,18 @@ class SortingData
         return array_key_exists($column, $this->columns);
     }
 
+    public function withColumn(SortingColumnData|string $column, ?string $direction = null, null|string|PropertyPathInterface $propertyPath = null): self
+    {
+        if (is_string($column)) {
+            $column = new SortingColumnData($column, $direction, $propertyPath);
+        }
+
+        $self = clone $this;
+        $self->columns[$column->getName()] = $column;
+
+        return $self;
+    }
+
     public function addColumn(SortingColumnData $column): void
     {
         $this->columns[$column->getName()] = $column;
@@ -122,5 +136,10 @@ class SortingData
     public function removeColumn(SortingColumnData $column): void
     {
         unset($this->columns[$column->getName()]);
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new \ArrayIterator($this->columns);
     }
 }

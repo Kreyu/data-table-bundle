@@ -14,15 +14,19 @@ class SortingColumnData
     private ?PropertyPathInterface $propertyPath;
 
     public function __construct(
-        private readonly string $name,
+        private string $name,
         private string $direction = 'asc',
         string|PropertyPathInterface|null $propertyPath = null,
     ) {
-        $this->setPropertyPath($propertyPath);
+        $this->propertyPath = $this->createPropertyPath($propertyPath);
     }
 
     /**
-     * @param array{name: string, direction: string, property_path: ?string} $data
+     * @param array{
+     *     name: string,
+     *     direction: "asc"|"desc"|"ASC"|"DESC",
+     *     property_path: null|string|PropertyPathInterface
+     * } $data
      */
     public static function fromArray(array $data): self
     {
@@ -31,8 +35,8 @@ class SortingColumnData
             ->setDefault('direction', 'asc')
             ->setDefault('property_path', null)
             ->setAllowedTypes('name', 'string')
-            ->setAllowedTypes('property_path', ['null', 'string'])
-            ->setAllowedValues('direction', ['asc', 'desc'])
+            ->setAllowedTypes('property_path', ['null', 'string', PropertyPathInterface::class])
+            ->setAllowedValues('direction', ['asc', 'desc', 'ASC', 'DESC'])
             ->addNormalizer('direction', function (Options $options, mixed $value) {
                 return strtolower((string) $value);
             })
@@ -48,14 +52,28 @@ class SortingColumnData
         return $this->name;
     }
 
+    public function withName(string $name): self
+    {
+        $clone = clone $this;
+        $clone->name = $name;
+
+        return $clone;
+    }
+
     public function getDirection(): string
     {
         return $this->direction;
     }
 
-    public function setDirection(string $direction): void
+    /**
+     * @param "asc"|"desc"|"ASC"|"DESC" $direction
+     */
+    public function withDirection(string $direction): self
     {
-        $this->direction = $direction;
+        $clone = clone $this;
+        $clone->direction = $direction;
+
+        return $clone;
     }
 
     public function getPropertyPath(): PropertyPathInterface
@@ -67,12 +85,20 @@ class SortingColumnData
         return $this->propertyPath;
     }
 
-    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): void
+    public function withPropertyPath(string|PropertyPathInterface|null $propertyPath): self
+    {
+        $clone = clone $this;
+        $clone->propertyPath = $this->createPropertyPath($propertyPath);
+
+        return $clone;
+    }
+
+    private function createPropertyPath(string|PropertyPathInterface|null $propertyPath): ?PropertyPathInterface
     {
         if (is_string($propertyPath)) {
             $propertyPath = new PropertyPath($propertyPath);
         }
 
-        $this->propertyPath = $propertyPath;
+        return $propertyPath;
     }
 }

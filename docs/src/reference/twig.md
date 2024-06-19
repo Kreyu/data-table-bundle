@@ -134,7 +134,6 @@ The following variables are common to every data table type:
 | `actions`                        | A list of actions defined for the data table.                                                                                          |
 | `filters`                        | A list of filters defined for the data table.                                                                                          |
 | `exporters`                      | A list of exporters defined for the data table.                                                                                        |
-| `column_count`                   | Holds count of the columns, respecting the personalization.                                                                            |
 | `filtration_form`                | Holds an instance of the filtration form view.                                                                                         |
 | `personalization_form`           | Holds an instance of the personalization form view.                                                                                    |
 | `export_form`                    | Holds an instance of the export form view.                                                                                             |

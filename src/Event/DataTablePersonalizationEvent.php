@@ -10,19 +10,35 @@ use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 class DataTablePersonalizationEvent extends DataTableEvent
 {
     public function __construct(
-        DataTableInterface $dataTable,
-        private PersonalizationData $personalizationData,
+        DataTableInterface          $dataTable,
+        private PersonalizationData $data,
     ) {
         parent::__construct($dataTable);
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function getPersonalizationData(): PersonalizationData
     {
-        return $this->personalizationData;
+        return $this->data;
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function setPersonalizationData(PersonalizationData $personalizationData): void
     {
-        $this->personalizationData = $personalizationData;
+        $this->data = $personalizationData;
+    }
+
+    public function getData(): PersonalizationData
+    {
+        return $this->data;
+    }
+
+    public function setData(PersonalizationData $data): void
+    {
+        $this->data = $data;
     }
 }

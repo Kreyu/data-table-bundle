@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Filter\Form\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
-use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FiltrationDataType extends AbstractType
+class FiltrationDataType extends AbstractType implements DataMapperInterface
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -25,11 +25,10 @@ class FiltrationDataType extends AbstractType
         $dataTable = $options['data_table'];
 
         foreach ($dataTable->getFilters() as $filter) {
-            $builder->add($filter->getFormName(), FilterDataType::class, $filter->getFormOptions() + [
-                'getter' => fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
-                'setter' => fn (FiltrationData $filtrationData, FilterData $filterData) => $filtrationData->setFilterData($filter, $filterData),
-            ]);
+            $builder->add($filter->getFormName(), FilterDataType::class, $filter->getFormOptions());
         }
+
+        $builder->setDataMapper($this);
     }
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
@@ -39,22 +38,9 @@ class FiltrationDataType extends AbstractType
          */
         $dataTable = $options['data_table'];
 
-        $dataTableView = $options['data_table_view'];
-
-        if (!$dataTableView instanceof DataTableView) {
-            throw new \LogicException('Unable to create filtration form view without the data table view.');
-        }
-
         $this->applyFormAttributeRecursively($view, $id = $view->vars['id']);
 
         $view->vars['attr']['id'] = $id;
-
-        foreach ($view as $name => $filterFormView) {
-            $filterView = $dataTableView->filters[$name];
-
-            $filterFormView->vars['label'] = $filterView->vars['label'];
-            $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
-        }
 
         $searchFields = [];
 
@@ -82,11 +68,10 @@ class FiltrationDataType extends AbstractType
                 'method' => 'GET',
                 'data_class' => FiltrationData::class,
                 'csrf_protection' => false,
-                'data_table_view' => null,
+                'allow_extra_fields' => true,
             ])
-            ->setRequired('data_table')
-            ->setAllowedTypes('data_table', DataTableInterface::class)
-            ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
+            ->setRequired('filters')
+            ->setAllowedTypes('filters', FilterInterface::class.'[]')
         ;
     }
 
@@ -97,5 +82,35 @@ class FiltrationDataType extends AbstractType
         foreach ($view->children as $child) {
             $this->applyFormAttributeRecursively($child, $id);
         }
+    }
+
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
+    {
+        if (!$viewData instanceof FiltrationData) {
+            return;
+        }
+
+        $forms = iterator_to_array($forms);
+
+        /** @var FormInterface[] $forms */
+
+        foreach ($viewData->getFilters() as $name => $filterData) {
+            $forms[$name]->setData($filterData);
+        }
+    }
+
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
+    {
+        $forms = iterator_to_array($forms);
+
+        /** @var FormInterface[] $forms */
+
+        $filters = [];
+
+        foreach ($forms as $name => $form) {
+            $filters[$name] = $form->getData();
+        }
+
+        $viewData = new FiltrationData(filters: $filters);
     }
 }

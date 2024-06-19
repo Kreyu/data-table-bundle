@@ -11,18 +11,34 @@ class DataTableSortingEvent extends DataTableEvent
 {
     public function __construct(
         DataTableInterface $dataTable,
-        private SortingData $sortingData,
+        private SortingData $data,
     ) {
         parent::__construct($dataTable);
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function getSortingData(): SortingData
     {
-        return $this->sortingData;
+        return $this->data;
     }
 
+    /**
+     * @deprecated use {@see setData()} instead
+     */
     public function setSortingData(SortingData $sortingData): void
     {
-        $this->sortingData = $sortingData;
+        $this->data = $sortingData;
+    }
+
+    public function getData(): SortingData
+    {
+        return $this->data;
+    }
+
+    public function setData(SortingData $data): void
+    {
+        $this->data = $data;
     }
 }

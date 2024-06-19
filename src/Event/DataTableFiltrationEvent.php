@@ -11,18 +11,34 @@ class DataTableFiltrationEvent extends DataTableEvent
 {
     public function __construct(
         DataTableInterface $dataTable,
-        private FiltrationData $filtrationData,
+        private FiltrationData $data,
     ) {
         parent::__construct($dataTable);
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function getFiltrationData(): FiltrationData
     {
-        return $this->filtrationData;
+        return $this->data;
     }
 
+    /**
+     * @deprecated use {@see getData()} instead
+     */
     public function setFiltrationData(FiltrationData $filtrationData): void
     {
-        $this->filtrationData = $filtrationData;
+        $this->data = $filtrationData;
+    }
+
+    public function getData(): FiltrationData
+    {
+        return $this->data;
+    }
+
+    public function setData(FiltrationData $data): void
+    {
+        $this->data = $data;
     }
 }

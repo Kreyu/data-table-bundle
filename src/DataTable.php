@@ -61,6 +61,21 @@ class DataTable implements DataTableInterface
      */
     private array $actions = [];
 
+    /**
+     * @var array<string, ActionInterface>
+     */
+    private array $batchActions = [];
+
+    /**
+     * @var array<string, ActionInterface>
+     */
+    private array $rowActions = [];
+
+    /**
+     * @var array<string, ExporterInterface>
+     */
+    private array $exporters = [];
+
     private ?SortingData $sortingData = null;
 
     private ?PaginationData $paginationData = null;

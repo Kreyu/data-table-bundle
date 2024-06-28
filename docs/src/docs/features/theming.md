@@ -124,7 +124,7 @@ you can provide your own theme with only a fraction of Twig blocks,
 using the built-in themes as a fallback, for example:
 
 ```twig
-{# templates/data_table/theme.html.twig #}
+{# themes/data_table.html.twig #}
 {% block column_boolean_value %}
     {# ... #}
 {% endblock %}
@@ -135,7 +135,7 @@ using the built-in themes as a fallback, for example:
 kreyu_data_table:
   defaults:
     themes:
-      - 'templates/data_table/theme.html.twig',
+      - 'themes/data_table.html.twig',
       - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
 
@@ -144,7 +144,7 @@ use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
     $config->defaults()->themes([
-        'templates/data_table/theme.html.twig',
+        'themes/data_table.html.twig',
         '@KreyuDataTable/themes/bootstrap_5.html.twig',
     ]);
 };
@@ -160,7 +160,7 @@ class ProductDataTableType extends AbstractDataTableType
     {
         $resolver->setDefaults([
             'themes' => [
-                'templates/data_table/theme.html.twig',
+                'themes/data_table.html.twig',
                 '@KreyuDataTable/themes/bootstrap_5.html.twig',
             ],
         ]);
@@ -184,7 +184,7 @@ class ProductController extends AbstractController
             query: $query,
             options: [
                 'themes' => [
-                    'templates/data_table/theme.html.twig',
+                    'themes/data_table.html.twig',
                     '@KreyuDataTable/themes/bootstrap_5.html.twig',
                 ],
             ],
@@ -197,7 +197,7 @@ class ProductController extends AbstractController
 <div class="card">
     {{ data_table(products, { 
         themes: [
-            'templates/data_table/theme.html.twig',
+            'themes/data_table.html.twig',
             '@KreyuDataTable/themes/bootstrap_5.html.twig',
         ]
     }) }}

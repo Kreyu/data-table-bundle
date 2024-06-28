@@ -10,8 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EnumColumnType extends AbstractColumnType
 {
-    public function __construct(private ?TranslatorInterface $translator)
-    {
+    public function __construct(
+        private ?TranslatorInterface $translator,
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

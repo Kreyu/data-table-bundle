@@ -8,7 +8,6 @@ use Kreyu\Bundle\DataTableBundle\Twig\DataTableExtension;
 use Kreyu\Bundle\DataTableBundle\Twig\DataTableThemeNode;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Test\Traits\RuntimeLoaderProvider;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
@@ -19,8 +18,6 @@ use Twig\Node\Node;
 
 class DataTableThemeNodeTest extends TestCase
 {
-    use RuntimeLoaderProvider;
-
     public function testConstructor()
     {
         $dataTable = new NameExpression('data_table', 0);

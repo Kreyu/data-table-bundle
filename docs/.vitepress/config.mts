@@ -91,6 +91,7 @@ export default defineConfig({
                 { text: 'DateTime', link: '/reference/types/column/date-time' },
                 { text: 'DatePeriod', link: '/reference/types/column/date-period' },
                 { text: 'Collection', link: '/reference/types/column/collection' },
+                { text: 'Enum', link: '/reference/types/column/enum' },
                 { text: 'Template', link: '/reference/types/column/template' },
                 { text: 'Actions', link: '/reference/types/column/actions' },
                 { text: 'Checkbox', link: '/reference/types/column/checkbox' },

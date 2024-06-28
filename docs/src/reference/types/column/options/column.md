@@ -7,6 +7,10 @@ const props = defineProps({
             property_path: 'null',
         },
     },
+    excludedOptions: {
+        type: Array,
+        default: ['test'],
+    },
 })
 </script>
 
@@ -100,6 +104,8 @@ Allows you to add a custom block prefix and override the block name used to rend
 Useful for example if you have multiple instances of the same column type, and you need to personalize
 the rendering of some of them, without the need to create a new column type.
 
+<span v-if="!excludedOptions.includes('formatter')">
+
 ### `formatter`
 
 - **type**: `null` or `callable`
@@ -114,6 +120,8 @@ $builder
     ])
 ;
 ```
+
+</span>
 
 ### `export`
 

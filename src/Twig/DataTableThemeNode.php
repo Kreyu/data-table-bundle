@@ -22,7 +22,7 @@ class DataTableThemeNode extends Node
             ->subcompile($this->getNode('data_table'))
             ->raw(', ')
             ->subcompile($this->getNode('themes'))
-            ->raw(sprintf(", %s);\n", $this->getAttribute('only') ? 'true' : 'false'));
+            ->raw(sprintf(", %s);\n", $this->getAttribute('only') ? 'true' : 'false'))
         ;
     }
 }

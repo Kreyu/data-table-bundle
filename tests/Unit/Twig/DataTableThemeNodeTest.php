@@ -35,7 +35,7 @@ class DataTableThemeNodeTest extends TestCase
     }
 
     #[DataProvider('provideCompileCases')]
-    public function testCompile(DataTableThemeNode $node, string $expected)
+    public function testCompile(DataTableThemeNode $node, array $expected)
     {
         $environment = new Environment($this->createMock(LoaderInterface::class));
 
@@ -45,7 +45,13 @@ class DataTableThemeNodeTest extends TestCase
 
         $compiler = new Compiler($environment);
 
-        $this->assertEquals($expected, trim($compiler->compile($node)->getSource()));
+        // In Twig 2, the ["foo", "bar"] is parsed with as [0 => "foo", 1 => "bar"].
+        // In Twig 3, the ["foo", "bar"] is parsed with as ["foo", "bar"].
+        // For compatibility, we are checking whether the compiled value is equal to one of the expected values.
+        $this->assertThat(trim($compiler->compile($node)->getSource()), $this->logicalOr(
+            $this->equalTo($expected[0]),
+            $this->equalTo($expected[1]),
+        ));
     }
 
     public static function provideCompileCases(): iterable
@@ -60,8 +66,10 @@ class DataTableThemeNodeTest extends TestCase
                 0,
                 'data_table_theme',
                 false,
-            ),
-            '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo"], false);',
+            ), [
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo"], false);',
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), [0 => "foo"], false);',
+            ],
         ];
 
         yield 'multiple themes without only' => [
@@ -76,8 +84,10 @@ class DataTableThemeNodeTest extends TestCase
                 0,
                 'data_table_theme',
                 false,
-            ),
-            '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo", "bar"], false);',
+            ), [
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo", "bar"], false);',
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), [0 => "foo", 1 => "bar"], false);',
+            ],
         ];
 
         yield 'multiple themes with only' => [
@@ -92,8 +102,10 @@ class DataTableThemeNodeTest extends TestCase
                 0,
                 'data_table_theme',
                 true,
-            ),
-            '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo", "bar"], true);',
+            ), [
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), ["foo", "bar"], true);',
+                '$this->env->getExtension("Kreyu\\Bundle\\DataTableBundle\\Twig\\DataTableExtension")->setDataTableThemes(($context["data_table"] ?? null), [0 => "foo", 1 => "bar"], true);',
+            ],
         ];
     }
 }

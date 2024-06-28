@@ -19,6 +19,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\MoneyColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\EnumColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
@@ -135,5 +136,11 @@ return static function (ContainerConfigurator $configurator) {
             service(UrlGeneratorInterface::class),
         ])
         ->alias(ColumnSortUrlGeneratorInterface::class, 'kreyu_data_table.column.column_sort_url_generator')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.enum', EnumColumnType::class)
+        ->args([service('translator')->nullOnInvalid()])
+        ->tag('kreyu_data_table.column.type')
     ;
 };

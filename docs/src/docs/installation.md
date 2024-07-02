@@ -14,7 +14,7 @@ This bundle can be installed at any moment during a project’s lifecycle.
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
 ```shell
-composer require kreyu/data-table-bundle 0.17.*
+composer require kreyu/data-table-bundle 0.18.*
 ```
 
 ::: danger This bundle is not production ready!

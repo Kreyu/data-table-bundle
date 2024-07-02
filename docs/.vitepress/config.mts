@@ -13,9 +13,12 @@ export default defineConfig({
     externalLinkIcon: true,
     outline: 'deep',
 
+    search: {
+      provider: 'local',
+    },
+
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
       { text: 'Documentation', link: '/docs/introduction', activeMatch: '/docs/' },
       { text: 'Reference', link: '/reference/types/data-table', activeMatch: '/reference/' },
     ],

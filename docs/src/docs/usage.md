@@ -33,18 +33,19 @@ In most cases, the data tables are created in the controller, using the `createD
 
 ```php
 use App\Repository\ProductRepository;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait; // [!code highlight]
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait; // [!code ++]
 
 class ProductController extends AbstractController
 {
-    use DataTableFactoryAwareTrait; // [!code ++]
+    use DataTableFactoryAwareTrait; // [!code highlight]
 
     public function index(ProductRepository $productRepository)
     {
-        $query = $productRepository->createQueryBuilder('product'); // [!code ++]
+        $queryBuilder = $productRepository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTable(ProductDataTableType::class, $query); // [!code ++]
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $queryBuilder);
     }
 }
 ```
@@ -64,23 +65,27 @@ In order to be able to paginate, sort, filter, personalize or export the data ta
 
 ```php
 use App\Repository\ProductRepository;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 
 class ProductController extends AbstractController
 {
     use DataTableFactoryAwareTrait;
     
-    public function index(Request $request, ProductRepository $productRepository)
+    public function index(ProductRepository $productRepository) // [!code --]
+    public function index(Request $request, ProductRepository $productRepository) // [!code ++]
     {
-        $query = $productRepository->createQueryBuilder('product');
+        $queryBuilder = $productRepository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $queryBuilder);
         $dataTable->handleRequest($request); // [!code ++]
     }
 }
 ```
+
+This method calls the [request handler](./features/extensibility.md#request-handlers) to handle all the hard work.
 
 ## Rendering the data tables
 
@@ -88,9 +93,10 @@ In order to render the data table, create the data table view and pass it to the
 
 ```php
 use App\Repository\ProductRepository;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 
 class ProductController extends AbstractController
 {
@@ -98,22 +104,26 @@ class ProductController extends AbstractController
     
     public function index(Request $request, ProductRepository $productRepository)
     {
-        $query = $productRepository->createQueryBuilder('product');
+        $queryBuilder = $productRepository->createQueryBuilder('product');
 
-        $dataTable = $this->createDataTable(ProductDataTableType::class, $query);
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $queryBuilder);
         $dataTable->handleRequest($request);
         
-        return $this->render('product/index.html.twig', [
+        return $this->render('product/index.html.twig', [ // [!code ++]
             'products' => $dataTable->createView(), // [!code ++]
-        ]);
+        ]); // [!code ++]
     }
 }
 ```
 
+:::tip Don't forget to call the `createView()` method!
+This creates a `DataTableView` object, used to render the data table.
+:::
+
 Now, in the template, render the data table using the `data_table` function:
 
 ```twig
-{# product/index.html.twig #}
+{# templates/product/index.html.twig #}
 
 <div class="card">
     {{ data_table(products) }}

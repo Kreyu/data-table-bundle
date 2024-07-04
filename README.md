@@ -1,4 +1,4 @@
-# DataTableBundle
+# DataTableBundle 
 
 <img align="right" width="200px" src="./docs/src/public/logo.png"/>
 

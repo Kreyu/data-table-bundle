@@ -34,10 +34,10 @@ final class LinkActionType extends AbstractActionType
         $resolver
             ->setDefaults([
                 'href' => '#',
-                'target' => '_self',
+                'target' => null,
             ])
             ->setAllowedTypes('href', ['string', 'callable'])
-            ->setAllowedTypes('target', ['string', 'callable'])
+            ->setAllowedTypes('target', ['null', 'string', 'callable'])
         ;
     }
 }

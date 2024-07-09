@@ -7,6 +7,7 @@ use Kreyu\Bundle\DataTableBundle\DataCollector\DataTableDataExtractor;
 use Kreyu\Bundle\DataTableBundle\DataCollector\Type\DataCollectorTypeExtension;
 use Kreyu\Bundle\DataTableBundle\Debug\TraceableDataTableFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $container) {

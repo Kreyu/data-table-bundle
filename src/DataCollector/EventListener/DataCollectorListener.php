@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\DataCollector\EventListener;
@@ -10,8 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DataCollectorListener implements EventSubscriberInterface
 {
-    public function __construct(readonly private DataTableDataCollectorInterface $dataCollector)
-    {
+    public function __construct(
+        readonly private DataTableDataCollectorInterface $dataCollector,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

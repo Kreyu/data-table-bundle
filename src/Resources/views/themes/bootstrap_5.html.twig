@@ -717,9 +717,9 @@
         </button>
         <ul class="dropdown-menu" id="linkList" aria-labelledby="dropdownMenuButton"
             data-kreyu--data-table-bundle--dropdown-target="content">
-            <li><a class="dropdown-item" href="https://example.com">Lien 1</a></li>
-            <li><a class="dropdown-item" href="https://example.com">Lien 2</a></li>
-            <li><a class="dropdown-item" href="https://example.com">Lien 3</a></li>
+            {% for action in actions %}
+                <li><a class="dropdown-item" href="https://example.com">Lien 1</a></li>
+            {% endfor %}
         </ul>
     </div>
 {% endblock %}

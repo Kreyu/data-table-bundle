@@ -11,7 +11,7 @@ class DropdownActionType extends AbstractActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        $view->vars['actions'] = $options['actions'];
+        $view->vars['actions'] = [];
     }
 
     public function configureOptions(OptionsResolver $resolver): void

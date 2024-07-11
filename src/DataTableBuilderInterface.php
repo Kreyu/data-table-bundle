@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Builder\RowActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
@@ -15,7 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
-interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
+interface DataTableBuilderInterface extends DataTableConfigBuilderInterface, RowActionBuilderInterface
 {
     public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
 
@@ -139,25 +140,6 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
      * @return array<ActionBuilderInterface>
      */
     public function getRowActions(): array;
-
-    /**
-     * @throws InvalidArgumentException if row action of given name does not exist
-     */
-    public function getRowAction(string $name): ActionBuilderInterface;
-
-    public function hasRowAction(string $name): bool;
-
-    /**
-     * @param class-string<ActionTypeInterface>|null $type
-     */
-    public function createRowAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface;
-
-    /**
-     * @param class-string<ActionTypeInterface>|null $type
-     */
-    public function addRowAction(ActionBuilderInterface|string $action, ?string $type = null, array $options = []): static;
-
-    public function removeRowAction(string $name): static;
 
     public function isAutoAddingActionsColumn(): bool;
 

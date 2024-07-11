@@ -195,6 +195,15 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
     }
 
+    public function createColumn(string $name, ?string $type = null, array $options = []): ColumnBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getColumnFactory()->createNamedBuilder($name, $type ?? TextColumnType::class, $options);
+    }
+
     public function addColumn(ColumnBuilderInterface|string $column, ?string $type = null, array $options = []): static
     {
         if ($this->locked) {
@@ -261,6 +270,15 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
+    }
+
+    public function createFilter(string $name, ?string $type = null, array $options = []): FilterBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getFilterFactory()->createNamedBuilder($name, $type ?? FilterType::class, $options);
     }
 
     public function addFilter(string|FilterBuilderInterface $filter, ?string $type = null, array $options = []): static
@@ -371,6 +389,15 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         throw new InvalidArgumentException(sprintf('The action with the name "%s" does not exist.', $name));
     }
 
+    public function createAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getActionFactory()->createNamedBuilder($name, $type ?? ButtonActionType::class, $options);
+    }
+
     public function addAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
     {
         if ($this->locked) {
@@ -446,6 +473,18 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         return isset($this->batchActions[$name]) || isset($this->unresolvedBatchActions[$name]);
+    }
+
+    public function createBatchAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getActionFactory()
+            ->createNamedBuilder($name, $type ?? ButtonActionType::class, $options)
+            ->setContext(ActionContext::Batch)
+        ;
     }
 
     public function addBatchAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
@@ -536,6 +575,18 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return isset($this->rowActions[$name]) || isset($this->unresolvedRowActions[$name]);
     }
 
+    public function createRowAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getActionFactory()
+            ->createNamedBuilder($name, $type ?? ButtonActionType::class, $options)
+            ->setContext(ActionContext::Row)
+        ;
+    }
+
     public function addRowAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
     {
         if ($this->locked) {
@@ -613,6 +664,15 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         throw new InvalidArgumentException(sprintf('The exporter with the name "%s" does not exist.', $name));
+    }
+
+    public function createExporter(string $name, ?string $type = null, array $options = []): ExporterBuilderInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getExporterFactory()->createNamedBuilder($name, $type ?? ExporterType::class, $options);
     }
 
     public function addExporter(string|ExporterBuilderInterface $exporter, ?string $type = null, array $options = []): static

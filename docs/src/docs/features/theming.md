@@ -82,12 +82,33 @@ class ProductController extends AbstractController
 }
 ```
 
-Last but not least, you can also overwrite the themes of the data table inside a template:
+## Applying themes in Twig
+
+Similar to forms, you can set the data table themes directly in the Twig template, by using the `data_table_theme` tag:
 
 ```twig
-<div class="card">
-    {{ data_table(products, { themes: ['@KreyuDataTable/themes/bootstrap_5.html.twig'] }) }}
-</div>
+{% data_table_theme products 'themes/data_table.html.twig' %}
+
+{{ data_table(products) }}
+```
+
+If you wish to use multiple themes, pass an array using the `with` keyword:
+
+```twig
+{% data_table_theme products with [
+    'themes/data_table.html.twig', 
+    '@KreyuDataTable/themes/bootstrap_5.html.twig',
+] %}
+
+{{ data_table(products) }}
+```
+
+If you wish to disable currently configured themes for the data table and **only** use given ones, add the `only` keyword after the list of data table themes:
+
+```twig
+{% data_table_theme products with ['themes/data_table.html.twig'] only %}
+
+{{ data_table(products) }}
 ```
 
 ## Customizing existing theme
@@ -103,7 +124,7 @@ you can provide your own theme with only a fraction of Twig blocks,
 using the built-in themes as a fallback, for example:
 
 ```twig
-{# templates/data_table/theme.html.twig #}
+{# themes/data_table.html.twig #}
 {% block column_boolean_value %}
     {# ... #}
 {% endblock %}
@@ -114,7 +135,7 @@ using the built-in themes as a fallback, for example:
 kreyu_data_table:
   defaults:
     themes:
-      - 'templates/data_table/theme.html.twig',
+      - 'themes/data_table.html.twig',
       - '@KreyuDataTable/themes/bootstrap_5.html.twig'
 ```
 
@@ -123,7 +144,7 @@ use Symfony\Config\KreyuDataTableConfig;
 
 return static function (KreyuDataTableConfig $config) {
     $config->defaults()->themes([
-        'templates/data_table/theme.html.twig',
+        'themes/data_table.html.twig',
         '@KreyuDataTable/themes/bootstrap_5.html.twig',
     ]);
 };
@@ -139,7 +160,7 @@ class ProductDataTableType extends AbstractDataTableType
     {
         $resolver->setDefaults([
             'themes' => [
-                'templates/data_table/theme.html.twig',
+                'themes/data_table.html.twig',
                 '@KreyuDataTable/themes/bootstrap_5.html.twig',
             ],
         ]);
@@ -163,7 +184,7 @@ class ProductController extends AbstractController
             query: $query,
             options: [
                 'themes' => [
-                    'templates/data_table/theme.html.twig',
+                    'themes/data_table.html.twig',
                     '@KreyuDataTable/themes/bootstrap_5.html.twig',
                 ],
             ],
@@ -176,7 +197,7 @@ class ProductController extends AbstractController
 <div class="card">
     {{ data_table(products, { 
         themes: [
-            'templates/data_table/theme.html.twig',
+            'themes/data_table.html.twig',
             '@KreyuDataTable/themes/bootstrap_5.html.twig',
         ]
     }) }}

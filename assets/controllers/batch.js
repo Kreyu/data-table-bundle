@@ -41,8 +41,12 @@ export default class extends Controller {
     #updateBatchActionBar() {
         const uniqueSelectedCount = this.#getUniqueSelectedCount();
 
-        this.selectedCounterTarget.innerHTML = uniqueSelectedCount;
-        this.batchActionBarTarget.hidden = uniqueSelectedCount === 0;
+        if (this.hasSelectedCounterTarget) {
+            this.selectedCounterTarget.innerHTML = uniqueSelectedCount;
+        }
+        if (this.hasBatchActionBarTarget) {
+            this.batchActionBarTarget.hidden = uniqueSelectedCount === 0;
+        }
     }
 
     #updateIndeterminateStates() {

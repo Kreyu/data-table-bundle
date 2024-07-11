@@ -708,6 +708,22 @@
     {% endif %}
 {% endblock %}
 
+{% block action_dropdown_value %}
+    <div class="dropdown" data-controller="kreyu--data-table-bundle--dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false"
+            data-action="kreyu--data-table-bundle--dropdown#toggle"
+        >
+            {{- block('action_value', theme, _context) -}}
+        </button>
+        <ul class="dropdown-menu" id="linkList" aria-labelledby="dropdownMenuButton"
+            data-kreyu--data-table-bundle--dropdown-target="content">
+            <li><a class="dropdown-item" href="https://example.com">Lien 1</a></li>
+            <li><a class="dropdown-item" href="https://example.com">Lien 2</a></li>
+            <li><a class="dropdown-item" href="https://example.com">Lien 3</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
 {% block sort_arrow_none %}
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-expand" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M3.646 9.146a.5.5 0 0 1 .708 0L8 12.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-2.292a.5.5 0 0 0 .708 0L8 3.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708z"/>

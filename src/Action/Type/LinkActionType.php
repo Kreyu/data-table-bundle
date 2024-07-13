@@ -26,6 +26,7 @@ final class LinkActionType extends AbstractActionType
         $view->vars = array_replace($view->vars, [
             'href' => $options['href'],
             'target' => $options['target'],
+            'link_attr' => $options['link_attr'],
         ]);
     }
 
@@ -35,6 +36,7 @@ final class LinkActionType extends AbstractActionType
             ->setDefaults([
                 'href' => '#',
                 'target' => '_self',
+                'link_attr' => [],
             ])
             ->setAllowedTypes('href', ['string', 'callable'])
             ->setAllowedTypes('target', ['string', 'callable'])

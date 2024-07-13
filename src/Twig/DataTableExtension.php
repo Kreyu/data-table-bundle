@@ -40,9 +40,6 @@ class DataTableExtension extends AbstractExtension
             'data_table_header_row' => $this->renderHeaderRow(...),
             'data_table_value_row' => $this->renderValueRow(...),
             'data_table_column_label' => $this->renderColumnLabel(...),
-            'data_table_column_header' => $this->renderColumnHeader(...),
-            'data_table_column_value' => $this->renderColumnValue(...),
-            'data_table_action' => $this->renderAction(...),
             'data_table_pagination' => $this->renderPagination(...),
             'data_table_filters_form' => $this->renderFiltersForm(...),
             'data_table_personalization_form' => $this->renderPersonalizationForm(...),
@@ -61,6 +58,36 @@ class DataTableExtension extends AbstractExtension
             ]);
         }
 
+        $functions[] = new TwigFunction('data_table_theme_block_old', $this->renderThemeViewBlock(...), [
+            'needs_environment' => true,
+            'needs_context' => true,
+            'is_safe' => ['html'],
+        ]);
+
+        $functions[] = new TwigFunction('data_table_column_header', $this->renderView(...), [
+            'needs_environment' => true,
+            'needs_context' => true,
+            'is_safe' => ['html'],
+        ]);
+
+        $functions[] = new TwigFunction('data_table_column_value', $this->renderView(...), [
+            'needs_environment' => true,
+            'needs_context' => true,
+            'is_safe' => ['html'],
+        ]);
+
+        $functions[] = new TwigFunction('data_table_action', $this->renderView(...), [
+            'needs_environment' => true,
+            'needs_context' => true,
+            'is_safe' => ['html'],
+        ]);
+
+        $functions[] = new TwigFunction('data_table_theme_block', $this->renderThemeBlock(...), [
+            'needs_environment' => true,
+            'needs_context' => true,
+            'is_safe' => ['html'],
+        ]);
+
         return $functions;
     }
 
@@ -74,7 +101,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             dataTable: $this->getDecoratedDataTable($view, $variables),
-            blockName: 'kreyu_data_table',
+            blockName: 'data_table',
             context: array_merge($view->vars, $variables),
         );
     }
@@ -170,19 +197,33 @@ class DataTableExtension extends AbstractExtension
         );
     }
 
-    /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
-     */
-    public function renderColumnHeader(Environment $environment, ColumnHeaderView $view, array $variables = []): string
+    public function renderView(Environment $environment, array $context, ColumnHeaderView|ColumnValueView|ActionView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
-            blockName: 'kreyu_data_table_column_header',
-            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'header'),
-        );
+        [$prefix, $suffix] = match ($view::class) {
+            ColumnHeaderView::class => ['column', 'header'],
+            ColumnValueView::class => ['column', 'value'],
+            ActionView::class => ['action', 'control'],
+        };
+
+        $blockNames = [];
+
+        foreach ($view->vars['block_prefixes'] as $blockPrefix) {
+            if ($prefix === $blockPrefix) {
+                $parts = [$prefix, $suffix];
+            } else {
+                $parts = [$prefix, $blockPrefix, $suffix];
+            }
+
+            $blockName = implode('_', array_filter($parts));
+
+            $blockNames[] = $blockName;
+
+            if ($content = $this->renderThemeBlock($environment, array_merge($context, $view->vars, $vars), $blockName)) {
+                return $content;
+            }
+        }
+
+        throw new RuntimeError('tried: '.implode(', ', $blockNames));
     }
 
     /**
@@ -229,7 +270,7 @@ class DataTableExtension extends AbstractExtension
         return $this->renderBlock(
             environment: $environment,
             dataTable: $this->getDecoratedDataTable($view->parent, $variables),
-            blockName: 'kreyu_data_table_pagination',
+            blockName: 'pagination',
             context: array_merge($view->vars, $variables),
         );
     }
@@ -307,6 +348,52 @@ class DataTableExtension extends AbstractExtension
         }
 
         return $this->columnSortUrlGenerator->generate(...$columnHeaderViews);
+    }
+
+    public function renderThemeViewBlock(Environment $environment, array $context, ColumnHeaderView|ColumnValueView|ActionView $view): string
+    {
+        $dataTable = $view->getDataTable();
+
+        [$prefix, $suffix] = match ($view::class) {
+            ColumnHeaderView::class => ['column', 'header'],
+            ColumnValueView::class => ['column', 'value'],
+            ActionView::class => ['action', 'control'],
+        };
+
+        foreach ($view->vars['block_prefixes'] as $blockPrefix) {
+            $blockName = $blockPrefix.'_'.$suffix;
+
+            if ($prefix !== $blockPrefix) {
+                $blockName = $prefix.'_'.$blockName;
+            }
+
+            foreach ($dataTable->vars['themes'] as $theme) {
+                $wrapper = $environment->load($theme);
+
+                if ($wrapper->hasBlock($blockName, $context)) {
+                    return $wrapper->renderBlock($blockName, array_merge($context, $view->vars, ['themes' => $dataTable->vars['themes']]));
+                }
+            }
+        }
+
+        throw new \Exception('Block not found.');
+    }
+
+    public function renderThemeBlock(Environment $environment, array $context, string $blockName, array $themes = []): ?string
+    {
+        if (empty($themes)){
+            $themes = $context['themes'];
+        }
+
+        foreach ($themes as $theme) {
+            $wrapper = $environment->load($theme);
+
+            if ($wrapper->hasBlock($blockName, $context)) {
+                return $wrapper->renderBlock($blockName, $context);
+            }
+        }
+
+        return null;
     }
 
     /**

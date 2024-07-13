@@ -1,0 +1,108 @@
+{% extends '@KreyuDataTable/themes/new_base.html.twig' %}
+
+{# Bootstrap 5 Theme #}
+{# @see https://getbootstrap.com/ #}
+
+{% block table %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            {{ block('table_head') }}
+            {{ block('table_body') }}
+        </table>
+    </div>
+{% endblock %}
+
+
+{# --- Pagination ----------------------------------------------------------- #}
+
+{% block pagination %}
+    <div class="card-footer">
+        <div class="pagination d-flex gap-3 flex-wrap justify-content-center align-items-center">
+            {{ block('pagination_counters') }}
+            <div class="d-flex col"></div>
+            {{ block('pagination_controls') }}
+            <div class="d-flex col"></div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block pagination_page %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_page_active %}
+    <div class="page-item active">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_first %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_first_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_previous %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_previous_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_last %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_next %}
+    <div class="page-item">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block pagination_next_disabled %}
+    <div class="page-item disabled">
+        {% with { attr: { class: 'page-link' } } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}

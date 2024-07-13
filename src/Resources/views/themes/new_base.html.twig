@@ -1,0 +1,426 @@
+{% trans_default_domain 'KreyuDataTable' %}
+
+{# Base HTML Theme #}
+
+{% block data_table %}
+    <turbo-frame id="kreyu_data_table_{{ name }}">
+        {% if filtration_enabled %}
+            {{ block('filtration_form') }}
+        {% endif %}
+
+        {{ block('table') }}
+
+        {% if pagination_enabled and pagination.vars.page_count > 1 %}
+            {% with pagination.vars only %}
+                {{ block('pagination') }}
+            {% endwith %}
+        {% endif %}
+    </turbo-frame>
+{% endblock %}
+
+{% block table %}
+    <table>
+        {{ block('table_head') }}
+        {{ block('table_body') }}
+    </table>
+{% endblock %}
+
+{% block table_head %}
+    <thead>
+        {% for row in [header_row] %}
+            {% with row.vars|merge({ children: row.children }) only %}
+                {{ block('header_row') }}
+            {% endwith %}
+        {% endfor %}
+    </thead>
+{% endblock %}
+
+{% block table_body %}
+    <tbody>
+        {% for row in value_rows %}
+            {% with row.vars|merge({ children: row.children }) only %}
+                {{ block('value_row') }}
+            {% endwith %}
+        {% endfor %}
+    </tbody>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\HeaderRowView #}
+{% block header_row %}
+    <tr{{ block('attributes') }}>
+        {% for column in children %}
+            {% set block = data_table_theme_block(column) %}
+
+            {% with { block, ...column.vars } only %}
+                <th{{ block('attributes') }}>
+                    {{ block(block.name, block.template ?? _self) }}
+                </th>
+            {% endwith %}
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\ValueRowView #}
+{% block value_row %}
+    <tr{{ block('attributes') }}>
+        {% for column in children %}
+            {% set block = data_table_theme_block(column) %}
+
+            {% with { block, ...column.vars } only %}
+                <td{{ block('attributes') }}>
+                    {{ block(block.name, block.template ?? _self) }}
+                </td>
+            {% endwith %}
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{# --- Column types ----------------------------------------------------------- #}
+
+{% block column_label %}
+    {% if translation_domain is not same as false %}
+        <span>{{ label|trans(translation_parameters, translation_domain) }}</span>
+    {% else %}
+        <span>{{ label }}</span>
+    {% endif %}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
+{% block column_header %}
+    {% if data_table.vars.sorting_enabled and sortable %}
+        <a href="{{ _self.current_route_path({ (sort_parameter_name): { (name): sort_direction|lower == 'desc' ? 'asc' : 'desc' } }) }}" data-turbo-action="advance">
+            {{ block('column_label') }}
+
+            {% if sorted %}
+                {% if sort_direction == 'asc' %}
+                    {{ block('column_sort_arrow_asc') }}
+                {% else %}
+                    {{ block('column_sort_arrow_desc') }}
+                {% endif %}
+            {% else %}
+                {{ block('column_sort_arrow_none') }}
+            {% endif %}
+        </a>
+    {% else %}
+        {{ block('column_label') }}
+    {% endif %}
+{% endblock %}
+
+{% block column_sort_arrow_none '' %}
+
+{% block column_sort_arrow_asc '↑' %}
+
+{% block column_sort_arrow_desc '↓' %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
+{% block column_value -%}
+    {% if translation_domain is not same as false %}
+        {{- value|trans({}, translation_domain) -}}
+    {% else %}
+        {{- value -}}
+    {% endif %}
+{%- endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType #}
+{% block column_text_value -%}
+    {{- block('column_value') -}}
+{%- endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType #}
+{% block column_number_value %}
+    {% if value is not null and use_intl_formatter %}
+        {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
+    {% endif %}
+
+    {{- block('column_text_value') -}}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType #}
+{% block column_boolean_value %}
+    {% with { value: value ? label_true : label_false } %}
+        {{- block('column_text_value') -}}
+    {% endwith %}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\MoneyColumnType #}
+{% block column_money_value %}
+    {% if value is not null and use_intl_formatter %}
+        {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
+    {% endif %}
+
+    {{- block('column_text_value') -}}
+
+    {%- if value is not null and not use_intl_formatter -%}
+        {{ currency }}
+    {%- endif -%}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType #}
+{% block column_link_value %}
+    <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+        {{- block('column_text_value') -}}
+    </a>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType #}
+{% block column_date_time_value %}
+    {% with { value: value ? value|date(format, timezone) : value } %}
+        {{- block('column_text_value') -}}
+    {% endwith %}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType #}
+{% block column_date_period_value %}
+    {% with { value: value ? value.start|date(format, timezone) ~ separator ~ value.end|date(format, timezone) : value } %}
+        {{- block('column_text_value') -}}
+    {% endwith %}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType #}
+{% block column_collection_value %}
+    {# Note: do **not** remove the HTML comments below, because it makes sure the separator is rendered properly. #}
+    {% apply spaceless %}
+        {% for child in children %}
+            {% set block = data_table_theme_block(child) %}
+
+            {% with { loop, separator, block, ...child.vars } only %}
+                {% if not loop.first %}-->{% endif %}
+                {{- block(block.name, block.template ?? _self) -}}<!--
+                -->{% if not loop.last %}{{- separator -}}<!--{% endif %}
+            {% endwith %}
+        {% endfor %}
+    {% endapply %}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType #}
+{% block column_template_value %}
+    {{- include(template_path, template_vars) -}}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType #}
+{% block column_actions_value %}
+    {% for action in actions %}
+        {% set block = data_table_theme_block(action) %}
+
+        {% with { block, ...action.vars } only %}
+            {{- block(block.name, block.template ?? _self) -}}
+        {% endwith %}
+    {% endfor %}
+{% endblock %}
+
+{# --- Actions -------------------------------------------------------------- #}
+
+{% block action_value_icon '' %}
+
+{% block action_label %}
+    {{- label|trans(translation_parameters, translation_domain) -}}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Action\Type\ActionType #}
+{% block action_control %}
+    {% if icon_attr %}
+        {% with { attr: icon_attr } %}
+            {{ block('action_value_icon') }}
+        {% endwith %}
+    {% endif %}
+
+    {{ block('action_label') }}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType #}
+{% block action_link_control %}
+    <a {% with { attr: link_attr|merge({ href, target }) } %}{{- block('attributes') -}}{% endwith %}>
+        {{- block('action_control') -}}
+    </a>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
+{% block action_button_control %}
+    <form method="get" action="{{ href }}" target="{{ target }}" style="display: inline;">
+        <input type="submit" value="{{ block('action_label') }}" />
+    </form>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
+{% block action_form_control %}
+    {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
+
+    <form id="{{ form_id }}" {{- block('attributes') -}}>
+        <input type="hidden" name="_method" value="{{ method }}"/>
+
+        {% set button_tag = button_tag|default('button') %}
+
+        <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
+            {{- block('action_control', theme, _context) -}}
+        </{{ button_tag }}>
+    </form>
+{% endblock %}
+
+{# --- Pagination ----------------------------------------------------------- #}
+
+{% block pagination %}
+    {{ block('pagination_counters') }}
+    {{ block('pagination_controls') }}
+{% endblock %}
+
+{% block pagination_counters %}
+    {{ block('pagination_counters_message') }}
+{% endblock %}
+
+{% block pagination_counters_message %}
+    {{- 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
+        '%current_page_first_item_index%': current_page_first_item_index|number_format(0, '', ' '),
+        '%current_page_last_item_index%': current_page_last_item_index|number_format(0, '', ' '),
+        '%total_item_count%': total_item_count|number_format(0, '', ' ')
+    }, 'KreyuDataTable') -}}
+{% endblock %}
+
+{% macro pagination_page_path(page_parameter_name, page) %}
+    {{- path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page })) -}}
+{% endmacro %}
+
+{% block pagination_controls %}
+    {% if has_previous_page %}
+        {{ block('pagination_first') }}
+        {{ block('pagination_previous') }}
+    {% else %}
+        {{ block('pagination_first_disabled') }}
+        {{ block('pagination_previous_disabled') }}
+    {% endif %}
+
+    {% for page_number in range(first_visible_page_number, last_visible_page_number) %}
+        {% if page_number == current_page_number %}
+            {{ block('pagination_page_active') }}
+        {% else %}
+            {{ block('pagination_page') }}
+        {% endif %}
+    {% endfor %}
+
+    {% if has_next_page %}
+        {{ block('pagination_next') }}
+        {{ block('pagination_last') }}
+    {% else %}
+        {{ block('pagination_next_disabled') }}
+        {{ block('pagination_last_disabled') }}
+    {% endif %}
+{% endblock %}
+
+{% block pagination_page %}
+    <a href="{{ _self.pagination_page_path(page_parameter_name, page_number) }}" data-turbo-action="advance">
+        {{ block('pagination_page_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_page_active %}
+    <span>{{ block('pagination_page_message') }}</span>
+{% endblock %}
+
+{% block pagination_page_message page_number %}
+
+{% block pagination_first %}
+    {% with { attr: attr | default({}) | merge({ a: 'b' }) } %}
+
+    <a href="{{ _self.pagination_page_path(page_parameter_name, 1) }}" data-turbo-action="advance">
+        {{ block('pagination_first_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_first_disabled %}
+    <span>{{ block('pagination_first_message') }}</span>
+{% endblock %}
+
+{% block pagination_first_message '«' %}
+
+{% block pagination_previous %}
+    <a href="{{ _self.pagination_page_path(page_parameter_name, current_page_number - 1) }}" data-turbo-action="advance">
+        {{ block('pagination_previous_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_previous_disabled %}
+    <span>{{ block('pagination_previous_message') }}</span>
+{% endblock %}
+
+{% block pagination_previous_message '‹' %}
+
+{% block pagination_last %}
+    <a href="{{ _self.pagination_page_path(page_parameter_name, page_count) }}" data-turbo-action="advance">
+        {{ block('pagination_last_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <span>{{ block('pagination_last_message') }}</span>
+{% endblock %}
+
+{% block pagination_last_message '»' %}
+
+{% block pagination_next %}
+    <a href="{{ _self.pagination_page_path(page_parameter_name, current_page_number + 1) }}" data-turbo-action="advance">
+        {{ block('pagination_next_message') }}
+    </a>
+{% endblock %}
+
+{% block pagination_next_disabled %}
+    <span>{{ block('pagination_next_message') }}</span>
+{% endblock %}
+
+{% block pagination_next_message '›' %}
+
+{# --- Filtration ----------------------------------------------------------- #}
+
+{% block filtration_form %}
+    {% form_theme filtration_form with form_themes|default([_self]) %}
+
+    {{ form_start(filtration_form, { attr: { 'data-turbo-action': 'advance', hidden: 'hidden' } }) }}
+        {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
+    {{ form_end(filtration_form, { render_rest: false }) }}
+
+    {{ block('filtration_form_children') }}
+    {{ block('filtration_form_submit') }}
+{% endblock %}
+
+{% block filtration_form_children %}
+    {% for child in filtration_form %}
+        {% with { form: child } %}
+            {{ block('filtration_form_row') }}
+        {% endwith %}
+    {% endfor %}
+{% endblock %}
+
+{% block filtration_form_row %}
+    <div {{ block('attributes') }}>{{ form_row(form) }}</div>
+{% endblock %}
+
+{% block filtration_form_submit %}
+    <button {% with { attr: attr|default({})|merge({ form: form.vars.id, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+        {{ 'Filter'|trans({}, 'KreyuDataTable') }}
+    </button>
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterDataType #}
+{% block kreyu_data_table_filter_data_row %}
+    {{ form_label(form) }}
+
+    {% if form.operator is defined %}
+        {{ form_widget(form.operator) }}
+    {% endif %}
+
+    {{ form_widget(form.value) }}
+{% endblock %}
+
+{# @see \Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType #}
+{% block kreyu_data_table_date_range_widget %}
+    {{ form_widget(form.from) }}
+    {{ form_widget(form.to) }}
+{% endblock %}
+
+{# --- Miscellaneous -------------------------------------------------------- #}
+
+{% block attributes -%}
+    {% for key, value in attr|default({}) %} {{ key }}="{{ value }}"{% endfor %}
+{% endblock %}
+
+{% macro current_route_path(parameters = {}) %}
+    {{ path(app.request.get('_route'), app.request.query.all|merge(parameters)|merge(app.request.attributes.get('_route_params'))) }}
+{% endmacro %}

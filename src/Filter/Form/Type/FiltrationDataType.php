@@ -29,6 +29,8 @@ class FiltrationDataType extends AbstractType
                 'getter' => fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
                 'setter' => fn (FiltrationData $filtrationData, FilterData $filterData) => $filtrationData->setFilterData($filter, $filterData),
             ]);
+
+            $builder->setAttributes(['a' => 'b']);
         }
     }
 
@@ -56,23 +58,15 @@ class FiltrationDataType extends AbstractType
             $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
         }
 
-        $searchFields = [];
-
-        foreach ($form as $child) {
+        foreach ($view as $name => $filterFormView) {
             try {
-                $filter = $dataTable->getFilter($child->getName());
+                $filter = $dataTable->getFilter($name);
             } catch (\InvalidArgumentException) {
                 continue;
             }
 
-            if ($filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
-                $searchFields[] = $view[$child->getName()];
-
-                unset($view[$child->getName()]);
-            }
+            $filterFormView->vars['search_filter'] = $filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface;
         }
-
-        $view->vars['search_fields'] = $searchFields;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

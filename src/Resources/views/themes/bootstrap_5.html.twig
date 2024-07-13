@@ -1,27 +1,42 @@
 {% extends '@KreyuDataTable/themes/base.html.twig' %}
 
 {# Bootstrap 5 Theme #}
-{# @see https://getbootstrap.com/docs/5.0/ #}
+{# @see https://getbootstrap.com/ #}
 
 {% block table %}
     <div class="table-responsive">
-        {% with { table_attr: { class: 'table table-hover align-middle mb-0' }|merge(table_attr|default({})) } %}
+        {% with { table_attr: { class: 'table table-hover align-middle mb-0' }|merge(table_attr ?? {}) } %}
             {{ parent() }}
         {% endwith %}
     </div>
 {% endblock %}
 
-{% block column_header %}
-    {% with {
-        active_attr: { class: 'border-bottom border-primary text-primary' },
-        label_attr: { class: 'text-decoration-none text-reset d-block w-100 h-100 py-1' },
-    } %}
+{% block header_row_cell %}
+    {% if sortable %}
+        {% set attr = attr|merge({ class: (attr.class|default('') ~ ' position-relative')|trim }) %}
+
+        {% if sorted %}
+            {% set attr = attr|merge({ class: (attr.class|default('') ~ ' border-bottom border-primary')|trim }) %}
+        {% endif %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block no_results_row_cell %}
+    {% with { attr: { class: 'text-center p-4' } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
 
-{% block action_bar %}
-    {% set display_filter_action = filtration_enabled and filters|length > 0 and filtration_form.children|length > 0 %}
+{% block column_header_sortable %}
+    {% set link_attr = { class: 'stretched-link text-decoration-none ' ~ (sorted ? 'text-primary' : 'text-reset') }|merge(link_attr ?? {}) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block header %}
+    {% set display_filter_action = filtration_enabled and filtration_form is not empty %}
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
     {% if title or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
@@ -36,22 +51,23 @@
 
             <div class="card-actions">
                 <div class="d-flex flex-row gap-1">
-                    {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
-                        <div>
-                            {{ block('action_search') }}
+                    {% if display_filter_action %}
+                        {# In this theme, we're rendering the "search" filters widget directly in the header. #}
+                        {# The search filters can be identified by their "search_filter" boolean variable. #}
+                        <div class="d-inline-block w-auto">
+                            {% for filter_form in filtration_form|filter(e => e.vars.search_filter) %}
+                                {% form_theme filter_form with [_self, 'bootstrap_5_layout.html.twig'] %}
+                                {{ form_widget(filter_form.value) }}
+                            {% endfor %}
                         </div>
                     {% endif %}
 
                     {% for action in actions %}
-                        <div>
-                            {{ data_table_action(action) }}
-                        </div>
+                        {{ data_table_action(action) }}
                     {% endfor %}
 
                     {% if display_filter_action %}
-                        <div>
-                            {{ block('action_filter') }}
-                        </div>
+                        {{ block('filtration_form_collapse_button') }}
                     {% endif %}
 
                     {% if display_export_action %}
@@ -74,7 +90,7 @@
         {% if filtration_enabled and filtration_form and filters|length > 0 %}
             <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
                 <div class="card-body">
-                    {{ data_table_filters_form(filtration_form) }}
+                    {{ data_table_theme_block('filtration_form') }}
                 </div>
             </div>
         {% endif %}
@@ -120,17 +136,7 @@
     </div>
 {% endblock %}
 
-{% block action_search %}
-    {% form_theme filtration_form with [_self, 'bootstrap_5_layout.html.twig'] %}
-
-    <div class="d-inline-block w-auto">
-        {% for child in filtration_form.vars.search_fields %}
-            {{ form_widget(child.value, { attr: { form: filtration_form.vars.id } }) }}
-        {% endfor %}
-    </div>
-{% endblock %}
-
-{% block action_filter %}
+{% block filtration_form_collapse_button %}
     {% set attr = {
         'class': 'btn btn-primary',
         'type': 'button',
@@ -141,7 +147,7 @@
         'title': 'Filter'|trans({}, 'KreyuDataTable'),
     }|merge(attr|default({})) %}
 
-    <button {{ block('attributes') }}>{{ block('action_filter_icon') }}</button>
+    <button{{ _self.attributes(attr) }}>{{ block('action_filter_icon') }}</button>
 {% endblock %}
 
 {% block action_filter_icon %}
@@ -159,7 +165,7 @@
         'title': 'Export'|trans({}, 'KreyuDataTable'),
     }|merge(attr|default({})) %}
 
-    <button {{ block('attributes') }}>{{ block('action_export_icon') }}</button>
+    <button{{ _self.attributes(attr) }}>{{ block('action_export_icon') }}</button>
 {% endblock %}
 
 {% block action_export_icon %}
@@ -225,7 +231,7 @@
             {% endif %}
         </span>
 
-        <span class="">{{ filter.vars.value|trans({}, filter.vars.translation_domain) }}</span>
+        <span class="fw-normal">{{ filter.vars.value|trans({}, filter.vars.translation_domain) }}</span>
         <span class="mx-2" aria-hidden="true">{{ block('filter_clear_button_icon') }}</span>
     </a>
 {% endblock %}
@@ -246,22 +252,23 @@
 
 {# Filtration #}
 
-{% block kreyu_data_table_filters_form %}
+{% block filtration_form %}
     {% with { form_themes: [_self, 'bootstrap_5_layout.html.twig'] } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
 
 {% block filtration_form_content %}
-    {% with { attr: { class: 'row' } } %}
+    <div class="row">
         {{ parent() }}
-    {% endwith %}
+        {{ data_table_theme_block('filtration_form_submit') }}
+    </div>
 {% endblock %}
 
 {% block filtration_form_row %}
-    {% with { attr: { class: 'col-12 col-md-6 col-lg-3' }, form_themes: [_self, 'bootstrap_5_layout.html.twig'] } %}
+    <div class="col-12 col-md-6 col-lg-3">
         {{ parent() }}
-    {% endwith %}
+    </div>
 {% endblock %}
 
 {% block filtration_form_submit %}
@@ -437,7 +444,7 @@
     </div>
 {% endblock %}
 
-{% block pagination_widget %}
+{% block pagination %}
     <div class="card-footer">
         <div class="pagination d-flex gap-3 flex-wrap justify-content-center align-items-center">
             {{ parent() }}
@@ -464,9 +471,9 @@
 
 {% block pagination_page_active %}
     <div class="page-item active">
-        {% with { attr: { class: 'page-link' } } %}
+        <span class="page-link">
             {{ parent() }}
-        {% endwith %}
+        </span>
     </div>
 {% endblock %}
 
@@ -480,9 +487,9 @@
 
 {% block pagination_first_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        <span class="page-link">
             {{ parent() }}
-        {% endwith %}
+        </span>
     </div>
 {% endblock %}
 
@@ -496,9 +503,9 @@
 
 {% block pagination_previous_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        <span class="page-link">
             {{ parent() }}
-        {% endwith %}
+        </span>
     </div>
 {% endblock %}
 
@@ -512,9 +519,9 @@
 
 {% block pagination_last_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        <span class="page-link">
             {{ parent() }}
-        {% endwith %}
+        </span>
     </div>
 {% endblock %}
 
@@ -528,12 +535,13 @@
 
 {% block pagination_next_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        <span class="page-link">
             {{ parent() }}
-        {% endwith %}
+        </span>
     </div>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FilterDataType #}
 {% block kreyu_data_table_filter_data_row %}
     <div class="row">
         {{ form_label(form) }}
@@ -560,10 +568,6 @@
         {{ form_widget(form.priority) }}
         {{ form_widget(form.visible) }}
     </li>
-{% endblock %}
-
-{% block action_value_icon %}
-    <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
 {% block action_confirmation_modal %}
@@ -627,13 +631,13 @@
     </div>
 {% endblock %}
 
-{% block action_value %}
+{% block action_control %}
     <div class="d-inline-block" {{ block('attributes') }}>
         {{ parent() }}
     </div>
 {% endblock %}
 
-{% block action_link_value %}
+{% block action_link_control %}
     {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
 
     {% if confirmation %}
@@ -656,7 +660,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_button_value %}
+{% block action_button_control %}
     {% set attr = {
         class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
@@ -681,7 +685,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_form_value %}
+{% block action_form_control %}
     {% set attr = { class: 'd-inline-block' }|merge(attr) %}
 
     {% set button_attr = {

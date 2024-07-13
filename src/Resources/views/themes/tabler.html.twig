@@ -11,30 +11,26 @@
     {% endwith %}
 {% endblock %}
 
-{% block table_body_row_no_results %}
-    <tr>
-        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
-            <div class="empty">
-                <div class="empty-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <circle cx="12" cy="12" r="9" />
-                        <line x1="9" y1="10" x2="9.01" y2="10" />
-                        <line x1="15" y1="10" x2="15.01" y2="10" />
-                        <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
-                    </svg>
-                </div>
-                <p class="empty-title">{{ 'No results found'|trans }}</p>
-                <p class="empty-subtitle text-muted">
-                    {{ 'Try adjusting your search or filter to find what you\'re looking for'|trans }}
-                </p>
-            </div>
-        </td>
-    </tr>
+{% block no_results_message %}
+    <div class="empty">
+        <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <circle cx="12" cy="12" r="9" />
+                <line x1="9" y1="10" x2="9.01" y2="10" />
+                <line x1="15" y1="10" x2="15.01" y2="10" />
+                <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
+            </svg>
+        </div>
+        <p class="empty-title">{{ 'No results found'|trans }}</p>
+        <p class="empty-subtitle text-muted">
+            {{ 'Try adjusting your search or filter to find what you\'re looking for'|trans }}
+        </p>
+    </div>
 {% endblock %}
 
-{% block action_filter %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') } } %}
+{% block filtration_form_collapse_button %}
+    {% with { attr: { class: 'btn btn-primary btn-icon' } } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

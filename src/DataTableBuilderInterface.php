@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
@@ -23,6 +24,9 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 
     public const ACTIONS_COLUMN_NAME = '__actions';
 
+    /**
+     * @deprecated since 0.19.1, the default actions column priority is now set in the type class {@see ActionsColumnType::configureOptions()}
+     */
     public const ACTIONS_COLUMN_PRIORITY = -1;
 
     public const SEARCH_FILTER_NAME = '__search';

@@ -918,7 +918,6 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     private function appendActionsColumn(): void
     {
         $this->addColumn(self::ACTIONS_COLUMN_NAME, ActionsColumnType::class, [
-            'priority' => self::ACTIONS_COLUMN_PRIORITY,
             'actions' => $this->getRowActions(),
         ]);
     }

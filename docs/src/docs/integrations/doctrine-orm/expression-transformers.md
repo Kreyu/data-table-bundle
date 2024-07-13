@@ -17,6 +17,7 @@ The expression transformers can be passed using the `expression_transformers` op
 use App\DataTable\Filter\ExpressionTransformer\UnaccentExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\CallbackExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\LowerExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\TrimExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
@@ -30,6 +31,10 @@ class ProductDataTableType extends AbstractDataTableType
                 'expression_transformers' => [
                     new LowerExpressionTransformer(),
                     new TrimExpressionTransformer(),
+                    new CallbackExpressionTransformer(function (mixed $expression) {
+                        // ...
+                        return $expression;
+                    })
                 ],
             ])
         ;
@@ -93,11 +98,6 @@ class UnaccentExpressionTransformer implements ExpressionTransformerInterface
 
         $leftExpr = sprintf('UNACCENT(%s)', (string) $expression->getLeftExpr());
         $rightExpr = sprintf('UNACCENT(%s)', (string) $expression->getRightExpr());
-        
-        // or use expression API:
-        //
-        // $leftExpr = new Expr\Func('UNACCENT', $expression->getLeftExpr());
-        // $rightExpr = new Expr\Func('UNACCENT', $expression->getRightExpr());
 
         return new Comparison($leftExpr, $expression->getOperator(), $rightExpr);
     }
@@ -117,19 +117,11 @@ class UnaccentExpressionTransformer extends AbstractComparisonExpressionTransfor
     protected function transformLeftExpr(mixed $leftExpr): mixed
     {
         return sprintf('UNACCENT(%s)', (string) $leftExpr);
-        
-        // or use expression API: 
-        // 
-        // return new Expr\Func('UNACCENT', $leftExpr);
     }
 
     protected function transformRightExpr(mixed $rightExpr): mixed
     {
         return sprintf('UNACCENT(%s)', (string) $rightExpr);
-        
-        // or use expression API: 
-        //
-        // return new Expr\Func('UNACCENT', $rightExpr);
     }
 }
 ```
@@ -181,7 +173,7 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-## Adding an option to automatically apply transformer
+## Adding an option to automatically apply the transformer
 
 Following the above example of `UnaccentExpressionTransformer`, let's assume, that we want to create such definition:
 

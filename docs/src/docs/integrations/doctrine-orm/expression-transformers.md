@@ -19,14 +19,14 @@ use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\LowerExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\ExpressionTransformer\TrimExpressionTransformer;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('name', TextFilterType::class, [
+            ->addFilter('name', StringFilterType::class, [
                 'expression_transformers' => [
                     new LowerExpressionTransformer(),
                     new TrimExpressionTransformer(),
@@ -48,14 +48,14 @@ For easier usage, some of the built-in transformers can be enabled using the `tr
 ```php
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('name', TextFilterType::class, [
+            ->addFilter('name', StringFilterType::class, [
                 'trim' => true,
                 'lower' => true,
                 'upper' => true,
@@ -164,14 +164,14 @@ To use the created expression transformer, pass it as the `expression_transforme
 use App\DataTable\Filter\ExpressionTransformer\UnaccentExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('name', TextFilterType::class, [
+            ->addFilter('name', StringFilterType::class, [
                 'expression_transformers' => [
                     new UnaccentExpressionTransformer(),
                 ],
@@ -186,17 +186,16 @@ class ProductDataTableType extends AbstractDataTableType
 Following the above example of `UnaccentExpressionTransformer`, let's assume, that we want to create such definition:
 
 ```php
-use App\DataTable\Filter\ExpressionTransformer\UnaccentExpressionTransformer;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
-use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\TextFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
 
 class ProductDataTableType extends AbstractDataTableType
 {
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addFilter('name', TextFilterType::class, [
+            ->addFilter('name', StringFilterType::class, [
                 'unaccent' => true,
             ])
         ;
@@ -204,38 +203,60 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-To achieve that, create a custom filter type extension:
+To achieve that, create a custom filter type extension, that:
+
+- adds a `unaccent` options, that defaults to `false`;
+- adds an event listener for [PreApplyExpressionEvent](events.md#preapplyexpressionevent) to execute the expression transformer if `unaccent` option is set to `true`;
 
 ```php
 use App\DataTable\Filter\ExpressionTransformer\UnaccentExpressionTransformer;
-use Kreyu\Bundle\DataTableBundle\Filter\Extension\AbstractFilterTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\DoctrineOrmFilterEvents;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\PreApplyExpressionEvent;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\DoctrineOrmFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Extension\AbstractFilterTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Options;
 
 class UnaccentFilterTypeExtension extends AbstractFilterTypeExtension
 {
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void
+    {
+        // Add event listener to apply the expression transformer
+        $builder->addEventListener(
+            DoctrineOrmFilterEvents::PRE_APPLY_EXPRESSION,
+            $this->applyExpressionTransformer(...),
+        );
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
+        // Add "unaccent" option that defaults to "false"
         $resolver
             ->setDefault('unaccent', false)
             ->setAllowedTypes('unaccent', 'bool')
-            ->addNormalizer('expression_transformers', function (Options $options, array $expressionTransformers) {
-                if ($options['unaccent']) {
-                    $expressionTransformers[] = new UnaccentExpressionTransformer();
-                }
-                
-                return $expressionTransformers;
-            })
         ;
     }
-    
+
+    public function applyExpressionTransformer(PreApplyExpressionEvent $event): void
+    {
+        $filter = $event->getFilter();
+        $expression = $event->getExpression();
+
+        // Check if "unaccent" option is set to true
+        if (!$filter->getConfig()->getOption('unaccent')) {
+            return;
+        }
+
+        // Apply the expression transformer
+        $expression = (new UnaccentExpressionTransformer())->transform($expression);
+
+        // Set the transformed expression in the event, so it can be chained further
+        $event->setExpression($expression);
+    }
+
     public static function getExtendedTypes(): iterable
     {
         return [DoctrineOrmFilterType::class];
     }
 }
 ```
-
-The `unaccent` option is now defined, and defaults to `false`. In addition, the options resolver normalizer will automatically push an instance
-of the custom expression transformer to the `expression_transformers` option, but only if the `unaccent` option equals `true`.

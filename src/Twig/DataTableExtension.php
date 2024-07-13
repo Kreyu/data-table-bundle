@@ -64,6 +64,22 @@ class DataTableExtension extends AbstractExtension
         return $functions;
     }
 
+    public function getTokenParsers(): array
+    {
+        return [
+            new DataTableThemeTokenParser(),
+        ];
+    }
+
+    public function setDataTableThemes(DataTableView $view, array $themes, bool $only = false): void
+    {
+        if ($only) {
+            $view->vars['themes'] = $themes;
+        } else {
+            array_push($view->vars['themes'], ...$themes);
+        }
+    }
+
     /**
      * @param array<string, mixed> $variables
      *

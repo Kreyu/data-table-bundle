@@ -42,6 +42,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     /**
      * @param class-string<ColumnTypeInterface>|null $type
      */
+    public function createColumn(string $name, ?string $type = null, array $options = []): ColumnBuilderInterface;
+
+    /**
+     * @param class-string<ColumnTypeInterface>|null $type
+     */
     public function addColumn(ColumnBuilderInterface|string $column, ?string $type = null, array $options = []): static;
 
     public function removeColumn(string $name): static;
@@ -57,6 +62,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function getFilter(string $name): FilterBuilderInterface;
 
     public function hasFilter(string $name): bool;
+
+    /**
+     * @param class-string<FilterTypeInterface>|null $type
+     */
+    public function createFilter(string $name, ?string $type = null, array $options = []): FilterBuilderInterface;
 
     /**
      * @param class-string<FilterTypeInterface>|null $type
@@ -88,6 +98,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     /**
      * @param class-string<ActionTypeInterface>|null $type
      */
+    public function createAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface;
+
+    /**
+     * @param class-string<ActionTypeInterface>|null $type
+     */
     public function addAction(ActionBuilderInterface|string $action, ?string $type = null, array $options = []): static;
 
     public function removeAction(string $name): static;
@@ -103,6 +118,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function getBatchAction(string $name): ActionBuilderInterface;
 
     public function hasBatchAction(string $name): bool;
+
+    /**
+     * @param class-string<ActionTypeInterface>|null $type
+     */
+    public function createBatchAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface;
 
     /**
      * @param class-string<ActionTypeInterface>|null $type
@@ -130,6 +150,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     /**
      * @param class-string<ActionTypeInterface>|null $type
      */
+    public function createRowAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface;
+
+    /**
+     * @param class-string<ActionTypeInterface>|null $type
+     */
     public function addRowAction(ActionBuilderInterface|string $action, ?string $type = null, array $options = []): static;
 
     public function removeRowAction(string $name): static;
@@ -149,6 +174,11 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function getExporter(string $name): ExporterBuilderInterface;
 
     public function hasExporter(string $name): bool;
+
+    /**
+     * @param class-string<ExporterTypeInterface>|null $type
+     */
+    public function createExporter(string $name, ?string $type = null, array $options = []): ExporterBuilderInterface;
 
     /**
      * @param class-string<ExporterTypeInterface>|null $type

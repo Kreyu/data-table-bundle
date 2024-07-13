@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactory;
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistry;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
@@ -107,6 +108,18 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(TextColumnType::class, $column->getColumnConfig()->getType()->getInnerType());
     }
 
+    public function testCreateColumn()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnFactory($this->createColumnFactory());
+
+        $column = $builder->createColumn('foo');
+
+        $this->assertInstanceOf(ColumnBuilderInterface::class, $column);
+        $this->assertSame('foo', $column->getName());
+        $this->assertSame(TextColumnType::class, $column->getType()->getInnerType()::class);
+    }
+
     public function testAddColumnWithColumnBuilder()
     {
         $columnFactory = $this->createColumnFactory();
@@ -181,6 +194,18 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(FilterBuilderInterface::class, $filter);
         $this->assertSame('foo', $filter->getName());
         $this->assertInstanceOf(FilterType::class, $filter->getFilterConfig()->getType()->getInnerType());
+    }
+
+    public function testCreateFilter()
+    {
+        $builder = $this->createBuilder();
+        $builder->setFilterFactory($this->createFilterFactory());
+
+        $filter = $builder->createFilter('foo');
+
+        $this->assertInstanceOf(FilterBuilderInterface::class, $filter);
+        $this->assertSame('foo', $filter->getName());
+        $this->assertSame(FilterType::class, $filter->getType()->getInnerType()::class);
     }
 
     public function testAddFilterWithFilterBuilder()
@@ -306,6 +331,19 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(ButtonActionType::class, $action->getActionConfig()->getType()->getInnerType());
     }
 
+    public function testCreateAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $action = $builder->createAction('foo');
+
+        $this->assertInstanceOf(ActionBuilderInterface::class, $action);
+        $this->assertSame('foo', $action->getName());
+        $this->assertSame(ButtonActionType::class, $action->getType()->getInnerType()::class);
+        $this->assertSame(ActionContext::Global, $action->getContext());
+    }
+
     public function testAddActionWithActionBuilder()
     {
         $actionFactory = $this->createActionFactory();
@@ -352,6 +390,19 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(ActionBuilderInterface::class, $action);
         $this->assertSame('foo', $action->getName());
         $this->assertInstanceOf(ButtonActionType::class, $action->getActionConfig()->getType()->getInnerType());
+    }
+
+    public function testCreateBatchAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $action = $builder->createBatchAction('foo');
+
+        $this->assertInstanceOf(ActionBuilderInterface::class, $action);
+        $this->assertSame('foo', $action->getName());
+        $this->assertSame(ButtonActionType::class, $action->getType()->getInnerType()::class);
+        $this->assertSame(ActionContext::Batch, $action->getContext());
     }
 
     public function testAddBatchActionWithBatchActionBuilder()
@@ -439,6 +490,19 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(ActionBuilderInterface::class, $action);
         $this->assertSame('foo', $action->getName());
         $this->assertInstanceOf(ButtonActionType::class, $action->getActionConfig()->getType()->getInnerType());
+    }
+
+    public function testCreateRowAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setActionFactory($this->createActionFactory());
+
+        $action = $builder->createRowAction('foo');
+
+        $this->assertInstanceOf(ActionBuilderInterface::class, $action);
+        $this->assertSame('foo', $action->getName());
+        $this->assertSame(ButtonActionType::class, $action->getType()->getInnerType()::class);
+        $this->assertSame(ActionContext::Row, $action->getContext());
     }
 
     public function testAddRowActionWithRowActionBuilder()
@@ -556,6 +620,18 @@ class DataTableBuilderTest extends TestCase
         $this->assertInstanceOf(ExporterBuilderInterface::class, $action);
         $this->assertSame('foo', $action->getName());
         $this->assertInstanceOf(ExporterType::class, $action->getExporterConfig()->getType()->getInnerType());
+    }
+
+    public function testCreateExporterAction()
+    {
+        $builder = $this->createBuilder();
+        $builder->setExporterFactory($this->createExporterFactory());
+
+        $exporter = $builder->createExporter('foo');
+
+        $this->assertInstanceOf(ExporterBuilderInterface::class, $exporter);
+        $this->assertSame('foo', $exporter->getName());
+        $this->assertSame(ExporterType::class, $exporter->getType()->getInnerType()::class);
     }
 
     public function testAddExporterWithExporterBuilder()

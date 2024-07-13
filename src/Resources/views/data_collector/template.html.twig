@@ -1,0 +1,141 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ source('@KreyuDataTable/data_collector/Icon/table-heart.svg') }}
+        <span class="sf-toolbar-value">{{ collector.dataTables|length }}</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Number of data tables</b>
+            <span class="sf-toolbar-status">{{ collector.dataTables|length }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label{{ collector.dataTables|length == 0 ? ' disabled' }}">
+        <span class="icon">
+            {{ source('@KreyuDataTable/data_collector/Icon/table-heart.svg') }}
+        </span>
+        <strong>Data Tables</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Data Tables</h2>
+
+    <div class="sf-serializer sf-reset">
+        {% for dataTable in collector.dataTables %}
+            <h3>{{ dataTable }}</h3>
+
+            <div class="sf-tabs">
+                {{ _self.render_columns_tab(collector.columns(dataTable)) }}
+                {{ _self.render_filters_tab(collector.filters(dataTable)) }}
+                {{ _self.render_actions_tab('Actions', collector.actions(dataTable)) }}
+                {{ _self.render_actions_tab('Batch Actions', collector.batchActions(dataTable)) }}
+                {{ _self.render_actions_tab('Row Actions', collector.rowActions(dataTable)) }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% macro render_columns_tab(columnsData) %}
+    <div class="tab">
+        <h3 class="tab-title">Columns <span class="badge">{{ columnsData|length }}</h3>
+        <div class="tab-content">
+            {% if not columnsData|length %}
+                <div class="empty">
+                    <p>No columns found.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for column in columnsData %}
+                            <tr>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.type }}</td>
+                                <td>{{ profiler_dump(column.options) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+{% macro render_filters_tab(filtersData) %}
+    <div class="tab">
+        <h3 class="tab-title">Filters <span class="badge">{{ filtersData|length }}</h3>
+        <div class="tab-content">
+            {% if not filtersData|length %}
+                <div class="empty">
+                    <p>No filters found.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Operator</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for filter in filtersData %}
+                            <tr>
+                                <td>{{ filter.name }}</td>
+                                <td>{{ filter.type }}</td>
+                                <td>{{ filter.operator }}</td>
+                                <td>{{ filter.value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_actions_tab(title, actionsData) %}
+    <div class="tab">
+        <h3 class="tab-title">{{ title }} <span class="badge">{{ actionsData|length }}</h3>
+        <div class="tab-content">
+            {% if not actionsData|length %}
+                <div class="empty">
+                    <p>No {{ title|lower }} found.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for action in actionsData %}
+                            <tr>
+                                <td>{{ action.name }}</td>
+                                <td>{{ action.type }}</td>
+                                <td>{{ profiler_dump(action.options) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

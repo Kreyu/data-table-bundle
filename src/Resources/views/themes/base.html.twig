@@ -3,7 +3,7 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    <turbo-frame id="kreyu_data_table_{{ name }}"
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top"
         {% if has_batch_actions %}
             data-controller="kreyu--data-table-bundle--batch"
         {% endif %}
@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
-    <turbo-frame id="kreyu_data_table_{{ name }}">
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
         {{ block('action_bar') }}
 
         {{ form_start(form, form_variables) }}
@@ -186,13 +186,13 @@
 {% endblock %}
 
 {% block pagination_page %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_page_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_page_active %}
-    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_page_message', theme) }}
     </span>
 {% endblock %}
@@ -200,13 +200,13 @@
 {% block pagination_page_message page_number %}
 
 {% block pagination_first %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_first_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_first_disabled %}
-    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_first_message', theme) }}
     </span>
 {% endblock %}
@@ -214,7 +214,7 @@
 {% block pagination_first_message '«' %}
 
 {% block pagination_previous %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_previous_message', theme) }}
     </a>
 {% endblock %}
@@ -226,7 +226,7 @@
 {% block pagination_previous_message '‹' %}
 
 {% block pagination_last %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_last_message', theme) }}
     </a>
 {% endblock %}
@@ -238,7 +238,7 @@
 {% block pagination_last_message '»' %}
 
 {% block pagination_next %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ block('pagination_next_message', theme) }}
     </a>
 {% endblock %}
@@ -254,7 +254,7 @@
 {% block kreyu_data_table_filters_form %}
     {% form_theme form with form_themes|default([_self]) %}
 
-    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'hidden': 'hidden' } }) }}
+    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
         {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
     {{ form_end(form, { render_rest: false }) }}
 
@@ -286,7 +286,7 @@
 {% endblock %}
 
 {% block filtration_form_submit %}
-    <button {% with { attr: attr|default({})|merge({ form: form.vars.id, 'data-turbo-action': 'advance' }) } %}{{ block('attributes') }}{% endwith %}>
+    <button {% with { attr: attr|default({})|merge({ form: form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
         {{ 'Filter'|trans({}, 'KreyuDataTable') }}
     </button>
 {% endblock %}
@@ -320,7 +320,7 @@
             {% set query_params = app.request.attributes.get('_route_params')|merge(query_params) %}
 
             {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
-            {% set label_attr = { 'data-turbo-action': 'advance' }|merge(label_attr) %}
+            {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
@@ -397,7 +397,7 @@
 {% endblock %}
 
 {% block column_link_value %}
-    <a {% with { attr: { href, target }|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
+    <a {% with { attr: { href, target }|filter(v => v != null)|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
         {{- block('column_text_value') -}}
     </a>
 {% endblock %}
@@ -495,7 +495,7 @@
 {% endblock %}
 
 {% block action_link_value %}
-    {% set attr = { href, target }|merge(attr|default({})) %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
@@ -507,7 +507,7 @@
 {% endblock %}
 
 {% block action_button_value %}
-    {% set attr = { href, target }|merge(attr|default({})) %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}

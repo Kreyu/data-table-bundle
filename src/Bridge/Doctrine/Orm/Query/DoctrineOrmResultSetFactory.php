@@ -59,7 +59,10 @@ class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterfac
 
             $firstResult += $itemCount;
 
-            $paginator->getQuery()->getEntityManager()->clear();
+            // TODO: Make clearing configurable and optional.
+            //       The code below alone breaks the UnitOfWork when rendering 
+            //       data tables with previously loaded entities on the same page.
+            // $paginator->getQuery()->getEntityManager()->clear();
         }
     }
 }

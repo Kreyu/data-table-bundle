@@ -539,6 +539,26 @@
     </form>
 {% endblock %}
 
+{% block action_dropdown_value %}
+<style>
+        #linkList {
+            display: none;
+        }
+        #linkList.show {
+            display: block;
+        }
+    </style>
+
+    <div class="dropdown-container" data-controller="kreyu--data-table-bundle--dropdown">
+        <button id="toggleButton" data-action="kreyu--data-table-bundle--dropdown#toggle">{{- block('action_value', theme, _context) -}}</button>
+        <ul id="linkList" data-kreyu--data-table-bundle--dropdown-target="content">
+            <li><a href="https://example.com">Lien 1</a></li>
+            <li><a href="https://example.com">Lien 2</a></li>
+            <li><a href="https://example.com">Lien 3</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
 {% block sort_arrow_none %}{% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}

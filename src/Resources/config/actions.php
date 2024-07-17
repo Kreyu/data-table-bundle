@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionRegistry;
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\DropdownActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
@@ -58,6 +59,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.action.type.form', FormActionType::class)
+        ->tag('kreyu_data_table.action.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.action.type.dropdown', DropdownActionType::class)
         ->tag('kreyu_data_table.action.type')
     ;
 };

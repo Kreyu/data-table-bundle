@@ -14,6 +14,11 @@
                 "main": "controllers/batch.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "dropdown": {
+                "main": "controllers/dropdown.js",
+                "fetch": "eager",
+                "enabled": true
             }
         },
         "importmap": {

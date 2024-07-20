@@ -67,11 +67,6 @@ class DoctrineOrmResultSetFactoryTest extends TestCase
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
 
-        // TODO: Make clearing configurable and optional.
-        //       The code below alone breaks the UnitOfWork when rendering 
-        //       data tables with previously loaded entities on the same page.
-        // $entityManager->expects($this->exactly(4))->method('clear');
-
         $query = $this->createMock(Query::class);
         $query->method('getFirstResult')->willReturn(0);
         $query->method('getMaxResults')->willReturn(100);

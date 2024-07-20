@@ -56,6 +56,9 @@ Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json
             "personalization": {
                 "enabled": true
             },
+            "persistence": {
+                "enabled": true
+            },
             "batch": {
                 "enabled": true
             }

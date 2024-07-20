@@ -3,11 +3,13 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top"
-        {% if has_batch_actions %}
-            data-controller="kreyu--data-table-bundle--batch"
-        {% endif %}
-    >
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top">
         {{ block('action_bar') }}
         {{ block('table') }}
 
@@ -18,7 +20,13 @@
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top">
         {{ block('action_bar') }}
 
         {{ form_start(form, form_variables) }}
@@ -254,7 +262,14 @@
 {% block kreyu_data_table_filters_form %}
     {% form_theme form with form_themes|default([_self]) %}
 
-    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
+    {{ form_start(form, {
+        attr: {
+            'data-turbo-action': 'advance',
+            'data-turbo-frame': '_self',
+            'data-kreyu--data-table-bundle--persistence-target': 'form',
+            'hidden': 'hidden',
+        }
+    }) }}
         {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
     {{ form_end(form, { render_rest: false }) }}
 

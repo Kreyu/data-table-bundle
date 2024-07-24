@@ -2,7 +2,7 @@
 
 <img align="right" width="200px" src="./docs/src/public/logo.png"/>
 
-[![Latest Stable Version](http://poser.pugx.org/kreyu/data-table-bundle/v)](https://packagist.org/packages/kreyu/data-table-bundle)
+![Packagist Version](https://img.shields.io/packagist/v/kreyu/data-table-bundle?label=version&color=%237986CB&link=https%3A%2F%2Fpackagist.org%2Fpackages%2Fkreyu%2Fdata-table-bundle)
 
 Streamlines the creation process of the data tables in Symfony applications.
 

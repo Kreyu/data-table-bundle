@@ -52,6 +52,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader->load('actions.php');
         $loader->load('exporter.php');
         $loader->load('filtration.php');
+        $loader->load('pagination.php');
         $loader->load('personalization.php');
         $loader->load('twig.php');
 

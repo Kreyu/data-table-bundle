@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,7 +18,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
     ) {
     }
 
-    public function generate(FilterView ...$filterViews): string
+    public function generate(DataTableView $dataTableView, FilterView ...$filterViews): string
     {
         $request = $this->getRequest();
 
@@ -27,8 +28,17 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
         $parameters = [...$routeParams, ...$queryParams];
 
+        // Recursively replace/merge with the URL query parameters defined in the data table view.
+        // This allows the user to define custom query parameters that should be preserved when clearing filters.
+        $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
+
         foreach ($filterViews as $filterView) {
             $parameters = array_replace_recursive($parameters, $this->getFilterClearQueryParameters($filterView));
+        }
+
+        // Clearing the filters should reset the pagination to the first page.
+        if ($dataTableView->vars['pagination_enabled']) {
+            $parameters[$dataTableView->vars['page_parameter_name']] = 1;
         }
 
         return $this->urlGenerator->generate($route, $parameters);
@@ -36,14 +46,17 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
     private function getFilterClearQueryParameters(FilterView $filterView): array
     {
+        $parameters = ['value' => ''];
+
+        if ($filterView->vars['operator_selectable']) {
+            $parameters['operator'] = null;
+        }
+
         $dataTableView = $filterView->parent;
 
         return [
             $dataTableView->vars['filtration_parameter_name'] => [
-                $filterView->vars['name'] => [
-                    'value' => '',
-                    'operator' => null,
-                ],
+                $filterView->vars['name'] => $parameters,
             ],
         ];
     }

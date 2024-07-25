@@ -15,6 +15,7 @@ class PaginationView
         PaginationInterface $pagination,
     ) {
         $this->vars = [
+            'pagination' => $this,
             'page_parameter_name' => $this->parent->vars['page_parameter_name'],
             'current_page_number' => $pagination->getCurrentPageNumber(),
             'current_page_item_count' => $pagination->getCurrentPageItemCount(),

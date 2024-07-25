@@ -19,6 +19,8 @@ class FilterClearUrlGeneratorTest extends TestCase
 {
     private const ROUTE_NAME = 'users_index';
     private const DATA_TABLE_NAME = 'users';
+    private const PAGE_PARAMETER_NAME = 'page_'.self::DATA_TABLE_NAME;
+    private const FILTRATION_PARAMETER_NAME = 'filter_'.self::DATA_TABLE_NAME;
 
     private MockObject&Request $request;
     private MockObject&RequestStack $requestStack;
@@ -37,79 +39,128 @@ class FilterClearUrlGeneratorTest extends TestCase
         $this->urlGenerator->method('generate')->willReturn('');
     }
 
-    public function testItGenerates(): void
-    {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::DATA_TABLE_NAME => [
-                'firstName' => [
-                    'value' => '',
-                    'operator' => null,
-                ],
-                'middleName' => [
-                    'value' => '',
-                    'operator' => null,
-                ],
-                'lastName' => [
-                    'value' => '',
-                    'operator' => null,
-                ],
-            ],
-        ]);
-
-        $this->generate(
-            $this->createFilterViewMock('firstName'),
-            $this->createFilterViewMock('middleName'),
-            $this->createFilterViewMock('lastName'),
-        );
-    }
-
-    public function testItGeneratesWithoutFilterViews(): void
+    public function testItPreservesRouteParams()
     {
         $this->request->attributes->set('_route_params', ['id' => 1]);
-        $this->request->query->set('action', 'list');
 
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
             'id' => 1,
+        ]);
+
+        $this->generate();
+    }
+
+    public function testItPreservesQueryParams()
+    {
+        $this->request->query->set('action', 'list');
+
+        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
             'action' => 'list',
         ]);
 
         $this->generate();
     }
 
-    public function testItMergesWithRouteAndQueryParameters(): void
+    public function testItPreservesDataTableUrlQueryParameters()
+    {
+        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            'foo' => 'bar',
+        ]);
+
+        $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
+    }
+
+    public function testItIncludesEmptyFilterParameters()
+    {
+        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::FILTRATION_PARAMETER_NAME => [
+                'firstName' => [
+                    'value' => '',
+                    'operator' => null,
+                ],
+                'lastName' => [
+                    'value' => '',
+                ],
+            ],
+        ]);
+
+        $this->generate(
+            $this->createDataTableViewMock(),
+            $this->createFilterViewMock('firstName', operatorSelectable: true),
+            $this->createFilterViewMock('lastName', operatorSelectable: false),
+        );
+    }
+
+    public function testItOverridesCurrentPageNumberToFirst()
+    {
+        $this->request->query->set(self::PAGE_PARAMETER_NAME, 3);
+
+        $dataTableView = $this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]);
+        $dataTableView->vars['pagination_enabled'] = true;
+
+        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::PAGE_PARAMETER_NAME => 1,
+        ]);
+
+        $this->generate($dataTableView);
+    }
+
+    public function testItMergesEverythingTogether(): void
     {
         $this->request->attributes->set('_route_params', ['id' => 1]);
         $this->request->query->set('action', 'list');
 
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::DATA_TABLE_NAME => [
+            'id' => 1,
+            'action' => 'list',
+            'foo' => 'bar',
+            self::PAGE_PARAMETER_NAME => 1,
+            self::FILTRATION_PARAMETER_NAME => [
                 'firstName' => [
                     'value' => '',
                     'operator' => null,
                 ],
+                'lastName' => [
+                    'value' => '',
+                ],
             ],
-            'id' => 1,
-            'action' => 'list',
         ]);
 
+        $dataTableView = $this->createDataTableViewMock(['foo' => 'bar']);
+        $dataTableView->vars['pagination_enabled'] = true;
+
         $this->generate(
-            $this->createFilterViewMock('firstName'),
+            $dataTableView,
+            $this->createFilterViewMock('firstName', operatorSelectable: true),
+            $this->createFilterViewMock('lastName', operatorSelectable: false),
         );
     }
 
-    private function generate(MockObject&FilterView ...$filterViews): void
+    private function generate(?DataTableView $dataTableView = null, FilterView ...$filterViews): void
     {
+        $dataTableView ??= $this->createMock(DataTableView::class);
+
         $filterClearUrlGenerator = new FilterClearUrlGenerator($this->requestStack, $this->urlGenerator);
-        $filterClearUrlGenerator->generate(...$filterViews);
+        $filterClearUrlGenerator->generate($dataTableView, ...$filterViews);
     }
 
-    private function createFilterViewMock(string $name): MockObject&FilterView
+    private function createDataTableViewMock(array $urlQueryParameters = []): DataTableView
+    {
+        $dataTableView = $this->createMock(DataTableView::class);
+        $dataTableView->vars['filtration_parameter_name'] = self::FILTRATION_PARAMETER_NAME;
+        $dataTableView->vars['page_parameter_name'] = self::PAGE_PARAMETER_NAME;
+        $dataTableView->vars['url_query_parameters'] = $urlQueryParameters;
+
+        return $dataTableView;
+    }
+
+    private function createFilterViewMock(string $name, bool $operatorSelectable): MockObject&FilterView
     {
         $filterView = $this->createMock(FilterView::class);
-        $filterView->parent = $this->createMock(DataTableView::class);
-        $filterView->parent->vars['filtration_parameter_name'] = self::DATA_TABLE_NAME;
-
         $filterView->vars['name'] = $name;
+        $filterView->vars['operator_selectable'] = $operatorSelectable;
+
+        $filterView->parent = $this->createDataTableViewMock();
 
         return $filterView;
     }

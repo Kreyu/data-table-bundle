@@ -270,14 +270,7 @@
 {% block kreyu_data_table_filters_form %}
     {% form_theme form with form_themes|default([_self]) %}
 
-    {{ form_start(form, {
-        attr: {
-            'data-turbo-action': 'advance',
-            'data-turbo-frame': '_self',
-            'data-kreyu--data-table-bundle--persistence-target': 'form',
-            'hidden': 'hidden',
-        }
-    }) }}
+    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
         {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
     {{ form_end(form, { render_rest: false }) }}
 

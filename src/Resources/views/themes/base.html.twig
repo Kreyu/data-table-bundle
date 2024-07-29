@@ -3,15 +3,16 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top"
-        {% if pagination_enabled %}data-kreyu--data-table-bundle--persistence-pagination-value="{{ { page: pagination.vars.current_page_number, parameter: page_parameter_name }|json_encode }}"{% endif %}
-        {% if sorting_enabled %}data-kreyu--data-table-bundle--persistence-sorting-value="{{ { columns: sorting_data.columns|map(column => column.direction), parameter: sort_parameter_name }|json_encode }}"{% endif %}
+    <turbo-frame
+        id="kreyu_data_table_{{ name }}" target="_top"
+        data-controller="{{ stimulus_controllers|join(' ') }}"
+        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
     >
         {{ block('action_bar') }}
         {{ block('table') }}
@@ -23,15 +24,16 @@
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top"
-        {% if pagination_enabled %}data-kreyu--data-table-bundle--persistence-pagination-value="{{ { page: pagination.vars.current_page_number, parameter: page_parameter_name }|json_encode }}"{% endif %}
-        {% if sorting_enabled %}data-kreyu--data-table-bundle--persistence-sorting-value="{{ { columns: sorting_data.columns|map(column => column.direction), parameter: sort_parameter_name }|json_encode }}"{% endif %}
+    <turbo-frame
+        id="kreyu_data_table_{{ name }}" target="_top"
+        data-controller="{{ stimulus_controllers|join(' ') }}"
+        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
     >
         {{ block('action_bar') }}
 
@@ -149,11 +151,11 @@
 
 {% block pagination_controls %}
     {%- if has_previous_page -%}
-        {% with { path: data_table_pagination_url(pagination, 1) } %}
+        {% with { path: data_table_pagination_url(data_table, 1) } %}
             {{ block('pagination_first', theme) }}
         {% endwith %}
 
-        {% with { path: data_table_pagination_url(pagination, current_page_number - 1) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number - 1) } %}
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
@@ -165,18 +167,18 @@
         {% if page_number == current_page_number %}
             {{ block('pagination_page_active', theme) }}
         {% else %}
-            {% with { path: data_table_pagination_url(pagination, page_number) } %}
+            {% with { path: data_table_pagination_url(data_table, page_number) } %}
                 {{ block('pagination_page', theme) }}
             {% endwith %}
         {% endif %}
     {% endfor %}
 
     {%- if has_next_page -%}
-        {% with { path: data_table_pagination_url(pagination, current_page_number + 1) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number + 1) } %}
             {{ block('pagination_next', theme) }}
         {% endwith %}
 
-        {% with { path: data_table_pagination_url(pagination, page_count) } %}
+        {% with { path: data_table_pagination_url(data_table, page_count) } %}
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}

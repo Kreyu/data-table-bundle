@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Pagination;
 
+use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,7 +18,7 @@ class PaginationUrlGenerator implements PaginationUrlGeneratorInterface
     ) {
     }
 
-    public function generate(PaginationView $paginationView, int $page): string
+    public function generate(DataTableView $dataTableView, int $page): string
     {
         $request = $this->getRequest();
 
@@ -29,9 +30,9 @@ class PaginationUrlGenerator implements PaginationUrlGeneratorInterface
 
         // Recursively replace/merge with the URL query parameters defined in the data table view.
         // This allows the user to define custom query parameters that should be preserved when changing pages.
-        $parameters = array_replace_recursive($parameters, $paginationView->parent->vars['url_query_parameters'] ?? []);
+        $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
 
-        $parameters[$paginationView->parent->vars['page_parameter_name']] = $page;
+        $parameters[$dataTableView->vars['page_parameter_name']] = $page;
 
         return $this->urlGenerator->generate($route, $parameters);
     }

@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Pagination;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGenerator;
-use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -69,7 +68,7 @@ class PaginationUrlGeneratorTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->generate($this->createPaginationViewMock(['foo' => 'bar']));
+        $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
     }
 
     public function testItIncludesGivenPage()
@@ -80,7 +79,7 @@ class PaginationUrlGeneratorTest extends TestCase
             self::PAGE_PARAMETER_NAME => 5,
         ]);
 
-        $this->generate($this->createPaginationViewMock([self::PAGE_PARAMETER_NAME => 2]), page: 5);
+        $this->generate($this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]), page: 5);
     }
 
     public function testItMergesEverythingTogether(): void
@@ -95,15 +94,15 @@ class PaginationUrlGeneratorTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->generate($this->createPaginationViewMock(['foo' => 'bar']), page: 5);
+        $this->generate($this->createDataTableViewMock(['foo' => 'bar']), page: 5);
     }
 
-    private function generate(?PaginationView $paginationView = null, int $page = 1): void
+    private function generate(?DataTableView $dataTableView = null, int $page = 1): void
     {
-        $paginationView ??= $this->createPaginationViewMock();
+        $dataTableView ??= $this->createDataTableViewMock();
 
         $paginationUrlGenerator = new PaginationUrlGenerator($this->requestStack, $this->urlGenerator);
-        $paginationUrlGenerator->generate($paginationView, $page);
+        $paginationUrlGenerator->generate($dataTableView, $page);
     }
 
     private function createDataTableViewMock(array $urlQueryParameters = []): MockObject&DataTableView
@@ -113,13 +112,5 @@ class PaginationUrlGeneratorTest extends TestCase
         $dataTableView->vars['url_query_parameters'] = $urlQueryParameters;
 
         return $dataTableView;
-    }
-
-    private function createPaginationViewMock(array $urlQueryParameters = []): MockObject&PaginationView
-    {
-        $paginationView = $this->createMock(PaginationView::class);
-        $paginationView->parent = $this->createDataTableViewMock($urlQueryParameters);
-
-        return $paginationView;
     }
 }

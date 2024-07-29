@@ -328,9 +328,9 @@ class DataTableExtension extends AbstractExtension
         return $this->columnSortUrlGenerator->generate($dataTableView, ...$columnHeaderViews);
     }
 
-    public function generatePaginationUrl(PaginationView $paginationView, int $page): string
+    public function generatePaginationUrl(DataTableView $dataTableView, int $page): string
     {
-        return $this->paginationUrlGenerator->generate($paginationView, $page);
+        return $this->paginationUrlGenerator->generate($dataTableView, $page);
     }
 
     /**

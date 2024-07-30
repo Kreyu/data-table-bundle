@@ -199,7 +199,7 @@
 {% block filter_clear_all_button %}
     {% set attr = {
         'class': 'btn btn-icon btn-outline-danger',
-        'href': data_table_filter_clear_url(filters),
+        'href': data_table_filter_clear_url(data_table, filters),
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
         'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
@@ -211,7 +211,7 @@
 
 {% block filter_clear_button %}
     <a class="btn px-2"
-       href="{{ data_table_filter_clear_url(filter) }}"
+       href="{{ data_table_filter_clear_url(data_table, filter) }}"
        data-turbo-action="advance"
        data-toggle="tooltip"
        data-placement="bottom"

@@ -176,6 +176,25 @@ class ProductController extends AbstractController
 ```
 :::
 
+### Adding pagination loaded from persistence to URL
+
+By default, the pagination loaded from the persistence is not visible in the URL.
+
+It is recommended to make sure the **state** controller is enabled in your `assets/controllers.json`,
+which will automatically append the pagination parameters to the URL, even if multiple data tables are visible on the same page.
+
+```json
+{
+    "controllers": {
+        "@kreyu/data-table-bundle": {
+            "state": {
+                "enabled": true
+            }
+        }
+    }
+}
+```
+
 ## Default pagination
 
 The default pagination data can be overridden using the data table builder's `setDefaultPaginationData()` method:

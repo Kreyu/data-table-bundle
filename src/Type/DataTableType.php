@@ -81,6 +81,7 @@ final class DataTableType implements DataTableTypeInterface
         $visibleColumns = $dataTable->getVisibleColumns();
 
         $view->vars = array_replace($view->vars, [
+            'data_table' => $view,
             'themes' => $dataTable->getConfig()->getThemes(),
             'title' => $options['title'],
             'title_translation_parameters' => $options['title_translation_parameters'],
@@ -132,6 +133,8 @@ final class DataTableType implements DataTableTypeInterface
         if ($dataTable->getConfig()->isExportingEnabled()) {
             $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
         }
+
+        $view->vars['url_query_parameters'] = $this->getUrlQueryParameters($view, $dataTable);
     }
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
@@ -388,5 +391,39 @@ final class DataTableType implements DataTableTypeInterface
         $formView->vars['data_table_view'] = $view;
 
         return $formView;
+    }
+
+    private function getUrlQueryParameters(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        $parameters = [];
+
+        if ($dataTable->getConfig()->isFiltrationEnabled()) {
+            foreach ($view->filters as $filterView) {
+                if (null === $filterView->data || !$filterView->data->hasValue()) {
+                    continue;
+                }
+
+                $filterParameter = ['value' => $filterView->data->getValue()];
+
+                if ($filterView->vars['operator_selectable']) {
+                    $filterParameter['operator'] = $filterView->data->getOperator()?->value;
+                }
+
+                $parameters[$dataTable->getConfig()->getFiltrationParameterName()][$filterView->vars['name']] = $filterParameter;
+            }
+        }
+
+        if ($dataTable->getConfig()->isPaginationEnabled()) {
+            $parameters[$dataTable->getConfig()->getPageParameterName()] = $view->pagination->vars['current_page_number'];
+            $parameters[$dataTable->getConfig()->getPerPageParameterName()] = $view->pagination->vars['item_number_per_page'];
+        }
+
+        if ($dataTable->getConfig()->isSortingEnabled()) {
+            foreach ($view->vars['sorting_data']->getColumns() as $sortingColumnData) {
+                $parameters[$dataTable->getConfig()->getSortParameterName()][$sortingColumnData->getName()] = $sortingColumnData->getDirection();
+            }
+        }
+
+        return $parameters;
     }
 }

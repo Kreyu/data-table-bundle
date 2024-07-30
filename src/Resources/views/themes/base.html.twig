@@ -3,13 +3,17 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top">
+    <turbo-frame
+        id="kreyu_data_table_{{ name }}" target="_top"
+        data-controller="{{ stimulus_controllers|join(' ') }}"
+        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+    >
         {{ block('action_bar') }}
         {{ block('table') }}
 
@@ -20,13 +24,17 @@
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--persistence'] %}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" data-controller="{{ stimulus_controllers|join(' ') }}" target="_top">
+    <turbo-frame
+        id="kreyu_data_table_{{ name }}" target="_top"
+        data-controller="{{ stimulus_controllers|join(' ') }}"
+        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+    >
         {{ block('action_bar') }}
 
         {{ form_start(form, form_variables) }}
@@ -143,11 +151,11 @@
 
 {% block pagination_controls %}
     {%- if has_previous_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, 1) } %}
             {{ block('pagination_first', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number - 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number - 1) } %}
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
@@ -159,18 +167,18 @@
         {% if page_number == current_page_number %}
             {{ block('pagination_page_active', theme) }}
         {% else %}
-            {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_number })) } %}
+            {% with { path: data_table_pagination_url(data_table, page_number) } %}
                 {{ block('pagination_page', theme) }}
             {% endwith %}
         {% endif %}
     {% endfor %}
 
     {%- if has_next_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number + 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number + 1) } %}
             {{ block('pagination_next', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_count })) } %}
+        {% with { path: data_table_pagination_url(data_table, page_count) } %}
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}
@@ -262,14 +270,7 @@
 {% block kreyu_data_table_filters_form %}
     {% form_theme form with form_themes|default([_self]) %}
 
-    {{ form_start(form, {
-        attr: {
-            'data-turbo-action': 'advance',
-            'data-turbo-frame': '_self',
-            'data-kreyu--data-table-bundle--persistence-target': 'form',
-            'hidden': 'hidden',
-        }
-    }) }}
+    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
         {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
     {{ form_end(form, { render_rest: false }) }}
 
@@ -317,24 +318,13 @@
     {% set label_attr = label_attr|default({}) %}
 
     {% if data_table.vars.sorting_enabled and sortable %}
-        {% set current_sort_field = sorting_field_data.name|default(null) %}
-        {% set current_sort_direction = sorting_field_data.direction|default(null) %}
-
         {% set active_attr = active_attr|default({}) %}
         {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% set attr = attr|default({}) %}
         {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
 
         <th {{ block('attributes') }}>
-            {% set query_params = app.request.query.all %}
-            {% set query_params = query_params|merge({ (sort_parameter_name): {
-                (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
-            } }) %}
-
-            {% set query_params = app.request.attributes.get('_route_params')|merge(query_params) %}
-
-            {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
+            {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
             {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>

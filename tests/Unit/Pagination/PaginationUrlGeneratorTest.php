@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Column;
+namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Pagination;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGenerator;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -16,12 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ColumnSortUrlGeneratorTest extends TestCase
+class PaginationUrlGeneratorTest extends TestCase
 {
     private const ROUTE_NAME = 'users_index';
     private const DATA_TABLE_NAME = 'users';
     private const PAGE_PARAMETER_NAME = 'page_'.self::DATA_TABLE_NAME;
-    private const SORT_PARAMETER_NAME = 'sort_'.self::DATA_TABLE_NAME;
 
     private MockObject&Request $request;
     private MockObject&RequestStack $requestStack;
@@ -45,6 +42,7 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->request->attributes->set('_route_params', ['id' => 1]);
 
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::PAGE_PARAMETER_NAME => 1,
             'id' => 1,
         ]);
 
@@ -56,6 +54,7 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->request->query->set('action', 'list');
 
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::PAGE_PARAMETER_NAME => 1,
             'action' => 'list',
         ]);
 
@@ -65,42 +64,22 @@ class ColumnSortUrlGeneratorTest extends TestCase
     public function testItPreservesDataTableUrlQueryParameters()
     {
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::PAGE_PARAMETER_NAME => 1,
             'foo' => 'bar',
         ]);
 
         $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
     }
 
-    public function testItGeneratesWithOppositeDirections(): void
-    {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-                'middleName' => 'desc',
-                'lastName' => 'asc',
-            ],
-        ]);
-
-        $this->generate(
-            $this->createDataTableViewMock(),
-            $this->createColumnHeaderViewMock('firstName', null),
-            $this->createColumnHeaderViewMock('middleName', 'asc'),
-            $this->createColumnHeaderViewMock('lastName', 'desc'),
-        );
-    }
-
-    public function testItOverridesCurrentPageNumberToFirst()
+    public function testItIncludesGivenPage()
     {
         $this->request->query->set(self::PAGE_PARAMETER_NAME, 3);
 
-        $dataTableView = $this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]);
-        $dataTableView->vars['pagination_enabled'] = true;
-
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
+            self::PAGE_PARAMETER_NAME => 5,
         ]);
 
-        $this->generate($dataTableView);
+        $this->generate($this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]), page: 5);
     }
 
     public function testItMergesEverythingTogether(): void
@@ -109,55 +88,29 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->request->query->set('action', 'list');
 
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::PAGE_PARAMETER_NAME => 5,
             'id' => 1,
             'action' => 'list',
             'foo' => 'bar',
-            self::PAGE_PARAMETER_NAME => 1,
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-                'middleName' => 'desc',
-                'lastName' => 'asc',
-            ],
         ]);
 
-        $dataTableView = $this->createDataTableViewMock(['foo' => 'bar']);
-        $dataTableView->vars['pagination_enabled'] = true;
-
-        $this->generate(
-            $dataTableView,
-            $this->createColumnHeaderViewMock('firstName', null),
-            $this->createColumnHeaderViewMock('middleName', 'asc'),
-            $this->createColumnHeaderViewMock('lastName', 'desc'),
-        );
+        $this->generate($this->createDataTableViewMock(['foo' => 'bar']), page: 5);
     }
 
-    private function generate(?DataTableView $dataTableView = null, ColumnHeaderView ...$columnHeaderViews): void
+    private function generate(?DataTableView $dataTableView = null, int $page = 1): void
     {
         $dataTableView ??= $this->createDataTableViewMock();
 
-        $columnSortUrlGenerator = new ColumnSortUrlGenerator($this->requestStack, $this->urlGenerator);
-        $columnSortUrlGenerator->generate($dataTableView, ...$columnHeaderViews);
+        $paginationUrlGenerator = new PaginationUrlGenerator($this->requestStack, $this->urlGenerator);
+        $paginationUrlGenerator->generate($dataTableView, $page);
     }
 
-    private function createDataTableViewMock(array $urlQueryParameters = []): DataTableView
+    private function createDataTableViewMock(array $urlQueryParameters = []): MockObject&DataTableView
     {
         $dataTableView = $this->createMock(DataTableView::class);
-        $dataTableView->vars['sort_parameter_name'] = self::SORT_PARAMETER_NAME;
         $dataTableView->vars['page_parameter_name'] = self::PAGE_PARAMETER_NAME;
         $dataTableView->vars['url_query_parameters'] = $urlQueryParameters;
 
         return $dataTableView;
-    }
-
-    private function createColumnHeaderViewMock(string $name, ?string $direction): MockObject&ColumnHeaderView
-    {
-        $columnHeaderView = $this->createMock(ColumnHeaderView::class);
-        $columnHeaderView->parent = $this->createMock(HeaderRowView::class);
-        $columnHeaderView->parent->parent = $this->createDataTableViewMock();
-
-        $columnHeaderView->vars['name'] = $name;
-        $columnHeaderView->vars['sort_direction'] = $direction;
-
-        return $columnHeaderView;
     }
 }

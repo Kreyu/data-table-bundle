@@ -15,8 +15,8 @@
                 "fetch": "eager",
                 "enabled": true
             },
-            "persistence": {
-                "main": "controllers/persistence.js",
+            "state": {
+                "main": "controllers/state.js",
                 "fetch": "eager",
                 "enabled": true
             }

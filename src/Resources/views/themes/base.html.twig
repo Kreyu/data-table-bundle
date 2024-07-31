@@ -12,7 +12,7 @@
     <turbo-frame
         id="kreyu_data_table_{{ name }}" target="_top"
         data-controller="{{ stimulus_controllers|join(' ') }}"
-        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
     >
         {{ block('action_bar') }}
         {{ block('table') }}
@@ -33,7 +33,7 @@
     <turbo-frame
         id="kreyu_data_table_{{ name }}" target="_top"
         data-controller="{{ stimulus_controllers|join(' ') }}"
-        data-kreyu--data-table-bundle--state-url-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
     >
         {{ block('action_bar') }}
 

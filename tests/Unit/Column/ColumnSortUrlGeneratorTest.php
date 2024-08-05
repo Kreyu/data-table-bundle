@@ -71,6 +71,23 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
     }
 
+    public function testItRemovesOtherSortParameters()
+    {
+        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
+            self::SORT_PARAMETER_NAME => [
+                'firstName' => 'asc',
+            ],
+        ]);
+
+        $this->generate(
+            $this->createDataTableViewMock([self::SORT_PARAMETER_NAME => [
+                'middleName' => 'asc',
+                'lastName' => 'desc',
+            ]]),
+            $this->createColumnHeaderViewMock('firstName', null),
+        );
+    }
+
     public function testItGeneratesWithOppositeDirections(): void
     {
         $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [

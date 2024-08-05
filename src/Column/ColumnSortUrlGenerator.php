@@ -32,6 +32,9 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
         // This allows the user to define custom query parameters that should be preserved when sorting columns.
         $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
 
+        // Remove all sort-related parameters to only apply sorting on given columns.
+        unset($parameters[$dataTableView->vars['sort_parameter_name']]);
+
         foreach ($columnHeaderViews as $columnHeaderView) {
             $parameters = array_replace_recursive($parameters, $this->getColumnSortQueryParameters($columnHeaderView));
         }

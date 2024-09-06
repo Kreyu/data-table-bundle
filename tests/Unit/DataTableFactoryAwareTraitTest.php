@@ -74,7 +74,7 @@ class DataTableFactoryAwareTraitTest extends TestCase
 
     private function createClassUsingTrait(?DataTableFactoryInterface $factory = null): object
     {
-        $class = new class() {
+        $class = new class {
             use DataTableFactoryAwareTrait;
 
             public function execute(string $method, array $arguments): void

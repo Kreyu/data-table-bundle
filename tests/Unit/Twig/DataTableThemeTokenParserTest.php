@@ -19,7 +19,7 @@ use Twig\Source;
 class DataTableThemeTokenParserTest extends TestCase
 {
     #[DataProvider('provideCompileCases')]
-    public function testCompile($source, $expected)
+    public function testCompile($source, DataTableThemeNode $expected)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $env->addTokenParser(new DataTableThemeTokenParser());
@@ -29,6 +29,10 @@ class DataTableThemeTokenParserTest extends TestCase
         $parser = new Parser($env);
 
         $expected->setSourceContext($source);
+
+        if (!$expected->requiresTagBackwardsCompatibility()) {
+            $expected->setNodeTag('data_table_theme');
+        }
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode('0'));
     }

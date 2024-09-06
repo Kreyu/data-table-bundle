@@ -15,7 +15,7 @@ class ComparisonExpressionTransformerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->transformer = new class() extends AbstractComparisonExpressionTransformer {};
+        $this->transformer = new class extends AbstractComparisonExpressionTransformer {};
     }
 
     public function testItThrowsExceptionWhenExpressionIsNotComparison(): void

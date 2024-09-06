@@ -46,7 +46,8 @@ $builder
 - **type**: `string` or `callable`
 - **default**: `'_self'`
 
-Sets the value that will be used as a [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
+Sets the value that will be used as a [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target). 
+Similar to [`href`](#href) option, you can pass a callable that receives three arguments.
 
 ## Inherited options
 

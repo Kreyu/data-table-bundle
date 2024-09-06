@@ -13,11 +13,11 @@ final class LinkColumnType extends AbstractColumnType
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         if (is_callable($href = $options['href'])) {
-            $href = $href($view->vars['data']);
+            $href = $href($view->vars['data'], $view->parent->data, $column);
         }
 
         if (is_callable($target = $options['target'])) {
-            $target = $target($view->vars['data']);
+            $target = $target($view->vars['data'], $view->parent->data, $column);
         }
 
         $view->vars = array_replace($view->vars, [

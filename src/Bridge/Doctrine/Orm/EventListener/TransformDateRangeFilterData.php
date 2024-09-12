@@ -27,6 +27,8 @@ class TransformDateRangeFilterData implements EventSubscriberInterface
         if ($valueTo) {
             $valueTo = \DateTime::createFromInterface($valueTo)->modify('+1 day');
             $valueTo->setTime(0, 0);
+
+            $valueTo = $valueTo->modify('-1 microsecond');
         }
 
         $data = clone $data;
@@ -39,7 +41,7 @@ class TransformDateRangeFilterData implements EventSubscriberInterface
             $data->setOperator(Operator::GreaterThanEquals);
         } elseif ($valueTo) {
             $data->setValue($valueTo);
-            $data->setOperator(Operator::LessThan);
+            $data->setOperator(Operator::LessThanEquals);
         }
 
         $event->setData($data);

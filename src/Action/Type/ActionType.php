@@ -9,7 +9,6 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionContext;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;

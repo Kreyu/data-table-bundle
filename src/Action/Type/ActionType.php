@@ -70,7 +70,7 @@ final class ActionType implements ActionTypeInterface
             'data_table' => $dataTable,
             'name' => $action->getName(),
             'block_prefixes' => $blockPrefixes,
-            'label' => $options['label'] ?? StringUtil::camelToSentence($action->getName()),
+            'label' => $options['label'] ?? $action->getName(),
             'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
             'translation_parameters' => $options['translation_parameters'],
             'attr' => $options['attr'],

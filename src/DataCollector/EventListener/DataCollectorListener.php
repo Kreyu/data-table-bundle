@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\DataCollector\EventListener;
 
 use Kreyu\Bundle\DataTableBundle\DataCollector\DataTableDataCollectorInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DataCollectorListener implements EventSubscriberInterface
@@ -19,12 +21,24 @@ class DataCollectorListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            DataTableEvents::POST_FILTER => ['onPostFilter', 255],
+            DataTableEvents::POST_INITIALIZE => ['collectDataTable', 255],
+            DataTableEvents::POST_FILTER => ['collectFiltrationData', 255],
+            DataTableEvents::POST_SORT => ['collectSortingData', 255],
         ];
     }
 
-    public function onPostFilter(DataTableFiltrationEvent $event): void
+    public function collectDataTable(DataTableEvent $event): void
     {
-        $this->dataCollector->collectFilter($event->getDataTable(), $event->getFiltrationData());
+        $this->dataCollector->collectDataTable($event->getDataTable());
+    }
+
+    public function collectFiltrationData(DataTableFiltrationEvent $event): void
+    {
+        $this->dataCollector->collectFiltrationData($event->getDataTable(), $event->getFiltrationData());
+    }
+
+    public function collectSortingData(DataTableSortingEvent $event): void
+    {
+        $this->dataCollector->collectSortingData($event->getDataTable(), $event->getSortingData());
     }
 }

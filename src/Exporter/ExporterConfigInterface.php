@@ -17,4 +17,10 @@ interface ExporterConfigInterface
     public function hasOption(string $name): bool;
 
     public function getOption(string $name, mixed $default = null): mixed;
+
+    public function getAttributes(): array;
+
+    public function hasAttribute(string $name): bool;
+
+    public function getAttribute(string $name, mixed $default = null): mixed;
 }

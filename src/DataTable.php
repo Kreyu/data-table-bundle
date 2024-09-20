@@ -132,6 +132,8 @@ class DataTable implements DataTableInterface
             return;
         }
 
+        $this->dispatch(DataTableEvents::PRE_INITIALIZE, new DataTableEvent($this));
+
         if ($paginationData = $this->getInitialPaginationData()) {
             $this->paginate($paginationData, false);
         }
@@ -149,6 +151,8 @@ class DataTable implements DataTableInterface
         }
 
         $this->initialized = true;
+
+        $this->dispatch(DataTableEvents::POST_INITIALIZE, new DataTableEvent($this));
     }
 
     public function getName(): string

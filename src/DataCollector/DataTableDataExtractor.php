@@ -10,7 +10,6 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
-use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 class DataTableDataExtractor implements DataTableDataExtractorInterface

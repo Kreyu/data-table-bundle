@@ -9,6 +9,16 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 final class DataTableEvents
 {
     /**
+     * @see DataTableInterface::initialize()
+     */
+    public const PRE_INITIALIZE = 'kreyu_data_table.pre_initialize';
+
+    /**
+     * @see DataTableInterface::initialize()
+     */
+    public const POST_INITIALIZE = 'kreyu_data_table.post_initialize';
+
+    /**
      * @see DataTableInterface::paginate()
      */
     public const PRE_PAGINATE = 'kreyu_data_table.pre_paginate';

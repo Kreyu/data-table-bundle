@@ -25,5 +25,9 @@ interface ExporterConfigBuilderInterface extends ExporterConfigInterface
      */
     public function setOption(string $name, mixed $value): static;
 
+    public function setAttribute(string $name, mixed $value): static;
+
+    public function setAttributes(array $attributes): static;
+
     public function getExporterConfig(): ExporterConfigInterface;
 }

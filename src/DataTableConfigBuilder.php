@@ -63,6 +63,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?RequestHandlerInterface $requestHandler = null;
 
     private array $themes = [];
+    private array $attributes = [];
     private array $headerRowAttributes = [];
     private array $valueRowAttributes = [];
 
@@ -691,6 +692,43 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->themes = $themes;
+
+        return $this;
+    }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function hasAttribute(string $name): bool
+    {
+        return array_key_exists($name, $this->attributes);
+    }
+
+    public function getAttribute(string $name, mixed $default = null): mixed
+    {
+        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+    }
+
+    public function setAttribute(string $name, mixed $value): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    public function setAttributes(array $attributes): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->attributes = $attributes;
 
         return $this;
     }

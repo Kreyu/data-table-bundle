@@ -62,8 +62,6 @@ final class CollectionColumnType extends AbstractColumnType
         /** @var ColumnFactoryInterface $prototypeFactory */
         $prototypeFactory = $column->getConfig()->getAttribute('prototype_factory');
 
-        $prototype = $prototypeFactory->createNamed('__name__', $options['entry_type'], $options['entry_options']);
-
         $children = [];
 
         foreach ($view->vars['value'] ?? [] as $index => $data) {
@@ -72,6 +70,9 @@ final class CollectionColumnType extends AbstractColumnType
             $valueRowView->origin = $view->parent;
             $valueRowView->index = $index;
             $valueRowView->data = $data;
+
+            $prototype = $prototypeFactory->createNamed((string) $index, $options['entry_type'], $options['entry_options']);
+            $prototype->setDataTable($column->getDataTable());
 
             $children[] = $prototype->createValueView($valueRowView);
         }

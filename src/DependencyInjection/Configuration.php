@@ -144,6 +144,14 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('profiler')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('max_depth')
+                            ->defaultValue(3)
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

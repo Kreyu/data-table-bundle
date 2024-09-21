@@ -53,6 +53,7 @@ export default defineConfig({
             { text: 'Persistence', link: '/docs/features/persistence' },
             { text: 'Theming', link: '/docs/features/theming' },
             { text: 'Asynchronicity', link: '/docs/features/asynchronicity' },
+            { text: 'Profiler', link: '/docs/features/profiler' },
             { text: 'Extensibility', link: '/docs/features/extensibility' },
           ]
         },

@@ -70,6 +70,12 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             ->getDefinition('kreyu_data_table.type.data_table')
             ->setArgument('$defaults', $config['defaults'])
         ;
+
+        if ($container->getParameter('kernel.debug')) {
+            $container
+                ->getDefinition('kreyu_data_table.debug.data_collector')
+                ->setArgument('$maxDepth', $config['profiler']['max_depth']);
+        }
     }
 
     public function prepend(ContainerBuilder $container): void

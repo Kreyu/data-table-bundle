@@ -25,7 +25,10 @@ final class ActionsColumnType extends AbstractColumnType
         $actions = [];
 
         foreach ($options['actions'] as $name => $action) {
-            $actions[$name] = $this->resolveAction($name, $action, $view)?->createView($view);
+            $action = $this->resolveAction($name, $action, $view);
+            $action?->setDataTable($column->getDataTable());
+
+            $actions[$name] = $action?->createView($view);
         }
 
         $view->vars['actions'] = array_filter($actions);

@@ -103,6 +103,12 @@ interface DataTableConfigInterface
 
     public function getRequestHandler(): ?RequestHandlerInterface;
 
+    public function getAttributes(): array;
+
+    public function hasAttribute(string $name): bool;
+
+    public function getAttribute(string $name, mixed $default = null): mixed;
+
     public function getHeaderRowAttributes(): array;
 
     public function hasHeaderRowAttribute(string $name): bool;

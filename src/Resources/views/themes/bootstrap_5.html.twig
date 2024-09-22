@@ -279,7 +279,7 @@
     {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
     <div data-controller="kreyu--data-table-bundle--personalization">
-        {{ form_start(form, { attr: { 'data-turbo-action': 'advance' } }) }}
+        {{ form_start(form, { attr: { 'data-turbo-frame': '_self' } }) }}
         {% if form._token is defined %}
             {{ form_row(form._token) }}
         {% endif %}

@@ -37,9 +37,8 @@ class DataTableFactory implements DataTableFactoryInterface
             foreach ($this->registry->getProxyQueryFactories() as $proxyQueryFactory) {
                 if ($proxyQueryFactory->supports($data)) {
                     $query = $proxyQueryFactory->create($data);
+                    break;
                 }
-
-                break;
             }
         }
 

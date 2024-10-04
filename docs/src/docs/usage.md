@@ -131,3 +131,65 @@ Now, in the template, render the data table using the `data_table` function:
 ```
 
 By default, the data table will look somewhat _ugly_, because we haven't configured the theme yet - see [theming](features/theming.md) documentation section.
+
+## Setting data table title
+
+The data tables can have a title set, that in built-in themes is displayed on the left side of the card header:
+
+```php
+namespace App\DataTable\Type;
+
+use App\Entity\Product;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'title' => 'Products',
+        ]);
+    }
+}
+```
+
+For more flexibility, you can set the title directly in the Twig, while rendering the data table:
+
+```twig
+{# templates/product/index.html.twig #}
+
+<div class="card">
+    {{ data_table(products, { title: 'Products' }) }}
+</div>
+```
+
+## Setting row attributes
+
+Both header and value rows HTML attributes can be provided by the `header_row_attr` and `value_row_attr`.
+The `value_row_attr` accepts a callable, that retrieves data of the row:
+
+```php
+namespace App\DataTable\Type;
+
+use App\Entity\Product;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'header_row_attr' => [
+                'class' => 'bg-primary',
+            ],
+            'value_row_attr' => function (Product $product): array {
+                return [
+                    'class' => $product->isOutOfStock() ? 'bg-danger' : '',
+                ];            
+            }
+        ]);
+    }
+}
+```

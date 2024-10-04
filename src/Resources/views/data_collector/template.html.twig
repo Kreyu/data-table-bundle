@@ -184,7 +184,7 @@
                                 </div>
 
                                 <ul id="{{ data_table.name }}-batch-actions" class="hidden">
-                                    {% for action in data_table.actions %}
+                                    {% for action in data_table.batch_actions %}
                                         <li>
                                             <div class="tree-inner" title="{{ action.name }} batch action" data-tab-target-id="{{ data_table.name }}-batch-action-{{ action.name }}-details">
                                                 <button class="toggle-button">

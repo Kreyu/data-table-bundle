@@ -111,24 +111,12 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setAttributes(array $attributes): static;
 
-    /**
-     * @deprecated use "header_row_attr" option instead
-     */
     public function setHeaderRowAttribute(string $name, mixed $value): static;
 
-    /**
-     * @deprecated use "header_row_attr" option instead
-     */
     public function setHeaderRowAttributes(array $headerRowAttributes): static;
 
-    /**
-     * @deprecated use "value_row_attr" option instead
-     */
     public function setValueRowAttribute(string $name, mixed $value): static;
 
-    /**
-     * @deprecated use "value_row_attr" option instead
-     */
     public function setValueRowAttributes(array $valueRowAttributes): static;
 
     public function getDataTableConfig(): DataTableConfigInterface;

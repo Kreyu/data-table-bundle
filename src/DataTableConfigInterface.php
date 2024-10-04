@@ -109,34 +109,16 @@ interface DataTableConfigInterface
 
     public function getAttribute(string $name, mixed $default = null): mixed;
 
-    /**
-     * @deprecated use "header_row_attr" option instead
-     */
     public function getHeaderRowAttributes(): array;
 
-    /**
-     * @deprecated use "header_row_attr" option instead
-     */
     public function hasHeaderRowAttribute(string $name): bool;
 
-    /**
-     * @deprecated use "header_row_attr" option instead
-     */
     public function getHeaderRowAttribute(string $name, mixed $default = null): mixed;
 
-    /**
-     * @deprecated use "value_row_attr" option instead
-     */
     public function getValueRowAttributes(): array;
 
-    /**
-     * @deprecated use "value_row_attr" option instead
-     */
     public function hasValueRowAttribute(string $name): bool;
 
-    /**
-     * @deprecated use "value_row_attr" option instead
-     */
     public function getValueRowAttribute(string $name, mixed $default = null): mixed;
 
     public function getPageParameterName(): string;

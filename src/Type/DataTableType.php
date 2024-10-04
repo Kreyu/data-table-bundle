@@ -284,12 +284,6 @@ final class DataTableType implements DataTableTypeInterface
             $headerRowView->vars['attr'][$key] = $value;
         }
 
-        $attr = $dataTable->getConfig()->getOption('header_row_attr', []);
-
-        foreach ($attr as $key => $value) {
-            $headerRowView->vars['attr'][$key] = $value;
-        }
-
         foreach ($columns as $column) {
             $headerRowView->children[$column->getName()] = $column->createHeaderView($headerRowView);
         }
@@ -317,16 +311,6 @@ final class DataTableType implements DataTableTypeInterface
                     $value = $value($data, $dataTable);
                 }
 
-                $valueRowView->vars['attr'][$key] = $value;
-            }
-
-            $attr = $dataTable->getConfig()->getOption('value_row_attr', []);
-
-            if (is_callable($attr)) {
-                $attr = $attr($data, $dataTable);
-            }
-
-            foreach ($attr as $key => $value) {
                 $valueRowView->vars['attr'][$key] = $value;
             }
 

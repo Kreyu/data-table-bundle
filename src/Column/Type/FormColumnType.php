@@ -9,6 +9,9 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @deprecated since 0.23, no replacement available
+ */
 final class FormColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void

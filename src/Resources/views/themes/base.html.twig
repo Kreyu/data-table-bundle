@@ -1,30 +1,11 @@
 {% trans_default_domain 'KreyuDataTable' %}
 
 {# Base HTML Theme #}
+{# This theme is not meant to be used as is, but rather to be extended and ease creation of proper themes #}
 
-{% block kreyu_data_table %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
-
-    {% if has_batch_actions %}
-        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
-    {% endif %}
-
-    <turbo-frame
-        id="kreyu_data_table_{{ name }}" target="_top"
-        data-controller="{{ stimulus_controllers|join(' ') }}"
-        data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
-    >
-        {{ block('action_bar') }}
-        {{ block('table') }}
-
-        {% if pagination_enabled %}
-            {{ data_table_pagination(pagination) }}
-        {% endif %}
-    </turbo-frame>
-{% endblock %}
-
-{% block kreyu_data_table_form_aware %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+{% block data_table %}
+    {% set stimulus_controllers = stimulus_controllers ?? [] %}
+    {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--state']) %}
 
     {% if has_batch_actions %}
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
@@ -35,127 +16,78 @@
         data-controller="{{ stimulus_controllers|join(' ') }}"
         data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
     >
-        {{ block('action_bar') }}
+        {{ block('action_bar', theme) }}
+        {{ block('table', theme) }}
 
-        {{ form_start(form, form_variables) }}
-            {{ block('table') }}
-        {{ form_end(form, { render_rest: false }) }}
-
-        {% if pagination_enabled %}
+        {% if pagination_enabled and pagination.vars.page_count > 1 %}
             {{ data_table_pagination(pagination) }}
         {% endif %}
     </turbo-frame>
 {% endblock %}
-
-{% block kreyu_data_table_table %}
-    {{ block('table') }}
-{% endblock %}
-
-{% block kreyu_data_table_action_bar %}
-    {{ block('action_bar') }}
-{% endblock %}
-
-{% block action_bar %}{% endblock %}
 
 {% block table %}
-    <table {% with { attr: table_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
-        {{ block('table_head') }}
-        {{ block('table_body') }}
+    <table{{ _self.attributes(table_attr ?? {}) }}>
+        {{ block('table_head', theme) }}
+        {{ block('table_body', theme) }}
     </table>
 {% endblock %}
 
 {% block table_head %}
-    <thead>{{ block('table_head_row') }}</thead>
-{% endblock %}
-
-{% block table_head_row %}
-    {{ data_table_header_row(header_row) }}
+    <thead{{ _self.attributes(thead_attr ?? {}) }}>
+        {{ block('header_row', theme) }}
+    </thead>
 {% endblock %}
 
 {% block table_body %}
-    <tbody>{{ block('table_body_row') }}</tbody>
+    <tbody{{ _self.attributes(tbody_attr ?? {}) }}>
+        {{ block('table_body_row', theme) }}
+    </tbody>
 {% endblock %}
 
 {% block table_body_row %}
-    {% if value_rows|length > 0 %}
-        {{ block('table_body_row_results') }}
-    {% else %}
-        {{ block('table_body_row_no_results') }}
-    {% endif %}
-{% endblock %}
-
-{% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {{ block('value_row', theme) }}
+    {% else %}
+        {{ block('no_results_row', theme) }}
     {% endfor %}
 {% endblock %}
 
-{% block table_body_row_no_results %}
-    <tr>
-        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{ 'No results found'|trans({}, 'KreyuDataTable') }}</td>
-    </tr>
-{% endblock %}
-
-{% block pagination %}
-    {{ data_table_pagination(pagination) }}
-{% endblock %}
-
-{% block kreyu_data_table_header_row %}
-    <tr {% with { attr: row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
-        {% for column_header in row %}
-            {{- data_table_column_header(column_header) -}}
+{% block header_row %}
+    <tr{{ _self.attributes(header_row.vars.attr|merge(header_row_attr ?? {})) }}>
+        {% for column_header in header_row %}
+            <th{{ _self.attributes(column_header.vars.attr|merge(column_header_attr ?? {})) }}>{{ data_table_column_header(column_header) }}</th>
         {% endfor %}
     </tr>
 {% endblock %}
 
-{% block kreyu_data_table_value_row %}
-    {% for column_value in row %}
-        <td>
-            {{- data_table_column_value(column_value) -}}
+{% block value_row %}
+    <tr{{ _self.attributes(value_row.vars.attr|merge(value_row_attr ?? {})) }}>
+        {% for column_value in value_row %}
+            <td{{ _self.attributes(column_value.vars.attr|merge(column_value_attr ?? {})) }}>{{ data_table_column_value(column_value) }}</td>
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block no_results_row %}
+    <tr{{ _self.attributes(tr_attr ?? {}) }}>
+        <td{{ _self.attributes({ colspan: column_count }|merge(td_attr ?? {})) }}>
+            {{ 'No results found'|trans({}, 'KreyuDataTable') }}
         </td>
-    {% endfor %}
+    </tr>
 {% endblock %}
 
-{% block kreyu_data_table_column_label %}
-    {% if translation_domain is not same as false %}
-        <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
-    {% else %}
-        <span>{{- label -}}</span>
-    {% endif %}
-{% endblock %}
-
-{% block kreyu_data_table_column_header %}
-    {{ block(block_name, block_theme ?? theme) }}
-{% endblock %}
-
-{% block kreyu_data_table_column_value %}
-    {{ block(block_name, block_theme ?? theme) }}
-{% endblock %}
-
-{% block kreyu_data_table_action %}
-    {% if visible %}{{- block(block_name, block_theme ?? theme) -}}{% endif %}
-{% endblock %}
-
-{# Pagination #}
-
-{% block kreyu_data_table_pagination %}
-    {% if page_count > 1 %}
-        {{ block('pagination_widget', theme) }}
-    {% endif %}
-{% endblock %}
-
-{% block pagination_widget %}
+{% block pagination %}
     {{ block('pagination_counters', theme) }}
     {{ block('pagination_controls', theme) }}
 {% endblock %}
 
 {% block pagination_controls %}
     {%- if has_previous_page -%}
-        {% with { path: data_table_pagination_url(data_table, 1) } %}
+        {% with { href: data_table_pagination_url(data_table, 1) } %}
             {{ block('pagination_first', theme) }}
         {% endwith %}
 
-        {% with { path: data_table_pagination_url(data_table, current_page_number - 1) } %}
+        {% with { href: data_table_pagination_url(data_table, current_page_number - 1) } %}
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
@@ -167,18 +99,18 @@
         {% if page_number == current_page_number %}
             {{ block('pagination_page_active', theme) }}
         {% else %}
-            {% with { path: data_table_pagination_url(data_table, page_number) } %}
+            {% with { href: data_table_pagination_url(data_table, page_number) } %}
                 {{ block('pagination_page', theme) }}
             {% endwith %}
         {% endif %}
     {% endfor %}
 
     {%- if has_next_page -%}
-        {% with { path: data_table_pagination_url(data_table, current_page_number + 1) } %}
+        {% with { href: data_table_pagination_url(data_table, current_page_number + 1) } %}
             {{ block('pagination_next', theme) }}
         {% endwith %}
 
-        {% with { path: data_table_pagination_url(data_table, page_count) } %}
+        {% with { href: data_table_pagination_url(data_table, page_count) } %}
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}
@@ -188,27 +120,25 @@
 {% endblock %}
 
 {% block pagination_counters %}
-    <span {{- block('attributes') -}}>
+    <span{{ _self.attributes(pagination_counters_attr ?? {}) }}>
         {{- block('pagination_counters_message', theme) -}}
     </span>
 {% endblock %}
 
-{% block pagination_counters_message %}
-    {{- 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
-        '%current_page_first_item_index%': current_page_first_item_index|number_format(0, '', ' '),
-        '%current_page_last_item_index%': current_page_last_item_index|number_format(0, '', ' '),
-        '%total_item_count%': total_item_count|number_format(0, '', ' ')
-    }, 'KreyuDataTable') -}}
-{% endblock %}
+{% block pagination_counters_message 'Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%'|trans({
+    '%current_page_first_item_index%': current_page_first_item_index|number_format(0, '', ' '),
+    '%current_page_last_item_index%': current_page_last_item_index|number_format(0, '', ' '),
+    '%total_item_count%': total_item_count|number_format(0, '', ' ')
+}, 'KreyuDataTable') %}
 
 {% block pagination_page %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a{{ _self.attributes({ href, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(pagination_page_attr ?? {})) }}>
         {{ block('pagination_page_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_page_active %}
-    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <span{{ _self.attributes(pagination_page_active_attr ?? {}) }}>
         {{ block('pagination_page_message', theme) }}
     </span>
 {% endblock %}
@@ -216,13 +146,13 @@
 {% block pagination_page_message page_number %}
 
 {% block pagination_first %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a{{ _self.attributes({ href, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(pagination_first_attr ?? {})) }}>
         {{ block('pagination_first_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_first_disabled %}
-    <span {% with { attr: attr|default({})|merge({ 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <span{{ _self.attributes(pagination_first_disabled_attr ?? {}) }}>
         {{ block('pagination_first_message', theme) }}
     </span>
 {% endblock %}
@@ -230,51 +160,55 @@
 {% block pagination_first_message '«' %}
 
 {% block pagination_previous %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a{{ _self.attributes({ href, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(pagination_previous_attr ?? {})) }}>
         {{ block('pagination_previous_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_previous_disabled %}
-    <span {{ block('attributes') }}>{{ block('pagination_previous_message', theme) }}</span>
+    <span{{ _self.attributes(pagination_previous_disabled_attr ?? {}) }}>
+        {{ block('pagination_previous_message', theme) }}
+    </span>
 {% endblock %}
 
 {% block pagination_previous_message '‹' %}
 
-{% block pagination_last %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
-        {{ block('pagination_last_message', theme) }}
-    </a>
-{% endblock %}
-
-{% block pagination_last_disabled %}
-    <span {{ block('attributes') }}>{{ block('pagination_last_message', theme) }}</span>
-{% endblock %}
-
-{% block pagination_last_message '»' %}
-
 {% block pagination_next %}
-    <a {% with { attr: attr|default({})|merge({ href: path, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }) } %}{{ block('attributes') }}{% endwith %}>
+    <a{{ _self.attributes({ href, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(pagination_next_attr ?? {})) }}>
         {{ block('pagination_next_message', theme) }}
     </a>
 {% endblock %}
 
 {% block pagination_next_disabled %}
-    <span {{ block('attributes') }}>{{ block('pagination_next_message', theme) }}</span>
+    <span{{ _self.attributes(pagination_next_disabled_attr ?? {}) }}>
+        {{ block('pagination_next_message', theme) }}
+    </span>
 {% endblock %}
 
 {% block pagination_next_message '›' %}
 
-{# Filtration #}
+{% block pagination_last %}
+    <a{{ _self.attributes({ href, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(pagination_last_attr ?? {})) }}>
+        {{ block('pagination_last_message', theme) }}
+    </a>
+{% endblock %}
+
+{% block pagination_last_disabled %}
+    <span{{ _self.attributes(pagination_last_disabled_attr ?? {}) }}>
+        {{ block('pagination_last_message', theme) }}
+    </span>
+{% endblock %}
+
+{% block pagination_last_message '»' %}
 
 {% block kreyu_data_table_filters_form %}
     {% form_theme form with form_themes|default([_self]) %}
 
-    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
+    {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' }|merge(form_attr ?? {}) }) }}
         {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
     {{ form_end(form, { render_rest: false }) }}
 
-    {% if form.count > 0 %}
+    {% if form is not empty %}
         {{ block('filtration_widget', theme) }}
     {% endif %}
 {% endblock %}
@@ -307,50 +241,20 @@
     </button>
 {% endblock %}
 
+{# Form Theme #}
+
 {% block kreyu_data_table_date_range_widget %}
     {{ form_widget(form.from) }}
     {{ form_widget(form.to) }}
 {% endblock %}
 
+{# TODO: Misc #}
+
+{% block action_bar %}{% endblock %}
+
 {# Column type header templates #}
 
-{% block column_header %}
-    {% set label_attr = label_attr|default({}) %}
-
-    {% if data_table.vars.sorting_enabled and sortable %}
-        {% set active_attr = active_attr|default({}) %}
-        {% set inactive_attr = inactive_attr|default({}) %}
-
-        {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
-
-        <th {{ block('attributes') }}>
-            {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
-            {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
-
-            <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
-                {{- block('column_header_label', theme, _context) -}}
-
-                {% if sorted %}
-                    {% if sort_direction == 'asc' %}
-                        {{ block('sort_arrow_asc', theme, _context) }}
-                    {% else %}
-                        {{ block('sort_arrow_desc', theme, _context) }}
-                    {% endif %}
-                {% else %}
-                    {{ block('sort_arrow_none', theme, _context) }}
-                {% endif %}
-            </a>
-        </th>
-    {% else %}
-        <th {{ block('attributes') }}>
-            <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
-                {{- block('column_header_label', theme, _context) -}}
-            </span>
-        </th>
-    {% endif %}
-{% endblock %}
-
-{% block column_header_label %}
+{% block column_label %}
     {% if translation_domain is not same as false %}
         <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
     {% else %}
@@ -358,20 +262,53 @@
     {% endif %}
 {% endblock %}
 
+{% block column_header %}
+    {% set label_attr = label_attr ?? {} %}
+
+    {% if data_table.vars.sorting_enabled and sortable %}
+        <div{{ _self.attributes(sorted ? (active_attr ?? {}) : (inactive_attr ?? {})) }}>
+            {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
+            {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
+
+            <a{{ _self.attributes(label_attr) }}>
+                {{- block('column_label', theme) -}}
+
+                {% if sorted %}
+                    {% if sort_direction == 'asc' %}
+                        {{ block('sort_arrow_asc', theme) }}
+                    {% else %}
+                        {{ block('sort_arrow_desc', theme) }}
+                    {% endif %}
+                {% else %}
+                    {{ block('sort_arrow_none', theme) }}
+                {% endif %}
+            </a>
+        </div>
+    {% else %}
+        <div {{ block('attributes') }}>
+            <span{{ _self.attributes(label_attr) }}>
+                {{- block('column_label', theme) -}}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {# Column type value templates #}
 
 {% block column_value %}
-    <span {{- block('attributes') -}}>
+    {% set tag = tag ?? 'span' %}
+
+    <{{ tag }}{{ _self.attributes(attr) }}>
         {%- if translation_domain is not same as false -%}
             {{- value|trans({}, translation_domain) -}}
         {%- else -%}
             {{- value -}}
         {%- endif -%}
-    </span>
+    </{{ tag }}>
 {% endblock %}
 
 {% block column_text_value %}
-    {{- block('column_value') -}}
+    {{- block('column_value', theme) -}}
 {% endblock %}
 
 {% block column_number_value %}
@@ -382,7 +319,7 @@
         {% set value = value|format_number(intl_formatter_options.attrs, intl_formatter_options.style) %}
     {% endif %}
 
-    {{- block('column_text_value') -}}
+    {{- block('column_text_value', theme) -}}
 {% endblock %}
 
 {% block column_money_value %}
@@ -394,7 +331,7 @@
         {% set value = value|format_currency(currency, intl_formatter_options.attrs) %}
     {% endif %}
 
-    {{- block('column_text_value') -}}
+    {{- block('column_text_value', theme) -}}
 
     {% if value is not null and not use_intl_formatter %}
         {{ currency }}
@@ -402,9 +339,9 @@
 {% endblock %}
 
 {% block column_link_value %}
-    <a {% with { attr: { href, target }|filter(v => v != null)|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
-        {{- block('column_text_value') -}}
-    </a>
+    {% with { tag: 'a', attr: { href, target }|filter(v => v != null)|merge(attr) } %}
+        {{- block('column_text_value', theme) -}}
+    {% endwith %}
 {% endblock %}
 
 {% block column_date_time_value %}
@@ -446,22 +383,6 @@
     {% endfor %}
 {% endblock %}
 
-{% block column_form_value %}
-    {% if form_child_path is not same as false %}
-        {% set form = form[row_index][form_child_path].createView() %}
-    {% else %}
-        {% set form = form[row_index].createView() %}
-    {% endif %}
-
-    {% set form_themes = form_themes|default(null) %}
-
-    {% if form_themes is not null %}
-        {% form_theme form with form_themes %}
-    {% endif %}
-
-    {{ form_widget(form) }}
-{% endblock %}
-
 {% block column_checkbox_header %}
     <th {{ block('attributes') }}>
         {% set input_attr = {
@@ -470,7 +391,7 @@
             'data-identifier-name': identifier_name,
             'data-kreyu--data-table-bundle--batch-target': 'selectAllCheckbox',
             'data-action': 'input->kreyu--data-table-bundle--batch#selectAll'
-        }|merge(input_attr|default({})) %}
+        }|merge(input_attr ?? {}) %}
 
         <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
     </th>
@@ -490,16 +411,220 @@
     <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
 {% endblock %}
 
-{# Action type templates #}
+{% block action_icon %}
+    <i{{ _self.attributes(icon_attr) }}></i>
+{% endblock %}
 
-{% block action_value_icon %}{% endblock %}
+{% block action_label %}
+    {{- label|trans(translation_parameters, translation_domain) -}}
+{% endblock %}
+
+{% block action_control %}
+    {% if icon_attr %}{{ block('action_icon', theme) }}{% endif %}
+    {{ block('action_label', theme) }}
+{% endblock %}
+
+{% block action_link_control %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr ?? {}) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <a{{ _self.attributes(attr) }}>
+        {{ block('action_control', theme) }}
+    </a>
+{% endblock %}
+
+{% block action_button_control %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr ?? {}) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <a{{ _self.attributes(attr) }}>
+        {{ block('action_control', theme) }}
+    </a>
+{% endblock %}
+
+{% block action_form_control %}
+    {% set attr = { action, method: html_friendly_method, id: form_id }|filter(v => v != null)|merge(attr ?? {}) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <form{{ _self.attributes(attr) }}>
+        {# Reset attributes to prevent bubbling #}
+        {% set attr = {} %}
+
+        <input type="hidden" name="_method" value="{{ method }}"/>
+
+        {% set button_tag = button_tag ?? 'button' %}
+
+        <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
+            {{- block('action_control', theme) -}}
+        </{{ button_tag }}>
+    </form>
+{% endblock %}
+
+{% block sort_arrow_none %}{% endblock %}
+
+{% block sort_arrow_asc %}↑{% endblock %}
+
+{% block sort_arrow_desc %}↓{% endblock %}
+
+{% block attributes %}
+    {% for key, value in attr ?? {} %} {{ key }}="{{ value }}"{% endfor %}
+{% endblock %}
+
+{% macro attributes(attr) %}
+    {% for key, value in attr ?? {} %} {{ key }}="{{ value }}"{% endfor %}
+{% endmacro %}
+
+{# --------------------------------------------- #}
+{# Deprecated - FIXME: remove for stable release #}
+{# --------------------------------------------- #}
+
+{% block kreyu_data_table %}
+    {% deprecated 'The "kreyu_data_table" block is deprecated, use "data_table" instead.' %}
+    {{ block('data_table') }}
+{% endblock %}
+
+{% block kreyu_data_table_form_aware %}
+    {% deprecated 'The "kreyu_data_table_form_aware" block is deprecated, no replacement available.' %}
+
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame
+            id="kreyu_data_table_{{ name }}" target="_top"
+            data-controller="{{ stimulus_controllers|join(' ') }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+    >
+        {{ block('action_bar') }}
+
+        {{ form_start(form, form_variables) }}
+        {{ block('table') }}
+        {{ form_end(form, { render_rest: false }) }}
+
+        {% if pagination_enabled %}
+            {{ data_table_pagination(pagination) }}
+        {% endif %}
+    </turbo-frame>
+{% endblock %}
+
+{% block kreyu_data_table_table %}
+    {% deprecated 'The "kreyu_data_table_table" block is deprecated, use "table" instead.' %}
+    {{ block('table') }}
+{% endblock %}
+
+{% block table_head_row %}
+    {% deprecated 'The "table_head_row" block is deprecated, use "header_row" instead.' %}
+    {{ block('table_header_row') }}
+{% endblock %}
+
+{% block kreyu_data_table_header_row %}
+    {% deprecated 'The "kreyu_data_table_header_row" block is deprecated, use "header_row" instead.' %}
+{% endblock %}
+
+{% block table_body_row_results %}
+    {% deprecated 'The "table_body_row_no_results" block is deprecated, no replacement available, as the value rows are now iterated inside the "table_body_row" block.' %}
+    {% for value_row in value_rows %}
+        {{ block('value_row') }}
+    {% endfor %}
+{% endblock %}
+
+{% block table_body_row_no_results %}
+    {% deprecated 'The "table_body_row_no_results" block is deprecated, use "no_results_row" instead.' %}
+{% endblock %}
+
+{% block kreyu_data_table_pagination %}
+    {% deprecated 'The "kreyu_data_table_pagination" block is deprecated, use "pagination" instead.' %}
+    {{ block('pagination') }}
+{% endblock %}
+
+{% block pagination_widget %}
+    {% deprecated 'The "pagination_widget" block is deprecated, use "pagination" instead.' %}
+    {{ block('pagination') }}
+{% endblock %}
+
+{% block kreyu_data_table_value_row %}
+    {% deprecated 'The "kreyu_data_table_value_row" is deprecated, as the structure has changed, check base theme.' %}
+
+    {% for column_value in row %}
+        <td>
+            {{- data_table_column_value(column_value) -}}
+        </td>
+    {% endfor %}
+{% endblock %}
+
+{% block kreyu_data_table_action_bar %}
+    {% deprecated 'The "kreyu_data_table_action_bar" block is deprecated, use "action_bar" instead.' %}
+    {{ block('action_bar') }}
+{% endblock %}
+
+{% block kreyu_data_table_column_header %}
+    {% deprecated 'The "kreyu_data_table_column_header" block is deprecated, the "data_table_column_header" now directly renders the column header block.' %}
+    {{ block(block_name, block_theme ?? theme) }}
+{% endblock %}
+
+{% block kreyu_data_table_column_value %}
+    {% deprecated 'The "kreyu_data_table_column_value" block is deprecated, the "data_table_column_value" now directly renders the column value block.' %}
+    {{ block(block_name, block_theme ?? theme) }}
+{% endblock %}
+
+{% block kreyu_data_table_action %}
+    {% deprecated 'The "kreyu_data_table_action" block is deprecated, the "data_table_action" now directly renders the action block.' %}
+    {% if visible %}{{- block(block_name, block_theme ?? theme) -}}{% endif %}
+{% endblock %}
+
+{% block kreyu_data_table_column_label %}
+    {% deprecated 'The "kreyu_data_table_column_label" is now deprecated, use "column_label" instead.' %}
+    {{ block('column_label') }}
+{% endblock %}
+
+{% block column_header_label %}
+    {% deprecated 'The "column_header_label" is deprecated, use "column_label" instead.' %}
+    {% if translation_domain is not same as false %}
+        <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
+    {% else %}
+        <span>{{- label -}}</span>
+    {% endif %}
+{% endblock %}
+
+{% block column_form_value %}
+    {% deprecated 'The "column_form_value" is deprecated. The FormColumnType is deprecated as well.' %}
+
+    {% if form_child_path is not same as false %}
+        {% set form = form[row_index][form_child_path].createView() %}
+    {% else %}
+        {% set form = form[row_index].createView() %}
+    {% endif %}
+
+    {% set form_themes = form_themes|default(null) %}
+
+    {% if form_themes is not null %}
+        {% form_theme form with form_themes %}
+    {% endif %}
+
+    {{ form_widget(form) }}
+{% endblock %}
 
 {% block action_value %}
+    {% deprecated 'The "action_value" block is deprecated, use "action_control" instead.' %}
+
     {% if icon_attr %}{{ block('action_value_icon', theme, _context) }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 
 {% block action_link_value %}
+    {% deprecated 'The "action_link_value" block is deprecated, use "action_link_control" instead.' %}
+
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -512,6 +637,8 @@
 {% endblock %}
 
 {% block action_button_value %}
+    {% deprecated 'The "action_button_value" block is deprecated, use "action_button_control" instead.' %}
+
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -524,6 +651,8 @@
 {% endblock %}
 
 {% block action_form_value %}
+    {% deprecated 'The "action_form_value" block is deprecated, use "action_form_control" instead.' %}
+
     {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
 
     {% if batch %}
@@ -544,12 +673,6 @@
     </form>
 {% endblock %}
 
-{% block sort_arrow_none %}{% endblock %}
-
-{% block sort_arrow_asc %}↑{% endblock %}
-
-{% block sort_arrow_desc %}↓{% endblock %}
-
-{% block attributes %}
-    {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
+{% block action_value_icon %}
+    {% deprecated 'The "action_value_icon" block is deprecated, use "action_icon" instead.' %}
 {% endblock %}

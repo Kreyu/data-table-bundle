@@ -437,7 +437,7 @@
     </div>
 {% endblock %}
 
-{% block pagination_widget %}
+{% block pagination %}
     <div class="card-footer">
         <div class="pagination d-flex gap-3 flex-wrap justify-content-center align-items-center">
             {{ parent() }}
@@ -456,7 +456,7 @@
 
 {% block pagination_page %}
     <div class="page-item">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_page_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -464,7 +464,7 @@
 
 {% block pagination_page_active %}
     <div class="page-item active">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_page_active_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -472,7 +472,7 @@
 
 {% block pagination_first %}
     <div class="page-item">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_first_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -480,7 +480,7 @@
 
 {% block pagination_first_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_first_disabled_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -488,7 +488,7 @@
 
 {% block pagination_previous %}
     <div class="page-item">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_previous_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -496,7 +496,7 @@
 
 {% block pagination_previous_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_previous_disabled_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -504,7 +504,7 @@
 
 {% block pagination_last %}
     <div class="page-item">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_last_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -512,7 +512,7 @@
 
 {% block pagination_last_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_last_disabled_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -520,7 +520,7 @@
 
 {% block pagination_next %}
     <div class="page-item">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_next_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -528,7 +528,7 @@
 
 {% block pagination_next_disabled %}
     <div class="page-item disabled">
-        {% with { attr: { class: 'page-link' } } %}
+        {% with { pagination_next_disabled_attr: { class: 'page-link' } } %}
             {{ parent() }}
         {% endwith %}
     </div>
@@ -560,10 +560,6 @@
         {{ form_widget(form.priority) }}
         {{ form_widget(form.visible) }}
     </li>
-{% endblock %}
-
-{% block action_value_icon %}
-    <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
 {% block action_confirmation_modal %}

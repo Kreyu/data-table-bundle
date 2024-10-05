@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
@@ -26,45 +27,38 @@ use Twig\TwigFunction;
 class DataTableExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
-        private readonly FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
-        private readonly PaginationUrlGeneratorInterface $paginationUrlGenerator,
+        private ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
+        private FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
+        private PaginationUrlGeneratorInterface $paginationUrlGenerator,
     ) {
     }
 
     public function getFunctions(): array
     {
-        $definitions = [
-            'data_table' => $this->renderDataTable(...),
-            'data_table_form_aware' => $this->renderDataTableFormAware(...),
-            'data_table_table' => $this->renderDataTableTable(...),
-            'data_table_action_bar' => $this->renderDataTableActionBar(...),
-            'data_table_header_row' => $this->renderHeaderRow(...),
-            'data_table_value_row' => $this->renderValueRow(...),
-            'data_table_column_label' => $this->renderColumnLabel(...),
-            'data_table_column_header' => $this->renderColumnHeader(...),
-            'data_table_column_value' => $this->renderColumnValue(...),
-            'data_table_action' => $this->renderAction(...),
-            'data_table_pagination' => $this->renderPagination(...),
-            'data_table_filters_form' => $this->renderFiltersForm(...),
-            'data_table_personalization_form' => $this->renderPersonalizationForm(...),
-            'data_table_export_form' => $this->renderExportForm(...),
+        $renderOptions = [
+            'needs_environment' => true,
+            'is_safe' => ['html'],
         ];
 
-        $functions = [
+        return [
+            new TwigFunction('data_table', $this->renderDataTable(...), $renderOptions),
+            new TwigFunction('data_table_form_aware', $this->renderDataTableFormAware(...), $renderOptions),
+            new TwigFunction('data_table_table', $this->renderTable(...), $renderOptions),
+            new TwigFunction('data_table_action_bar', $this->renderActionBar(...), $renderOptions),
+            new TwigFunction('data_table_header_row', $this->renderHeaderRow(...), $renderOptions),
+            new TwigFunction('data_table_value_row', $this->renderValueRow(...), $renderOptions),
+            new TwigFunction('data_table_column_label', $this->renderColumnLabel(...), $renderOptions),
+            new TwigFunction('data_table_column_header', $this->renderColumnHeader(...), $renderOptions),
+            new TwigFunction('data_table_column_value', $this->renderColumnValue(...), $renderOptions),
+            new TwigFunction('data_table_action', $this->renderAction(...), $renderOptions),
+            new TwigFunction('data_table_pagination', $this->renderPagination(...), $renderOptions),
+            new TwigFunction('data_table_filters_form', $this->renderFiltersForm(...), $renderOptions),
+            new TwigFunction('data_table_personalization_form', $this->renderPersonalizationForm(...), $renderOptions),
+            new TwigFunction('data_table_export_form', $this->renderExportForm(...), $renderOptions),
             new TwigFunction('data_table_filter_clear_url', $this->generateFilterClearUrl(...)),
             new TwigFunction('data_table_column_sort_url', $this->generateColumnSortUrl(...)),
             new TwigFunction('data_table_pagination_url', $this->generatePaginationUrl(...)),
         ];
-
-        foreach ($definitions as $name => $callable) {
-            $functions[] = new TwigFunction($name, $callable, [
-                'needs_environment' => true,
-                'is_safe' => ['html'],
-            ]);
-        }
-
-        return $functions;
     }
 
     public function getTokenParsers(): array
@@ -84,230 +78,136 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderDataTable(Environment $environment, DataTableView $view, array $variables = []): string
+    public function renderDataTable(Environment $environment, DataTableView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view, $variables),
-            blockName: 'kreyu_data_table',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderBlock($environment, $view, 'data_table', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $dataTableVariables
-     * @param array<string, mixed> $formVariables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
+    public function renderTable(Environment $environment, DataTableView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view, $dataTableVariables),
-            blockName: 'kreyu_data_table_form_aware',
-            context: array_merge($view->vars, $dataTableVariables, ['form' => $formView, 'form_variables' => $formVariables]),
-        );
+        return $this->renderBlock($environment, $view, 'table', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderDataTableTable(Environment $environment, DataTableView $view, array $variables = []): string
+    public function renderActionBar(Environment $environment, DataTableView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view, $variables),
-            blockName: 'kreyu_data_table_table',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderBlock($environment, $view, 'action_bar', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderDataTableActionBar(Environment $environment, DataTableView $view, array $variables = []): string
+    public function renderHeaderRow(Environment $environment, HeaderRowView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view, $variables),
-            blockName: 'kreyu_data_table_action_bar',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderBlock($environment, $view->parent, 'header_row', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderHeaderRow(Environment $environment, HeaderRowView $view, array $variables = []): string
+    public function renderValueRow(Environment $environment, ValueRowView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
-            blockName: 'kreyu_data_table_header_row',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderBlock($environment, $view->parent, 'value_row', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support any block from the hierarchy
      */
-    public function renderValueRow(Environment $environment, ValueRowView $view, array $variables = []): string
+    public function renderColumnLabel(Environment $environment, ColumnHeaderView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
-            blockName: 'kreyu_data_table_value_row',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderHierarchyAwareViewBlock($environment, $view, 'label', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support any block from the hierarchy
      */
-    public function renderColumnLabel(Environment $environment, ColumnHeaderView $view, array $variables = []): string
+    public function renderColumnHeader(Environment $environment, ColumnHeaderView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
-            blockName: 'kreyu_data_table_column_label',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderHierarchyAwareViewBlock($environment, $view, 'header', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support any block from the hierarchy
      */
-    public function renderColumnHeader(Environment $environment, ColumnHeaderView $view, array $variables = []): string
+    public function renderColumnValue(Environment $environment, ColumnValueView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
-            blockName: 'kreyu_data_table_column_header',
-            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'header'),
-        );
+        return $this->renderHierarchyAwareViewBlock($environment, $view, 'value', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support any block from the hierarchy
      */
-    public function renderColumnValue(Environment $environment, ColumnValueView $view, array $variables = []): string
+    public function renderAction(Environment $environment, ActionView $view, array $vars = []): string
     {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
-            blockName: 'kreyu_data_table_column_value',
-            context: $this->getDecoratedViewContext($environment, $view, $variables, 'column', 'value'),
-        );
+        return $this->renderHierarchyAwareViewBlock($environment, $view, 'control', array_merge($view->vars, $vars));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderAction(Environment $environment, ActionView $view, array $variables = []): string
-    {
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
-            blockName: 'kreyu_data_table_action',
-            context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'value'),
-        );
-    }
-
-    /**
-     * @param array<string, mixed> $variables
-     *
-     * @throws TwigException|\Throwable
-     */
-    public function renderPagination(Environment $environment, DataTableView|PaginationView $view, array $variables = []): string
+    public function renderPagination(Environment $environment, DataTableView|PaginationView $view, array $vars = []): string
     {
         if ($view instanceof DataTableView) {
             $view = $view->vars['pagination'];
         }
 
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($view->parent, $variables),
-            blockName: 'kreyu_data_table_pagination',
-            context: array_merge($view->vars, $variables),
-        );
+        return $this->renderBlock($environment, $view->parent, 'pagination', array_merge($view->vars, $vars));
     }
 
     /**
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
+    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form, array $vars = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
 
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
-            blockName: 'kreyu_data_table_filters_form',
-            context: [
-                'form' => $form,
-            ],
-        );
+        return $this->renderBlock($environment, $form->vars['data_table_view'], 'kreyu_data_table_filters_form', array_merge($vars, ['form' => $form]));
     }
 
     /**
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
+    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form, array $vars = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
 
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
-            blockName: 'kreyu_data_table_personalization_form',
-            context: [
-                'form' => $form,
-            ],
-        );
+        return $this->renderBlock($environment, $form->vars['data_table_view'], 'kreyu_data_table_personalization_form', array_merge($vars, ['form' => $form]));
     }
 
     /**
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
-    public function renderExportForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
+    public function renderExportForm(Environment $environment, FormInterface|FormView $form, array $vars = []): string
     {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
 
-        return $this->renderBlock(
-            environment: $environment,
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
-            blockName: 'kreyu_data_table_export_form',
-            context: [
-                'form' => $form,
-            ],
-        );
+        return $this->renderBlock($environment, $form->vars['data_table_view'], 'kreyu_data_table_export_form', array_merge($vars, ['form' => $form]));
     }
 
     public function generateFilterClearUrl(DataTableView $dataTableView, FilterView|array $filterViews): string
@@ -334,9 +234,8 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string, mixed> $context
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support given block
      */
     private function renderBlock(Environment $environment, DataTableView $dataTable, string $blockName, array $context = []): string
     {
@@ -350,48 +249,79 @@ class DataTableExtension extends AbstractExtension
             }
         }
 
-        throw new RuntimeError(sprintf('Block "%s" does not exist on any of the configured data table themes', $blockName));
+        throw new LogicException(sprintf(
+            'Unable to render block "%s" as it is not supported by any of the following themes: "%s".',
+            $blockName,
+            implode('", "', $dataTable->vars['themes'])
+        ));
     }
 
     /**
-     * @param array<string, mixed> $variables
-     *
-     * @return array<string, mixed>
-     *
-     * @throws TwigException|\Throwable
+     * @throws TwigException
+     * @throws LogicException if none of the data table themes support any block from the hierarchy
      */
-    private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array
+    private function renderHierarchyAwareViewBlock(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, string $blockNameSuffix, array $context = []): string
     {
         $dataTable = $view->getDataTable();
 
-        $context = array_merge($view->vars, $variables);
-        $context['block_name'] = $prefix.'_'.$suffix;
+        $blockNamePrefix = match ($view::class) {
+            ColumnHeaderView::class, ColumnValueView::class => 'column',
+            ActionView::class => 'action',
+        };
+
+        $blockNameHierarchy = [];
 
         foreach ($view->vars['block_prefixes'] as $blockPrefix) {
-            $blockName = $blockPrefix.'_'.$suffix;
+            $blockName = $blockPrefix.'_'.$blockNameSuffix;
 
-            if ($prefix !== $blockPrefix) {
-                $blockName = $prefix.'_'.$blockName;
+            if ($blockNamePrefix !== $blockPrefix) {
+                $blockName = $blockNamePrefix.'_'.$blockName;
             }
 
             foreach ($dataTable->vars['themes'] as $theme) {
                 $wrapper = $environment->load($theme);
 
                 if ($wrapper->hasBlock($blockName, $context)) {
-                    $context['block_name'] = $blockName;
-                    $context['block_theme'] = $theme;
+                    $context['theme'] = $theme;
 
-                    break 2;
+                    return $wrapper->renderBlock($blockName, $context);
                 }
             }
+
+            $blockNameHierarchy[] = $blockName;
         }
 
-        return $context;
+        throw new LogicException(sprintf(
+            'Unable to render any of the following blocks: "%s" as none of them is supported by any of the following themes: "%s".',
+            implode('", "', array_reverse($blockNameHierarchy)),
+            implode('", "', $dataTable->vars['themes'])
+        ));
     }
 
-    private function getDecoratedDataTable(DataTableView $view, array $variables = []): DataTableView
+    /**
+     * @deprecated no replacement available
+     *
+     * @param array<string, mixed> $dataTableVariables
+     * @param array<string, mixed> $formVariables
+     *
+     * @throws TwigException|\Throwable
+     */
+    public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
     {
-        if (!empty($themes = $variables['themes'] ?? [])) {
+        return $this->renderBlock(
+            environment: $environment,
+            dataTable: $this->getDecoratedDataTableView($view, $dataTableVariables),
+            blockName: 'kreyu_data_table_form_aware',
+            context: array_merge($view->vars, $dataTableVariables, ['form' => $formView, 'form_variables' => $formVariables]),
+        );
+    }
+
+    /**
+     * @deprecated no replacement available
+     */
+    private function getDecoratedDataTableView(DataTableView $view, array $vars = []): DataTableView
+    {
+        if (!empty($themes = $vars['themes'] ?? [])) {
             if (!is_array($themes)) {
                 throw new RuntimeError('The "themes" option passed in the template must be an array.');
             }

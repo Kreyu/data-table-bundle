@@ -36,6 +36,6 @@ class ArrayProxyQueryFactoryTest extends TestCase
         yield 'integer' => [123, false];
         yield 'bool' => [true, false];
         yield 'null' => [null, false];
-        yield 'object' => [new \stdClass, false];
+        yield 'object' => [new \stdClass(), false];
     }
 }

@@ -74,7 +74,6 @@ return static function (ContainerConfigurator $configurator) {
         ->tag('kreyu_data_table.proxy_query.factory')
     ;
 
-
     $services
         ->set('kreyu_data_table.proxy_query.factory.doctrine_orm', DoctrineOrmProxyQueryFactory::class)
         ->tag('kreyu_data_table.proxy_query.factory')

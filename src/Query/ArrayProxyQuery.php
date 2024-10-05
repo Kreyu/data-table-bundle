@@ -39,9 +39,9 @@ class ArrayProxyQuery implements ProxyQueryInterface
                 $valueB = $propertyAccessor->getValue($b, $propertyPath);
 
                 if ($valueA < $valueB) {
-                    return $direction === 'asc' ? -1 : 1;
+                    return 'asc' === $direction ? -1 : 1;
                 } elseif ($valueA > $valueB) {
-                    return $direction === 'asc' ? 1 : -1;
+                    return 'asc' === $direction ? 1 : -1;
                 }
             }
 

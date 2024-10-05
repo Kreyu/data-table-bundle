@@ -139,14 +139,17 @@
 {# Pagination #}
 
 {% block kreyu_data_table_pagination %}
-    {% if page_count > 1 %}
-        {{ block('pagination_widget', theme) }}
-    {% endif %}
+    {{ block('pagination_widget', theme) }}
 {% endblock %}
 
 {% block pagination_widget %}
     {{ block('pagination_counters', theme) }}
-    {{ block('pagination_controls', theme) }}
+
+    {% if page_count > 1 %}
+        {{ block('pagination_controls', theme) }}
+    {% endif %}
+
+    {{ block('pagination_per_page', theme) }}
 {% endblock %}
 
 {% block pagination_controls %}
@@ -185,6 +188,34 @@
         {{ block('pagination_next_disabled', theme) }}
         {{ block('pagination_last_disabled', theme) }}
     {%- endif -%}
+{% endblock %}
+
+{% block pagination_per_page %}
+    {% set choices = data_table.vars.per_page_choices %}
+
+    {% if choices is not empty %}
+        {{ block('pagination_per_page_message', theme) }}
+        {{ block('pagination_per_page_form', theme) }}
+    {% else %}
+        <div></div>
+    {% endif %}
+{% endblock %}
+
+{% block pagination_per_page_message 'Items per page'|trans %}
+
+{% block pagination_per_page_form %}
+    <form>
+        {% set select_attr = {
+            name: data_table.vars.per_page_parameter_name,
+            onchange: 'this.form.submit()',
+        }|merge(select_attr|default({})) %}
+
+        <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
+            {% for choice in choices %}
+                <option value="{{ choice }}"{{ item_number_per_page == choice ? ' selected' }}>{{ choice }}</option>
+            {% endfor %}
+        </select>
+    </form>
 {% endblock %}
 
 {% block pagination_counters %}

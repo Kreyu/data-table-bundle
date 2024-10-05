@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\CachePersistenceClearer;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceClearerInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
+use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
@@ -67,6 +68,12 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.request_handler.http_foundation', HttpFoundationRequestHandler::class)
     ;
+
+    $services
+        ->set('kreyu_data_table.proxy_query.factory.array', ArrayProxyQueryFactory::class)
+        ->tag('kreyu_data_table.proxy_query.factory')
+    ;
+
 
     $services
         ->set('kreyu_data_table.proxy_query.factory.doctrine_orm', DoctrineOrmProxyQueryFactory::class)

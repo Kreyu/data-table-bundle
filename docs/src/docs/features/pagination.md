@@ -222,6 +222,71 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
+## Configuring items per page
+
+The per-page limit choices can be configured using the `per_page_choices` option.
+Those choices will be rendered inside a select field, next to the pagination controls.
+
+::: code-group
+```yaml [Globally (YAML)]
+kreyu_data_table:
+  defaults:
+    pagination:
+      per_page_choices: [10, 25, 50, 100]
+```
+
+```php [Globally (PHP)]
+use Symfony\Config\KreyuDataTableConfig;
+
+return static function (KreyuDataTableConfig $config) {
+    $defaults = $config->defaults();
+    $defaults->pagination()
+        ->perPageChoices([10, 25, 50, 100)
+    ;
+};
+```
+
+```php [For data table type]
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'per_page_choices' => [10, 25, 50, 100],
+        ]);
+    }
+}
+```
+
+```php [For specific data table]
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'per_page_choices' => [10, 25, 50, 100],
+            ],
+        );
+    }
+}
+```
+:::
+
+Setting the `per_page_choices` to an empty array will hide the per-page select field.
+
+
 ## Events
 
 The following events are dispatched when `paginate()` method of the [`DataTableInterface`](https://github.com/Kreyu/data-table-bundle/blob/main/src/DataTableInterface.php) is called:

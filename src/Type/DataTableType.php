@@ -103,6 +103,7 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
+            'per_page_choices' => $options['per_page_choices'],
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -168,6 +169,7 @@ final class DataTableType implements DataTableTypeInterface
                 'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'] ?? false,
                 'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
                 'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
+                'per_page_choices' => $this->defaults['pagination']['per_page_choices'] ?? [10, 25, 50, 100],
                 'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? false,
                 'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
                 'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,

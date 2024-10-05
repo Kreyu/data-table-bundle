@@ -37,6 +37,7 @@ kreyu_data_table:
       persistence_adapter: kreyu_data_table.pagination.persistence.adapter.cache
       # if persistence is enabled and symfony/security-bundle is installed, null otherwise 
       persistence_subject_provider: kreyu_data_table.persistence.subject_provider.token_storage
+      per_page_choices: [10, 25, 50, 100]
     filtration:
       enabled: true
       persistence_enabled: false
@@ -92,6 +93,7 @@ return static function (KreyuDataTableConfig $config) {
         ->persistenceAdapter('kreyu_data_table.pagination.persistence.adapter.cache')
         // if persistence is enabled and symfony/security-bundle is installed, null otherwise
         ->persistenceSubjectProvider('kreyu_data_table.persistence.subject_provider.token_storage')
+        ->perPageChoices([10, 25, 50, 100])
     ;
 
     $defaults->filtration()

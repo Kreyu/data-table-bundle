@@ -116,7 +116,9 @@ Formats the value to the desired string.
 ```php
 $builder
     ->addColumn('quantity', NumberColumnType::class, [
-        'formatter' => fn (float $value) => number_format($value, 2) . 'kg',
+        'formatter' => function (float $value, Product $product, ColumnInterface $column, array $options) {
+            return number_format($value, 2) . $product->getUnit();
+        },
     ])
 ;
 ```

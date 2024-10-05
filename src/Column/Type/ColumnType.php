@@ -68,7 +68,7 @@ final class ColumnType implements ColumnTypeInterface
         $rowData = $view->parent->data;
 
         $normData = $this->getNormDataFromRowData($rowData, $column, $options);
-        $viewData = $this->getViewDataFromNormData($normData, $column, $options);
+        $viewData = $this->getViewDataFromNormData($normData, $rowData, $column, $options);
 
         $view->data = $normData;
         $view->value = $viewData;
@@ -146,8 +146,10 @@ final class ColumnType implements ColumnTypeInterface
             'formatter' => $options['formatter'],
         ];
 
-        $normData = $this->getNormDataFromRowData($view->parent->data, $column, $options['export']);
-        $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);
+        $rowData = $view->parent->data;
+
+        $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
+        $viewData = $this->getViewDataFromNormData($normData, $rowData, $column, $options['export']);
 
         if ($this->translator && is_string($viewData)) {
             $translationDomain = $options['export']['value_translation_domain']
@@ -230,39 +232,41 @@ final class ColumnType implements ColumnTypeInterface
      * - using the property accessor with the "property_path" option;
      * - falling back to the unmodified column data;
      */
-    private function getNormDataFromRowData(mixed $data, ColumnInterface $column, array $options): mixed
+    private function getNormDataFromRowData(mixed $rowData, ColumnInterface $column, array $options): mixed
     {
-        if (null === $data) {
+        if (null === $rowData) {
             return null;
         }
 
         if (is_callable($getter = $options['getter'])) {
-            return $getter($data, $column, $options);
+            return $getter($rowData, $column, $options);
         }
 
         $propertyPath = $options['property_path'] ?? $column->getName();
 
-        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($data) || is_object($data))) {
-            return $options['property_accessor']->getValue($data, $propertyPath);
+        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($rowData) || is_object($rowData))) {
+            return $options['property_accessor']->getValue($rowData, $propertyPath);
         }
 
-        return $data;
+        return $rowData;
     }
 
     /**
      * Retrieves the column view data from the norm data by applying the formatter if given.
      */
-    private function getViewDataFromNormData(mixed $data, ColumnInterface $column, array $options): mixed
+    private function getViewDataFromNormData(mixed $normData, mixed $rowData, ColumnInterface $column, array $options): mixed
     {
-        if (null === $data) {
+        if (null === $normData) {
             return null;
         }
 
+        $viewData = $normData;
+
         if (is_callable($formatter = $options['formatter'])) {
-            $data = $formatter($data, $column, $options);
+            $viewData = $formatter($normData, $rowData, $column, $options);
         }
 
-        return $data;
+        return $viewData;
     }
 
     /**

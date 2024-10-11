@@ -205,9 +205,29 @@
 
 {% block pagination_per_page_form %}
     <form>
+        {% set url_query_parameters = data_table.vars.url_query_parameters %}
+
+        {#
+            Changing the "per page" parameter automatically changes page to the first one.
+            You can disable this behavior by in your own theme that extends this one, for example:
+
+            {% block pagination_per_page_form %}
+                {% with { should_reset_to_first_page: false } %}
+                    {{ parent() }}
+                {% endwith %}
+            {% endblock %}
+        #}
+
+        {% if should_reset_to_first_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+        {% endif %}
+
+        {{ _self.array_to_form_inputs(url_query_parameters) }}
+
         {% set select_attr = {
             name: data_table.vars.per_page_parameter_name,
             onchange: 'this.form.submit()',
+            autocomplete: 'off',
         }|merge(select_attr|default({})) %}
 
         <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
@@ -219,9 +239,11 @@
 {% endblock %}
 
 {% block pagination_counters %}
-    <span {{- block('attributes') -}}>
-        {{- block('pagination_counters_message', theme) -}}
-    </span>
+    {% if total_item_count > 0 %}
+        <span {{- block('attributes') -}}>
+            {{- block('pagination_counters_message', theme) -}}
+        </span>
+    {% endif %}
 {% endblock %}
 
 {% block pagination_counters_message %}
@@ -307,6 +329,35 @@
 
     {% if form.count > 0 %}
         {{ block('filtration_widget', theme) }}
+    {% endif %}
+
+    {#
+        Submitting a filtration form should keep current "per page" and change current page to the first one.
+        You can disable this behavior by in your own theme that extends this one, for example:
+
+        {% block kreyu_data_table_filters_form %}
+            {% with { should_reset_to_first_page: false, should_keep_per_page: false } %}
+                {{ parent() }}
+            {% endwith %}
+        {% endblock %}
+    #}
+
+    {% set data_table = form.vars.data_table_view %}
+
+    {% if data_table.vars.pagination_enabled %}
+        {% set url_query_parameters = [] %}
+
+        {% if should_reset_to_first_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+        {% endif %}
+
+        {% if should_keep_per_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({
+                (data_table.vars.per_page_parameter_name): data_table.vars.pagination.vars.item_number_per_page,
+            }) %}
+        {% endif %}
+
+        {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
     {% endif %}
 {% endblock %}
 
@@ -584,3 +635,26 @@
 {% block attributes %}
     {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
 {% endblock %}
+
+{# Transforms given array to form inputs. Supports nested arrays. #}
+{# For example, ['foo' => ['bar' => 'baz']] will be rendered as:  #}
+{# <input name="foo[bar]" value="baz">                            #}
+{% macro array_to_form_inputs(input, attr = [], parent = null) %}
+    {% for key, value in input %}
+        {% if value is iterable %}
+            {% if parent is not null %}
+                {% set key = parent ~ '[' ~ key ~ ']' %}
+            {% endif %}
+
+            {{ _self.array_to_form_inputs(value, attr, key) }}
+        {% else %}
+            {% if parent is not null %}
+                {% set key = '[' ~ key ~ ']' %}
+            {% endif %}
+
+            {% with { attr: { type: 'hidden' }|merge(attr|merge({ name: parent ~ key, value })) } %}
+                <input {{ block('attributes') }}>
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

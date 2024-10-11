@@ -16,6 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,6 +117,13 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
                 'sort_direction' => $columnSortingData->getDirection(),
             ];
         }
+    }
+
+    public function collectPaginationData(DataTableInterface $dataTable, PaginationData $data): void
+    {
+        $this->data[$dataTable->getName()]['page'] = $data->getPage();
+        $this->data[$dataTable->getName()]['per_page'] = $data->getPerPage();
+        $this->data[$dataTable->getName()]['total_count'] = $dataTable->getPagination()->getTotalItemCount();
     }
 
     public function collectFilterView(FilterInterface $filter, FilterView $view): void

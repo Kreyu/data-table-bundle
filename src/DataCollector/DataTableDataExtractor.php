@@ -42,9 +42,6 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
                     'persistence_enabled' => $dataTable->getConfig()->isPersonalizationPersistenceEnabled(),
                 ],
             ],
-            'page' => $dataTable->getPagination()->getCurrentPageNumber(),
-            'per_page' => $dataTable->getPagination()->getItemNumberPerPage(),
-            'total_count' => $dataTable->getPagination()->getTotalItemCount(),
         ];
 
         ksort($data['passed_options']);

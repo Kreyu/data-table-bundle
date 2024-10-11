@@ -818,6 +818,7 @@ class DataTable implements DataTableInterface
     private function resetPagination(): void
     {
         $this->pagination = null;
+        $this->resultSet = null;
     }
 
     private function getInitialPaginationData(): ?PaginationData

@@ -14,6 +14,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -29,6 +30,8 @@ interface DataTableDataCollectorInterface extends DataCollectorInterface
     public function collectColumnValueView(ColumnInterface $column, ColumnValueView $view): void;
 
     public function collectSortingData(DataTableInterface $dataTable, SortingData $data): void;
+
+    public function collectPaginationData(DataTableInterface $dataTable, PaginationData $data): void;
 
     public function collectFilterView(FilterInterface $filter, FilterView $view): void;
 

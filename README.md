@@ -7,7 +7,7 @@
 Streamlines the creation process of the data tables in Symfony applications.
 
 > [!WARNING]
-> This bundle is still in early stages of development and is likely to **change**, or even **change drastically**.
+> This bundle is still in development and is likely to **change**, or even **change drastically**.
 > It is **NOT** production ready, and backwards compatibility is **NOT** guaranteed until the first stable release. 
 
 ## Documentation

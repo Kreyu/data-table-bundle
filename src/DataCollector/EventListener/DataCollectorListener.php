@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\DataCollector\DataTableDataCollectorInterface;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,6 +24,7 @@ class DataCollectorListener implements EventSubscriberInterface
         return [
             DataTableEvents::POST_INITIALIZE => ['collectDataTable', 255],
             DataTableEvents::POST_FILTER => ['collectFiltrationData', 255],
+            DataTableEvents::POST_PAGINATE => ['collectPaginationData', 255],
             DataTableEvents::POST_SORT => ['collectSortingData', 255],
         ];
     }
@@ -30,6 +32,11 @@ class DataCollectorListener implements EventSubscriberInterface
     public function collectDataTable(DataTableEvent $event): void
     {
         $this->dataCollector->collectDataTable($event->getDataTable());
+    }
+
+    public function collectPaginationData(DataTablePaginationEvent $event): void
+    {
+        $this->dataCollector->collectPaginationData($event->getDataTable(), $event->getPaginationData());
     }
 
     public function collectFiltrationData(DataTableFiltrationEvent $event): void

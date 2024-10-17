@@ -143,7 +143,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()] ??= [];
             $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()] += [
                 'data' => $filterData,
-                'operator_label' => $filterData->getOperator()->getLabel(),
+                'operator_label' => $filterData->getOperator()?->getLabel(),
             ];
         }
     }

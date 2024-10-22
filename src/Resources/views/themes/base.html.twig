@@ -205,7 +205,7 @@
 
 {% block pagination_per_page_form %}
     <form>
-        {% set url_query_parameters = data_table.vars.url_query_parameters %}
+        {% set url_query_parameters = [] %}
 
         {#
             Changing the "per page" parameter automatically changes page to the first one.

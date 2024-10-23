@@ -119,7 +119,7 @@ final class ActionType implements ActionTypeInterface
         return null;
     }
 
-    private function resolveConfirmationOption(true|array $confirmation): array
+    private function resolveConfirmationOption(bool|array $confirmation): array
     {
         if (true === $confirmation) {
             $confirmation = [];
@@ -143,6 +143,6 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedValues('type', ['danger', 'warning', 'info'])
         ;
 
-        return $optionsResolver->resolve($confirmation);
+        return $optionsResolver->resolve($confirmation ?: []);
     }
 }

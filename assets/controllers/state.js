@@ -20,7 +20,9 @@ export default class extends Controller {
             }
         }
 
-        window.history.replaceState(null, null, url);
+        if (url.toString() !== window.location.href) {
+            window.history.replaceState(null, null, url);
+        }
     }
 
     #flattenParameters(input, keyName) {
@@ -30,7 +32,7 @@ export default class extends Controller {
             const newKey =  keyName ? `${keyName}[${key}]` : key;
 
             if (typeof input[key] === "object" && !Array.isArray(input[key])) {
-                result = {...result, ...this.#flattenParameters(input[key], newKey)}
+                result = { ...result, ...this.#flattenParameters(input[key], newKey) }
             } else {
                 result[newKey] = input[key];
             }

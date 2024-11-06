@@ -775,10 +775,6 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             $dataTable->addExporter($exporter->getExporter());
         }
 
-        // TODO: Remove initialization logic from builder.
-        //       Instead, add "initialized" flag to the data table itself to allow lazy initialization.
-        $dataTable->initialize();
-
         return $dataTable;
     }
 

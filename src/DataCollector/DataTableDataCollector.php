@@ -18,6 +18,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
+use Kreyu\Bundle\DataTableBundle\Util\ArrayUtil;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,6 +43,11 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
         return parent::__sleep();
     }
 
+    public static function getTemplate(): ?string
+    {
+        return '@KreyuDataTable/data_collector/template.html.twig';
+    }
+
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
     }
@@ -49,27 +55,27 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
     public function collectDataTable(DataTableInterface $dataTable): void
     {
         $data = [
-            'columns' => $this->mapWithKeys(
+            'columns' => ArrayUtil::mapWithKeys(
                 fn (ColumnInterface $column) => [$column->getName() => $this->dataExtractor->extractColumnConfiguration($column)],
                 $dataTable->getColumns(),
             ),
-            'filters' => $this->mapWithKeys(
+            'filters' => ArrayUtil::mapWithKeys(
                 fn (FilterInterface $filter) => [$filter->getName() => $this->dataExtractor->extractFilterConfiguration($filter)],
                 $dataTable->getFilters(),
             ),
-            'actions' => $this->mapWithKeys(
+            'actions' => ArrayUtil::mapWithKeys(
                 fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
                 $dataTable->getActions(),
             ),
-            'row_actions' => $this->mapWithKeys(
+            'row_actions' => ArrayUtil::mapWithKeys(
                 fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
                 $dataTable->getRowActions(),
             ),
-            'batch_actions' => $this->mapWithKeys(
+            'batch_actions' => ArrayUtil::mapWithKeys(
                 fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
                 $dataTable->getBatchActions(),
             ),
-            'exporters' => $this->mapWithKeys(
+            'exporters' => ArrayUtil::mapWithKeys(
                 fn (ExporterInterface $exporter) => [$exporter->getName() => $this->dataExtractor->extractExporterConfiguration($exporter)],
                 $dataTable->getExporters(),
             ),
@@ -83,14 +89,14 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
     public function collectDataTableView(DataTableInterface $dataTable, DataTableView $view): void
     {
         $this->data[$dataTable->getName()] += [
-            'view_vars' => $this->ksort($view->vars),
+            'view_vars' => ArrayUtil::ksort($view->vars),
             'value_rows' => $this->dataExtractor->extractValueRows($view),
         ];
     }
 
     public function collectColumnHeaderView(ColumnInterface $column, ColumnHeaderView $view): void
     {
-        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['header_view_vars'] = $this->ksort($view->vars);
+        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['header_view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectColumnValueView(ColumnInterface $column, ColumnValueView $view): void
@@ -100,7 +106,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             return;
         }
 
-        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['value_view_vars'] = $this->ksort($view->vars);
+        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['value_view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectSortingData(DataTableInterface $dataTable, SortingData $data): void
@@ -128,7 +134,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
 
     public function collectFilterView(FilterInterface $filter, FilterView $view): void
     {
-        $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()]['view_vars'] = $this->ksort($view->vars);
+        $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectFiltrationData(DataTableInterface $dataTable, FiltrationData $data): void
@@ -156,44 +162,11 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             ActionContext::Batch => 'batch_actions',
         };
 
-        $this->data[$action->getDataTable()->getName()][$actionsKey][$action->getName()]['view_vars'] = $this->ksort($view->vars);
-    }
-
-    public static function getTemplate(): ?string
-    {
-        return '@KreyuDataTable/data_collector/template.html.twig';
+        $this->data[$action->getDataTable()->getName()][$actionsKey][$action->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function getData(): array|Data
     {
         return $this->data;
-    }
-
-    /**
-     * @internal
-     */
-    private function mapWithKeys(callable $callback, array $array): array
-    {
-        $data = [];
-
-        foreach ($array as $value) {
-            foreach ($callback($value) as $mapKey => $mapValue) {
-                $data[$mapKey] = $mapValue;
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @internal
-     */
-    private function ksort(array $array): array
-    {
-        $copy = $array;
-
-        ksort($copy);
-
-        return $copy;
     }
 }

@@ -134,19 +134,19 @@ class DataTable implements DataTableInterface
 
         $this->dispatch(DataTableEvents::PRE_INITIALIZE, new DataTableEvent($this));
 
-        if ($paginationData = $this->getInitialPaginationData()) {
+        if (null === $this->paginationData && $paginationData = $this->getInitialPaginationData()) {
             $this->paginate($paginationData, false);
         }
 
-        if ($sortingData = $this->getInitialSortingData()) {
+        if (null === $this->sortingData && $sortingData = $this->getInitialSortingData()) {
             $this->sort($sortingData, false);
         }
 
-        if ($filtrationData = $this->getInitialFiltrationData()) {
+        if (null === $this->filtrationData && $filtrationData = $this->getInitialFiltrationData()) {
             $this->filter($filtrationData, false);
         }
 
-        if ($personalizationData = $this->getInitialPersonalizationData()) {
+        if (null === $this->personalizationData && $personalizationData = $this->getInitialPersonalizationData()) {
             $this->personalize($personalizationData, false);
         }
 
@@ -584,7 +584,7 @@ class DataTable implements DataTableInterface
         $data = $event->getExportData();
 
         if (ExportStrategy::IncludeAll === $data->strategy) {
-            $dataTable->getQuery()->paginate(new PaginationData(perPage: null));
+            $this->paginate(new PaginationData(page: 1, perPage: null), persistence: false);
         }
 
         if (!$data->includePersonalization) {
@@ -784,6 +784,10 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
+        if (!$this->initialized) {
+            $this->initialize();
+        }
+
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 
@@ -796,6 +800,10 @@ class DataTable implements DataTableInterface
 
     public function createExportView(): DataTableView
     {
+        if (!$this->initialized) {
+            $this->initialize();
+        }
+
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 

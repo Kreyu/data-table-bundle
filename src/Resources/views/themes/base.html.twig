@@ -9,17 +9,18 @@
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame
-        id="kreyu_data_table_{{ name }}" target="_top"
-        data-controller="{{ stimulus_controllers|join(' ') }}"
-        data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
-    >
-        {{ block('action_bar') }}
-        {{ block('table') }}
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+        <div
+            data-controller="{{ stimulus_controllers|join(' ') }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        >
+            {{ block('action_bar') }}
+            {{ block('table') }}
 
-        {% if pagination_enabled %}
-            {{ data_table_pagination(pagination) }}
-        {% endif %}
+            {% if pagination_enabled %}
+                {{ data_table_pagination(pagination) }}
+            {% endif %}
+        </div>
     </turbo-frame>
 {% endblock %}
 
@@ -30,20 +31,21 @@
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame
-        id="kreyu_data_table_{{ name }}" target="_top"
-        data-controller="{{ stimulus_controllers|join(' ') }}"
-        data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
-    >
-        {{ block('action_bar') }}
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+        <div
+            data-controller="{{ stimulus_controllers|join(' ') }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        >
+            {{ block('action_bar') }}
 
-        {{ form_start(form, form_variables) }}
-            {{ block('table') }}
-        {{ form_end(form, { render_rest: false }) }}
+            {{ form_start(form, form_variables) }}
+                {{ block('table') }}
+            {{ form_end(form, { render_rest: false }) }}
 
-        {% if pagination_enabled %}
-            {{ data_table_pagination(pagination) }}
-        {% endif %}
+            {% if pagination_enabled %}
+                {{ data_table_pagination(pagination) }}
+            {% endif %}
+        </div>
     </turbo-frame>
 {% endblock %}
 

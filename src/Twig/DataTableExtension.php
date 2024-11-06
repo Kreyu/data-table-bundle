@@ -36,7 +36,6 @@ class DataTableExtension extends AbstractExtension
     {
         $definitions = [
             'data_table' => $this->renderDataTable(...),
-            'data_table_form_aware' => $this->renderDataTableFormAware(...),
             'data_table_table' => $this->renderDataTableTable(...),
             'data_table_action_bar' => $this->renderDataTableActionBar(...),
             'data_table_header_row' => $this->renderHeaderRow(...),
@@ -63,6 +62,12 @@ class DataTableExtension extends AbstractExtension
                 'is_safe' => ['html'],
             ]);
         }
+
+        $functions[] = new TwigFunction('data_table_form_aware', $this->renderDataTableFormAware(...), [
+            'needs_environment' => true,
+            'is_safe' => ['html'],
+            'deprecated' => true,
+        ]);
 
         return $functions;
     }
@@ -103,6 +108,8 @@ class DataTableExtension extends AbstractExtension
      * @param array<string, mixed> $formVariables
      *
      * @throws TwigException|\Throwable
+     *
+     * @deprecated The "data_table_form_aware" function is deprecated. Instead of wrapping the data table with form, reference it by using the "form" HTML attribute.
      */
     public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
     {

@@ -25,6 +25,8 @@
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
+    {% deprecated 'The "kreyu_data_table_form_aware" block is deprecated. Instead of wrapping the data table with form, reference it by using the "form" HTML attribute.' %}
+
     {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}

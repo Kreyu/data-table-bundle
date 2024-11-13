@@ -841,11 +841,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Pagination);
         }
 
-        $data ??= $this->config->getDefaultPaginationData();
-
-        $data ??= new PaginationData();
-
-        return $data;
+        return $data ?? $this->config->getDefaultPaginationData();
     }
 
     private function getInitialSortingData(): ?SortingData
@@ -860,11 +856,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Sorting);
         }
 
-        $data ??= $this->config->getDefaultSortingData();
-
-        $data ??= new SortingData();
-
-        return $data;
+        return $data ?? $this->config->getDefaultSortingData();
     }
 
     private function getInitialFiltrationData(): ?FiltrationData
@@ -879,13 +871,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Filtration);
         }
 
-        $data ??= $this->config->getDefaultFiltrationData();
-
-        $data ??= FiltrationData::fromDataTable($this);
-
-        $data->appendMissingFilters($this->getFilters());
-
-        return $data;
+        return $data ?? $this->config->getDefaultFiltrationData();
     }
 
     private function getInitialPersonalizationData(): ?PersonalizationData
@@ -900,11 +886,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Personalization);
         }
 
-        $data ??= $this->config->getDefaultPersonalizationData();
-
-        $data ??= PersonalizationData::fromDataTable($this);
-
-        return $data;
+        return $data ?? $this->config->getDefaultPersonalizationData();
     }
 
     private function isPersistenceEnabled(PersistenceContext $context): bool

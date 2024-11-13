@@ -584,7 +584,7 @@ class DataTable implements DataTableInterface
         $data = $event->getExportData();
 
         if (ExportStrategy::IncludeAll === $data->strategy) {
-            $this->paginate(new PaginationData(page: 1, perPage: null), persistence: false);
+            $dataTable->paginate(new PaginationData(page: 1, perPage: null), persistence: false);
         }
 
         if (!$data->includePersonalization) {

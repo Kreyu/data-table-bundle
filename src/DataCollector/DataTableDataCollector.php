@@ -54,36 +54,36 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
 
     public function collectDataTable(DataTableInterface $dataTable): void
     {
-        $data = [
-            'columns' => ArrayUtil::mapWithKeys(
-                fn (ColumnInterface $column) => [$column->getName() => $this->dataExtractor->extractColumnConfiguration($column)],
-                $dataTable->getColumns(),
-            ),
-            'filters' => ArrayUtil::mapWithKeys(
-                fn (FilterInterface $filter) => [$filter->getName() => $this->dataExtractor->extractFilterConfiguration($filter)],
-                $dataTable->getFilters(),
-            ),
-            'actions' => ArrayUtil::mapWithKeys(
-                fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
-                $dataTable->getActions(),
-            ),
-            'row_actions' => ArrayUtil::mapWithKeys(
-                fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
-                $dataTable->getRowActions(),
-            ),
-            'batch_actions' => ArrayUtil::mapWithKeys(
-                fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
-                $dataTable->getBatchActions(),
-            ),
-            'exporters' => ArrayUtil::mapWithKeys(
-                fn (ExporterInterface $exporter) => [$exporter->getName() => $this->dataExtractor->extractExporterConfiguration($exporter)],
-                $dataTable->getExporters(),
-            ),
-        ];
-
-        $data = array_merge($data, $this->dataExtractor->extractDataTableConfiguration($dataTable));
-
-        $this->data[$dataTable->getName()] = $data;
+        $this->data[$dataTable->getName()] = array_merge(
+            $this->data[$dataTable->getName()] ?? [],
+            $this->dataExtractor->extractDataTableConfiguration($dataTable),
+            [
+                'columns' => ArrayUtil::mapWithKeys(
+                    fn (ColumnInterface $column) => [$column->getName() => $this->dataExtractor->extractColumnConfiguration($column)],
+                    $dataTable->getColumns(),
+                ),
+                'filters' => ArrayUtil::mapWithKeys(
+                    fn (FilterInterface $filter) => [$filter->getName() => $this->dataExtractor->extractFilterConfiguration($filter)],
+                    $dataTable->getFilters(),
+                ),
+                'actions' => ArrayUtil::mapWithKeys(
+                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    $dataTable->getActions(),
+                ),
+                'row_actions' => ArrayUtil::mapWithKeys(
+                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    $dataTable->getRowActions(),
+                ),
+                'batch_actions' => ArrayUtil::mapWithKeys(
+                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    $dataTable->getBatchActions(),
+                ),
+                'exporters' => ArrayUtil::mapWithKeys(
+                    fn (ExporterInterface $exporter) => [$exporter->getName() => $this->dataExtractor->extractExporterConfiguration($exporter)],
+                    $dataTable->getExporters(),
+                ),
+            ],
+        );
     }
 
     public function collectDataTableView(DataTableInterface $dataTable, DataTableView $view): void

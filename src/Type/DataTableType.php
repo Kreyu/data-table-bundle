@@ -416,12 +416,12 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         if ($dataTable->getConfig()->isPaginationEnabled()) {
-            $parameters[$dataTable->getConfig()->getPageParameterName()] = $view->pagination->vars['current_page_number'];
-            $parameters[$dataTable->getConfig()->getPerPageParameterName()] = $view->pagination->vars['item_number_per_page'];
+            $parameters[$dataTable->getConfig()->getPageParameterName()] = $dataTable->getPagination()->getCurrentPageNumber();
+            $parameters[$dataTable->getConfig()->getPerPageParameterName()] = $dataTable->getPagination()->getItemNumberPerPage();
         }
 
-        if ($dataTable->getConfig()->isSortingEnabled()) {
-            foreach ($view->vars['sorting_data']->getColumns() as $sortingColumnData) {
+        if ($dataTable->getConfig()->isSortingEnabled() && $sortingData = $dataTable->getSortingData()) {
+            foreach ($sortingData->getColumns() as $sortingColumnData) {
                 $parameters[$dataTable->getConfig()->getSortParameterName()][$sortingColumnData->getName()] = $sortingColumnData->getDirection();
             }
         }

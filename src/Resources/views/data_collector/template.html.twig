@@ -605,7 +605,7 @@
                 <span class="label">Sortable</span>
             </div>
 
-            {% if column.resolved_options.seek('sort') %}
+            {% if column.resolved_options.sort %}
                 <div class="metric">
                     <span class="value value-is-icon{{ not column.sort_direction|default(null) ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.sort_direction|default(null)) }}</span>
                     <span class="label">Sorted</span>

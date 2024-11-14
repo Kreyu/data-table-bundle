@@ -841,7 +841,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Pagination);
         }
 
-        return $data ?? $this->config->getDefaultPaginationData();
+        return $data ?? $this->config->getDefaultPaginationData() ?? new PaginationData();
     }
 
     private function getInitialSortingData(): ?SortingData

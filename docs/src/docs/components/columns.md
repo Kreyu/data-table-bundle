@@ -149,7 +149,7 @@ return static function (KreyuDataTableConfig $config) {
 
 
 If the `column_phone_number_value` block wasn't defined in any of the configured themes, the bundle will render block of the parent type.
-In our example, because we set [`TextColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TextColumnType.php) as a parent, a `column_phone_number_value` block will be rendered.
+In our example, because we set [`TextColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/TextColumnType.php) as a parent, a `column_text_value` block will be rendered.
 
 ### Adding configuration options
 

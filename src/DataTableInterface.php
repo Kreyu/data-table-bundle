@@ -182,23 +182,38 @@ interface DataTableInterface
 
     public function getSortingData(): ?SortingData;
 
+    /**
+     * @deprecated since 0.26, use {@see sort()} instead
+     */
     public function setSortingData(?SortingData $sortingData): static;
-
-    public function setPaginationData(?PaginationData $paginationData): static;
 
     public function getPaginationData(): ?PaginationData;
 
-    public function setFiltrationData(?FiltrationData $filtrationData): static;
+    /**
+     * @deprecated since 0.26, use {@see paginate()} instead
+     */
+    public function setPaginationData(?PaginationData $paginationData): static;
 
     public function getFiltrationData(): ?FiltrationData;
 
-    public function setPersonalizationData(?PersonalizationData $personalizationData): static;
+    /**
+     * @deprecated since 0.26, use {@see filter()} instead
+     */
+    public function setFiltrationData(?FiltrationData $filtrationData): static;
 
     public function getPersonalizationData(): ?PersonalizationData;
 
-    public function setExportData(?ExportData $exportData): static;
+    /**
+     * @deprecated since 0.26, use {@see personalize()} instead
+     */
+    public function setPersonalizationData(?PersonalizationData $personalizationData): static;
 
     public function getExportData(): ?ExportData;
+
+    /**
+     * @deprecated since 0.26, use {@see export()} instead
+     */
+    public function setExportData(?ExportData $exportData): static;
 
     public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 

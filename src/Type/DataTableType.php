@@ -12,6 +12,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\EventListener\EnsureValidSortingColumnsPropertyPaths;
+use Kreyu\Bundle\DataTableBundle\EventListener\RemoveRedundantFilters;
+use Kreyu\Bundle\DataTableBundle\EventListener\RemoveRedundantPersonalizationColumns;
+use Kreyu\Bundle\DataTableBundle\EventListener\RemoveRedundantSortingColumns;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
@@ -72,6 +77,20 @@ final class DataTableType implements DataTableTypeInterface
             if (null !== $value = $options[$option]) {
                 $setter($value);
             }
+        }
+
+        if ($builder->isSortingEnabled()) {
+            $builder
+                ->addEventSubscriber(new RemoveRedundantSortingColumns())
+                ->addEventSubscriber(new EnsureValidSortingColumnsPropertyPaths());
+        }
+
+        if ($builder->isFiltrationEnabled()) {
+            $builder->addEventSubscriber(new RemoveRedundantFilters());
+        }
+
+        if ($builder->isPersonalizationEnabled()) {
+            $builder->addEventSubscriber(new RemoveRedundantPersonalizationColumns());
         }
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\EventListener\RemoveRedundantFilters;
 
 class FiltrationData implements \ArrayAccess
 {
@@ -126,6 +127,8 @@ class FiltrationData implements \ArrayAccess
 
     /**
      * @param array<FilterInterface> $filters
+     *
+     * @deprecated since 0.26, use {@see RemoveRedundantFilters} event listener instead
      */
     public function removeRedundantFilters(array $filters): void
     {

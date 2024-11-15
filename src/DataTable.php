@@ -107,7 +107,7 @@ class DataTable implements DataTableInterface
     /**
      * The copy of a query used to retrieve the data, without any filters applied.
      */
-    private ProxyQueryInterface $originalQuery;
+    private ProxyQueryInterface $nonFilteredQuery;
 
     private ?ResultSetInterface $resultSet = null;
 
@@ -117,13 +117,14 @@ class DataTable implements DataTableInterface
         private ProxyQueryInterface $query,
         private /* readonly */ DataTableConfigInterface $config,
     ) {
-        $this->originalQuery = clone $this->query;
+        $this->nonFilteredQuery = clone $this->query;
     }
 
     public function __clone(): void
     {
         $this->config = clone $this->config;
         $this->query = clone $this->query;
+        $this->nonFilteredQuery = clone $this->nonFilteredQuery;
     }
 
     public function initialize(): void
@@ -464,13 +465,14 @@ class DataTable implements DataTableInterface
 
         $this->query->paginate($data);
 
-        $this->originalQuery = $this->query;
+        $this->nonFilteredQuery = $this->query;
 
         if ($persistence && $this->config->isPaginationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Pagination, $data);
         }
 
-        $this->setPaginationData($data);
+        $this->paginationData = $data;
+
         $this->resetPagination();
 
         $this->dispatch(DataTableEvents::POST_PAGINATE, new DataTablePaginationEvent($this, $data));
@@ -486,20 +488,16 @@ class DataTable implements DataTableInterface
 
         $data = $event->getSortingData();
 
-        $columns = $this->getColumns();
-
-        $data->removeRedundantColumns($columns);
-        $data->ensureValidPropertyPaths($columns);
-
         $this->query->sort($data);
 
-        $this->originalQuery = $this->query;
+        $this->nonFilteredQuery = $this->query;
 
         if ($persistence && $this->config->isSortingPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Sorting, $data);
         }
 
-        $this->setSortingData($data);
+        $this->sortingData = $data;
+
         $this->resetPagination();
 
         $this->dispatch(DataTableEvents::POST_SORT, new DataTableSortingEvent($this, $data));
@@ -511,18 +509,13 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        $this->query = clone $this->originalQuery;
+        $this->query = clone $this->nonFilteredQuery;
 
         $this->dispatch(DataTableEvents::PRE_FILTER, $event = new DataTableFiltrationEvent($this, $data));
 
         $data = $event->getFiltrationData();
 
-        $filters = $this->getFilters();
-
-        $data->appendMissingFilters($filters);
-        $data->removeRedundantFilters($filters);
-
-        foreach ($filters as $filter) {
+        foreach ($this->getFilters() as $filter) {
             $filterData = $data->getFilterData($filter->getName());
 
             if ($filterData && $filterData->hasValue()) {
@@ -534,7 +527,8 @@ class DataTable implements DataTableInterface
             $this->setPersistenceData(PersistenceContext::Filtration, $data);
         }
 
-        $this->setFiltrationData($data);
+        $this->filtrationData = $data;
+
         $this->resetPagination();
 
         $this->dispatch(DataTableEvents::POST_FILTER, new DataTableFiltrationEvent($this, $data));
@@ -553,13 +547,12 @@ class DataTable implements DataTableInterface
         $columns = $this->getColumns();
 
         $data->addMissingColumns($columns);
-        $data->removeRedundantColumns($columns);
 
         if ($persistence && $this->config->isPersonalizationPersistenceEnabled()) {
             $this->setPersistenceData(PersistenceContext::Personalization, $data);
         }
 
-        $this->setPersonalizationData($data);
+        $this->personalizationData = $data;
 
         $data->apply($this->getColumns());
 
@@ -647,6 +640,9 @@ class DataTable implements DataTableInterface
         return $this->sortingData;
     }
 
+    /**
+     * @deprecated use {@see sort()} method instead
+     */
     public function setSortingData(?SortingData $sortingData): static
     {
         $this->sortingData = $sortingData;
@@ -659,6 +655,9 @@ class DataTable implements DataTableInterface
         return $this->paginationData;
     }
 
+    /**
+     * @deprecated use {@see paginate()} method instead
+     */
     public function setPaginationData(?PaginationData $paginationData): static
     {
         $this->paginationData = $paginationData;
@@ -671,6 +670,9 @@ class DataTable implements DataTableInterface
         return $this->filtrationData;
     }
 
+    /**
+     * @deprecated use {@see filter()} method instead
+     */
     public function setFiltrationData(?FiltrationData $filtrationData): static
     {
         $this->filtrationData = $filtrationData;
@@ -683,6 +685,9 @@ class DataTable implements DataTableInterface
         return $this->personalizationData;
     }
 
+    /**
+     * @deprecated use {@see personalize()} method instead
+     */
     public function setPersonalizationData(?PersonalizationData $personalizationData): static
     {
         $this->personalizationData = $personalizationData;
@@ -695,6 +700,9 @@ class DataTable implements DataTableInterface
         return $this->exportData;
     }
 
+    /**
+     * @deprecated use {@see export()} method instead
+     */
     public function setExportData(?ExportData $exportData): static
     {
         $this->exportData = $exportData;
@@ -814,19 +822,22 @@ class DataTable implements DataTableInterface
         return $view;
     }
 
-    private function dispatch(string $eventName, DataTableEvent $event): void
-    {
-        $dispatcher = $this->config->getEventDispatcher();
-
-        if ($dispatcher->hasListeners($eventName)) {
-            $dispatcher->dispatch($event, $eventName);
-        }
-    }
-
     private function resetPagination(): void
     {
         $this->pagination = null;
         $this->resultSet = null;
+    }
+
+    private function resetPersonalization(): void
+    {
+        $this->personalizationData = null;
+
+        foreach ($this->columns as $column) {
+            $column
+                ->setPriority($column->getConfig()->getOption('priority'))
+                ->setVisible($column->getConfig()->getOption('visible'))
+            ;
+        }
     }
 
     private function getInitialPaginationData(): ?PaginationData
@@ -958,15 +969,12 @@ class DataTable implements DataTableInterface
         return $provider->provide();
     }
 
-    private function resetPersonalization(): void
+    private function dispatch(string $eventName, DataTableEvent $event): void
     {
-        $this->personalizationData = null;
+        $dispatcher = $this->config->getEventDispatcher();
 
-        foreach ($this->columns as $column) {
-            $column
-                ->setPriority($column->getConfig()->getOption('priority'))
-                ->setVisible($column->getConfig()->getOption('visible'))
-            ;
+        if ($dispatcher->hasListeners($eventName)) {
+            $dispatcher->dispatch($event, $eventName);
         }
     }
 }

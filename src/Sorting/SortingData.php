@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Sorting;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\EventListener\EnsureValidSortingColumnsPropertyPaths;
+use Kreyu\Bundle\DataTableBundle\EventListener\RemoveRedundantSortingColumns;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 
 class SortingData
@@ -47,6 +49,8 @@ class SortingData
 
     /**
      * @param array<ColumnInterface> $columns
+     *
+     * @deprecated since 0.26, use {@see RemoveRedundantSortingColumns} event listener instead
      */
     public function removeRedundantColumns(array $columns): void
     {
@@ -74,6 +78,8 @@ class SortingData
 
     /**
      * @param array<ColumnInterface> $columns
+     *
+     * @deprecated since 0.26, use {@see EnsureValidSortingColumnsPropertyPaths} event listener instead
      */
     public function ensureValidPropertyPaths(array $columns): void
     {

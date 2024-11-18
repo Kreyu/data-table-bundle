@@ -871,7 +871,12 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Filtration);
         }
 
-        return $data ?? $this->config->getDefaultFiltrationData();
+        $data ??= $this->config->getDefaultFiltrationData();
+        
+        $data ??= FiltrationData::fromDataTable($this);
+        $data->appendMissingFilters($this->getFilters());
+        
+        return $data;
     }
 
     private function getInitialPersonalizationData(): ?PersonalizationData
@@ -886,7 +891,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Personalization);
         }
 
-        return $data ?? $this->config->getDefaultPersonalizationData();
+        return $data ?? $this->config->getDefaultPersonalizationData() ?? PersonalizationData::fromDataTable($this);
     }
 
     private function isPersistenceEnabled(PersistenceContext $context): bool

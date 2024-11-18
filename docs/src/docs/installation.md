@@ -18,7 +18,7 @@ This bundle can be installed at any moment during a project’s lifecycle.
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
 ```shell-vue
-composer require kreyu/data-table-bundle {{ version }}
+composer require kreyu/data-table-bundle:"{{ version }}"
 ```
 
 ::: danger This bundle is not production ready!

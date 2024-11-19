@@ -401,11 +401,17 @@ final class DataTableType implements DataTableTypeInterface
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
             foreach ($view->filters as $filterView) {
-                if (null === $filterView->data || !$filterView->data->hasValue()) {
+                $value = null;
+
+                if ($formView = $view->vars['filtration_form'][$filterView->vars['name']]['value'] ?? null) {
+                    $value = FormUtil::getFormViewValueRecursive($formView);
+                }
+
+                if (empty($value)) {
                     continue;
                 }
 
-                $filterParameter = ['value' => $filterView->data->getValue()];
+                $filterParameter = ['value' => $value];
 
                 if ($filterView->vars['operator_selectable']) {
                     $filterParameter['operator'] = $filterView->data->getOperator()?->value;

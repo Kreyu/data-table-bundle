@@ -872,10 +872,10 @@ class DataTable implements DataTableInterface
         }
 
         $data ??= $this->config->getDefaultFiltrationData();
-        
         $data ??= FiltrationData::fromDataTable($this);
+
         $data->appendMissingFilters($this->getFilters());
-        
+
         return $data;
     }
 

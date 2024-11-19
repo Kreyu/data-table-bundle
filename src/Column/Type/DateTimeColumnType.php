@@ -33,9 +33,9 @@ final class DateTimeColumnType extends AbstractColumnType
 
                 if (is_array($value)) {
                     $value += [
-                        'formatter' => static function (mixed $dateTime, ColumnInterface $column): string {
-                            if ($dateTime instanceof \DateTimeInterface) {
-                                return $dateTime->format($column->getConfig()->getOption('format'));
+                        'formatter' => static function (mixed $value, mixed $data, ColumnInterface $column): string {
+                            if ($value instanceof \DateTimeInterface) {
+                                return $value->format($column->getConfig()->getOption('format'));
                             }
 
                             return '';

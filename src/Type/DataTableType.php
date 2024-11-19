@@ -23,6 +23,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
+use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;

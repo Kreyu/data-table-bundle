@@ -285,13 +285,11 @@ class ModalActionType extends ButtonActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        $templatePath = $options['template_path'];
-
         if ($view->parent instanceof ColumnValueView) { // [!code ++] 
             $value = $view->parent->vars['value']; // [!code ++] 
 
             foreach (['template_path', 'template_vars'] as $optionName) { // [!code ++] 
-                if (is_callable($templatePath)) { // [!code ++] 
+                if (is_callable($options[$optionName])) { // [!code ++] 
                     $options[$optionName] = $options[$optionName]($value); // [!code ++] 
                 } // [!code ++]
             } // [!code ++]

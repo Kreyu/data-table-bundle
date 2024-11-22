@@ -23,6 +23,7 @@ export default class extends Controller {
 
         if (url.toString() !== window.location.href) {
             window.history.replaceState(null, null, url);
+            Turbo.navigator.history.push(url);
         }
     }
 

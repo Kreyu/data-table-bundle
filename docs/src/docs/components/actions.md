@@ -258,7 +258,7 @@ Now we can update the template of the type class to use the newly added variable
         {{ label }}
     </button>
     
-    <div class="modal fade" id="#action-modal-{{ name }}">
+    <div class="modal fade" id="action-modal-{{ name }}">
         <div class="modal-dialog">
             <div class="modal-content">
                 {{ include(template_path, template_vars) }} // [!code ++]
@@ -285,6 +285,8 @@ class ModalActionType extends ButtonActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
+        $templatePath = $options['template_path'];
+
         if ($view->parent instanceof ColumnValueView) { // [!code ++] 
             $value = $view->parent->vars['value']; // [!code ++] 
 

@@ -25,9 +25,17 @@ final class ColumnType implements ColumnTypeInterface
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
+        $sortPropertyPath = null;
+
+        if (true === $options['sort']) {
+            $sortPropertyPath = $builder->getName();
+        } elseif (is_string($options['sort'])) {
+            $sortPropertyPath = $options['sort'];
+        }
+
         $builder
-            ->setPropertyPath($options['property_path'] ?: null)
-            ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
+            ->setPropertyPath($options['property_path'] ?? $builder->getName() ?: null)
+            ->setSortPropertyPath($sortPropertyPath)
             ->setPriority($options['priority'])
             ->setVisible($options['visible'])
             ->setPersonalizable($options['personalizable'])
@@ -77,14 +85,22 @@ final class ColumnType implements ColumnTypeInterface
             $attr = $attr($normData, $rowData);
         }
 
+        $translationParameters = $options['value_translation_parameters'];
+
+        if (is_callable($translationParameters)) {
+            $translationParameters = $translationParameters($normData, $rowData);
+        }
+
         $view->vars = array_replace($view->vars, [
+            'name' => $column->getName(),
+            'column' => $view,
             'row' => $view->parent,
             'data_table' => $view->parent->parent,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'data' => $view->data,
             'value' => $view->value,
             'translation_domain' => $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
-            'translation_parameters' => $options['value_translation_parameters'] ?? [],
+            'translation_parameters' => $translationParameters ?? [],
             'attr' => $attr,
         ]);
     }
@@ -99,29 +115,21 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export'] += [
-            'getter' => $options['getter'],
-            'property_path' => $options['property_path'],
-            'formatter' => $options['formatter'],
-        ];
+        $options['export']['label'] ??= $options['label'] ?? StringUtil::camelToSentence($column->getName());
+        $options['export']['header_translation_domain'] ??= $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['header_translation_parameters'] ??= $options['header_translation_parameters'] ?? [];
 
-        $label = $options['label'] ?? StringUtil::camelToSentence($column->getName());
+        $label = $options['export']['label'];
 
         if ($this->translator) {
             if ($label instanceof TranslatableInterface) {
                 $label = $label->trans($this->translator, $this->translator->getLocale());
             } else {
-                $translationDomain = $options['export']['header_translation_domain']
-                    ?? $options['header_translation_domain']
-                    ?? $view->parent->parent->vars['translation_domain']
-                    ?? false;
+                $translationDomain = $options['export']['header_translation_domain'];
+                $translationParameters = $options['export']['header_translation_parameters'];
 
                 if ($translationDomain) {
-                    $label = $this->translator->trans(
-                        id: $label,
-                        parameters: $options['header_translation_parameters'],
-                        domain: $translationDomain,
-                    );
+                    $label = $this->translator->trans($label, $translationParameters, $translationDomain);
                 }
             }
         }
@@ -139,35 +147,43 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export'] += [
-            'getter' => $options['getter'],
-            'property_path' => $options['property_path'],
-            'property_accessor' => $options['property_accessor'],
-            'formatter' => $options['formatter'],
-        ];
+        $options['export']['getter'] ??= $options['getter'];
+        $options['export']['property_path'] ??= $options['property_path'];
+        $options['export']['property_accessor'] ??= $options['property_accessor'];
+        $options['export']['formatter'] ??= $options['formatter'];
+        $options['export']['value_translation_domain'] ??= $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
 
         $rowData = $view->parent->data;
 
         $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
         $viewData = $this->getViewDataFromNormData($normData, $rowData, $column, $options['export']);
 
-        if ($this->translator && is_string($viewData)) {
-            $translationDomain = $options['export']['value_translation_domain']
-                ?? $options['value_translation_domain']
-                ?? $view->parent->parent->vars['translation_domain']
-                ?? false;
+        if ($this->translator && (is_string($viewData) || $viewData instanceof TranslatableInterface)) {
+            if ($viewData instanceof TranslatableInterface) {
+                $viewData = $viewData->trans($this->translator, $this->translator->getLocale());
+            } else {
+                $translationDomain = $options['export']['value_translation_domain'];
+                $translationParameters = $options['export']['value_translation_parameters'];
 
-            if ($translationDomain) {
-                $viewData = $this->translator->trans(
-                    id: $viewData,
-                    parameters: $options['value_translation_parameters'],
-                    domain: $translationDomain,
-                );
+                if (is_callable($translationParameters)) {
+                    $translationParameters = $translationParameters($normData, $rowData);
+                }
+
+                if ($translationDomain) {
+                    $viewData = $this->translator->trans(
+                        id: $viewData,
+                        parameters: $translationParameters,
+                        domain: $translationDomain,
+                    );
+                }
             }
         }
 
+        $view->data = $normData;
         $view->value = $viewData;
 
+        $view->vars['data'] = $normData;
         $view->vars['value'] = $viewData;
     }
 
@@ -198,7 +214,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('value_translation_parameters', 'array')
+            ->setAllowedTypes('value_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])

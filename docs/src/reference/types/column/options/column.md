@@ -53,6 +53,9 @@ Setting the option to `false` disables its translation.
 
 ### `value_translation_parameters`
 
+- **type**: `array` or `callable` that returns an array
+- **default**: `[]`
+
 Sets the parameters used when translating the column value.
 
 If given the callable, it will receive two arguments:

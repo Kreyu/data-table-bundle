@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 class User
 {
     public function __construct(
-        public null|string|TranslatableInterface $firstName = null,
+        public string|TranslatableInterface|null $firstName = null,
     ) {
     }
 

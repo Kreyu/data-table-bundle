@@ -467,7 +467,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     public function testPassingFormatterOption(): void
     {
         $user = new User(firstName: 'john');
-        
+
         $column = $this->createNamedColumn('firstName', [
             'formatter' => function (string $value, User $data, ColumnInterface $column, array $options) use ($user) {
                 $this->assertEquals($user, $data);

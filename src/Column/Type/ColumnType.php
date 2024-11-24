@@ -123,7 +123,13 @@ final class ColumnType implements ColumnTypeInterface
 
         if ($this->translator) {
             if ($label instanceof TranslatableInterface) {
-                $label = $label->trans($this->translator, $this->translator->getLocale());
+                $locale = null;
+
+                if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                    $locale = $this->translator->getLocale();
+                }
+
+                $label = $label->trans($this->translator, $locale);
             } else {
                 $translationDomain = $options['export']['header_translation_domain'];
                 $translationParameters = $options['export']['header_translation_parameters'];
@@ -161,7 +167,13 @@ final class ColumnType implements ColumnTypeInterface
 
         if ($this->translator && (is_string($viewData) || $viewData instanceof TranslatableInterface)) {
             if ($viewData instanceof TranslatableInterface) {
-                $viewData = $viewData->trans($this->translator, $this->translator->getLocale());
+                $locale = null;
+
+                if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                    $locale = $this->translator->getLocale();
+                }
+
+                $viewData = $viewData->trans($this->translator, $locale);
             } else {
                 $translationDomain = $options['export']['value_translation_domain'];
                 $translationParameters = $options['export']['value_translation_parameters'];

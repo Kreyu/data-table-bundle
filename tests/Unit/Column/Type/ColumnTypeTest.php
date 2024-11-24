@@ -979,7 +979,13 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     protected function createTranslator(): MockObject&TranslatorInterface
     {
-        return $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+
+        if (method_exists(TranslatableInterface::class, 'getLocale')) {
+            $translator->method('getLocale')->willReturn('en');
+        }
+
+        return $translator;
     }
 
     protected function createTranslatable(string $value, bool $expectTranslated = true): MockObject&TranslatableInterface
@@ -989,9 +995,15 @@ class ColumnTypeTest extends ColumnTypeTestCase
         if ($expectTranslated) {
             $this->translator ??= $this->createTranslator();
 
+            $locale = null;
+
+            if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                $locale = 'en';
+            }
+
             $translatable->expects($this->once())
                 ->method('trans')
-                ->with($this->translator)
+                ->with($this->translator, $locale)
                 ->willReturn($value)
             ;
 

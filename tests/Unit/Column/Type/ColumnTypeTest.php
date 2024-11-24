@@ -16,24 +16,26 @@ use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Model\User;
 use Kreyu\Bundle\DataTableBundle\Tests\ReflectionTrait;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ColumnTypeTest extends ColumnTypeTestCase
 {
     use ReflectionTrait;
-    
-    protected function getTestedType(): string
+
+    private ?TranslatorInterface $translator = null;
+
+    protected function getTestedColumnType(): ColumnTypeInterface
     {
-        return ColumnType::class;
+        return new ColumnType($this->translator);
     }
 
     public function testDefaultLabelInheritsFromName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $headerView = $column->createHeaderView($this->createHeaderRowView());
 
@@ -42,7 +44,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testDefaultExportLabelInheritsFromLabel(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'label' => 'Name',
             'export' => true,
         ]);
@@ -52,9 +54,9 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $this->assertEquals('Name', $exportHeaderView->vars['label']);
     }
 
-    public function testDefaultExportLabelAndColumnLabelInheritsFromName(): void
+    public function testDefaultExportLabelInheritsFromName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => true,
         ]);
 
@@ -65,7 +67,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingLabelOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'label' => 'Name',
         ]);
 
@@ -76,7 +78,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportLabelOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'label' => 'Name',
             ],
@@ -89,48 +91,44 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportLabelOptionAsTranslatable(): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translatable = $this->createTranslatable(value: 'First name');
 
-        $translatable = $this->createMock(TranslatableInterface::class);
-        $translatable->expects($this->once())->method('trans')->with($translator, $translator->getLocale());
-
-        $this->withTranslator($translator);
-
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'label' => $translatable,
             ],
         ]);
 
-        $column->createExportHeaderView($this->createHeaderRowView());
+        $exportHeaderView = $column->createExportHeaderView($this->createHeaderRowView());
+
+        $this->assertEquals('First name', $exportHeaderView->vars['label']);
     }
 
     public function testPassingExportLabelOptionAsTranslatableWithoutTranslator(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $translatable = $this->createTranslatable(value: 'First name', expectTranslated: false);
+
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
-                'label' => $label = new TranslatableMessage('First name'),
+                'label' => $translatable,
             ],
         ]);
 
         $exportHeaderView = $column->createExportHeaderView($this->createHeaderRowView());
 
-        $this->assertEquals($label, $exportHeaderView->vars['label']);
+        $this->assertEquals($translatable, $exportHeaderView->vars['label']);
     }
 
     #[DataProvider('provideExportLabelTranslationOptions')]
     public function testExportLabelTranslation(array $options): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->once())
-            ->method('trans')
+        $this->translator = $this->createTranslator();
+        $this->translator->expects($this->once())->method('trans')
             ->with('%first_name%', ['%first_name%' => 'John'], 'user')
             ->willReturn('John')
         ;
 
-        $this->withTranslator($translator);
-
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), $options);
+        $column = $this->createNamedColumn('firstName', $options);
 
         $exportHeaderView = $column->createExportHeaderView($this->createHeaderRowView());
 
@@ -184,14 +182,12 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportLabelOptionWithTranslatorInheritsTranslationDomain(): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->once())->method('trans')->with(
+        $this->translator = $this->createTranslator();
+        $this->translator->expects($this->once())->method('trans')->with(
             '%first_name%', ['%first_name%' => 'John'], 'user',
         );
 
-        $this->withTranslator($translator);
-
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'header_translation_domain' => 'user',
             'export' => [
                 'label' => '%first_name%',
@@ -204,7 +200,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderTranslationDomainDefaultsToDataTableTranslationDomainOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $dataTableView = new DataTableView();
         $dataTableView->vars['translation_domain'] = 'user';
@@ -216,7 +212,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingHeaderTranslationDomainOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'header_translation_domain' => 'user',
         ]);
 
@@ -227,7 +223,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingHeaderTranslationParametersOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'header_translation_parameters' => ['%first_name%' => 'John'],
         ]);
 
@@ -238,7 +234,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingValueTranslationDomainAsNullDefaultsToDataTableTranslationDomain(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_translation_domain' => null,
         ]);
 
@@ -252,7 +248,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingValueTranslationDomainOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_translation_domain' => 'product',
         ]);
 
@@ -263,7 +259,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingValueTranslationParametersOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_translation_parameters' => ['%first_name%' => 'John'],
         ]);
 
@@ -276,7 +272,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_translation_parameters' => function (string $value, User $data) use ($user) {
                 $this->assertEquals('John', $value);
                 $this->assertEquals($user, $data);
@@ -292,18 +288,15 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingCallableExportValueTranslationParametersOption(): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->once())
-            ->method('trans')
+        $this->translator = $this->createTranslator();
+        $this->translator->expects($this->once())->method('trans')
             ->with('%first_name%', ['%first_name%' => 'John'], 'user')
             ->willReturn('John')
         ;
 
-        $this->withTranslator($translator);
-
         $user = new User(firstName: '%first_name%');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'value_translation_domain' => 'user',
                 'value_translation_parameters' => function (string $value, User $data) use ($user) {
@@ -322,21 +315,11 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testTranslatableExportValue()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->never())->method('trans');
-
-        $firstName = $this->createMock(TranslatableInterface::class);
-        $firstName->expects($this->once())
-            ->method('trans')
-            ->with($translator, $translator->getLocale())
-            ->willReturn('John')
-        ;
-
-        $this->withTranslator($translator);
+        $firstName = $this->createTranslatable(value: 'John');
 
         $user = new User(firstName: $firstName);
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'value_translation_domain' => 'user',
             ],
@@ -350,12 +333,10 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testNonStringExportValueNotTranslated()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->never())->method('trans');
+        $this->translator = $this->createTranslator();
+        $this->translator->expects($this->never())->method('trans');
 
-        $this->withTranslator($translator);
-
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'value_translation_domain' => 'user',
             ],
@@ -372,16 +353,13 @@ class ColumnTypeTest extends ColumnTypeTestCase
     #[DataProvider('provideExportValueTranslationOptions')]
     public function testExportValueTranslation(array $options): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->once())
-            ->method('trans')
+        $this->translator = $this->createTranslator();
+        $this->translator->expects($this->once())->method('trans')
             ->with('%first_name%', ['%first_name%' => 'John'], 'user')
             ->willReturn('John')
         ;
 
-        $this->withTranslator($translator);
-
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), $options);
+        $column = $this->createNamedColumn('firstName', $options);
 
         $user = new User(firstName: '%first_name%');
 
@@ -424,7 +402,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingBlockPrefixOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'block_prefix' => 'first_name',
         ]);
 
@@ -437,7 +415,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingSortOptionAsBoolean(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'sort' => true,
         ]);
 
@@ -450,7 +428,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingSortOptionAsString(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'sort' => 'user.firstName',
         ]);
 
@@ -462,7 +440,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportOptionAsBoolean(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => true,
         ]);
 
@@ -474,7 +452,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportOptionAsArray(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => ['label' => 'Name'],
         ]);
 
@@ -490,7 +468,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'john');
         
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'formatter' => function (string $value, User $data, ColumnInterface $column, array $options) use ($user) {
                 $this->assertEquals($user, $data);
                 $this->assertEquals('firstName', $column->getName());
@@ -510,7 +488,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'john');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'formatter' => function (string $value, User $data, ColumnInterface $column, array $options) use ($user) {
                     $this->assertEquals($user, $data);
@@ -530,7 +508,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testFormatterNotAppliedWithNullData(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'formatter' => fn (mixed $value) => throw new \LogicException('This should not be called!'),
         ]);
 
@@ -541,7 +519,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testExportFormatterNotAppliedWithNullData(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'formatter' => fn (mixed $value) => throw new \LogicException('This should not be called!'),
             ],
@@ -554,7 +532,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testDefaultPropertyPathInheritsFromName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $valueView = $column->createValueView($this->createValueRowView(data: new User(firstName: 'John')));
 
@@ -564,7 +542,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testExportPropertyPathInheritsFromName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => true,
         ]);
 
@@ -575,7 +553,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testExportPropertyPathInheritsFromPropertyPathOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'property_path' => 'firstNameUppercased',
             'export' => true,
         ]);
@@ -587,7 +565,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingPropertyPathOptionAsString(): void
     {
-        $column = $this->factory->createNamed('name', $this->getTestedType(), [
+        $column = $this->createNamedColumn('name', [
             'property_path' => 'firstNameUppercased',
         ]);
 
@@ -599,7 +577,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportPropertyPathOptionAsString(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'property_path' => 'firstNameUppercased',
             ],
@@ -612,7 +590,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingPropertyPathOptionAsObject(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'property_path' => new PropertyPath('firstNameUppercased'),
         ]);
 
@@ -624,7 +602,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingExportPropertyPathOptionAsObject(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'property_path' => new PropertyPath('firstNameUppercased'),
             ],
@@ -645,7 +623,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             ->with($user, 'firstName')
         ;
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'property_accessor' => $propertyAccessor,
         ]);
 
@@ -662,7 +640,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             ->with($user, 'firstName')
         ;
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'property_accessor' => $propertyAccessor,
             ],
@@ -675,7 +653,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'property_path' => 'firstNameUppercased',
             'getter' => function (User $data, ColumnInterface $column, array $options) use ($user) {
                 $this->assertEquals($user, $data);
@@ -695,7 +673,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'property_path' => 'firstNameUppercased',
                 'getter' => function (User $data, ColumnInterface $column, array $options) use ($user) {
@@ -717,7 +695,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'getter' => function (User $data, ColumnInterface $column, array $options) use ($user) {
                 $this->assertEquals($user, $data);
                 $this->assertEquals('firstName', $column->getName());
@@ -737,7 +715,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'getter' => function (User $data, ColumnInterface $column, array $options) use ($user) {
                     $this->assertEquals($user, $data);
@@ -758,7 +736,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'property_path' => false,
         ]);
 
@@ -772,7 +750,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => [
                 'property_path' => false,
             ],
@@ -786,7 +764,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingHeaderAttrOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'header_attr' => ['class' => 'text-primary'],
         ]);
 
@@ -797,7 +775,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingValueAttrOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_attr' => ['class' => 'text-primary'],
         ]);
 
@@ -810,7 +788,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $user = new User(firstName: 'John');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'value_attr' => function (string $value, User $data) use ($user) {
                 $this->assertEquals('John', $value);
                 $this->assertEquals($user, $data);
@@ -826,7 +804,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingPriorityOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'priority' => 10,
         ]);
 
@@ -835,7 +813,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingVisibleOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'visible' => false,
         ]);
 
@@ -844,7 +822,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testPassingPersonalizableOption(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'personalizable' => false,
         ]);
 
@@ -853,7 +831,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $headerView = $column->createHeaderView($this->createHeaderRowView());
 
@@ -862,7 +840,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testValueViewVarsContainsName(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $valueView = $column->createValueView($this->createValueRowView());
 
@@ -871,7 +849,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsItself()
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType());
+        $column = $this->createNamedColumn('firstName');
 
         $headerView = $column->createHeaderView($this->createHeaderRowView());
 
@@ -880,7 +858,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testValueViewVarsContainsItself()
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $valueView = $column->createValueView($this->createValueRowView());
 
@@ -889,7 +867,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsHeaderRow()
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $headerView = $column->createHeaderView($headerRow = $this->createHeaderRowView());
 
@@ -898,7 +876,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testValueViewVarsContainsValueRow()
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $valueView = $column->createValueView($valueRow = $this->createValueRowView());
 
@@ -907,7 +885,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsDataTable(): void
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $headerView = $column->createHeaderView($this->createHeaderRowView($dataTableView = new DataTableView()));
 
@@ -916,7 +894,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testValueViewVarsContainsDataTable(): void
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $valueView = $column->createValueView($this->createValueRowView($dataTableView = new DataTableView()));
 
@@ -925,7 +903,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsSortParameterName(): void
     {
-        $column = $this->factory->create($this->getTestedType());
+        $column = $this->createColumn();
 
         $headerView = $column->createHeaderView($this->createHeaderRowView());
 
@@ -934,7 +912,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testHeaderViewVarsContainsSortingData(): void
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'sort' => true,
         ]);
 
@@ -949,7 +927,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testBuildExportHeaderViewWithNonExportableColumn()
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => false,
         ]);
 
@@ -960,7 +938,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public function testBuildExportValueViewWithNonExportableColumn()
     {
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'export' => false,
         ]);
 
@@ -974,7 +952,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $parent = $this->createMock(ResolvedColumnTypeInterface::class);
         $parent->method('getBlockPrefix')->willReturn('parent');
 
-        $column = $this->factory->createNamed('firstName', $this->getTestedType(), [
+        $column = $this->createNamedColumn('firstName', [
             'block_prefix' => 'first_name',
         ]);
 
@@ -983,8 +961,10 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $headerView = $column->createHeaderView($this->createHeaderRowView());
         $valueView = $column->createValueView($this->createValueRowView());
 
-        $this->assertEquals(['first_name', 'column', 'parent'], $headerView->vars['block_prefixes']);
-        $this->assertEquals(['first_name', 'column', 'parent'], $valueView->vars['block_prefixes']);
+        $expectedBlockPrefixes = ['first_name', 'column', 'parent'];
+
+        $this->assertEquals($expectedBlockPrefixes, $headerView->vars['block_prefixes']);
+        $this->assertEquals($expectedBlockPrefixes, $valueView->vars['block_prefixes']);
     }
 
     private function createHeaderRowView(?DataTableView $dataTableView = null): HeaderRowView
@@ -997,20 +977,32 @@ class ColumnTypeTest extends ColumnTypeTestCase
         return new ValueRowView($dataTableView ?? new DataTableView(), 0, $data);
     }
 
-    /**
-     * @return ColumnTypeInterface[]
-     */
-    protected function getColumnTypes(): array
+    protected function createTranslator(): MockObject&TranslatorInterface
     {
-        return [
-            new ($this->getTestedType()),
-        ];
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('getLocale')->willReturn('en');
+
+        return $translator;
     }
 
-    private function withTranslator(?TranslatorInterface $translator = null): void
+    protected function createTranslatable(string $value, bool $expectTranslated = true): MockObject&TranslatableInterface
     {
-        $translator ??= $this->createMock(TranslatorInterface::class);
+        $translatable = $this->createMock(TranslatableInterface::class);
 
-        $this->recreateFactoryWithType(new ColumnType($translator));
+        if ($expectTranslated) {
+            $this->translator ??= $this->createTranslator();
+
+            $translatable->expects($this->once())
+                ->method('trans')
+                ->with($this->translator, $this->translator->getLocale())
+                ->willReturn($value)
+            ;
+
+            return $translatable;
+        }
+
+        $translatable->expects($this->never())->method('trans');
+
+        return $translatable;
     }
 }

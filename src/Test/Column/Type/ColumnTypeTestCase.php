@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Test\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
@@ -17,38 +20,72 @@ use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\TestColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
+use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class ColumnTypeTestCase extends TestCase
 {
-    protected ColumnFactoryInterface $factory;
+    protected ColumnFactoryInterface $columnFactory;
+    protected ColumnRegistryInterface $columnRegistry;
+    protected ResolvedColumnTypeFactoryInterface $resolvedColumnTypeFactory;
+    protected DataTableFactoryInterface $dataTableFactory;
+    protected DataTableRegistryInterface $dataTableRegistry;
+    protected ResolvedDataTableTypeFactoryInterface $resolvedDataTableTypeFactory;
     protected DataTableInterface $dataTable;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    abstract protected function getTestedColumnType(): ColumnTypeInterface;
 
-        $this->recreateFactoryWithType($this->instantiateType());
+    protected function createColumn(array $options = []): ColumnInterface
+    {
+        return $this->getColumnFactory()->create($this->getTestedColumnType()::class, $options);
     }
 
-    protected function recreateFactoryWithType(ColumnTypeInterface $type): void
+    protected function createNamedColumn(string $name, array $options = []): ColumnInterface
     {
-        $registry = new ColumnRegistry(
-            types: [$type],
+        return $this->getColumnFactory()->createNamed($name, $this->getTestedColumnType()::class, $options);
+    }
+
+    protected function getColumnFactory(): ColumnFactoryInterface
+    {
+        return $this->columnFactory ??= $this->createColumnFactory();
+    }
+
+    protected function createColumnFactory(): ColumnFactoryInterface
+    {
+        $factory = new TestColumnFactory($this->getColumnRegistry());
+        $factory->setDataTable($this->getDataTable());
+
+        return $factory;
+    }
+
+    protected function getColumnRegistry(): ColumnRegistryInterface
+    {
+        return $this->columnRegistry ??= $this->createColumnRegistry();
+    }
+
+    protected function createColumnRegistry(): ColumnRegistryInterface
+    {
+        return new ColumnRegistry(
+            types: [$this->getTestedColumnType()],
             typeExtensions: [],
-            resolvedTypeFactory: new ResolvedColumnTypeFactory(),
+            resolvedTypeFactory: $this->getResolvedColumnTypeFactory(),
         );
-
-        $this->factory = new TestColumnFactory($registry);
-        $this->factory->setDataTable($this->getDataTable());
     }
 
-    protected function instantiateType(): ColumnTypeInterface
+    protected function getResolvedColumnTypeFactory(): ResolvedColumnTypeFactoryInterface
     {
-        return new ($this->getTestedType());
+        return $this->resolvedColumnTypeFactory ??= $this->createResolvedColumnTypeFactory();
     }
 
-    abstract protected function getTestedType(): string;
+    protected function createResolvedColumnTypeFactory(): ResolvedColumnTypeFactoryInterface
+    {
+        return new ResolvedColumnTypeFactory();
+    }
+
+    protected function getDataTableRegistry(): DataTableRegistryInterface
+    {
+        return $this->dataTableRegistry ??= $this->createDataTableRegistry();
+    }
 
     protected function createDataTableRegistry(): DataTableRegistryInterface
     {
@@ -56,8 +93,13 @@ abstract class ColumnTypeTestCase extends TestCase
             types: [new DataTableType()],
             typeExtensions: [],
             proxyQueryFactories: [],
-            resolvedTypeFactory: new ResolvedDataTableTypeFactory(),
+            resolvedTypeFactory: $this->getResolvedDataTableTypeFactory(),
         );
+    }
+
+    protected function getDataTableFactory(): DataTableFactoryInterface
+    {
+        return $this->dataTableFactory ??= $this->createDataTableFactory();
     }
 
     protected function createDataTableFactory(): DataTableFactoryInterface
@@ -65,8 +107,23 @@ abstract class ColumnTypeTestCase extends TestCase
         return new DataTableFactory($this->createDataTableRegistry());
     }
 
+    protected function getResolvedDataTableTypeFactory(): ResolvedDataTableTypeFactoryInterface
+    {
+        return $this->resolvedDataTableTypeFactory ??= $this->createResolvedDataTableTypeFactory();
+    }
+
+    protected function createResolvedDataTableTypeFactory(): ResolvedDataTableTypeFactoryInterface
+    {
+        return new ResolvedDataTableTypeFactory();
+    }
+
     protected function getDataTable(): DataTableInterface
     {
-        return $this->dataTable ??= $this->createDataTableFactory()->create(DataTableType::class, new ArrayProxyQuery([]));
+        return $this->dataTable ??= $this->createDataTable();
+    }
+
+    protected function createDataTable(): DataTableInterface
+    {
+        return $this->getDataTableFactory()->create(DataTableType::class, new ArrayProxyQuery([]));
     }
 }

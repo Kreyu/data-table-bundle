@@ -9,6 +9,9 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 
+/**
+ * Column factory that automatically sets the data table on created column.
+ */
 class TestColumnFactory extends ColumnFactory
 {
     private DataTableInterface $dataTable;
@@ -29,8 +32,10 @@ class TestColumnFactory extends ColumnFactory
         return $column;
     }
 
-    public function setDataTable(DataTableInterface $dataTable): void
+    public function setDataTable(DataTableInterface $dataTable): self
     {
         $this->dataTable = $dataTable;
+
+        return $this;
     }
 }

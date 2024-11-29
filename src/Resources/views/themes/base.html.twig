@@ -14,8 +14,8 @@
             data-controller="{{ stimulus_controllers|join(' ') }}"
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
         >
-            {{ block('action_bar') }}
-            {{ block('table') }}
+            {{ block('action_bar', theme) }}
+            {{ block('table', theme) }}
 
             {% if pagination_enabled %}
                 {{ data_table_pagination(pagination) }}
@@ -38,10 +38,10 @@
             data-controller="{{ stimulus_controllers|join(' ') }}"
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
         >
-            {{ block('action_bar') }}
+            {{ block('action_bar', theme) }}
 
             {{ form_start(form, form_variables) }}
-                {{ block('table') }}
+                {{ block('table', theme) }}
             {{ form_end(form, { render_rest: false }) }}
 
             {% if pagination_enabled %}
@@ -52,24 +52,24 @@
 {% endblock %}
 
 {% block kreyu_data_table_table %}
-    {{ block('table') }}
+    {{ block('table', theme) }}
 {% endblock %}
 
 {% block kreyu_data_table_action_bar %}
-    {{ block('action_bar') }}
+    {{ block('action_bar', theme) }}
 {% endblock %}
 
 {% block action_bar %}{% endblock %}
 
 {% block table %}
     <table {% with { attr: table_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
-        {{ block('table_head') }}
-        {{ block('table_body') }}
+        {{ block('table_head', theme) }}
+        {{ block('table_body', theme) }}
     </table>
 {% endblock %}
 
 {% block table_head %}
-    <thead>{{ block('table_head_row') }}</thead>
+    <thead>{{ block('table_head_row', theme) }}</thead>
 {% endblock %}
 
 {% block table_head_row %}
@@ -77,14 +77,14 @@
 {% endblock %}
 
 {% block table_body %}
-    <tbody>{{ block('table_body_row') }}</tbody>
+    <tbody>{{ block('table_body_row', theme) }}</tbody>
 {% endblock %}
 
 {% block table_body_row %}
     {% if value_rows|length > 0 %}
-        {{ block('table_body_row_results') }}
+        {{ block('table_body_row_results', theme) }}
     {% else %}
-        {{ block('table_body_row_no_results') }}
+        {{ block('table_body_row_no_results', theme) }}
     {% endif %}
 {% endblock %}
 

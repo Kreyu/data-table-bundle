@@ -208,7 +208,9 @@
 {% block pagination_per_page_message 'Items per page'|trans %}
 
 {% block pagination_per_page_form %}
-    <form>
+    {% set form_attr = { 'data-turbo-frame': '_self' }|merge(form_attr ?? {}) %}
+
+    <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
         {% set url_query_parameters = [] %}
 
         {#
@@ -230,7 +232,7 @@
 
         {% set select_attr = {
             name: data_table.vars.per_page_parameter_name,
-            onchange: 'this.form.submit()',
+            onchange: 'this.form.requestSubmit()',
             autocomplete: 'off',
         }|merge(select_attr|default({})) %}
 

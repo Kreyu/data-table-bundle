@@ -42,7 +42,6 @@ final class ActionsColumnType extends AbstractColumnType
                 'export' => false,
                 'property_path' => false,
                 'actions' => [],
-                'priority' => -1,
             ])
             ->setNormalizer('actions', function (Options $options, mixed $value) {
                 ($resolver = new OptionsResolver())

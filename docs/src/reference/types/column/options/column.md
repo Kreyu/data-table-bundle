@@ -51,6 +51,28 @@ Sets the parameters used when translating the column header.
 Sets the translation domain used when translating the column value.  
 Setting the option to `false` disables its translation.
 
+### `value_translation_parameters`
+
+- **type**: `array` or `callable` that returns an array
+- **default**: `[]`
+
+Sets the parameters used when translating the column value.
+
+If given the callable, it will receive two arguments:
+- column value, e.g. column (row) data formatted by the optional `formatter` option;
+- column (row) data, e.g. value returned by property accessor or getter;
+
+```php
+// Assume the data table of User entities
+$builder->addColumn('firstName', options: [
+    'value_translation_parameters' => function (string $firstName, User $user) {
+        return [...];
+    },
+]);
+```
+
+The `ColumnValueView` will contain the resolved callable.
+
 ### `property_path`
 
 - **type**: `null`, `false` or `string`

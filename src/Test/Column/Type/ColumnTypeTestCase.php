@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Test\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
@@ -16,11 +19,14 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\TestColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use PHPUnit\Framework\TestCase;
 
 abstract class ColumnTypeTestCase extends TestCase
@@ -34,6 +40,16 @@ abstract class ColumnTypeTestCase extends TestCase
     protected DataTableInterface $dataTable;
 
     abstract protected function getTestedColumnType(): ColumnTypeInterface;
+
+    /**
+     * @return ColumnTypeInterface[]
+     */
+    protected function getAdditionalColumnTypes(): array
+    {
+        return [
+            new ColumnType(),
+        ];
+    }
 
     protected function createColumn(array $options = []): ColumnInterface
     {
@@ -66,7 +82,10 @@ abstract class ColumnTypeTestCase extends TestCase
     protected function createColumnRegistry(): ColumnRegistryInterface
     {
         return new ColumnRegistry(
-            types: [$this->getTestedColumnType()],
+            types: [
+                $this->getTestedColumnType(),
+                ...$this->getAdditionalColumnTypes(),
+            ],
             typeExtensions: [],
             resolvedTypeFactory: $this->getResolvedColumnTypeFactory(),
         );
@@ -125,5 +144,41 @@ abstract class ColumnTypeTestCase extends TestCase
     protected function createDataTable(): DataTableInterface
     {
         return $this->getDataTableFactory()->create(DataTableType::class, new ArrayProxyQuery([]));
+    }
+
+    protected function createHeaderRowView(?DataTableView $dataTableView = null): HeaderRowView
+    {
+        return new HeaderRowView($dataTableView ?? new DataTableView());
+    }
+
+    protected function createValueRowView(?DataTableView $dataTableView = null, int $index = 0, mixed $data = null): ValueRowView
+    {
+        return new ValueRowView($dataTableView ?? new DataTableView(), $index, $data);
+    }
+
+    protected function createColumnHeaderView(ColumnInterface $column, ?HeaderRowView $headerRowView = null): ColumnHeaderView
+    {
+        return $column->createHeaderView($headerRowView ?? $this->createHeaderRowView());
+    }
+
+    protected function createExportColumnHeaderView(ColumnInterface $column, ?HeaderRowView $headerRowView = null): ColumnHeaderView
+    {
+        return $column->createExportHeaderView($headerRowView ?? $this->createHeaderRowView());
+    }
+
+    protected function createColumnValueView(ColumnInterface $column, ?ValueRowView $valueRowView = null, mixed $data = null, mixed $rowData = null): ColumnValueView
+    {
+        $columnValueView = $column->createValueView($valueRowView ?? $this->createValueRowView(data: $rowData));
+        $columnValueView->data = $data;
+
+        return $columnValueView;
+    }
+
+    protected function createExportColumnValueView(ColumnInterface $column, ?ValueRowView $valueRowView = null, mixed $data = null, mixed $rowData = null): ColumnValueView
+    {
+        $columnValueView = $column->createExportValueView($valueRowView ?? $this->createValueRowView(data: $rowData));
+        $columnValueView->data = $data;
+
+        return $columnValueView;
     }
 }

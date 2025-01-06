@@ -237,7 +237,7 @@ class DataTableExtension extends AbstractExtension
             environment: $environment,
             dataTable: $this->getDecoratedDataTable($view->getDataTable(), $variables),
             blockName: 'kreyu_data_table_action',
-            context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'value'),
+            context: $this->getDecoratedViewContext($environment, $view, $variables, 'action', 'control'),
         );
     }
 

@@ -577,7 +577,7 @@
     </li>
 {% endblock %}
 
-{% block action_value_icon %}
+{% block action_control_icon %}
     <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
@@ -642,13 +642,13 @@
     </div>
 {% endblock %}
 
-{% block action_value %}
+{% block action_control %}
     <div class="d-inline-block" {{ block('attributes') }}>
         {{ parent() }}
     </div>
 {% endblock %}
 
-{% block action_link_value %}
+{% block action_link_control %}
     {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
 
     {% if confirmation %}
@@ -671,7 +671,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_button_value %}
+{% block action_button_control %}
     {% set attr = {
         class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
@@ -696,7 +696,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_form_value %}
+{% block action_form_control %}
     {% set attr = { class: 'd-inline-block' }|merge(attr) %}
 
     {% set button_attr = {

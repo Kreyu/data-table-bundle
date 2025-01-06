@@ -580,14 +580,14 @@
 
 {# Action type templates #}
 
-{% block action_value_icon %}{% endblock %}
+{% block action_control_icon %}{% endblock %}
 
-{% block action_value %}
-    {% if icon_attr %}{{ block('action_value_icon', theme, _context) }}{% endif %}
+{% block action_control %}
+    {% if icon_attr %}{{ block('action_control_icon', theme, _context) }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 
-{% block action_link_value %}
+{% block action_link_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -595,11 +595,11 @@
     {% endif %}
 
     <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
-{% block action_button_value %}
+{% block action_button_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -607,11 +607,11 @@
     {% endif %}
 
     <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
-{% block action_form_value %}
+{% block action_form_control %}
     {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
 
     {% if batch %}
@@ -627,7 +627,7 @@
         {% set button_tag = button_tag|default('button') %}
 
         <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
-            {{- block('action_value', theme, _context) -}}
+            {{- block('action_control', theme, _context) -}}
         </{{ button_tag }}>
     </form>
 {% endblock %}

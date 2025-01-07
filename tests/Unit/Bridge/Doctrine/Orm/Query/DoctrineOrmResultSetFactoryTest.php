@@ -66,7 +66,6 @@ class DoctrineOrmResultSetFactoryTest extends TestCase
         $paginator->method('getIterator')->willReturn(new \ArrayIterator(array_fill(0, 25, 'item')));
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->exactly(4))->method('clear');
 
         $query = $this->createMock(Query::class);
         $query->method('getFirstResult')->willReturn(0);

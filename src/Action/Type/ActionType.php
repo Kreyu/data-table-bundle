@@ -10,7 +10,6 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -44,6 +43,10 @@ final class ActionType implements ActionTypeInterface
                     $options[$optionName] = $options[$optionName]($value);
                 }
             }
+        }
+
+        if (false !== $options['confirmation']) {
+            $options['confirmation'] = $this->resolveConfirmationOption($options['confirmation']);
         }
 
         if ($action->getConfig()->isConfirmable()) {
@@ -103,41 +106,6 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedTypes('icon_attr', ['array', 'callable'])
             ->setAllowedTypes('confirmation', ['bool', 'array', 'callable'])
             ->setAllowedTypes('visible', ['bool', 'callable'])
-            ->setNormalizer('confirmation', function (Options $options, mixed $value) {
-                if (false === $value) {
-                    return false;
-                }
-
-                if (true === $value) {
-                    $value = [];
-                }
-
-                ($resolver = new OptionsResolver())
-                    ->setDefault('confirmation', function (OptionsResolver $resolver) {
-                        $resolver
-                            ->setDefaults([
-                                'translation_domain' => 'KreyuDataTable',
-                                'label_title' => 'Action confirmation',
-                                'label_description' => 'Are you sure you want to execute this action?',
-                                'label_confirm' => 'Confirm',
-                                'label_cancel' => 'Cancel',
-                                'type' => 'danger',
-                            ])
-                            ->setAllowedTypes('translation_domain', ['null', 'string'])
-                            ->setAllowedTypes('label_title', ['null', 'string', TranslatableInterface::class])
-                            ->setAllowedTypes('label_description', ['null', 'string', TranslatableInterface::class])
-                            ->setAllowedTypes('label_confirm', ['null', 'string', TranslatableInterface::class])
-                            ->setAllowedTypes('label_cancel', ['null', 'string', TranslatableInterface::class])
-                            ->setAllowedTypes('type', ['null', 'string'])
-                            ->setAllowedValues('type', ['danger', 'warning', 'info'])
-                        ;
-                    })
-                ;
-
-                $value = $resolver->resolve(['confirmation' => $value]);
-
-                return $value['confirmation'];
-            })
         ;
     }
 
@@ -149,5 +117,32 @@ final class ActionType implements ActionTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function resolveConfirmationOption(bool|array $confirmation): array
+    {
+        if (true === $confirmation) {
+            $confirmation = [];
+        }
+
+        $optionsResolver = (new OptionsResolver())
+            ->setDefaults([
+                'translation_domain' => 'KreyuDataTable',
+                'label_title' => 'Action confirmation',
+                'label_description' => 'Are you sure you want to execute this action?',
+                'label_confirm' => 'Confirm',
+                'label_cancel' => 'Cancel',
+                'type' => 'danger',
+            ])
+            ->setAllowedTypes('translation_domain', ['null', 'string'])
+            ->setAllowedTypes('label_title', ['null', 'string', TranslatableInterface::class])
+            ->setAllowedTypes('label_description', ['null', 'string', TranslatableInterface::class])
+            ->setAllowedTypes('label_confirm', ['null', 'string', TranslatableInterface::class])
+            ->setAllowedTypes('label_cancel', ['null', 'string', TranslatableInterface::class])
+            ->setAllowedTypes('type', ['null', 'string'])
+            ->setAllowedValues('type', ['danger', 'warning', 'info'])
+        ;
+
+        return $optionsResolver->resolve($confirmation ?: []);
     }
 }

@@ -51,4 +51,13 @@ trait DataTableFactoryAwareTrait
 
         return $this->dataTableFactory->createBuilder(DataTableType::class, $query, $options);
     }
+
+    protected function createNamedDataTableBuilder(string $name, mixed $query = null, array $options = []): DataTableBuilderInterface
+    {
+        if (null === $this->dataTableFactory) {
+            throw new LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+        }
+
+        return $this->dataTableFactory->createNamedBuilder($name, DataTableType::class, $query, $options);
+    }
 }

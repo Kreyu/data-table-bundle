@@ -131,3 +131,76 @@ Now, in the template, render the data table using the `data_table` function:
 ```
 
 By default, the data table will look somewhat _ugly_, because we haven't configured the theme yet - see [theming](features/theming.md) documentation section.
+
+## Using array as data source
+
+:::warning In most cases, using array as data source is used only for fast prototyping!
+Remember that paginating an array is not memory efficient, as every item is already loaded into memory.
+If your data comes from a database, pass an instance of Doctrine ORM query builder instead.
+:::
+
+In some cases, you might want to use an array as a data source. This can be achieved by simply passing an array as data to the data table factory method:
+
+```php
+use App\Entity\Product;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $products = [
+            new Product(id: 1, name: 'Product 1'),
+            new Product(id: 2, name: 'Product 2'),
+            new Product(id: 3, name: 'Product 3'),
+        ];
+
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $products);
+    }
+}
+```
+
+Alternatively, you can manually create an instance of `ArrayProxyQuery` to provide total item count different from given array count.
+This can be useful in cases where you're already retrieving paginated data and still want the data table to properly display the pagination controls:
+
+```php
+use App\Entity\Product;
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQuery;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $products = new ArrayProxyQuery(
+            data: [
+                new Product(id: 1, name: 'Product 1'),
+                new Product(id: 2, name: 'Product 2'),
+                new Product(id: 3, name: 'Product 3'),
+            ], 
+            totalItemCount: 25,
+        );  
+        
+        $dataTable = $this->createDataTable(ProductDataTableType::class, $products);
+        
+        // For example, in this case, paginating with 3 items per page will result in 9 pages,
+        // because the proxy query now assumes there's 25 items in total, and the data array
+        // only represents results of a currently displayed page.
+        $dataTable->paginate(new PaginationData(page: 1, perPage: 3));
+    }
+}
+```
+
+Sorting will perform `usort` on the given array, while paginating will simply slice the array.
+However, **there are no built-in filters** for this proxy query, but you can implement 
+your own filter types - see [creating filter types](components/filters#creating-filter-types).
+

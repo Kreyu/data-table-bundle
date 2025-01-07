@@ -1,3 +1,7 @@
+<script setup>
+    import { data as version } from './composer-require-version.data';
+</script>
+
 # Installation
 
 This bundle can be installed at any moment during a project’s lifecycle.
@@ -13,8 +17,8 @@ This bundle can be installed at any moment during a project’s lifecycle.
 
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
-```shell
-composer require kreyu/data-table-bundle 0.18.*
+```shell-vue
+composer require kreyu/data-table-bundle:"{{ version }}"
 ```
 
 ::: danger This bundle is not production ready!
@@ -54,6 +58,9 @@ Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json
     "controllers": {
         "@kreyu/data-table-bundle": {
             "personalization": {
+                "enabled": true
+            },
+            "state": {
                 "enabled": true
             },
             "batch": {

@@ -23,6 +23,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
+use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -81,6 +82,7 @@ final class DataTableType implements DataTableTypeInterface
         $visibleColumns = $dataTable->getVisibleColumns();
 
         $view->vars = array_replace($view->vars, [
+            'data_table' => $view,
             'themes' => $dataTable->getConfig()->getThemes(),
             'title' => $options['title'],
             'title_translation_parameters' => $options['title_translation_parameters'],
@@ -102,6 +104,7 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
+            'per_page_choices' => $options['per_page_choices'],
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -132,6 +135,8 @@ final class DataTableType implements DataTableTypeInterface
         if ($dataTable->getConfig()->isExportingEnabled()) {
             $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
         }
+
+        $view->vars['url_query_parameters'] = $this->getUrlQueryParameters($view, $dataTable);
     }
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
@@ -165,6 +170,7 @@ final class DataTableType implements DataTableTypeInterface
                 'pagination_persistence_enabled' => $this->defaults['pagination']['persistence_enabled'] ?? false,
                 'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
                 'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
+                'per_page_choices' => $this->defaults['pagination']['per_page_choices'] ?? [10, 25, 50, 100],
                 'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? false,
                 'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
                 'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,
@@ -388,5 +394,45 @@ final class DataTableType implements DataTableTypeInterface
         $formView->vars['data_table_view'] = $view;
 
         return $formView;
+    }
+
+    private function getUrlQueryParameters(DataTableView $view, DataTableInterface $dataTable): array
+    {
+        $parameters = [];
+
+        if ($dataTable->getConfig()->isFiltrationEnabled()) {
+            foreach ($view->filters as $filterView) {
+                $value = null;
+
+                if ($formView = $view->vars['filtration_form'][$filterView->vars['name']]['value'] ?? null) {
+                    $value = FormUtil::getFormViewValueRecursive($formView);
+                }
+
+                if (empty($value)) {
+                    continue;
+                }
+
+                $filterParameter = ['value' => $value];
+
+                if ($filterView->vars['operator_selectable']) {
+                    $filterParameter['operator'] = $filterView->data->getOperator()?->value;
+                }
+
+                $parameters[$dataTable->getConfig()->getFiltrationParameterName()][$filterView->vars['name']] = $filterParameter;
+            }
+        }
+
+        if ($dataTable->getConfig()->isPaginationEnabled()) {
+            $parameters[$dataTable->getConfig()->getPageParameterName()] = $dataTable->getPagination()->getCurrentPageNumber();
+            $parameters[$dataTable->getConfig()->getPerPageParameterName()] = $dataTable->getPagination()->getItemNumberPerPage();
+        }
+
+        if ($dataTable->getConfig()->isSortingEnabled() && $sortingData = $dataTable->getSortingData()) {
+            foreach ($sortingData->getColumns() as $sortingColumnData) {
+                $parameters[$dataTable->getConfig()->getSortParameterName()][$sortingColumnData->getName()] = $sortingColumnData->getDirection();
+            }
+        }
+
+        return $parameters;
     }
 }

@@ -58,8 +58,6 @@ class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterfac
             }
 
             $firstResult += $itemCount;
-
-            $paginator->getQuery()->getEntityManager()->clear();
         }
     }
 }

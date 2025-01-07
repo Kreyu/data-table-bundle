@@ -148,6 +148,33 @@ For more information, consider reading:
 
 - [[Stack Overflow] Doctrine2 one-to-one relation auto loads on query](https://stackoverflow.com/questions/12362901/doctrine2-one-to-one-relation-auto-loads-on-query/22253783#22253783)
 
+## The modals are not closing properly
+
+By default, if you submit a personalization or action confirmation modal, it will be closed,
+but the backdrop is still visible. This is a classic issue with Bootstrap modals working with Turbo.
+
+This issue is not related to the DataTableBundle itself, because other modals in the application
+will work the same way, unless you're doing a full redirection or handle the modals in a different way.
+
+To fix this, you can add following JavaScript code to automatically remove the backdrop:
+
+```js
+// assets/app.js
+document.addEventListener('turbo:submit-end', () => {
+    if (document.body.classList.contains('modal-open')) {
+        document.querySelector('.modal-backdrop').remove();
+        document.body.attributes.removeNamedItem('style');
+    }
+});
+```
+
+::: warning
+This code will remove the `style` attribute on the `<body>` element.
+You should test whether this doesn't break anything in your application.
+:::
+
+For more details, see [this issue](https://github.com/Kreyu/data-table-bundle/issues/48).
+
 ## Persistence "cache tag contains reserved characters" error
 
 When using the default configuration, after enabling the persistence for any feature, it may result in the error:

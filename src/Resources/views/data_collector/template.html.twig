@@ -1,23 +1,25 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% set icon %}
-        {{ source('@KreyuDataTable/data_collector/Icon/table-heart.svg') }}
-        <span class="sf-toolbar-value">{{ collector.dataTables|length }}</span>
-    {% endset %}
+    {% if collector.data|length %}
+        {% set icon %}
+            {{ source('@KreyuDataTable/data_collector/Icon/table-heart.svg') }}
+            <span class="sf-toolbar-value">{{ collector.data|length }}</span>
+        {% endset %}
 
-    {% set text %}
-        <div class="sf-toolbar-info-piece">
-            <b>Number of data tables</b>
-            <span class="sf-toolbar-status">{{ collector.dataTables|length }}</span>
-        </div>
-    {% endset %}
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Number of data tables</b>
+                <span class="sf-toolbar-status">{{ collector.data|length }}</span>
+            </div>
+        {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+    {% endif %}
 {% endblock %}
 
 {% block menu %}
-    <span class="label{{ collector.dataTables|length == 0 ? ' disabled' }}">
+    <span class="label{{ collector.data is empty ? ' disabled' }}">
         <span class="icon">
             {{ source('@KreyuDataTable/data_collector/Icon/table-heart.svg') }}
         </span>
@@ -28,84 +30,689 @@
 {% block panel %}
     <h2>Data Tables</h2>
 
-    <div class="sf-serializer sf-reset">
-        {% for dataTable in collector.dataTables %}
-            <h3>{{ dataTable }}</h3>
+    <style>
+        .toggle-button {
+            vertical-align: middle;
+            margin-top: -3px;
+        }
 
-            <div class="sf-tabs">
-                {{ _self.render_columns_tab(collector.columns(dataTable)) }}
-                {{ _self.render_filters_tab(collector.filters(dataTable)) }}
-                {{ _self.render_actions_tab('Actions', collector.actions(dataTable)) }}
-                {{ _self.render_actions_tab('Batch Actions', collector.batchActions(dataTable)) }}
-                {{ _self.render_actions_tab('Row Actions', collector.rowActions(dataTable)) }}
-            </div>
-        {% endfor %}
+        .theme-light .toggle-button {
+            color: black;
+        }
+
+        .theme-dark .toggle-button {
+            color: white;
+        }
+    </style>
+
+    <div id="tree-menu" class="tree metric" style="margin-right: 10px; text-align: start; width: 185px;">
+        <ul>
+            {% for data_table in collector.data %}
+                <li>
+                    <div class="tree-inner" data-tab-target-id="{{ data_table.name }}-details" title="{{ data_table.name }}">
+                        <button class="toggle-button" data-toggle-button data-toggle-target-id="{{ data_table.name }}-children">
+                            {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                        </button>
+
+                        <span>
+                            {{ data_table.name }}
+                        </span>
+                    </div>
+
+                    <ul id="{{ data_table.name }}-children"{% if not loop.first %} class="hidden"{% endif %}>
+                        {# Columns #}
+                        <li>
+                            <div class="tree-inner" title="{{ data_table.name }} columns" data-toggle-button data-toggle-target-id="{{ data_table.name }}-columns">
+                                <button class="toggle-button">
+                                    {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                </button>
+
+                                <span>
+                                    Columns
+                                </span>
+                            </div>
+
+                            <ul id="{{ data_table.name }}-columns" {% if not loop.first %} class="hidden"{% endif %}>
+                                {% for column in data_table.columns %}
+                                    <li>
+                                        <div class="tree-inner" title="{{ column.name }} column" data-tab-target-id="{{ data_table.name }}-column-{{ column.name }}-details">
+                                            <button class="toggle-button">
+                                                {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                            </button>
+                                            <span>{{ column.name }}</span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                        {# Filters #}
+                        {% if data_table.filters is not empty %}
+                            <li>
+                                <div class="tree-inner closed" title="{{ data_table.name }} filters" data-toggle-button data-toggle-target-id="{{ data_table.name }}-filters">
+                                    <button class="toggle-button">
+                                        {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                    </button>
+
+                                    <span>
+                                        Filters
+                                    </span>
+                                </div>
+
+                                <ul id="{{ data_table.name }}-filters" class="hidden">
+                                    {% for filter in data_table.filters %}
+                                        <li>
+                                            <div class="tree-inner" title="{{ filter.name }} filter" data-tab-target-id="{{ data_table.name }}-filter-{{ filter.name }}-details">
+                                                <button class="toggle-button">
+                                                    {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                                </button>
+                                                <span>{{ filter.name }}</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {# Actions #}
+                        {% if data_table.actions is not empty %}
+                            <li>
+                                <div class="tree-inner closed" title="{{ data_table.name }} actions" data-toggle-button data-toggle-target-id="{{ data_table.name }}-actions">
+                                    <button class="toggle-button">
+                                        {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                    </button>
+
+                                    <span>
+                                        Actions
+                                    </span>
+                                </div>
+
+                                <ul id="{{ data_table.name }}-actions" class="hidden">
+                                    {% for action in data_table.actions %}
+                                        <li>
+                                            <div class="tree-inner" title="{{ action.name }} action" data-tab-target-id="{{ data_table.name }}-action-{{ action.name }}-details">
+                                                <button class="toggle-button">
+                                                    {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                                </button>
+                                                <span>{{ action.name }}</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {# Row Actions #}
+                        {% if data_table.row_actions is not empty %}
+                            <li>
+                                <div class="tree-inner closed" title="{{ data_table.name }} row actions" data-toggle-button data-toggle-target-id="{{ data_table.name }}-row-actions">
+                                    <button class="toggle-button">
+                                        {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                    </button>
+
+                                    <span>
+                                        Row actions
+                                    </span>
+                                </div>
+
+                                <ul id="{{ data_table.name }}-row-actions" class="hidden">
+                                    {% for action in data_table.row_actions %}
+                                        <li>
+                                            <div class="tree-inner" title="{{ action.name }} row action" data-tab-target-id="{{ data_table.name }}-row-action-{{ action.name }}-details">
+                                                <button class="toggle-button">
+                                                    {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                                </button>
+                                                <span>{{ action.name }}</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {# Batch Actions #}
+                        {% if data_table.batch_actions is not empty %}
+                            <li>
+                                <div class="tree-inner closed" title="{{ data_table.name }} actions" data-toggle-button data-toggle-target-id="{{ data_table.name }}-batch-actions">
+                                    <button class="toggle-button">
+                                        {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                    </button>
+
+                                    <span>
+                                        Batch actions
+                                    </span>
+                                </div>
+
+                                <ul id="{{ data_table.name }}-batch-actions" class="hidden">
+                                    {% for action in data_table.batch_actions %}
+                                        <li>
+                                            <div class="tree-inner" title="{{ action.name }} batch action" data-tab-target-id="{{ data_table.name }}-batch-action-{{ action.name }}-details">
+                                                <button class="toggle-button">
+                                                    {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                                </button>
+                                                <span>{{ action.name }}</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {# Exporters #}
+                        {% if data_table.exporters is not empty %}
+                            <li>
+                                <div class="tree-inner closed" title="{{ data_table.name }} exporters" data-toggle-button data-toggle-target-id="{{ data_table.name }}-exporters">
+                                    <button class="toggle-button">
+                                        {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                    </button>
+
+                                    <span>
+                                        Exporters
+                                    </span>
+                                </div>
+
+                                <ul id="{{ data_table.name }}-exporters" class="hidden">
+                                    {% for exporter in data_table.exporters %}
+                                        <li>
+                                            <div class="tree-inner" title="{{ exporter.name }} exporter" data-tab-target-id="{{ data_table.name }}-exporter-{{ exporter.name }}-details">
+                                                <button class="toggle-button">
+                                                    {{ source('@KreyuDataTable/data_collector/Icon/point.svg') }}
+                                                </button>
+                                                <span>{{ exporter.name }}</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="tree-details-container">
+        <div class="sf-serializer sf-reset">
+            {% for data_table in collector.data %}
+                <div id="{{ data_table.name }}-details">
+                    <h3>{{ data_table.name }}</h3>
+
+                    <div class="type-class">
+                        <span class="type-class-label">Type class:</span>
+                        {{ profiler_dump(data_table.type_class) }}
+                    </div>
+
+                    <div class="sf-tabs">
+                        <div class="tab">
+                            <h3 class="tab-title">Overview</h3>
+
+                            <div class="tab-content">
+                                {{ _self.render_data_table_overview(data_table) }}
+                            </div>
+                        </div>
+
+                        <div class="tab{{ data_table.value_rows ?? [] is empty ? ' disabled' }}">
+                            <h3 class="tab-title">Value Rows</h3>
+
+                            <div class="tab-content">
+                                {{ _self.render_value_rows(data_table) }}
+                            </div>
+                        </div>
+
+                        <div class="tab{{ data_table.passed_options ?? [] is empty ? ' disabled' }}">
+                            <h3 class="tab-title">Passed Options</h3>
+
+                            <div class="tab-content">
+                                {{ _self.render_passed_options(data_table, 'data table') }}
+                            </div>
+                        </div>
+
+                        <div class="tab{{ data_table.resolved_options ?? [] is empty ? ' disabled' }}">
+                            <h3 class="tab-title">Resolved Options</h3>
+
+                            <div class="tab-content">
+                                {{ _self.render_resolved_options(data_table) }}
+                            </div>
+                        </div>
+
+                        <div class="tab{{ data_table.view_vars ?? [] is empty ? ' disabled' }}">
+                            <h3 class="tab-title">View Vars</h3>
+
+                            <div class="tab-content">
+                                {{ _self.render_view_variables(data_table.view_vars ?? []) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Columns #}
+                {% for column in data_table.columns %}
+                    <div id="{{ data_table.name }}-column-{{ column.name }}-details" class="hidden">
+                        <h3>{{ column.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(column.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab">
+                                <h3 class="tab-title">Overview</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_column_overview(column) }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ column.passed_options ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(column, 'column') }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ column.resolved_options ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(column) }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ column.header_view_vars ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Header View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(column.header_view_vars ?? []) }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ column.value_view_vars ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Value View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(column.value_view_vars ?? []) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Filters #}
+                {% for filter in data_table.filters %}
+                    <div id="{{ data_table.name }}-filter-{{ filter.name }}-details" class="hidden">
+                        <h3>{{ filter.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(filter.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab{{ not filter.data.value|default(false) ? ' disabled' }}">
+                                <h3 class="tab-title">Overview</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_filter_overview(filter) }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ filter.passed_options ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(filter, 'filter') }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ filter.resolved_options ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(filter) }}
+                                </div>
+                            </div>
+
+                            <div class="tab{{ filter.view_vars ?? [] is empty ? ' disabled' }}">
+                                <h3 class="tab-title">View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(filter.view_vars ?? []) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Actions #}
+                {% for action in data_table.actions %}
+                    <div id="{{ data_table.name }}-action-{{ action.name }}-details" class="hidden">
+                        <h3>{{ action.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(action.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(action, 'action') }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(action) }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Row Actions #}
+                {% for action in data_table.row_actions %}
+                    <div id="{{ data_table.name }}-row-action-{{ action.name }}-details" class="hidden">
+                        <h3>{{ action.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(action.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(action, 'row action') }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(action) }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Batch Actions #}
+                {% for action in data_table.batch_actions %}
+                    <div id="{{ data_table.name }}-batch-action-{{ action.name }}-details" class="hidden">
+                        <h3>{{ action.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(action.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(action, 'batch action') }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(action) }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">View Vars</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {# Exporters #}
+                {% for exporter in data_table.exporters %}
+                    <div id="{{ data_table.name }}-exporter-{{ exporter.name }}-details" class="hidden">
+                        <h3>{{ exporter.name }}</h3>
+
+                        <div class="type-class">
+                            <span class="type-class-label">Type class:</span>
+                            {{ profiler_dump(exporter.type_class) }}
+                        </div>
+
+                        <div class="sf-tabs">
+                            <div class="tab {{ exporter.passed_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Passed Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_passed_options(exporter, 'exporter') }}
+                                </div>
+                            </div>
+
+                            <div class="tab {{ exporter.resolved_options ?? [] is empty ? 'disabled' }}">
+                                <h3 class="tab-title">Resolved Options</h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_resolved_options(exporter) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
 
-{% macro render_columns_tab(columnsData) %}
-    <div class="tab">
-        <h3 class="tab-title">Columns <span class="badge">{{ columnsData|length }}</h3>
-        <div class="tab-content">
-            {% if not columnsData|length %}
-                <div class="empty">
-                    <p>No columns found.</p>
-                </div>
-            {% else %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Options</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for column in columnsData %}
-                            <tr>
-                                <td>{{ column.name }}</td>
-                                <td>{{ column.type }}</td>
-                                <td>{{ profiler_dump(column.options) }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
+{% macro render_data_table_overview(data) %}
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ data.total_count }}</span>
+            <span class="label">Total item count</span>
         </div>
+
+        {% if data.resolved_options.seek('pagination_enabled') %}
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ data.page }}</span>
+                    <span class="label">Current page</span>
+                </div>
+                <div class="metric">
+                    <span class="value">{{ data.per_page }}</span>
+                    <span class="label">Items per page</span>
+                </div>
+            </div>
+        {% endif %}
     </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 180px">Feature</th>
+                <th>Enabled</th>
+                <th>Persistent</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Pagination</th>
+                <td>{{ _self.render_boolean(data.features.pagination.enabled) }}</td>
+                <td>{{ _self.render_boolean(data.features.pagination.persistence_enabled) }}</td>
+            </tr>
+            <tr>
+                <th>Sorting</th>
+                <td>{{ _self.render_boolean(data.features.sorting.enabled) }}</td>
+                <td>{{ _self.render_boolean(data.features.sorting.persistence_enabled) }}</td>
+            </tr>
+            <tr>
+                <th>Filtration</th>
+                <td>{{ _self.render_boolean(data.features.filtration.enabled) }}</td>
+                <td>{{ _self.render_boolean(data.features.filtration.persistence_enabled) }}</td>
+            </tr>
+            <tr>
+                <th>Personalization</th>
+                <td>{{ _self.render_boolean(data.features.personalization.enabled) }}</td>
+                <td>{{ _self.render_boolean(data.features.personalization.persistence_enabled) }}</td>
+            </tr>
+            <tr>
+                <th>Exporting</th>
+                <td>{{ _self.render_boolean(data.features.exporting.enabled) }}</td>
+                <td>Not supported</td>
+            </tr>
+        </tbody>
+    </table>
 {% endmacro %}
-{% macro render_filters_tab(filtersData) %}
-    <div class="tab">
-        <h3 class="tab-title">Filters <span class="badge">{{ filtersData|length }}</h3>
-        <div class="tab-content">
-            {% if not filtersData|length %}
-                <div class="empty">
-                    <p>No filters found.</p>
+
+{% macro render_column_overview(column) %}
+    <div class="metrics">
+        <div class="metric">
+            <span class="value value-is-icon{{ not column.resolved_options.visible ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.resolved_options.visible) }}</span>
+            <span class="label">Visible</span>
+        </div>
+
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value value-is-icon{{ not column.resolved_options.sort ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.resolved_options.sort) }}</span>
+                <span class="label">Sortable</span>
+            </div>
+
+            {% if column.resolved_options.sort %}
+                <div class="metric">
+                    <span class="value value-is-icon{{ not column.sort_direction|default(null) ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.sort_direction|default(null)) }}</span>
+                    <span class="label">Sorted</span>
                 </div>
-            {% else %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Operator</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for filter in filtersData %}
-                            <tr>
-                                <td>{{ filter.name }}</td>
-                                <td>{{ filter.type }}</td>
-                                <td>{{ filter.operator }}</td>
-                                <td>{{ filter.value }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+                {% if column.sort_direction|default(null) %}
+                    <div class="metric">
+                        <span class="value">{{ column.sort_direction|default(null) ? column.sort_direction|title : 'N/A' }}</span>
+                        <span class="label">Sort direction</span>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric">
+            <span class="value value-is-icon{{ not column.resolved_options.export ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.resolved_options.export) }}</span>
+            <span class="label">Exportable</span>
+        </div>
+
+        <div class="metric">
+            <span class="value value-is-icon{{ not column.resolved_options.personalizable ? ' value-shows-no-color' }}">{{ _self.render_boolean(column.resolved_options.personalizable) }}</span>
+            <span class="label">Personalizable</span>
+        </div>
     </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 180px">Setting</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Priority</th>
+                <td>{{ column.resolved_options.seek('priority') }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_filter_overview(filter) %}
+    <div class="metrics">
+        <div class="metric">
+            <span class="value value-is-icon{{ not filter.data.value|default(false) ? ' value-shows-no-color' }}">{{ _self.render_boolean(filter.data.value|default(false)) }}</span>
+            <span class="label">Applied</span>
+        </div>
+
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">{{ filter.operator_label|default('N/A') }}</span>
+                <span class="label">Operator</span>
+            </div>
+            <div class="metric">
+                <span class="value value-is-icon{{ not filter.resolved_options.operator_selectable ? ' value-shows-no-color' }}">{{ _self.render_boolean(filter.resolved_options.operator_selectable) }}</span>
+                <span class="label">Operator selectable</span>
+            </div>
+        </div>
+    </div>
+
+    {% if filter.data.value|default(false) %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Display value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ profiler_dump(filter.data, 1) }}</td>
+                    <td>{{ profiler_dump(filter.view_vars.seek('value'), 1) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>This filter was not applied.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_value_rows(data) %}
+    {% if data.value_rows ?? [] is not empty %}
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 180px">Row Index</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row_data in data.value_rows %}
+                    <tr>
+                        <th>{{ loop.index }}</th>
+                        <td>{{ profiler_dump(row_data, 1) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>The data table has no value rows.</p>
+        </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro render_actions_tab(title, actionsData) %}
@@ -130,7 +737,7 @@
                             <tr>
                                 <td>{{ action.name }}</td>
                                 <td>{{ action.type }}</td>
-                                <td>{{ profiler_dump(action.options) }}</td>
+                                <td>{{ profiler_dump(action.options, 1) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -139,3 +746,409 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro render_passed_options(data, label) %}
+    {% if data.passed_options ?? [] is not empty %}
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 180px">Option</th>
+                    <th>Passed Value</th>
+                    <th>Resolved Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for option, value in data.passed_options %}
+                    <tr>
+                        <th>{{ option }}</th>
+                        <td>{{ profiler_dump(value, 1) }}</td>
+                        <td>
+                            {% set option_value = value.value|default(value) %}
+                            {% set resolved_option_value = data.resolved_options[option].value|default(data.resolved_options[option]) %}
+
+                            {% if resolved_option_value == option_value %}
+                                <em class="font-normal text-muted">same as passed value</em>
+                            {% else %}
+                                {{ profiler_dump(data.resolved_options.seek(option), 1) }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No options were passed when constructing this {{ label }}.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_resolved_options(data) %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 180px">Option</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for option, value in data.resolved_options ?? [] %}
+                <tr>
+                    <th scope="row">{{ option }}</th>
+                    <td>{{ profiler_dump(value, 1) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_view_variables(view_vars) %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 180px">Variable</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for variable, value in view_vars %}
+                <tr>
+                    <th scope="row">{{ variable }}</th>
+                    <td>{{ profiler_dump(value, 1) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_boolean(value) %}
+    {% if value %}
+        <div style="color: var(--metric-icon-green-color)">{{ source('@WebProfiler/Icon/yes.svg') }}</div>
+    {% else %}
+        <div style="color: var(--metric-icon-red-color); filter: grayscale(1);">{{ source('@WebProfiler/Icon/no.svg') }}</div>
+    {% endif %}
+{% endmacro %}
+
+{# Stylesheets mostly copied from Symfony Form integration with the Profiler #}
+{# https://github.com/symfony/web-profiler-bundle/blob/master/Resources/views/Collector/form.html.twig #}
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        table td, table th, table td svg {
+            vertical-align: middle;
+        }
+        .type-class {
+            font-size: var(--font-size-body);
+            display: flex;
+            margin: 0 0 15px;
+        }
+        .type-class-label {
+            margin-right: 4px;
+        }
+        .type-class pre.sf-dump {
+            font-family: var(--font-family-system) !important;
+            font-size: var(--font-size-body) !important;
+            margin-left: 5px;
+        }
+        .type-class .sf-dump .sf-dump-str {
+            color: var(--color-link) !important;
+            text-decoration: underline;
+        }
+        .type-class .sf-dump .sf-dump-str:hover {
+            text-decoration: none;
+        }
+        #tree-menu {
+            float: left;
+            padding-right: 10px;
+            width: 220px;
+        }
+        #tree-menu ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 0;
+        }
+        #tree-menu li {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #tree-menu .empty {
+            border: 0;
+            box-shadow: none !important;
+            padding: 0;
+        }
+        #tree-details-container {
+            border-left: 1px solid var(--table-border-color);
+            margin-left: 230px;
+            padding-left: 20px;
+        }
+        .tree-details {
+            padding-bottom: 40px;
+        }
+        .tree-details h3 {
+            font-size: 18px;
+            position: relative;
+        }
+        .toggle-icon {
+            display: inline-block;
+        }
+        .tree .tree-inner {
+            cursor: pointer;
+            padding: 5px 7px 5px 22px;
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tree .toggle-button {
+            width: 16px;
+            height: 16px;
+            margin-left: -18px;
+            display: inline-grid;
+            place-content: center;
+            background: none;
+            border: none;
+            transition: transform 200ms;
+        }
+        .tree [data-toggle-button].closed svg {
+            transform: rotate(-90deg);
+        }
+        .tree .toggle-button.closed svg {
+            transform: rotate(-90deg);
+        }
+        .tree .toggle-button svg {
+            transform: rotate(0deg);
+            width: 16px;
+            height: 16px;
+        }
+        .tree .tree-inner {
+            border-radius: 4px;
+        }
+        .tree ul ul .tree-inner {
+            padding-left: 32px;
+        }
+        .tree ul ul ul .tree-inner {
+            padding-left: 48px;
+        }
+        .tree ul ul ul ul .tree-inner {
+            padding-left: 64px;
+        }
+        .tree ul ul ul ul ul .tree-inner {
+            padding-left: 72px;
+        }
+        .theme-light .tree .tree-inner:hover {
+            background: var(--gray-100);
+        }
+        .theme-dark .tree .tree-inner:hover {
+            background: var(--gray-600);
+        }
+        .tree .tree-inner.active, .tree .tree-inner.active:hover {
+            background: var(--tree-active-background);
+            font-weight: bold;
+        }
+        .tree-details .toggle-icon {
+            width: 16px;
+            height: 16px;
+            /* vertically center the button */
+            position: absolute;
+            top: 50%;
+            margin-top: -9px;
+            margin-left: 6px;
+        }
+        h3 a, h3 a:hover, h3 a:focus {
+            color: inherit;
+            text-decoration: inherit;
+        }
+    </style>
+{% endblock %}
+
+{# Javascripts mostly copied from Symfony Form integration with the Profiler #}
+{# https://github.com/symfony/web-profiler-bundle/blob/master/Resources/views/Collector/form.html.twig #}
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerDataTablePanel();
+        });
+
+        class SymfonyProfilerDataTablePanel {
+            #activeTreeItem;
+            #activeTreePanel;
+            #storage;
+            #storageKey = 'kreyu_data_table_bundle_toggle_data';
+            #togglerStates = {};
+
+            constructor() {
+                this.#storage = sessionStorage;
+                this.#initTrees();
+                this.#initTogglerButtons();
+            }
+
+            #initTrees() {
+                const treeItems = document.querySelectorAll('.tree .tree-inner');
+                treeItems.forEach((treeItem) => {
+                    var targetId = treeItem.getAttribute('data-tab-target-id');
+
+                    if (null === targetId) {
+                        return;
+                    }
+
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Tab target ${targetId} does not exist`;
+                    }
+
+                    treeItem.addEventListener('click', (e) => {
+                        this.#selectTreeItem(treeItem);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    target.classList.add('hidden');
+                });
+
+                if (treeItems.length > 0) {
+                    this.#selectTreeItem(treeItems[0]);
+                }
+            };
+
+            #selectTreeItem(treeItem) {
+                const treePanelId = treeItem.getAttribute('data-tab-target-id');
+                const treePanel = document.getElementById(treePanelId);
+
+                console.log(treePanelId);
+
+                if (!treePanel) {
+                    throw `The tree panel ${treePanelId} does not exist`;
+                }
+
+                if (this.#activeTreeItem) {
+                    this.#activeTreeItem.classList.remove('active');
+                }
+
+                if (this.#activeTreePanel) {
+                    this.#activeTreePanel.classList.add('hidden');
+                }
+
+                treeItem.classList.add('active');
+                treePanel.classList.remove('hidden');
+
+                this.#activeTreeItem = treeItem;
+                this.#activeTreePanel = treePanel;
+            }
+
+            #initTogglerButtons() {
+                this.#togglerStates = this.#getTogglerStates();
+                if (!this.#isObject(this.#togglerStates)) {
+                    this.#togglerStates = {};
+                }
+
+                const buttons = document.querySelectorAll('[data-toggle-button]');
+
+                buttons.forEach((button) => {
+                    const targetId = button.getAttribute('data-toggle-target-id');
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Toggle target ${targetId} does not exist`;
+                    }
+
+                    // correct the initial state of the button
+                    if (target.classList.contains('hidden')) {
+                        button.classList.add('closed');
+                    }
+
+                    button.addEventListener('click', (e) => {
+                        this.#toggleToggler(button);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    if (this.#togglerStates.hasOwnProperty(targetId)) {
+                        // open or collapse based on stored data
+                        if (0 === this.#togglerStates[targetId]) {
+                            this.#collapseToggler(button);
+                        } else {
+                            this.#expandToggler(button);
+                        }
+                    }
+                });
+            };
+
+            #isTogglerCollapsed(button) {
+                return button.classList.contains('closed');
+            }
+
+            #isTogglerExpanded(button) {
+                return !this.#isTogglerCollapsed(button);
+            }
+
+            #expandToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw "Toggle target " + targetId + " does not exist";
+                }
+
+                if (this.#isTogglerCollapsed(button)) {
+                    button.classList.remove('closed');
+                    target.classList.remove('hidden');
+
+                    this.#togglerStates[targetId] = 1;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #collapseToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw `Toggle target ${targetId} does not exist`;
+                }
+
+                if (this.#isTogglerExpanded(button)) {
+                    button.classList.add('closed');
+                    target.classList.add('hidden');
+
+                    this.#togglerStates[targetId] = 0;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #toggleToggler(button) {
+                if (button.classList.contains('closed')) {
+                    this.#expandToggler(button);
+                } else {
+                    this.#collapseToggler(button);
+                }
+            }
+
+            #saveTogglerStates() {
+                this.#storage.setItem(this.#storageKey, JSON.stringify(this.#togglerStates));
+            }
+
+            #getTogglerStates() {
+                const data = this.#storage.getItem(this.#storageKey);
+
+                if (null !== data) {
+                    try {
+                        return JSON.parse(data);
+                    } catch(e) {
+                    }
+                }
+
+                return {};
+            }
+
+            #isObject(variable) {
+                return null !== variable && 'object' === typeof variable && !Array.isArray(variable);
+            }
+        }
+    </script>
+{% endblock %}

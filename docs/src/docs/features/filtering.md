@@ -176,6 +176,25 @@ class ProductController extends AbstractController
 ```
 :::
 
+### Adding filters loaded from persistence to URL
+
+By default, the filters loaded from the persistence are not visible in the URL.
+
+It is recommended to make sure the **state** controller is enabled in your `assets/controllers.json`,
+which will automatically append the filters to the URL, even if multiple data tables are visible on the same page.
+
+```json
+{
+    "controllers": {
+        "@kreyu/data-table-bundle": {
+            "state": {
+                "enabled": true
+            }
+        }
+    }
+}
+```
+
 ## Default filtration
 
 The default filtration data can be overridden using the data table builder's `setDefaultFiltrationData()` method:

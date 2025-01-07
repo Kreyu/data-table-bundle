@@ -24,10 +24,12 @@ class AliasResolver implements AliasResolverInterface
         }
 
         foreach ($queryBuilder->getDQLPart('select') ?? [] as $select) {
-            $parts = preg_split('/ as( hidden)? /i', $select->getParts()[0]);
+            foreach ($select->getParts() as $clause) {
+                preg_match_all('/([^,]+)\s+AS\s+(HIDDEN\s+)?([^,]+)?/i', $clause, $matches);
 
-            if ($path === ($parts[1] ?? $parts[0])) {
-                return false;
+                if (in_array($path, $matches[3])) {
+                    return false;
+                }
             }
         }
 

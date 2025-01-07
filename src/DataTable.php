@@ -132,23 +132,27 @@ class DataTable implements DataTableInterface
             return;
         }
 
-        if ($paginationData = $this->getInitialPaginationData()) {
+        $this->dispatch(DataTableEvents::PRE_INITIALIZE, new DataTableEvent($this));
+
+        if (null === $this->paginationData && $paginationData = $this->getInitialPaginationData()) {
             $this->paginate($paginationData, false);
         }
 
-        if ($sortingData = $this->getInitialSortingData()) {
+        if (null === $this->sortingData && $sortingData = $this->getInitialSortingData()) {
             $this->sort($sortingData, false);
         }
 
-        if ($filtrationData = $this->getInitialFiltrationData()) {
+        if (null === $this->filtrationData && $filtrationData = $this->getInitialFiltrationData()) {
             $this->filter($filtrationData, false);
         }
 
-        if ($personalizationData = $this->getInitialPersonalizationData()) {
+        if (null === $this->personalizationData && $personalizationData = $this->getInitialPersonalizationData()) {
             $this->personalize($personalizationData, false);
         }
 
         $this->initialized = true;
+
+        $this->dispatch(DataTableEvents::POST_INITIALIZE, new DataTableEvent($this));
     }
 
     public function getName(): string
@@ -580,7 +584,7 @@ class DataTable implements DataTableInterface
         $data = $event->getExportData();
 
         if (ExportStrategy::IncludeAll === $data->strategy) {
-            $dataTable->getQuery()->paginate(new PaginationData(perPage: null));
+            $dataTable->paginate(new PaginationData(page: 1, perPage: null), persistence: false);
         }
 
         if (!$data->includePersonalization) {
@@ -780,6 +784,10 @@ class DataTable implements DataTableInterface
 
     public function createView(): DataTableView
     {
+        if (!$this->initialized) {
+            $this->initialize();
+        }
+
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 
@@ -792,6 +800,10 @@ class DataTable implements DataTableInterface
 
     public function createExportView(): DataTableView
     {
+        if (!$this->initialized) {
+            $this->initialize();
+        }
+
         $type = $this->config->getType();
         $options = $this->config->getOptions();
 
@@ -814,6 +826,7 @@ class DataTable implements DataTableInterface
     private function resetPagination(): void
     {
         $this->pagination = null;
+        $this->resultSet = null;
     }
 
     private function getInitialPaginationData(): ?PaginationData
@@ -828,11 +841,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Pagination);
         }
 
-        $data ??= $this->config->getDefaultPaginationData();
-
-        $data ??= new PaginationData();
-
-        return $data;
+        return $data ?? $this->config->getDefaultPaginationData() ?? new PaginationData();
     }
 
     private function getInitialSortingData(): ?SortingData
@@ -847,11 +856,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Sorting);
         }
 
-        $data ??= $this->config->getDefaultSortingData();
-
-        $data ??= new SortingData();
-
-        return $data;
+        return $data ?? $this->config->getDefaultSortingData();
     }
 
     private function getInitialFiltrationData(): ?FiltrationData
@@ -867,7 +872,6 @@ class DataTable implements DataTableInterface
         }
 
         $data ??= $this->config->getDefaultFiltrationData();
-
         $data ??= FiltrationData::fromDataTable($this);
 
         $data->appendMissingFilters($this->getFilters());
@@ -887,11 +891,7 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Personalization);
         }
 
-        $data ??= $this->config->getDefaultPersonalizationData();
-
-        $data ??= PersonalizationData::fromDataTable($this);
-
-        return $data;
+        return $data ?? $this->config->getDefaultPersonalizationData() ?? PersonalizationData::fromDataTable($this);
     }
 
     private function isPersistenceEnabled(PersistenceContext $context): bool

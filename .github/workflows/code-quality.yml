@@ -1,9 +1,11 @@
 name: Code Quality
 
 on:
-  - push
-  - pull_request
-  - workflow_dispatch
+  push:
+  pull_request:
+  workflow_dispatch:
+    paths:
+      - '**.php'
 
 jobs:
   php-cs-fixer:
@@ -22,7 +24,12 @@ jobs:
         uses: ramsey/composer-install@v2
 
       - name: Run php-cs-fixer
-        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
+        run: ./vendor/bin/php-cs-fixer fix --diff
+
+      - name: Commit php-cs-fixer changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply php-cs-fixer changes
 
   phpstan:
     runs-on: ubuntu-latest

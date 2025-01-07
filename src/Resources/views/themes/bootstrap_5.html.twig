@@ -199,7 +199,7 @@
 {% block filter_clear_all_button %}
     {% set attr = {
         'class': 'btn btn-icon btn-outline-danger',
-        'href': data_table_filter_clear_url(filters),
+        'href': data_table_filter_clear_url(data_table, filters),
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
         'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
@@ -211,7 +211,7 @@
 
 {% block filter_clear_button %}
     <a class="btn px-2"
-       href="{{ data_table_filter_clear_url(filter) }}"
+       href="{{ data_table_filter_clear_url(data_table, filter) }}"
        data-turbo-action="advance"
        data-toggle="tooltip"
        data-placement="bottom"
@@ -279,7 +279,7 @@
     {% form_theme form with [_self, 'bootstrap_5_layout.html.twig'] %}
 
     <div data-controller="kreyu--data-table-bundle--personalization">
-        {{ form_start(form) }}
+        {{ form_start(form, { attr: { 'data-turbo-frame': '_self' } }) }}
         {% if form._token is defined %}
             {{ form_row(form._token) }}
         {% endif %}
@@ -439,19 +439,34 @@
 
 {% block pagination_widget %}
     <div class="card-footer">
-        <div class="pagination d-flex gap-3 flex-wrap justify-content-center align-items-center">
+        <div class="pagination d-flex flex-wrap justify-content-between align-items-center flex-lg-row flex-column gap-2">
             {{ parent() }}
-            <div class="d-flex col"></div>
         </div>
     </div>
 {% endblock %}
 
 {% block pagination_counters %}
-    <div class="d-flex col">{{ parent() }}</div>
+    <div class="d-flex col justify-content-start">{{ parent() }}</div>
 {% endblock %}
 
 {% block pagination_controls %}
-    <div class="d-flex">{{ parent() }}</div>
+    <div class="d-flex col justify-content-center">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_per_page %}
+    <div class="d-flex col justify-content-end">
+        {{ parent() }}
+    </div>
+{% endblock %}
+
+{% block pagination_per_page_message %}
+    <div class="me-2 d-flex align-items-center">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_per_page_form %}
+    {% with { select_attr: { class: 'col form-select' } } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
 
 {% block pagination_page %}
@@ -562,7 +577,7 @@
     </li>
 {% endblock %}
 
-{% block action_value_icon %}
+{% block action_control_icon %}
     <i {% with { attr: icon_attr } %}{{ block('attributes') }}{% endwith %}></i>
 {% endblock %}
 
@@ -627,13 +642,13 @@
     </div>
 {% endblock %}
 
-{% block action_value %}
+{% block action_control %}
     <div class="d-inline-block" {{ block('attributes') }}>
         {{ parent() }}
     </div>
 {% endblock %}
 
-{% block action_link_value %}
+{% block action_link_control %}
     {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
 
     {% if confirmation %}
@@ -656,7 +671,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_button_value %}
+{% block action_button_control %}
     {% set attr = {
         class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
     }|merge(attr) %}
@@ -681,7 +696,7 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_form_value %}
+{% block action_form_control %}
     {% set attr = { class: 'd-inline-block' }|merge(attr) %}
 
     {% set button_attr = {

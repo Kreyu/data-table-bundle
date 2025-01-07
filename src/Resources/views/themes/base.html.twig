@@ -3,53 +3,73 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top"
-        {% if has_batch_actions %}
-            data-controller="kreyu--data-table-bundle--batch"
-        {% endif %}
-    >
-        {{ block('action_bar') }}
-        {{ block('table') }}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
-        {% if pagination_enabled %}
-            {{ data_table_pagination(pagination) }}
-        {% endif %}
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+        <div
+            data-controller="{{ stimulus_controllers|join(' ') }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        >
+            {{ block('action_bar', theme) }}
+            {{ block('table', theme) }}
+
+            {% if pagination_enabled %}
+                {{ data_table_pagination(pagination) }}
+            {% endif %}
+        </div>
     </turbo-frame>
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
+    {% deprecated 'The "kreyu_data_table_form_aware" block is deprecated. Instead of wrapping the data table with form, reference it by using the "form" HTML attribute.' %}
+
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
     <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
-        {{ block('action_bar') }}
+        <div
+            data-controller="{{ stimulus_controllers|join(' ') }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+        >
+            {{ block('action_bar', theme) }}
 
-        {{ form_start(form, form_variables) }}
-            {{ block('table') }}
-        {{ form_end(form, { render_rest: false }) }}
+            {{ form_start(form, form_variables) }}
+                {{ block('table', theme) }}
+            {{ form_end(form, { render_rest: false }) }}
 
-        {% if pagination_enabled %}
-            {{ data_table_pagination(pagination) }}
-        {% endif %}
+            {% if pagination_enabled %}
+                {{ data_table_pagination(pagination) }}
+            {% endif %}
+        </div>
     </turbo-frame>
 {% endblock %}
 
 {% block kreyu_data_table_table %}
-    {{ block('table') }}
+    {{ block('table', theme) }}
 {% endblock %}
 
 {% block kreyu_data_table_action_bar %}
-    {{ block('action_bar') }}
+    {{ block('action_bar', theme) }}
 {% endblock %}
 
 {% block action_bar %}{% endblock %}
 
 {% block table %}
     <table {% with { attr: table_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
-        {{ block('table_head') }}
-        {{ block('table_body') }}
+        {{ block('table_head', theme) }}
+        {{ block('table_body', theme) }}
     </table>
 {% endblock %}
 
 {% block table_head %}
-    <thead>{{ block('table_head_row') }}</thead>
+    <thead>{{ block('table_head_row', theme) }}</thead>
 {% endblock %}
 
 {% block table_head_row %}
@@ -57,14 +77,14 @@
 {% endblock %}
 
 {% block table_body %}
-    <tbody>{{ block('table_body_row') }}</tbody>
+    <tbody>{{ block('table_body_row', theme) }}</tbody>
 {% endblock %}
 
 {% block table_body_row %}
     {% if value_rows|length > 0 %}
-        {{ block('table_body_row_results') }}
+        {{ block('table_body_row_results', theme) }}
     {% else %}
-        {{ block('table_body_row_no_results') }}
+        {{ block('table_body_row_no_results', theme) }}
     {% endif %}
 {% endblock %}
 
@@ -123,23 +143,26 @@
 {# Pagination #}
 
 {% block kreyu_data_table_pagination %}
-    {% if page_count > 1 %}
-        {{ block('pagination_widget', theme) }}
-    {% endif %}
+    {{ block('pagination_widget', theme) }}
 {% endblock %}
 
 {% block pagination_widget %}
     {{ block('pagination_counters', theme) }}
-    {{ block('pagination_controls', theme) }}
+
+    {% if page_count > 1 %}
+        {{ block('pagination_controls', theme) }}
+    {% endif %}
+
+    {{ block('pagination_per_page', theme) }}
 {% endblock %}
 
 {% block pagination_controls %}
     {%- if has_previous_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, 1) } %}
             {{ block('pagination_first', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number - 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number - 1) } %}
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
@@ -151,18 +174,18 @@
         {% if page_number == current_page_number %}
             {{ block('pagination_page_active', theme) }}
         {% else %}
-            {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_number })) } %}
+            {% with { path: data_table_pagination_url(data_table, page_number) } %}
                 {{ block('pagination_page', theme) }}
             {% endwith %}
         {% endif %}
     {% endfor %}
 
     {%- if has_next_page -%}
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): current_page_number + 1 })) } %}
+        {% with { path: data_table_pagination_url(data_table, current_page_number + 1) } %}
             {{ block('pagination_next', theme) }}
         {% endwith %}
 
-        {% with { path: path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({ (page_parameter_name): page_count })) } %}
+        {% with { path: data_table_pagination_url(data_table, page_count) } %}
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}
@@ -171,10 +194,62 @@
     {%- endif -%}
 {% endblock %}
 
+{% block pagination_per_page %}
+    {% set choices = data_table.vars.per_page_choices %}
+
+    {% if choices is not empty %}
+        {{ block('pagination_per_page_message', theme) }}
+        {{ block('pagination_per_page_form', theme) }}
+    {% else %}
+        <div></div>
+    {% endif %}
+{% endblock %}
+
+{% block pagination_per_page_message 'Items per page'|trans %}
+
+{% block pagination_per_page_form %}
+    {% set form_attr = { 'data-turbo-frame': '_self' }|merge(form_attr ?? {}) %}
+
+    <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
+        {% set url_query_parameters = [] %}
+
+        {#
+            Changing the "per page" parameter automatically changes page to the first one.
+            You can disable this behavior by in your own theme that extends this one, for example:
+
+            {% block pagination_per_page_form %}
+                {% with { should_reset_to_first_page: false } %}
+                    {{ parent() }}
+                {% endwith %}
+            {% endblock %}
+        #}
+
+        {% if should_reset_to_first_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+        {% endif %}
+
+        {{ _self.array_to_form_inputs(url_query_parameters) }}
+
+        {% set select_attr = {
+            name: data_table.vars.per_page_parameter_name,
+            onchange: 'this.form.requestSubmit()',
+            autocomplete: 'off',
+        }|merge(select_attr|default({})) %}
+
+        <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
+            {% for choice in choices %}
+                <option value="{{ choice }}"{{ item_number_per_page == choice ? ' selected' }}>{{ choice }}</option>
+            {% endfor %}
+        </select>
+    </form>
+{% endblock %}
+
 {% block pagination_counters %}
-    <span {{- block('attributes') -}}>
-        {{- block('pagination_counters_message', theme) -}}
-    </span>
+    {% if total_item_count > 0 %}
+        <span {{- block('attributes') -}}>
+            {{- block('pagination_counters_message', theme) -}}
+        </span>
+    {% endif %}
 {% endblock %}
 
 {% block pagination_counters_message %}
@@ -261,6 +336,35 @@
     {% if form.count > 0 %}
         {{ block('filtration_widget', theme) }}
     {% endif %}
+
+    {#
+        Submitting a filtration form should keep current "per page" and change current page to the first one.
+        You can disable this behavior by in your own theme that extends this one, for example:
+
+        {% block kreyu_data_table_filters_form %}
+            {% with { should_reset_to_first_page: false, should_keep_per_page: false } %}
+                {{ parent() }}
+            {% endwith %}
+        {% endblock %}
+    #}
+
+    {% set data_table = form.vars.data_table_view %}
+
+    {% if data_table.vars.pagination_enabled %}
+        {% set url_query_parameters = [] %}
+
+        {% if should_reset_to_first_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+        {% endif %}
+
+        {% if should_keep_per_page ?? true %}
+            {% set url_query_parameters = url_query_parameters|merge({
+                (data_table.vars.per_page_parameter_name): data_table.vars.pagination.vars.item_number_per_page,
+            }) %}
+        {% endif %}
+
+        {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
+    {% endif %}
 {% endblock %}
 
 {% block filtration_widget %}
@@ -302,24 +406,13 @@
     {% set label_attr = label_attr|default({}) %}
 
     {% if data_table.vars.sorting_enabled and sortable %}
-        {% set current_sort_field = sorting_field_data.name|default(null) %}
-        {% set current_sort_direction = sorting_field_data.direction|default(null) %}
-
         {% set active_attr = active_attr|default({}) %}
         {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% set attr = attr|default({}) %}
         {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
 
         <th {{ block('attributes') }}>
-            {% set query_params = app.request.query.all %}
-            {% set query_params = query_params|merge({ (sort_parameter_name): {
-                (name): sort_direction|lower == 'desc' ? 'asc' : 'desc'
-            } }) %}
-
-            {% set query_params = app.request.attributes.get('_route_params')|merge(query_params) %}
-
-            {% set label_attr = { href: path(app.request.get('_route'), query_params) }|merge(label_attr) %}
+            {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
             {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
 
             <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
@@ -487,14 +580,14 @@
 
 {# Action type templates #}
 
-{% block action_value_icon %}{% endblock %}
+{% block action_control_icon %}{% endblock %}
 
-{% block action_value %}
-    {% if icon_attr %}{{ block('action_value_icon', theme, _context) }}{% endif %}
+{% block action_control %}
+    {% if icon_attr %}{{ block('action_control_icon', theme, _context) }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 
-{% block action_link_value %}
+{% block action_link_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -502,11 +595,11 @@
     {% endif %}
 
     <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
-{% block action_button_value %}
+{% block action_button_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
@@ -514,11 +607,11 @@
     {% endif %}
 
     <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_value', theme, _context) -}}{% endwith %}
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
     </a>
 {% endblock %}
 
-{% block action_form_value %}
+{% block action_form_control %}
     {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
 
     {% if batch %}
@@ -534,7 +627,7 @@
         {% set button_tag = button_tag|default('button') %}
 
         <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
-            {{- block('action_value', theme, _context) -}}
+            {{- block('action_control', theme, _context) -}}
         </{{ button_tag }}>
     </form>
 {% endblock %}
@@ -568,3 +661,26 @@
 {% block attributes %}
     {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
 {% endblock %}
+
+{# Transforms given array to form inputs. Supports nested arrays. #}
+{# For example, ['foo' => ['bar' => 'baz']] will be rendered as:  #}
+{# <input name="foo[bar]" value="baz">                            #}
+{% macro array_to_form_inputs(input, attr = [], parent = null) %}
+    {% for key, value in input %}
+        {% if value is iterable %}
+            {% if parent is not null %}
+                {% set key = parent ~ '[' ~ key ~ ']' %}
+            {% endif %}
+
+            {{ _self.array_to_form_inputs(value, attr, key) }}
+        {% else %}
+            {% if parent is not null %}
+                {% set key = '[' ~ key ~ ']' %}
+            {% endif %}
+
+            {% with { attr: { type: 'hidden' }|merge(attr|merge({ name: parent ~ key, value })) } %}
+                <input {{ block('attributes') }}>
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

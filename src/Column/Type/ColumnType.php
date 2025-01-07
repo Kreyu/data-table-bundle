@@ -25,9 +25,17 @@ final class ColumnType implements ColumnTypeInterface
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
+        $sortPropertyPath = null;
+
+        if (true === $options['sort']) {
+            $sortPropertyPath = $builder->getName();
+        } elseif (is_string($options['sort'])) {
+            $sortPropertyPath = $options['sort'];
+        }
+
         $builder
-            ->setPropertyPath($options['property_path'] ?: null)
-            ->setSortPropertyPath(is_string($options['sort']) ? $options['sort'] : null)
+            ->setPropertyPath($options['property_path'] ?? $builder->getName() ?: null)
+            ->setSortPropertyPath($sortPropertyPath)
             ->setPriority($options['priority'])
             ->setVisible($options['visible'])
             ->setPersonalizable($options['personalizable'])
@@ -68,7 +76,7 @@ final class ColumnType implements ColumnTypeInterface
         $rowData = $view->parent->data;
 
         $normData = $this->getNormDataFromRowData($rowData, $column, $options);
-        $viewData = $this->getViewDataFromNormData($normData, $column, $options);
+        $viewData = $this->getViewDataFromNormData($normData, $rowData, $column, $options);
 
         $view->data = $normData;
         $view->value = $viewData;
@@ -77,14 +85,22 @@ final class ColumnType implements ColumnTypeInterface
             $attr = $attr($normData, $rowData);
         }
 
+        $translationParameters = $options['value_translation_parameters'];
+
+        if (is_callable($translationParameters)) {
+            $translationParameters = $translationParameters($normData, $rowData);
+        }
+
         $view->vars = array_replace($view->vars, [
+            'name' => $column->getName(),
+            'column' => $view,
             'row' => $view->parent,
             'data_table' => $view->parent->parent,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'data' => $view->data,
             'value' => $view->value,
             'translation_domain' => $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? null,
-            'translation_parameters' => $options['value_translation_parameters'] ?? [],
+            'translation_parameters' => $translationParameters ?? [],
             'attr' => $attr,
         ]);
     }
@@ -99,29 +115,27 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export'] += [
-            'getter' => $options['getter'],
-            'property_path' => $options['property_path'],
-            'formatter' => $options['formatter'],
-        ];
+        $options['export']['label'] ??= $options['label'] ?? StringUtil::camelToSentence($column->getName());
+        $options['export']['header_translation_domain'] ??= $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['header_translation_parameters'] ??= $options['header_translation_parameters'] ?? [];
 
-        $label = $options['label'] ?? StringUtil::camelToSentence($column->getName());
+        $label = $options['export']['label'];
 
         if ($this->translator) {
             if ($label instanceof TranslatableInterface) {
-                $label = $label->trans($this->translator, $this->translator->getLocale());
+                $locale = null;
+
+                if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                    $locale = $this->translator->getLocale();
+                }
+
+                $label = $label->trans($this->translator, $locale);
             } else {
-                $translationDomain = $options['export']['header_translation_domain']
-                    ?? $options['header_translation_domain']
-                    ?? $view->parent->parent->vars['translation_domain']
-                    ?? false;
+                $translationDomain = $options['export']['header_translation_domain'];
+                $translationParameters = $options['export']['header_translation_parameters'];
 
                 if ($translationDomain) {
-                    $label = $this->translator->trans(
-                        id: $label,
-                        parameters: $options['header_translation_parameters'],
-                        domain: $translationDomain,
-                    );
+                    $label = $this->translator->trans($label, $translationParameters, $translationDomain);
                 }
             }
         }
@@ -139,33 +153,49 @@ final class ColumnType implements ColumnTypeInterface
             $options['export'] = [];
         }
 
-        $options['export'] += [
-            'getter' => $options['getter'],
-            'property_path' => $options['property_path'],
-            'property_accessor' => $options['property_accessor'],
-            'formatter' => $options['formatter'],
-        ];
+        $options['export']['getter'] ??= $options['getter'];
+        $options['export']['property_path'] ??= $options['property_path'];
+        $options['export']['property_accessor'] ??= $options['property_accessor'];
+        $options['export']['formatter'] ??= $options['formatter'];
+        $options['export']['value_translation_domain'] ??= $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
 
-        $normData = $this->getNormDataFromRowData($view->parent->data, $column, $options['export']);
-        $viewData = $this->getViewDataFromNormData($normData, $column, $options['export']);
+        $rowData = $view->parent->data;
 
-        if ($this->translator && is_string($viewData)) {
-            $translationDomain = $options['export']['value_translation_domain']
-                ?? $options['value_translation_domain']
-                ?? $view->parent->parent->vars['translation_domain']
-                ?? false;
+        $normData = $this->getNormDataFromRowData($rowData, $column, $options['export']);
+        $viewData = $this->getViewDataFromNormData($normData, $rowData, $column, $options['export']);
 
-            if ($translationDomain) {
-                $viewData = $this->translator->trans(
-                    id: $viewData,
-                    parameters: $options['value_translation_parameters'],
-                    domain: $translationDomain,
-                );
+        if ($this->translator && (is_string($viewData) || $viewData instanceof TranslatableInterface)) {
+            if ($viewData instanceof TranslatableInterface) {
+                $locale = null;
+
+                if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                    $locale = $this->translator->getLocale();
+                }
+
+                $viewData = $viewData->trans($this->translator, $locale);
+            } else {
+                $translationDomain = $options['export']['value_translation_domain'];
+                $translationParameters = $options['export']['value_translation_parameters'];
+
+                if (is_callable($translationParameters)) {
+                    $translationParameters = $translationParameters($normData, $rowData);
+                }
+
+                if ($translationDomain) {
+                    $viewData = $this->translator->trans(
+                        id: $viewData,
+                        parameters: $translationParameters,
+                        domain: $translationDomain,
+                    );
+                }
             }
         }
 
+        $view->data = $normData;
         $view->value = $viewData;
 
+        $view->vars['data'] = $normData;
         $view->vars['value'] = $viewData;
     }
 
@@ -196,7 +226,7 @@ final class ColumnType implements ColumnTypeInterface
             ->setAllowedTypes('header_translation_domain', ['null', 'bool', 'string'])
             ->setAllowedTypes('header_translation_parameters', ['null', 'array'])
             ->setAllowedTypes('value_translation_domain', ['null', 'bool', 'string'])
-            ->setAllowedTypes('value_translation_parameters', 'array')
+            ->setAllowedTypes('value_translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('block_name', ['null', 'string'])
             ->setAllowedTypes('block_prefix', ['null', 'string'])
             ->setAllowedTypes('sort', ['bool', 'string'])
@@ -230,39 +260,41 @@ final class ColumnType implements ColumnTypeInterface
      * - using the property accessor with the "property_path" option;
      * - falling back to the unmodified column data;
      */
-    private function getNormDataFromRowData(mixed $data, ColumnInterface $column, array $options): mixed
+    private function getNormDataFromRowData(mixed $rowData, ColumnInterface $column, array $options): mixed
     {
-        if (null === $data) {
+        if (null === $rowData) {
             return null;
         }
 
         if (is_callable($getter = $options['getter'])) {
-            return $getter($data, $column, $options);
+            return $getter($rowData, $column, $options);
         }
 
         $propertyPath = $options['property_path'] ?? $column->getName();
 
-        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($data) || is_object($data))) {
-            return $options['property_accessor']->getValue($data, $propertyPath);
+        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($rowData) || is_object($rowData))) {
+            return $options['property_accessor']->getValue($rowData, $propertyPath);
         }
 
-        return $data;
+        return $rowData;
     }
 
     /**
      * Retrieves the column view data from the norm data by applying the formatter if given.
      */
-    private function getViewDataFromNormData(mixed $data, ColumnInterface $column, array $options): mixed
+    private function getViewDataFromNormData(mixed $normData, mixed $rowData, ColumnInterface $column, array $options): mixed
     {
-        if (null === $data) {
+        if (null === $normData) {
             return null;
         }
 
+        $viewData = $normData;
+
         if (is_callable($formatter = $options['formatter'])) {
-            $data = $formatter($data, $column, $options);
+            $viewData = $formatter($normData, $rowData, $column, $options);
         }
 
-        return $data;
+        return $viewData;
     }
 
     /**

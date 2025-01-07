@@ -733,13 +733,6 @@ class DataTableBuilderTest extends TestCase
         $this->assertEquals($expectedExporters, $dataTable->getExporters());
     }
 
-    public function testGetDataTableInitializesDataTable()
-    {
-        $dataTable = $this->createBuilder()->getDataTable();
-
-        $this->assertTrue($this->getPrivatePropertyValue($dataTable, 'initialized'));
-    }
-
     private function createBuilder(): DataTableBuilder
     {
         return new DataTableBuilder(

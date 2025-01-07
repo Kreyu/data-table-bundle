@@ -45,22 +45,96 @@ class AliasResolverTest extends TestCase
             'category.name',
         ];
 
-        yield 'With query path present in SELECT part' => [
+        yield 'With query path present in SELECT clause' => [
             TestEntityManagerFactory::create()
                 ->createQueryBuilder()
                 ->addSelect('UPPER(product.name) AS product_name')
+                ->from(Product::class, 'product'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With query path present in SELECT clause, marked as HIDDEN' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) AS HIDDEN product_name')
+                ->from(Product::class, 'product'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With multiple selects in single call, first match' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) AS product_name', 'category.name AS HIDDEN category_name')
                 ->from(Product::class, 'product')
                 ->leftJoin('product.category', 'category'),
             'product_name',
             'product_name',
         ];
 
-        yield 'With query path present in SELECT part marked as HIDDEN' => [
+        yield 'With multiple selects in single call, second match' => [
             TestEntityManagerFactory::create()
                 ->createQueryBuilder()
-                ->addSelect('UPPER(product.name) AS HIDDEN product_name')
+                ->addSelect('UPPER(product.name) AS product_name', 'category.name AS HIDDEN category_name')
                 ->from(Product::class, 'product')
                 ->leftJoin('product.category', 'category'),
+            'category_name',
+            'category_name',
+        ];
+
+        yield 'With multiple selects in single clause, first match' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) AS product_name, category.name AS HIDDEN category_name')
+                ->from(Product::class, 'product')
+                ->leftJoin('product.category', 'category'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With multiple selects in single clause, second match' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) AS product_name, category.name AS HIDDEN category_name')
+                ->from(Product::class, 'product')
+                ->leftJoin('product.category', 'category'),
+            'category_name',
+            'category_name',
+        ];
+
+        yield 'With lowercase AS' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) as product_name')
+                ->from(Product::class, 'product'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With lowercase AS HIDDEN' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) as hidden product_name')
+                ->from(Product::class, 'product'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With mixed case AS' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) As product_name')
+                ->from(Product::class, 'product'),
+            'product_name',
+            'product_name',
+        ];
+
+        yield 'With mixed case AS HIDDEN' => [
+            TestEntityManagerFactory::create()
+                ->createQueryBuilder()
+                ->addSelect('UPPER(product.name) aS HIDdeN product_name')
+                ->from(Product::class, 'product'),
             'product_name',
             'product_name',
         ];

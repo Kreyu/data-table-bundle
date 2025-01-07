@@ -176,6 +176,25 @@ class ProductController extends AbstractController
 ```
 :::
 
+### Adding pagination loaded from persistence to URL
+
+By default, the pagination loaded from the persistence is not visible in the URL.
+
+It is recommended to make sure the **state** controller is enabled in your `assets/controllers.json`,
+which will automatically append the pagination parameters to the URL, even if multiple data tables are visible on the same page.
+
+```json
+{
+    "controllers": {
+        "@kreyu/data-table-bundle": {
+            "state": {
+                "enabled": true
+            }
+        }
+    }
+}
+```
+
 ## Default pagination
 
 The default pagination data can be overridden using the data table builder's `setDefaultPaginationData()` method:
@@ -202,6 +221,71 @@ class ProductDataTableType extends AbstractDataTableType
     }
 }
 ```
+
+## Configuring items per page
+
+The per-page limit choices can be configured using the `per_page_choices` option.
+Those choices will be rendered inside a select field, next to the pagination controls.
+
+::: code-group
+```yaml [Globally (YAML)]
+kreyu_data_table:
+  defaults:
+    pagination:
+      per_page_choices: [10, 25, 50, 100]
+```
+
+```php [Globally (PHP)]
+use Symfony\Config\KreyuDataTableConfig;
+
+return static function (KreyuDataTableConfig $config) {
+    $defaults = $config->defaults();
+    $defaults->pagination()
+        ->perPageChoices([10, 25, 50, 100)
+    ;
+};
+```
+
+```php [For data table type]
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'per_page_choices' => [10, 25, 50, 100],
+        ]);
+    }
+}
+```
+
+```php [For specific data table]
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+    
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'per_page_choices' => [10, 25, 50, 100],
+            ],
+        );
+    }
+}
+```
+:::
+
+Setting the `per_page_choices` to an empty array will hide the per-page select field.
+
 
 ## Events
 

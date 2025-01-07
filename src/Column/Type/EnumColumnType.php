@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class EnumColumnType extends AbstractColumnType
 {
     public function __construct(
-        private ?TranslatorInterface $translator,
+        private ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -22,7 +22,11 @@ final class EnumColumnType extends AbstractColumnType
 
     protected function format(\UnitEnum $enum): string
     {
-        return $enum instanceof TranslatableInterface ? $enum->trans($this->translator) : $enum->name;
+        if ($enum instanceof TranslatableInterface && null !== $this->translator) {
+            return $enum->trans($this->translator);
+        }
+
+        return $enum->name;
     }
 
     public function getParent(): ?string

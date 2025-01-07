@@ -46,8 +46,8 @@ class TransformDateRangeFilterDataTest extends TestCase
                 operator: Operator::Between,
             ),
             'expected' => new FilterData(
-                value: new \DateTime('2022-01-02 00:00:00'),
-                operator: Operator::LessThan,
+                value: new \DateTime('2022-01-01 23:59:59.999999'),
+                operator: Operator::LessThanEquals,
             ),
         ];
 
@@ -62,7 +62,7 @@ class TransformDateRangeFilterDataTest extends TestCase
             'expected' => new FilterData(
                 value: [
                     'from' => new \DateTime('2022-01-01 00:00:00'),
-                    'to' => new \DateTime('2022-01-03 00:00:00'),
+                    'to' => new \DateTime('2022-01-02 23:59:59.999999'),
                 ],
                 operator: Operator::Between,
             ),

@@ -18,6 +18,10 @@ interface FilterConfigBuilderInterface extends FilterConfigInterface
 
     public function setHandler(FilterHandlerInterface $handler): static;
 
+    public function setAttribute(string $name, mixed $value): static;
+
+    public function setAttributes(array $attributes): static;
+
     /**
      * @param class-string<FormTypeInterface> $formType
      */

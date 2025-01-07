@@ -52,6 +52,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         $loader->load('actions.php');
         $loader->load('exporter.php');
         $loader->load('filtration.php');
+        $loader->load('pagination.php');
         $loader->load('personalization.php');
         $loader->load('twig.php');
 
@@ -69,6 +70,12 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             ->getDefinition('kreyu_data_table.type.data_table')
             ->setArgument('$defaults', $config['defaults'])
         ;
+
+        if ($container->getParameter('kernel.debug')) {
+            $container
+                ->getDefinition('kreyu_data_table.debug.data_collector')
+                ->setArgument('$maxDepth', $config['profiler']['max_depth']);
+        }
     }
 
     public function prepend(ContainerBuilder $container): void

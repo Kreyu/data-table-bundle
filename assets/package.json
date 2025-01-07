@@ -15,10 +15,15 @@
                 "fetch": "eager",
                 "enabled": true
             },
-            "dropdown": {
-                "main": "controllers/dropdown.js",
+            "state": {
+                "main": "controllers/state.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "dropdown": {
+              "main": "controllers/dropdown.js",
+              "fetch": "eager",
+              "enabled": true
             }
         },
         "importmap": {

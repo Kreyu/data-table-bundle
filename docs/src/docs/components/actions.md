@@ -258,7 +258,7 @@ Now we can update the template of the type class to use the newly added variable
         {{ label }}
     </button>
     
-    <div class="modal fade" id="#action-modal-{{ name }}">
+    <div class="modal fade" id="action-modal-{{ name }}">
         <div class="modal-dialog">
             <div class="modal-content">
                 {{ include(template_path, template_vars) }} // [!code ++]
@@ -289,7 +289,7 @@ class ModalActionType extends ButtonActionType
             $value = $view->parent->vars['value']; // [!code ++] 
 
             foreach (['template_path', 'template_vars'] as $optionName) { // [!code ++] 
-                if (is_callable($templatePath)) { // [!code ++] 
+                if (is_callable($options[$optionName])) { // [!code ++] 
                     $options[$optionName] = $options[$optionName]($value); // [!code ++] 
                 } // [!code ++]
             } // [!code ++]

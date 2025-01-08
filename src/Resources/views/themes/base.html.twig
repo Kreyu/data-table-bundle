@@ -633,15 +633,6 @@
 {% endblock %}
 
 {% block action_dropdown_control %}
-<style>
-        #linkList {
-            display: none;
-        }
-        #linkList.show {
-            display: block;
-        }
-    </style>
-
     <div data-controller="kreyu--data-table-bundle--dropdown">
         <button id="toggleButton" data-action="kreyu--data-table-bundle--dropdown#toggle">{{- block('action_control', theme, _context) -}}</button>
         <ul data-kreyu--data-table-bundle--dropdown-target="content">

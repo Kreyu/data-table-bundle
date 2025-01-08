@@ -11,7 +11,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DropdownActionType extends AbstractActionType
 {
-
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
         $itemActions = [];

@@ -632,6 +632,18 @@
     </form>
 {% endblock %}
 
+{% block action_modal_control %}
+    {% set attr = { dataUrl }|filter(v => v != null)|merge(attr|default({})) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <button {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+    </button>
+{% endblock %}
+
 {% block sort_arrow_none %}{% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}

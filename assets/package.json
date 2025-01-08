@@ -19,6 +19,11 @@
                 "main": "controllers/state.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "bootstrap-modal": {
+                "main": "controllers/bootstrap/modal.js",
+                "fetch": "eager",
+                "enabled": true
             }
         },
         "importmap": {

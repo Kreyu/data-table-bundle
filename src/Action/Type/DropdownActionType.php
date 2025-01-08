@@ -28,7 +28,7 @@ class DropdownActionType extends AbstractActionType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define('actions')
-            ->allowedTypes('array')
+            ->allowedTypes(ActionBuilderInterface::class.'[]')
             ->required()
         ;
     }

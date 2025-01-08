@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Builder\RowActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
@@ -17,7 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
-interface DataTableBuilderInterface extends DataTableConfigBuilderInterface, RowActionBuilderInterface
+interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
 {
     public const BATCH_CHECKBOX_COLUMN_NAME = '__batch';
 

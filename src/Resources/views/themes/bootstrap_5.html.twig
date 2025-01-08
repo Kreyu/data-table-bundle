@@ -723,20 +723,26 @@
     {% endif %}
 {% endblock %}
 
-{% block action_dropdown_value %}
+{% block action_dropdown_control %}
     <div class="dropdown" data-controller="kreyu--data-table-bundle--dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false"
             data-action="kreyu--data-table-bundle--dropdown#toggle"
         >
-            {{- block('action_value', theme, _context) -}}
+            {{- block('action_control', theme, _context) -}}
         </button>
-        <ul class="dropdown-menu" id="linkList" aria-labelledby="dropdownMenuButton"
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton"
             data-kreyu--data-table-bundle--dropdown-target="content">
             {% for action in actions %}
-                <li><a class="dropdown-item" href="https://example.com">Lien 1</a></li>
+                <li>{{ data_table_action(action) }}</li>
             {% endfor %}
         </ul>
     </div>
+{% endblock %}
+
+{% block action_link_dropdown_item_control %}
+    {% set attr = { 'class': 'dropdown-item'}|merge(attr) %}
+
+    {{ parent() }}
 {% endblock %}
 
 {% block sort_arrow_none %}

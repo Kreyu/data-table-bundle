@@ -633,7 +633,7 @@
 {% endblock %}
 
 {% block action_modal_control %}
-    {% set attr = { dataUrl }|filter(v => v != null)|merge(attr|default({})) %}
+    {% set attr = { href }|filter(v => v != null)|merge(attr|default({})) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}

@@ -23,7 +23,7 @@
             "bootstrap-modal": {
                 "main": "controllers/bootstrap/modal.js",
                 "fetch": "eager",
-                "enabled": true
+                "enabled": false
             }
         },
         "importmap": {

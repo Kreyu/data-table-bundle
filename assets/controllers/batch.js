@@ -90,10 +90,15 @@ export default class extends Controller {
 
     #updateIdentifierHolderHref(identifierHolder, identifierMap) {
         let href;
+        let hrefHolder =  'href';
+
+        if (identifierHolder.dataset.hrefHolder !== undefined) {
+            hrefHolder = identifierHolder.dataset.hrefHolder;
+        }
 
         try {
-            href = new URL(identifierHolder.href);
-        } catch (exception) {
+            href = new URL(identifierHolder.dataset[hrefHolder]);
+        } catch (exception) {console.log(exception)
             return;
         }
 
@@ -111,7 +116,7 @@ export default class extends Controller {
             }
         }
 
-        identifierHolder.href = href.toString();
+        identifierHolder.dataset[hrefHolder] = href.toString();
     }
 
     #updateIdentifierHolderDataParam(identifierHolder, identifierMap) {

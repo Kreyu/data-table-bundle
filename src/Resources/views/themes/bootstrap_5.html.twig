@@ -727,7 +727,12 @@
 {% block action_modal_control %}
 <div
     data-controller="kreyu--data-table-bundle--bootstrap-modal"
-    data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ dataUrl }}"
+    data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
+
+    {% if batch %}
+        data-kreyu--data-table-bundle--batch-target="identifierHolder"
+        data-href-holder="kreyu-DataTableBundle-BootstrapModalUrlValue"
+    {% endif %}
 >
     {% set modalId = 'modalId-' ~ random() %}
     <button

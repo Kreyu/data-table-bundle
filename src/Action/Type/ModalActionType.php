@@ -40,7 +40,7 @@ final class ModalActionType extends AbstractActionType
             }
         }
 
-        $href = $options['href'] ?? $this->router->generate($options['route'], $options['route_params']);
+        $href = $options['href'] ?? $this->router->generate($options['route'], $options['route_params'], RouterInterface::ABSOLUTE_URL);
 
         $view->vars = array_replace($view->vars, [
             'href' => $href,
@@ -51,7 +51,8 @@ final class ModalActionType extends AbstractActionType
     {
         $resolver
             ->define('route')
-            ->allowedTypes('string', 'callable')
+            ->default(null)
+            ->allowedTypes('null', 'string', 'callable')
         ;
 
         $resolver
@@ -62,7 +63,8 @@ final class ModalActionType extends AbstractActionType
 
         $resolver
             ->define('href')
-            ->allowedTypes('string', 'callable')
+            ->default(null)
+            ->allowedTypes('null', 'string', 'callable')
         ;
     }
 }

@@ -98,7 +98,7 @@ export default class extends Controller {
 
         try {
             href = new URL(identifierHolder.dataset[hrefHolder]);
-        } catch (exception) {console.log(exception)
+        } catch (exception) {
             return;
         }
 

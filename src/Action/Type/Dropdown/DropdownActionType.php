@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kreyu\Bundle\DataTableBundle\Action\Type;
+namespace Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
+use Kreyu\Bundle\DataTableBundle\Action\Type\AbstractActionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DropdownActionType extends AbstractActionType

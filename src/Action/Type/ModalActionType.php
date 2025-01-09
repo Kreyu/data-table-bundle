@@ -40,7 +40,7 @@ final class ModalActionType extends AbstractActionType
             }
         }
 
-        $href = $options['href'] ?? $this->router->generate($options['route'], $options['route_params'], RouterInterface::ABSOLUTE_URL);
+        $href = $options['href'] ?? $this->router->generate($options['route'], $options['route_params']);
 
         $view->vars = array_replace($view->vars, [
             'href' => $href,

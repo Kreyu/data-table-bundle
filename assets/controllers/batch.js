@@ -97,7 +97,7 @@ export default class extends Controller {
         }
 
         try {
-            href = new URL(identifierHolder.dataset[hrefHolder]);
+            href = new URL(identifierHolder.dataset[hrefHolder], window.location.origin);
         } catch (exception) {
             return;
         }

@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Formatter\EntityActiveFilterFormatter;
-use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\Options;
@@ -19,21 +18,17 @@ final class EntityFilterType extends AbstractDoctrineOrmFilterType
     ) {
     }
 
-    public function buildFilter(FilterBuilderInterface $builder, array $options): void
-    {
-        $builder->setSupportedOperators([
-            Operator::Equals,
-            Operator::NotEquals,
-            Operator::In,
-            Operator::NotIn,
-        ]);
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
                 'form_type' => EntityType::class,
+                'supported_operators' => [
+                    Operator::Equals,
+                    Operator::NotEquals,
+                    Operator::In,
+                    Operator::NotIn,
+                ],
                 'choice_label' => null,
                 'active_filter_formatter' => new EntityActiveFilterFormatter(),
             ])

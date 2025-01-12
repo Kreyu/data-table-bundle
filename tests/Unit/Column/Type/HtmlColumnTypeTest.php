@@ -71,7 +71,7 @@ class HtmlColumnTypeTest extends ColumnTypeTestCase
     }
 
     #[DataProvider('provideAllowedTagsOption')]
-    public function testPassingAllowedTagsOption(null|string|array $allowedTags): void
+    public function testPassingAllowedTagsOption(string|array|null $allowedTags): void
     {
         $column = $this->createColumn(['allowed_tags' => $allowedTags]);
         $columnValueView = $this->createColumnValueView($column);

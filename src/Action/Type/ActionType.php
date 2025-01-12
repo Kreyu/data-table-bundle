@@ -51,7 +51,7 @@ final class ActionType implements ActionTypeInterface
 
         if ($action->getConfig()->isConfirmable()) {
             $options['confirmation']['identifier'] = vsprintf(
-               // [data table name]--[context]-action--[action name]--confirmation
+                // [data table name]--[context]-action--[action name]--confirmation
                 format: '%s--%s-action--%s',
                 values: [
                     $dataTable->vars['name'],

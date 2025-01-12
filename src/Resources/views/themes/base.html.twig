@@ -632,6 +632,24 @@
     </form>
 {% endblock %}
 
+{% block action_dropdown_control %}
+    {# Themes that extend base theme should provide their own implementation of dropdown #}
+    <button>{{- block('action_control', theme, _context) -}}</button>
+    <ul>
+        {% for action in actions %}
+            <li>{{ data_table_action(action) }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block action_link_dropdown_item_control %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
+
+    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+    </a>
+{% endblock %}
+
 {% block sort_arrow_none %}{% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}

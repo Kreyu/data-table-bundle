@@ -251,7 +251,7 @@
                             </div>
                         </div>
 
-                        <div class="tab{{ data_table.value_rows ?? [] is empty ? ' disabled' }}">
+                        <div class="tab{{ data_table.value_rows|default([]) is empty ? ' disabled' }}">
                             <h3 class="tab-title">Value Rows</h3>
 
                             <div class="tab-content">
@@ -259,7 +259,7 @@
                             </div>
                         </div>
 
-                        <div class="tab{{ data_table.passed_options ?? [] is empty ? ' disabled' }}">
+                        <div class="tab{{ data_table.passed_options|default([]) is empty ? ' disabled' }}">
                             <h3 class="tab-title">Passed Options</h3>
 
                             <div class="tab-content">
@@ -267,7 +267,7 @@
                             </div>
                         </div>
 
-                        <div class="tab{{ data_table.resolved_options ?? [] is empty ? ' disabled' }}">
+                        <div class="tab{{ data_table.resolved_options|default([]) is empty ? ' disabled' }}">
                             <h3 class="tab-title">Resolved Options</h3>
 
                             <div class="tab-content">
@@ -275,11 +275,11 @@
                             </div>
                         </div>
 
-                        <div class="tab{{ data_table.view_vars ?? [] is empty ? ' disabled' }}">
+                        <div class="tab{{ data_table.view_vars|default([]) is empty ? ' disabled' }}">
                             <h3 class="tab-title">View Vars</h3>
 
                             <div class="tab-content">
-                                {{ _self.render_view_variables(data_table.view_vars ?? []) }}
+                                {{ _self.render_view_variables(data_table.view_vars|default([])) }}
                             </div>
                         </div>
                     </div>
@@ -304,7 +304,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ column.passed_options ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ column.passed_options|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -312,7 +312,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ column.resolved_options ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ column.resolved_options|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -320,19 +320,19 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ column.header_view_vars ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ column.header_view_vars|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Header View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(column.header_view_vars ?? []) }}
+                                    {{ _self.render_view_variables(column.header_view_vars|default([])) }}
                                 </div>
                             </div>
 
-                            <div class="tab{{ column.value_view_vars ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ column.value_view_vars|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Value View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(column.value_view_vars ?? []) }}
+                                    {{ _self.render_view_variables(column.value_view_vars|default([])) }}
                                 </div>
                             </div>
                         </div>
@@ -358,7 +358,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ filter.passed_options ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ filter.passed_options|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -366,7 +366,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ filter.resolved_options ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ filter.resolved_options|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -374,11 +374,11 @@
                                 </div>
                             </div>
 
-                            <div class="tab{{ filter.view_vars ?? [] is empty ? ' disabled' }}">
+                            <div class="tab{{ filter.view_vars|default([]) is empty ? ' disabled' }}">
                                 <h3 class="tab-title">View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(filter.view_vars ?? []) }}
+                                    {{ _self.render_view_variables(filter.view_vars|default([])) }}
                                 </div>
                             </div>
                         </div>
@@ -396,7 +396,7 @@
                         </div>
 
                         <div class="sf-tabs">
-                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.passed_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -404,7 +404,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.resolved_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -412,11 +412,11 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.view_vars|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                    {{ _self.render_view_variables(action.view_vars|default([])) }}
                                 </div>
                             </div>
                         </div>
@@ -434,7 +434,7 @@
                         </div>
 
                         <div class="sf-tabs">
-                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.passed_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -442,7 +442,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.resolved_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -450,11 +450,11 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.view_vars|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                    {{ _self.render_view_variables(action.view_vars|default([])) }}
                                 </div>
                             </div>
                         </div>
@@ -472,7 +472,7 @@
                         </div>
 
                         <div class="sf-tabs">
-                            <div class="tab {{ action.passed_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.passed_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -480,7 +480,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.resolved_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.resolved_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -488,11 +488,11 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ action.view_vars ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ action.view_vars|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">View Vars</h3>
 
                                 <div class="tab-content">
-                                    {{ _self.render_view_variables(action.view_vars ?? []) }}
+                                    {{ _self.render_view_variables(action.view_vars|default([])) }}
                                 </div>
                             </div>
                         </div>
@@ -510,7 +510,7 @@
                         </div>
 
                         <div class="sf-tabs">
-                            <div class="tab {{ exporter.passed_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ exporter.passed_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Passed Options</h3>
 
                                 <div class="tab-content">
@@ -518,7 +518,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab {{ exporter.resolved_options ?? [] is empty ? 'disabled' }}">
+                            <div class="tab {{ exporter.resolved_options|default([]) is empty ? 'disabled' }}">
                                 <h3 class="tab-title">Resolved Options</h3>
 
                                 <div class="tab-content">
@@ -691,7 +691,7 @@
 {% endmacro %}
 
 {% macro render_value_rows(data) %}
-    {% if data.value_rows ?? [] is not empty %}
+    {% if data.value_rows|default([]) is not empty %}
         <table>
             <thead>
                 <tr>
@@ -748,7 +748,7 @@
 {% endmacro %}
 
 {% macro render_passed_options(data, label) %}
-    {% if data.passed_options ?? [] is not empty %}
+    {% if data.passed_options|default([]) is not empty %}
         <table>
             <thead>
                 <tr>
@@ -792,7 +792,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for option, value in data.resolved_options ?? [] %}
+            {% for option, value in data.resolved_options|default([]) %}
                 <tr>
                     <th scope="row">{{ option }}</th>
                     <td>{{ profiler_dump(value, 1) }}</td>

@@ -51,7 +51,8 @@ final class ActionType implements ActionTypeInterface
 
         if ($action->getConfig()->isConfirmable()) {
             $options['confirmation']['identifier'] = vsprintf(
-                format: '%s-%s-action-confirmation-%s',
+               // [data table name]--[context]-action--[action name]--confirmation
+                format: '%s--%s-action--%s',
                 values: [
                     $dataTable->vars['name'],
                     $action->getConfig()->getContext()->value,
@@ -60,7 +61,8 @@ final class ActionType implements ActionTypeInterface
             );
 
             if ($view->parent instanceof ColumnValueView) {
-                $options['confirmation']['identifier'] .= '-'.$view->parent->parent->index;
+                // [data table name]--[context]-action--[action name]--confirmation--[row index]
+                $options['confirmation']['identifier'] .= '--'.$view->parent->parent->index;
             }
         }
 

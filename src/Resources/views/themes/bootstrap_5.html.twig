@@ -728,7 +728,7 @@
         {% set attr = {
             'class': 'btn btn-primary dropdown-toggle',
             'type': 'button',
-            'id': data_table.vars.name ~ '--row-action--' ~ name ~ '--button',
+            'id': data_table.vars.name ~ '--' ~ context.value ~ '-action--' ~ name ~ '--button',
             'aria-expanded': 'false',
             'data-bs-toggle': 'dropdown',
         }|merge(attr) %}

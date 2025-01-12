@@ -633,14 +633,13 @@
 {% endblock %}
 
 {% block action_dropdown_control %}
-    <div data-controller="kreyu--data-table-bundle--dropdown">
-        <button id="toggleButton" data-action="kreyu--data-table-bundle--dropdown#toggle">{{- block('action_control', theme, _context) -}}</button>
-        <ul data-kreyu--data-table-bundle--dropdown-target="content">
-            {% for action in actions %}
-                <li>{{ data_table_action(action) }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+    {# Themes that extend base theme should provide their own implementation of dropdown #}
+    <button>{{- block('action_control', theme, _context) -}}</button>
+    <ul>
+        {% for action in actions %}
+            <li>{{ data_table_action(action) }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block action_link_dropdown_item_control %}

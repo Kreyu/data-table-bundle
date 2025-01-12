@@ -724,12 +724,19 @@
 {% endblock %}
 
 {% block action_dropdown_control %}
-    <div class="dropdown" data-controller="kreyu--data-table-bundle--dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false"
-            data-action="kreyu--data-table-bundle--dropdown#toggle"
-        >
-            {{- block('action_control', theme, _context) -}}
+    <div class="dropdown d-inline-block">
+        {% set attr = {
+            'class': 'btn btn-primary dropdown-toggle',
+            'type': 'button',
+            'id': data_table.vars.name ~ '--row-action--' ~ name ~ '--button',
+            'aria-expanded': 'false',
+            'data-bs-toggle': 'dropdown',
+        }|merge(attr) %}
+
+        <button {{ block('attributes') }}>
+            {% with { attr: {} } %}{{- block('action_control', theme) -}}{% endwith %}
         </button>
+
         {# We must define the confirmation modals outside the ul/li, because the ul is in "position: relative" and that does not work properly with modals. #}
         {% for action in actions %}
             {% if action.vars.confirmation %}
@@ -740,14 +747,14 @@
                 {% if batch %}
                     {% set confirm_button_attr = {
                         'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
-                    }|merge(action.vars.confirm_button_attr) %}
+                    }|merge(confirm_button_attr) %}
                 {% endif %}
 
                 {% with { confirm_button_attr, confirmation } only %}{{ block('action_confirmation_modal') }}{% endwith %}
             {% endif %}
         {% endfor %}
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton"
-            data-kreyu--data-table-bundle--dropdown-target="content">
+
+        <ul class="dropdown-menu" aria-labelledby="{{ name }}-button">
             {% for action in actions %}
                 <li>{{ data_table_action(action) }}</li>
             {% endfor %}
@@ -756,7 +763,7 @@
 {% endblock %}
 
 {% block action_link_dropdown_item_control %}
-    {% set attr = { 'class': 'dropdown-item'}|merge(attr) %}
+    {% set attr = { class: 'dropdown-item' }|merge(attr) %}
 
     {% if confirmation %}
         {% set attr = {

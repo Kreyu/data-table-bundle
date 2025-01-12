@@ -495,6 +495,14 @@
     </a>
 {%- endblock %}
 
+{% block column_html_value -%}
+    {% if strip_tags %}
+        {% set value = value|striptags(allowed_tags) %}
+    {% endif %}
+
+    {{ raw ? value|raw : value }}
+{%- endblock %}
+
 {% block column_date_time_value -%}
     {% with { value: value ? value|date(format, timezone) : value } %}
         {{- block('column_text_value') -}}

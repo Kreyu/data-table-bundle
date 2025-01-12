@@ -585,9 +585,11 @@ $builder
     ->addRowAction('advanced', DropdownActionType::class, [
         'actions' => [
             $builder->createRowAction('update', LinkDropdownItemActionType::class, [
-                'href' => fn (Post $post) => $this->urlGenerator->generate('post_delete', [
-                    'id' => $post->getId(),
-                ]),            
+                'href' => function (Post $post) {
+                    return $this->urlGenerator->generate('post_delete', [
+                        'id' => $post->getId(),
+                    ]),
+                },
             ]),
         ],
     ])

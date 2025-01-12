@@ -24,9 +24,7 @@ $builder
     ->addAction('advanced', DropdownActionType::class, [
         'actions' => [
             $builder->createAction('update', LinkDropdownItemActionType::class, [
-                'href' => fn (Post $post) => $this->urlGenerator->generate('post_update', [
-                    'id' => $post->getId(),
-                ]),           
+                'href' => '#',           
             ]),
         ],
     ])
@@ -44,9 +42,11 @@ $builder
     ->addRowAction('advanced', DropdownActionType::class, [
         'actions' => [
             $builder->createRowAction('update', LinkDropdownItemActionType::class, [
-                'href' => fn (Post $post) => $this->urlGenerator->generate('post_update', [
-                    'id' => $post->getId(),
-                ]),            
+                'href' => function (Post $post) {
+                    return $this->urlGenerator->generate('post_update', [
+                        'id' => $post->getId(),
+                    ]);
+                },
             ]),
         ],
     ])
@@ -55,7 +55,7 @@ $builder
 
 ### `target`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `callable` (if using as a row action)
 - **default**: `'_self'`
 
 Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
@@ -73,6 +73,27 @@ $builder
             ]),
         ],
     ])
+;
+```
+
+When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+that will receive the row data as an argument and should return a string.
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType;
+
+$builder
+    ->addAction('advanced', DropdownActionType::class, [
+        'actions' => [
+            $builder->createRowAction('wiki', LinkDropdownItemActionType::class, [
+                'target' => function (Configuration $configuration) {
+                    return $configuration->isExternal() ? '_blank' : '_self';
+                },
+            ])
+        ],
+    ])
+    
 ;
 ```
 

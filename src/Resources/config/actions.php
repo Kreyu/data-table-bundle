@@ -68,7 +68,7 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.action.type.modal', ModalActionType::class)
         ->tag('kreyu_data_table.action.type')
-        ->args([UrlGeneratorInterface::class])
+        ->args([service(UrlGeneratorInterface::class)])
     ;
 
     $services

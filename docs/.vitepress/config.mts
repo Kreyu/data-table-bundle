@@ -97,6 +97,7 @@ export default defineConfig({
                 { text: 'Collection', link: '/reference/types/column/collection' },
                 { text: 'Enum', link: '/reference/types/column/enum' },
                 { text: 'Template', link: '/reference/types/column/template' },
+                { text: 'Html', link: '/reference/types/column/html' },
                 { text: 'Actions', link: '/reference/types/column/actions' },
                 { text: 'Checkbox', link: '/reference/types/column/checkbox' },
                 { text: 'Column', link: '/reference/types/column/column' },

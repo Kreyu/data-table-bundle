@@ -12,7 +12,7 @@
     ·
     <a href="https://data-table-bundle.swroblewski.pl/">Documentation</a>
     ·
-    <a href="https://data-table-bundle.swroblewski.pl/reference">Reference</a>
+    <a href="https://https://data-table-bundle.swroblewski.pl/reference/types/data-table.html">Reference</a>
   </p>
 </p>
 

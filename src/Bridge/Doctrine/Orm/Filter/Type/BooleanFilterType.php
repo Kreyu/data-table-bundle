@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type;
 
-use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,19 +13,15 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 final class BooleanFilterType extends AbstractDoctrineOrmFilterType
 {
-    public function buildFilter(FilterBuilderInterface $builder, array $options): void
-    {
-        $builder->setSupportedOperators([
-            Operator::Equals,
-            Operator::NotEquals,
-        ]);
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
                 'form_type' => ChoiceType::class,
+                'supported_operators' => [
+                    Operator::Equals,
+                    Operator::NotEquals,
+                ],
                 'active_filter_formatter' => function (FilterData $data) {
                     return new TranslatableMessage($data->getValue() ? 'Yes' : 'No', domain: 'KreyuDataTable');
                 },

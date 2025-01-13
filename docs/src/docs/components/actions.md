@@ -569,3 +569,34 @@ If `FormActionType` is used, the scripts will append hidden inputs with selected
 <input type="hidden" name="product_id[]" value="1">
 <input type="hidden" name="category_id[]" value="4">
 ```
+
+## Dropdown actions
+
+In some cases, it may be useful to group multiple actions under a single dropdown.
+
+To do so, define an action using the [`DropdownActionType`](../../reference/types/action/dropdown.md) type:
+Then, define child actions under its `actions` array. Each child action can be created using the builder's `createAction`, `createRowAction` or `createBatchAction` method, depending on the context:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType;
+
+$builder
+    ->addRowAction('advanced', DropdownActionType::class, [
+        'actions' => [
+            $builder->createRowAction('update', LinkDropdownItemActionType::class, [
+                'href' => function (Post $post) {
+                    return $this->urlGenerator->generate('post_delete', [
+                        'id' => $post->getId(),
+                    ]),
+                },
+            ]),
+        ],
+    ])
+;
+```
+
+> [!TIP]
+> Although any action type can be used, rendering forms and buttons inside a dropdown may look weird.
+> Therefore, it is recommended to use [`LinkDropdownItemActionType`](../../reference/types/action/link-dropdown-item.md) for dropdown items,
+> so it will be rendered properly as a simple link.

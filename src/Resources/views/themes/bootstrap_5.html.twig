@@ -725,33 +725,85 @@
 
 
 {% block action_modal_control %}
-<div
-    data-controller="kreyu--data-table-bundle--bootstrap-modal"
-    data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
+    <div
+        data-controller="kreyu--data-table-bundle--bootstrap-modal"
+        data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
 
-    {% if batch %}
-        data-kreyu--data-table-bundle--batch-target="identifierHolder"
-        data-href-holder="kreyu-DataTableBundle-BootstrapModalUrlValue"
-    {% endif %}
->
-    {% set modalId = 'modalId-' ~ random() %}
-    <button
+        {% if batch %}
+           data-kreyu--data-table-bundle--batch-target="identifierHolder"
+           data-href-holder="kreyu-DataTableBundle-BootstrapModalUrlValue"
+        {% endif %}
+    >
+       {% set modalId = 'modalId-' ~ random() %}
+        <button
             data-action="kreyu--data-table-bundle--bootstrap-modal#open"
             type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ modalId }}">
-        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-    </button>
+            {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+        </button>
 
-    <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}Label" aria-hidden="true"
-         data-kreyu--data-table-bundle--bootstrap-modal-target="modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    {{ 'Loading'|trans }}
+        <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}Label" aria-hidden="true"
+            data-kreyu--data-table-bundle--bootstrap-modal-target="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                       {{ 'Loading'|trans }}
+                    </div>
                 </div>
-            </div>
-        </div>
+           </div>
+       </div>
     </div>
-</div>
+{% endblock %}
+
+{% block action_dropdown_control %}
+    <div class="dropdown d-inline-block">
+        {% set attr = {
+            'class': 'btn btn-primary dropdown-toggle',
+            'type': 'button',
+            'id': data_table.vars.name ~ '--' ~ context.value ~ '-action--' ~ name ~ '--button',
+            'aria-expanded': 'false',
+            'data-bs-toggle': 'dropdown',
+        }|merge(attr) %}
+
+        <button {{ block('attributes') }}>
+            {% with { attr: {} } %}{{- block('action_control', theme) -}}{% endwith %}
+        </button>
+
+        {# We must define the confirmation modals outside the ul/li, because the ul is in "position: relative" and that does not work properly with modals. #}
+        {% for action in actions %}
+            {% if action.vars.confirmation %}
+                {% set href = action.vars.href %}
+                {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
+                {% set confirmation = action.vars.confirmation %}
+
+                {% if batch %}
+                    {% set confirm_button_attr = {
+                        'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+                    }|merge(confirm_button_attr) %}
+                {% endif %}
+
+                {% with { confirm_button_attr, confirmation } only %}{{ block('action_confirmation_modal') }}{% endwith %}
+            {% endif %}
+        {% endfor %}
+
+        <ul class="dropdown-menu" aria-labelledby="{{ name }}-button">
+            {% for action in actions %}
+                <li>{{ data_table_action(action) }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block action_link_dropdown_item_control %}
+    {% set attr = { class: 'dropdown-item' }|merge(attr) %}
+
+    {% if confirmation %}
+        {% set attr = {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#' ~ confirmation.identifier,
+        }|merge(attr) %}
+    {% endif %}
+
+    {{ parent() }}
 {% endblock %}
 
 {% block sort_arrow_none %}

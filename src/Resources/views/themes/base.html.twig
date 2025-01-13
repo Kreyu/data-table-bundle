@@ -128,13 +128,13 @@
     {% endif %}
 {% endblock %}
 
-{% block kreyu_data_table_column_header %}
+{% block kreyu_data_table_column_header -%}
     {{ block(block_name, block_theme ?? theme) }}
-{% endblock %}
+{%- endblock %}
 
-{% block kreyu_data_table_column_value %}
+{% block kreyu_data_table_column_value -%}
     {{ block(block_name, block_theme ?? theme) }}
-{% endblock %}
+{%- endblock %}
 
 {% block kreyu_data_table_action %}
     {% if visible %}{{- block(block_name, block_theme ?? theme) -}}{% endif %}
@@ -448,7 +448,7 @@
 
 {# Column type value templates #}
 
-{% block column_value %}
+{% block column_value -%}
     <span {{- block('attributes') -}}>
         {%- if translation_domain is not same as false -%}
             {{- value|trans({}, translation_domain) -}}
@@ -456,13 +456,13 @@
             {{- value -}}
         {%- endif -%}
     </span>
-{% endblock %}
+{%- endblock %}
 
-{% block column_text_value %}
+{% block column_text_value -%}
     {{- block('column_value') -}}
-{% endblock %}
+{%- endblock %}
 
-{% block column_number_value %}
+{% block column_number_value -%}
     {# @var bool  use_intl_formatter - Determines whether the Intl formatter should be used #}
     {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
 
@@ -471,9 +471,9 @@
     {% endif %}
 
     {{- block('column_text_value') -}}
-{% endblock %}
+{%- endblock %}
 
-{% block column_money_value %}
+{% block column_money_value -%}
     {# @var bool    use_intl_formatter - Determines whether the Intl formatter should be used #}
     {# @var array   intl_formatter_options - Options used to configure the Intl formatter #}
     {# @var string  currency #}
@@ -487,54 +487,58 @@
     {% if value is not null and not use_intl_formatter %}
         {{ currency }}
     {% endif %}
-{% endblock %}
+{%- endblock %}
 
-{% block column_link_value %}
+{% block column_link_value -%}
     <a {% with { attr: { href, target }|filter(v => v != null)|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
         {{- block('column_text_value') -}}
     </a>
-{% endblock %}
+{%- endblock %}
 
-{% block column_date_time_value %}
+{% block column_html_value -%}
+    {% if strip_tags %}
+        {% set value = value|striptags(allowed_tags) %}
+    {% endif %}
+
+    {{ raw ? value|raw : value }}
+{%- endblock %}
+
+{% block column_date_time_value -%}
     {% with { value: value ? value|date(format, timezone) : value } %}
         {{- block('column_text_value') -}}
     {% endwith %}
-{% endblock %}
+{%- endblock %}
 
-{% block column_date_period_value %}
+{% block column_date_period_value -%}
     {% with { value: value ? value.start|date(format, timezone) ~ separator ~ value.end|date(format, timezone) : value } %}
         {{- block('column_text_value') -}}
     {% endwith %}
-{% endblock %}
+{%- endblock %}
 
-{% block column_boolean_value %}
+{% block column_boolean_value -%}
     {% with { value: value ? label_true : label_false } %}
         {{- block('column_text_value') -}}
     {% endwith %}
-{% endblock %}
+{%- endblock %}
 
-{% block column_collection_value %}
-    {# Note: do **not** remove the HTML comments below, because it makes sure the separator is rendered properly. #}
-    {% apply spaceless %}
-        {% for child in children %}
-            {% if not loop.first %}-->{% endif %}
-            {{- data_table_column_value(child) -}}<!--
-            -->{% if not loop.last %}{{- separator -}}<!--{% endif %}
-        {% endfor %}
-    {% endapply %}
-{% endblock %}
+{% block column_collection_value -%}
+    {% for child in children -%}
+        {{- data_table_column_value(child) -}}
+        <span>{{ not loop.last ? separator }}</span>
+    {%- endfor %}
+{%- endblock %}
 
-{% block column_template_value %}
+{% block column_template_value -%}
     {{- include(template_path, template_vars) -}}
-{% endblock %}
+{%- endblock %}
 
-{% block column_actions_value %}
+{% block column_actions_value -%}
     {% for action in actions %}
         {{ data_table_action(action) }}
     {% endfor %}
-{% endblock %}
+{%- endblock %}
 
-{% block column_form_value %}
+{% block column_form_value -%}
     {% if form_child_path is not same as false %}
         {% set form = form[row_index][form_child_path].createView() %}
     {% else %}
@@ -548,9 +552,9 @@
     {% endif %}
 
     {{ form_widget(form) }}
-{% endblock %}
+{%- endblock %}
 
-{% block column_checkbox_header %}
+{% block column_checkbox_header -%}
     <th {{ block('attributes') }}>
         {% set input_attr = {
             'type': 'checkbox',
@@ -562,9 +566,9 @@
 
         <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
     </th>
-{% endblock %}
+{%- endblock %}
 
-{% block column_checkbox_value %}
+{% block column_checkbox_value -%}
     {% set input_attr = {
         'type': 'checkbox',
         'value': value,
@@ -576,7 +580,7 @@
     }|merge(input_attr|default({})) %}
 
     <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
-{% endblock %}
+{%- endblock %}
 
 {# Action type templates #}
 
@@ -632,6 +636,7 @@
     </form>
 {% endblock %}
 
+
 {% block action_modal_control %}
     {% set attr = { href }|filter(v => v != null)|merge(attr|default({})) %}
 
@@ -644,15 +649,33 @@
     </button>
 {% endblock %}
 
+{% block action_dropdown_control %}
+    {# Themes that extend base theme should provide their own implementation of dropdown #}
+    <button>{{- block('action_control', theme, _context) -}}</button>
+    <ul>
+        {% for action in actions %}
+            <li>{{ data_table_action(action) }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block action_link_dropdown_item_control %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
+
+    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+    </a>
+{% endblock %}
+
 {% block sort_arrow_none %}{% endblock %}
 
 {% block sort_arrow_asc %}↑{% endblock %}
 
 {% block sort_arrow_desc %}↓{% endblock %}
 
-{% block attributes %}
-    {% for key, value in attr|default({}) %}{{ key }}="{{ value }}"{% endfor %}
-{% endblock %}
+{% block attributes -%}
+    {% for key, value in attr|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor %}
+{%- endblock %}
 
 {# Transforms given array to form inputs. Supports nested arrays. #}
 {# For example, ['foo' => ['bar' => 'baz']] will be rendered as:  #}

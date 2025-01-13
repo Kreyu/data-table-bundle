@@ -8,12 +8,15 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionRegistry;
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -65,6 +68,16 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.action.type.modal', ModalActionType::class)
         ->tag('kreyu_data_table.action.type')
-        ->args([service('router')])
+        ->args([UrlGeneratorInterface::class])
+    ;
+
+    $services
+        ->set('kreyu_data_table.action.type.dropdown', DropdownActionType::class)
+        ->tag('kreyu_data_table.action.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.action.type.link_dropdown_item', LinkDropdownItemActionType::class)
+        ->tag('kreyu_data_table.action.type')
     ;
 };

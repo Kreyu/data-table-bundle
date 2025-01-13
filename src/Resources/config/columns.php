@@ -18,6 +18,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\EnumColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\HtmlColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\MoneyColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
@@ -106,6 +107,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.template', TemplateColumnType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.html', HtmlColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

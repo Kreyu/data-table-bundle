@@ -134,6 +134,12 @@ export default defineConfig({
                 { text: 'Link', link: '/reference/types/action/link' },
                 { text: 'Button', link: '/reference/types/action/button' },
                 { text: 'Form', link: '/reference/types/action/form' },
+                {
+                  text: 'Dropdown', link: '/reference/types/action/dropdown',
+                  items: [
+                    { text: 'LinkDropdownItem', link: '/reference/types/action/link-dropdown-item' },
+                  ],
+                },
                 { text: 'Action', link: '/reference/types/action/action' },
               ],
             },

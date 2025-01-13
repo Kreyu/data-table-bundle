@@ -9,12 +9,12 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ModalActionType extends AbstractActionType
 {
     public function __construct(
-        private readonly RouterInterface $router,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -40,7 +40,7 @@ final class ModalActionType extends AbstractActionType
             }
         }
 
-        $href = $options['href'] ?? $this->router->generate($options['route'], $options['route_params']);
+        $href = $options['href'] ?? $this->urlGenerator->generate($options['route'], $options['route_params']);
 
         $view->vars = array_replace($view->vars, [
             'href' => $href,

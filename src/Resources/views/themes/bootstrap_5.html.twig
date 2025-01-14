@@ -204,19 +204,24 @@
         'data-placement': 'bottom',
         'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
         'data-turbo-action': 'advance',
+        'data-turbo-frame': '_self',
     }|merge(attr|default({})) %}
 
     <a {{ block('attributes') }}>{{ block('filter_clear_all_button_icon') }}</a>
 {% endblock %}
 
 {% block filter_clear_button %}
-    <a class="btn px-2"
-       href="{{ data_table_filter_clear_url(data_table, filter) }}"
-       data-turbo-action="advance"
-       data-toggle="tooltip"
-       data-placement="bottom"
-       title="{{ 'Clear filter'|trans({}, 'KreyuDataTable') }}"
-    >
+    {% set attr = {
+        'class': 'btn px-2',
+        'href': data_table_filter_clear_url(data_table, filter),
+        'data-toggle': 'tooltip',
+        'data-placement': 'bottom',
+        'title': 'Clear filter'|trans({}, 'KreyuDataTable'),
+        'data-turbo-action': 'advance',
+        'data-turbo-frame': '_self',
+    }|merge(attr|default({})) %}
+
+    <a {{ block('attributes') }}>
         <span class="mx-1">
             <strong>{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</strong>
 
@@ -225,7 +230,23 @@
             {% endif %}
         </span>
 
-        <span class="">{{ filter.vars.value|trans({}, filter.vars.translation_domain) }}</span>
+        <span>
+            {% if filter.vars.value is iterable %}
+                {% for value in filter.vars.value %}
+                    {%- if filter.vars.translation_domain is not same as false -%}
+                        {{ value|trans({}, filter.vars.translation_domain) }}
+                    {%- else -%}
+                        {{ filter.vars.value }}
+                    {%- endif -%}
+                    {{- not loop.last ? ', ' }}
+                {% endfor %}
+            {% elseif filter.vars.translation_domain is not same as false %}
+                {{ filter.vars.value|trans({}, filter.vars.translation_domain) }}
+            {% else %}
+                {{ filter.vars.value }}
+            {% endif %}
+        </span>
+
         <span class="mx-2" aria-hidden="true">{{ block('filter_clear_button_icon') }}</span>
     </a>
 {% endblock %}

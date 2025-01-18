@@ -636,6 +636,19 @@
     </form>
 {% endblock %}
 
+
+{% block action_modal_control %}
+    {% set attr = { href }|filter(v => v != null)|merge(attr|default({})) %}
+
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
+
+    <button {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
+        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+    </button>
+{% endblock %}
+
 {% block action_dropdown_control %}
     {# Themes that extend base theme should provide their own implementation of dropdown #}
     <button>{{- block('action_control', theme, _context) -}}</button>

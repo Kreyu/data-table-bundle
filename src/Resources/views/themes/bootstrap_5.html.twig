@@ -744,6 +744,37 @@
     {% endif %}
 {% endblock %}
 
+
+{% block action_modal_control %}
+    <div
+        data-controller="kreyu--data-table-bundle--bootstrap-modal"
+        data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
+
+        {% if batch %}
+           data-kreyu--data-table-bundle--batch-target="identifierHolder"
+           data-href-holder="kreyu-DataTableBundle-BootstrapModalUrlValue"
+        {% endif %}
+    >
+       {% set modalId = 'modalId-' ~ random() %}
+        <button
+            data-action="kreyu--data-table-bundle--bootstrap-modal#open"
+            type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ modalId }}">
+            {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
+        </button>
+
+        <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}Label" aria-hidden="true"
+            data-kreyu--data-table-bundle--bootstrap-modal-target="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                       {{ 'Loading'|trans }}
+                    </div>
+                </div>
+           </div>
+       </div>
+    </div>
+{% endblock %}
+
 {% block action_dropdown_control %}
     <div class="dropdown d-inline-block">
         {% set attr = {

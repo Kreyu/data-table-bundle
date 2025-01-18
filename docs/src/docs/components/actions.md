@@ -600,3 +600,75 @@ $builder
 > Although any action type can be used, rendering forms and buttons inside a dropdown may look weird.
 > Therefore, it is recommended to use [`LinkDropdownItemActionType`](../../reference/types/action/link-dropdown-item.md) for dropdown items,
 > so it will be rendered properly as a simple link.
+
+## Modal actions
+
+You can define an action to open a modal with contents loaded from given URL.
+For example, let's define a modal that displays a post details.
+
+First things first, the built-in modal action type requires additional JavaScript to work properly.
+If using the built-in Bootstrap 5 or Tabler (based on Bootstrap) theme, we have to enable the `bootstrap-modal` 
+script in your `controllers.json` file, because **it is disabled by default**:
+
+```json
+{
+  "controllers": {
+    "@kreyu/data-table-bundle": {
+      "bootstrap-modal": {
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+Then, simply add a row action using the `ModalActionType`:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType;
+
+$builder
+    ->addRowAction('details', ModalActionType::class, [
+        'route' => 'post_details_modal',
+        'route_params' => fn (Post $post) => [
+            'id' => $post->getId(),
+        ],
+        // You can generate the URL by yourself with "href" option
+        // instead of using "route" and "route_params":
+        //
+        // 'href' => function (Post $post) {
+        //     return $this->urlGenerator->generate('post_details_modal', [
+        //         'id' => $post->getId(),
+        //     ]);
+        // },
+    ])
+;
+```
+
+Now, make sure the `post_details_modal` route is defined in a controller:
+
+```php
+#[Route('/posts/{id}/details', name: 'post_details_modal')]
+public function details(Post $post): Response
+{
+    return $this->render('posts/details_modal.html.twig', [
+        'post' => $post,
+    ]);
+}
+```
+
+Inside the template, we can render the modal however we want:
+
+```twig
+{# templates/posts/details_modal.html.twig #}
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <h5 class="modal-title">{{ post.title }}</h5>
+            <p>{{ post.content }}</p>
+        </div>
+    </div>
+</div>
+```
+
+For more details, see the [`ModalActionType`](../../reference/types/action/modal.md) reference page.

@@ -4,7 +4,7 @@
 
 # DropdownActionType
 
-The [`DropdownActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/DropdownActionType.php) represents an action rendered as a dropdown, where each item corresponds to separate action.
+The [`DropdownActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/Dropdown/DropdownActionType.php) represents an action rendered as a dropdown, where each item corresponds to separate action.
 
 ## Options
 

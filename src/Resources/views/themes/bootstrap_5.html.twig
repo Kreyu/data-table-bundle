@@ -744,9 +744,9 @@
     {% endif %}
 {% endblock %}
 
-
 {% block action_modal_control %}
     <div
+        class="d-inline-block"
         data-controller="kreyu--data-table-bundle--bootstrap-modal"
         data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
 
@@ -755,10 +755,17 @@
            data-href-holder="kreyu-DataTableBundle-BootstrapModalUrlValue"
         {% endif %}
     >
-       {% set modalId = 'modalId-' ~ random() %}
-        <button
-            data-action="kreyu--data-table-bundle--bootstrap-modal#open"
-            type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ modalId }}">
+        {% set modalId = 'modalId-' ~ random() %}
+
+        {% set attr = {
+            class: 'btn btn-primary',
+            type: 'button',
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#' ~ modalId,
+            'data-action': 'kreyu--data-table-bundle--bootstrap-modal#open',
+        }|merge(attr) %}
+
+        <button {{ block('attributes') }}>
             {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
         </button>
 

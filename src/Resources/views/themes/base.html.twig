@@ -636,7 +636,6 @@
     </form>
 {% endblock %}
 
-
 {% block action_modal_control %}
     {% set attr = { href }|filter(v => v != null)|merge(attr|default({})) %}
 
@@ -661,6 +660,10 @@
 
 {% block action_link_dropdown_item_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
+
+    {% if not confirmation and batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
 
     <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
         {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}

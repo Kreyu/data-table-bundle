@@ -10,6 +10,13 @@ export default class extends Controller {
         'identifierHolder',
     ];
 
+    static values = {
+        identifierHolderAttribute: {
+            type: String,
+            default: 'href',
+        }
+    }
+
     #previousIdentifierMap = null;
 
     connect() {
@@ -77,7 +84,7 @@ export default class extends Controller {
         }
 
         for (const identifierHolder of this.identifierHolderTargets) {
-            this.#updateIdentifierHolderHref(identifierHolder, identifierMap);
+            this.#updateIdentifierHolderAttribute(identifierHolder, identifierMap);
             this.#updateIdentifierHolderDataParam(identifierHolder, identifierMap);
 
             if (identifierHolder.tagName === 'FORM') {
@@ -88,35 +95,30 @@ export default class extends Controller {
         this.#previousIdentifierMap = identifierMap;
     }
 
-    #updateIdentifierHolderHref(identifierHolder, identifierMap) {
-        let href;
-        let hrefHolder =  'href';
-
-        if (identifierHolder.dataset.hrefHolder !== undefined) {
-            hrefHolder = identifierHolder.dataset.hrefHolder;
-        }
+    #updateIdentifierHolderAttribute(identifierHolder, identifierMap) {
+        let url;
 
         try {
-            href = new URL(identifierHolder.dataset[hrefHolder], window.location.origin);
+            url = new URL(identifierHolder.getAttribute(this.identifierHolderAttributeValue), window.location.origin);
         } catch (exception) {
             return;
         }
 
         if (identifierMap.size === 0 && this.#previousIdentifierMap) {
             for (const identifierName of this.#previousIdentifierMap.keys()) {
-                href.searchParams.delete(identifierName + '[]');
+                url.searchParams.delete(identifierName + '[]');
             }
         }
 
         for (const [identifierName, identifiers] of identifierMap) {
-            href.searchParams.delete(identifierName + '[]');
+            url.searchParams.delete(identifierName + '[]');
 
             for (const identifier of identifiers) {
-                href.searchParams.append(identifierName + '[]', identifier);
+                url.searchParams.append(identifierName + '[]', identifier);
             }
         }
 
-        identifierHolder.dataset[hrefHolder] = href.toString();
+        identifierHolder.setAttribute(this.identifierHolderAttributeValue, url.toString());
     }
 
     #updateIdentifierHolderDataParam(identifierHolder, identifierMap) {

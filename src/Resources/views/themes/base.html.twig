@@ -409,7 +409,13 @@
         {% set active_attr = active_attr|default({}) %}
         {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% set attr = attr|merge(sorted ? active_attr : inactive_attr) %}
+        {% set sorted_attr = sorted ? active_attr : inactive_attr %}
+
+        {# Merge the sorted attr with column header attr, but merge its classes. #}
+        {# The column header attr class is added after the sorted attr class. #}
+        {% set attr = attr|merge(sorted_attr|merge({
+            class: (sorted_attr.class|default('') ~ ' ' ~ attr.class|default(''))|trim
+        })) %}
 
         <th {{ block('attributes') }}>
             {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}

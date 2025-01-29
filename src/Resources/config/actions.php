@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactory;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionRefreshUrlGenerator;
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistry;
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Action\ActionRefreshUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
@@ -13,11 +15,11 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType
 use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\RefreshActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -54,6 +56,23 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.action.type.link', LinkActionType::class)
         ->tag('kreyu_data_table.action.type')
     ;
+
+    $services
+        ->set('kreyu_data_table.action.type.refresh', RefreshActionType::class)
+        ->tag('kreyu_data_table.action.type')
+        ->args([service(ActionRefreshUrlGeneratorInterface::class)])
+    ;
+
+
+    $services
+        ->set('kreyu_data_table.action.action_refresh_url_generator', ActionRefreshUrlGenerator::class)
+        ->args([
+            service('request_stack'),
+            service(UrlGeneratorInterface::class),
+        ])
+        ->alias(ActionRefreshUrlGeneratorInterface::class, 'kreyu_data_table.action.action_refresh_url_generator')
+    ;
+
 
     $services
         ->set('kreyu_data_table.action.type.button', ButtonActionType::class)

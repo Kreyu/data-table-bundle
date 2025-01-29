@@ -717,6 +717,14 @@
     {{ parent() }}
 {% endblock %}
 
+{% block action_refresh_control %}
+    {% set attr = {
+        class: 'btn btn-primary',
+    }|merge(attr) %}
+
+    {{ parent() }}
+{% endblock %}
+
 {% block action_form_control %}
     {% set attr = { class: 'd-inline-block' }|merge(attr) %}
 

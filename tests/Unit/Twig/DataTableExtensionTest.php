@@ -10,6 +10,8 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Twig\DataTableExtension;
 use PHPUnit\Framework\TestCase;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class DataTableExtensionTest extends TestCase
 {
@@ -31,6 +33,81 @@ class DataTableExtensionTest extends TestCase
         $this->createExtension()->setDataTableThemes($view, ['bar'], true);
 
         $this->assertEquals(['bar'], $view->vars['themes']);
+    }
+
+    public function testRenderThemeBlockRendersFirstOccurrence(): void
+    {
+        $environment = new Environment(new ArrayLoader([
+            'base.html.twig' => '',
+            // This theme contains the block, and is the first occurrence, so it should be rendered.
+            'bootstrap_5.html.twig' => <<<TWIG
+                {% block content -%}
+                    Hello from bootstrap_5.html.twig
+                {%- endblock %}
+            TWIG,
+            // This theme contains the block, but is second occurrence.
+            'tabler.html.twig' => <<<TWIG
+                {% block content -%}
+                    Hello from tabler.html.twig
+                {%- endblock %}
+            TWIG,
+        ]));
+
+        $dataTable = new DataTableView();
+        $dataTable->vars['themes'] = ['base.html.twig', 'bootstrap_5.html.twig', 'tabler.html.twig'];
+
+        $html = $this->createExtension()->renderThemeBlock(
+            environment: $environment,
+            context: [],
+            dataTable: $dataTable,
+            blockName: 'content',
+        );
+
+        $this->assertEquals('Hello from bootstrap_5.html.twig', $html);
+    }
+
+    public function testRenderThemeBlockThrowsExceptionOnMissingBlock(): void
+    {
+        $environment = new Environment(new ArrayLoader([
+            'base.html.twig' => '',
+            'bootstrap_5.html.twig' => '',
+            'tabler.html.twig' => '',
+        ]));
+
+        $dataTable = new DataTableView();
+        $dataTable->vars['themes'] = ['base.html.twig', 'bootstrap_5.html.twig', 'tabler.html.twig'];
+
+        $this->expectExceptionMessage('Block "content" does not exist on any of the configured data table themes: "base.html.twig", "bootstrap_5.html.twig", "tabler.html.twig"');
+
+        $this->createExtension()->renderThemeBlock(
+            environment: $environment,
+            context: [],
+            dataTable: $dataTable,
+            blockName: 'content',
+        );
+    }
+
+    public function testRenderThemeBlockPassesContext(): void
+    {
+        $environment = new Environment(new ArrayLoader([
+            'base.html.twig' => <<<TWIG
+                {% block content -%}
+                    {{ label }}
+                {%- endblock %}
+            TWIG,
+        ]));
+
+        $dataTable = new DataTableView();
+        $dataTable->vars['themes'] = ['base.html.twig'];
+
+        $html = $this->createExtension()->renderThemeBlock(
+            environment: $environment,
+            context: ['label' => 'Hello World'],
+            dataTable: $dataTable,
+            blockName: 'content',
+        );
+
+        $this->assertEquals('Hello World', $html);
     }
 
     private function createExtension(): DataTableExtension

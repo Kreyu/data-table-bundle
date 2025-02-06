@@ -58,7 +58,7 @@ class DataTableExtension extends AbstractExtension
                 'needs_environment' => true,
                 'needs_context' => true,
                 'is_safe' => ['html'],
-            ])
+            ]),
         ];
 
         foreach ($definitions as $name => $callable) {
@@ -396,11 +396,7 @@ class DataTableExtension extends AbstractExtension
             }
         }
 
-        throw new RuntimeError(sprintf(
-            'Block "%s" does not exist on any of the configured data table themes: %s',
-            $blockName,
-            implode(', ', array_map(fn (string $theme) => "\"$theme\"", $themes)),
-        ));
+        throw new RuntimeError(sprintf('Block "%s" does not exist on any of the configured data table themes: %s', $blockName, implode(', ', array_map(fn (string $theme) => "\"$theme\"", $themes))));
     }
 
     /**

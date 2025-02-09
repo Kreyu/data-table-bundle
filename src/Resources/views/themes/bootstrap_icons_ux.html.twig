@@ -1,0 +1,34 @@
+{#
+    Bootstrap UX Icons Theme
+    @see https://ux.symfony.com/icons?set=bi
+
+    Need to change the default width or height in Twig?
+    Just override the `width` and `height` attributes in the `icon_attr` array:
+
+    {% extends '@KreyuDataTable/themes/bootstrap_icons_ux.html.twig' %}
+
+    {% block icon -%}
+        {% with { icon_attr: { width: '1.5em', height: '1.5em' }|merge(icon_attr) %}
+            {{ parent() }}
+        {% endwith %}
+    {%- endblock %}
+
+    You can also remove the "width" and "height" attributes by setting them to `false`:
+
+    {% extends '@KreyuDataTable/themes/bootstrap_icons_ux.html.twig' %}
+
+    {% block icon -%}
+        {% with { icon_attr: { width: false, height: false }|merge(icon_attr) %}
+            {{ parent() }}
+        {% endwith %}
+    {%- endblock %}
+
+    Remember to merge with the "icon_attr" variable to allow passing the "icon_attr" option!
+    Attributes from the "icon_attr" should always override the defaults.
+#}
+
+{% block icon -%}
+    {# @var icon string #}
+    {# @var icon_attr array #}
+    {{ ux_icon('bi:' ~ icon, { width: '1em', height: '1.4em' }|merge(icon_attr)|filter(e => e != false)) }}
+{%- endblock %}

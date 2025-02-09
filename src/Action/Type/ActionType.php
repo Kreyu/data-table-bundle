@@ -33,6 +33,7 @@ final class ActionType implements ActionTypeInterface
                 'translation_parameters',
                 'block_prefix',
                 'attr',
+                'icon',
                 'icon_attr',
                 'confirmation',
                 'visible',
@@ -80,6 +81,7 @@ final class ActionType implements ActionTypeInterface
             'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
             'translation_parameters' => $options['translation_parameters'],
             'attr' => $options['attr'],
+            'icon' => $options['icon'],
             'icon_attr' => $options['icon_attr'],
             'confirmation' => $options['confirmation'],
             'context' => $action->getConfig()->getContext(),
@@ -97,6 +99,7 @@ final class ActionType implements ActionTypeInterface
                 'translation_parameters' => [],
                 'block_prefix' => null,
                 'attr' => [],
+                'icon' => null,
                 'icon_attr' => [],
                 'confirmation' => false,
                 'visible' => true,
@@ -106,6 +109,7 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedTypes('translation_parameters', ['array', 'callable'])
             ->setAllowedTypes('block_prefix', ['null', 'string', 'callable'])
             ->setAllowedTypes('attr', ['array', 'callable'])
+            ->setAllowedTypes('icon', ['null', 'string', 'callable'])
             ->setAllowedTypes('icon_attr', ['array', 'callable'])
             ->setAllowedTypes('confirmation', ['bool', 'array', 'callable'])
             ->setAllowedTypes('visible', ['bool', 'callable'])

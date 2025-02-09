@@ -150,3 +150,14 @@
         {{ parent() }}
     {% endwith %}
 {% endblock %}
+
+{% block action_button_control %}
+    {% set is_icon_only = icon is not empty and label is empty %}
+
+    {% if is_icon_only %}
+        {# In Tabler, icon-only buttons require the "btn-icon" class for proper padding #}
+        {% set attr = attr|merge({ class: ('btn-icon ' ~ attr.class|default(''))|trim }) %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}

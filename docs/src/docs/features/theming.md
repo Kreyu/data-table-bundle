@@ -315,7 +315,7 @@ However, if you use the `data_table_theme_block` instead of the `block`:
 ```
 
 In this case, the `column_header` will render "Label B". The `data_table_theme_block` function will iterate 
-through the data table themes in reverse and render the first block that matches the name.
+through the data table themes render the last block that matches the name, as each theme overrides the previous ones.
 
 In some cases, the `attr` variable may be incorrectly rendered on each nested element. For example:
 

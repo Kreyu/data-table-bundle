@@ -35,6 +35,7 @@ class DataTableExtension extends AbstractExtension
     public function getFunctions(): array
     {
         $definitions = [
+            'data_table_name' => $this->getDataTableName(...),
             'data_table' => $this->renderDataTable(...),
             'data_table_table' => $this->renderDataTableTable(...),
             'data_table_action_bar' => $this->renderDataTableActionBar(...),
@@ -86,6 +87,11 @@ class DataTableExtension extends AbstractExtension
         } else {
             array_push($view->vars['themes'], ...$themes);
         }
+    }
+
+    public function getDataTableName(Environment $environment, DataTableView $view): string
+    {
+        return 'kreyu_data_table_'.$view->vars['name'];
     }
 
     /**

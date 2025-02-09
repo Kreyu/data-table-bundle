@@ -672,3 +672,11 @@ Inside the template, we can render the modal however we want:
 ```
 
 For more details, see the [`ModalActionType`](../../reference/types/action/modal.md) reference page.
+
+## Refresh actions
+
+You have the option to add an action that refreshes the content of the DataTable.
+
+Thanks to `Hotwire Turbo`, only the content of the DataTable is refreshed.
+
+This action cannot be added as a `RowAction` or `BatchAction`.

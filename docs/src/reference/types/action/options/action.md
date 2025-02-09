@@ -117,10 +117,10 @@ $builder
 Defines the HTML attributes for the icon to render.
 
 ```php
-use Kreyu\Bundle\DataTableBundle\Column\Type\IconColumnType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
-    ->addColumn('status', IconColumnType::class, [
+    ->addRowAction('status', ButtonActionType::class, [
         'icon' => 'check',
         'icon_attr' => [
             'class' => 'text-success',

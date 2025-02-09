@@ -400,8 +400,6 @@
     {{ form_widget(form.to) }}
 {% endblock %}
 
-{# Column type header templates #}
-
 {% block column_header %}
     {% set label_attr = label_attr|default({}) %}
 
@@ -452,8 +450,7 @@
     {% endif %}
 {% endblock %}
 
-{# Column type value templates #}
-
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
 {% block column_value -%}
     <span {{- block('attributes') -}}>
         {%- if translation_domain is not same as false -%}
@@ -464,10 +461,12 @@
     </span>
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType #}
 {% block column_text_value -%}
     {{- block('column_value') -}}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType #}
 {% block column_number_value -%}
     {# @var bool  use_intl_formatter - Determines whether the Intl formatter should be used #}
     {# @var array intl_formatter_options - Options used to configure the Intl formatter #}
@@ -479,6 +478,7 @@
     {{- block('column_text_value') -}}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\MoneyColumnType #}
 {% block column_money_value -%}
     {# @var bool    use_intl_formatter - Determines whether the Intl formatter should be used #}
     {# @var array   intl_formatter_options - Options used to configure the Intl formatter #}
@@ -495,12 +495,14 @@
     {% endif %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType #}
 {% block column_link_value -%}
     <a {% with { attr: { href, target }|filter(v => v != null)|merge(attr) } %}{{- block('attributes') -}}{% endwith %}>
         {{- block('column_text_value') -}}
     </a>
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\HtmlColumnType #}
 {% block column_html_value -%}
     {% if strip_tags %}
         {% set value = value|striptags(allowed_tags) %}
@@ -509,24 +511,33 @@
     {{ raw ? value|raw : value }}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\IconColumnType #}
+{% block column_icon_value -%}
+    {{- data_table_theme_block(data_table, 'icon') -}}
+{%- endblock %}
+
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType #}
 {% block column_date_time_value -%}
     {% with { value: value ? value|date(format, timezone) : value } %}
         {{- block('column_text_value') -}}
     {% endwith %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType #}
 {% block column_date_period_value -%}
     {% with { value: value ? value.start|date(format, timezone) ~ separator ~ value.end|date(format, timezone) : value } %}
         {{- block('column_text_value') -}}
     {% endwith %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType #}
 {% block column_boolean_value -%}
     {% with { value: value ? label_true : label_false } %}
         {{- block('column_text_value') -}}
     {% endwith %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType #}
 {% block column_collection_value -%}
     {% for child in children -%}
         {{- data_table_column_value(child) -}}
@@ -534,16 +545,19 @@
     {%- endfor %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType #}
 {% block column_template_value -%}
     {{- include(template_path, template_vars) -}}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType #}
 {% block column_actions_value -%}
     {% for action in actions %}
         {{ data_table_action(action) }}
     {% endfor %}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType #}
 {% block column_form_value -%}
     {% if form_child_path is not same as false %}
         {% set form = form[row_index][form_child_path].createView() %}
@@ -560,6 +574,7 @@
     {{ form_widget(form) }}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType #}
 {% block column_checkbox_header -%}
     <th {{ block('attributes') }}>
         {% set input_attr = {
@@ -574,6 +589,7 @@
     </th>
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType #}
 {% block column_checkbox_value -%}
     {% set input_attr = {
         'type': 'checkbox',
@@ -593,7 +609,7 @@
 {% block action_control_icon %}{% endblock %}
 
 {% block action_control %}
-    {% if icon_attr %}{{ block('action_control_icon', theme, _context) }}{% endif %}
+    {% if icon %}{{ data_table_theme_block(data_table, 'icon') }}{% endif %}
     {{- label|trans(translation_parameters, translation_domain) -}}
 {% endblock %}
 
@@ -685,6 +701,10 @@
 {% block attributes -%}
     {% for key, value in attr|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor %}
 {%- endblock %}
+
+{% macro attributes(attributes) -%}
+    {% for key, value in attributes|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor %}
+{%- endmacro %}
 
 {# Transforms given array to form inputs. Supports nested arrays. #}
 {# For example, ['foo' => ['bar' => 'baz']] will be rendered as:  #}

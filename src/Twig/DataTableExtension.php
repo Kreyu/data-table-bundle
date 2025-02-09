@@ -342,51 +342,54 @@ class DataTableExtension extends AbstractExtension
     /**
      * Renders the first occurrence of a block in the themes of a given data table.
      *
-     * For example, if you have a data table with two themes:
+     * For example, let's assume the data table has two themes:
      *
-     * - themes/theme-a.html.twig
-     * - themes/theme-b.html.twig
+     * - `themes/theme-a.html.twig`
+     * - `themes/theme-b.html.twig`
      *
-     * and their content is as follows:
-     *
-     * ```
-     * {# themes/theme-a.html.twig #}
-     * {% block foo %}{% endblock %}
-     *
-     * {# themes/theme-b.html.twig #}
-     * {% block bar %}{% endblock %}
-     * ```
-     *
-     * to render block `bar`, either from theme A or theme B, you can use the following code:
+     * Please note that the theme B is added after the theme A. Their content is as follows:
      *
      * ```
-     * {{ data_table_theme_block(data_table, 'bar') }}
+     * +----------------------------------------+----------------------------------------+
+     * | themes/theme-a.html.twig               | themes/theme-b.html.twig               |
+     * +----------------------------------------+----------------------------------------+
+     * | {% block column_header %}              |                                        |
+     * |     {{ block('column_label') }}        |                                        |
+     * | {% endblock %}                         |                                        |
+     * |                                        |                                        |
+     * | {% block column_label %}               |  {% block column_label %}              |
+     * |     Label A                            |      Label B                           |
+     * | {% endblock %}                         |  {% endblock %}                        |
+     * +----------------------------------------+----------------------------------------+
      * ```
      *
-     * This will iterate through the given data table themes - first theme A, then theme B.
-     *
-     * The issue reveals when we try to render `foo` block from the `bar` block.
-     * With Twig, this requires theme B to extend the theme A, which in some cases is not possible.
-     *
-     * In such cases, this function can be used instead:
+     * In this case, the `column_header` will render "Label A", because it has no idea about theme B.
      *
      * ```
-     * {# themes/theme-a.html.twig #}
-     * {% block foo %}{% endblock %}
-     *
-     * {# themes/theme-b.html.twig #}
-     * {% block bar %}
-     *     {{ data_table_theme_block(data_table, 'foo') }}
-     * {% endblock %}
+     * +--------------------------------------------------------------+----------------------------------------+
+     * | themes/theme-a.html.twig                                     | themes/theme-b.html.twig               |
+     * +--------------------------------------------------------------+----------------------------------------+
+     * | {% block column_header %}                                    |                                        |
+     * |     {{ data_table_theme_block(data_table, 'column_label') }} |                                        |
+     * | {% endblock %}                                               |                                        |
+     * |                                                              |                                        |
+     * | {% block column_label %}                                     | {% block column_label %}               |
+     * |     Label A                                                  |     Label B                            |
+     * | {% endblock %}                                               | {% endblock %}                         |
+     * +--------------------------------------------------------------+----------------------------------------+
      * ```
      *
-     * If the block is not found in any of the themes, a {@see RuntimeError} is thrown.
+     * The order of the themes is important. Each theme overrides all the previous themes.
+     * In this case, the `column_header` will render "Label B". The `data_table_theme_block` function
+     * iterates through data table themes **in reverse** and renders the first block that matches the name.
+     *
+     * @throws RuntimeError if the block is not found in any of the given data table themes
      */
     public function renderThemeBlock(Environment $environment, array $context, DataTableView $dataTable, string $blockName): string
     {
         $themes = $dataTable->vars['themes'];
 
-        foreach ($themes as $theme) {
+        foreach (array_reverse($themes) as $theme) {
             $wrapper = $environment->load($theme);
 
             if ($wrapper->hasBlock($blockName, $context)) {
@@ -401,15 +404,6 @@ class DataTableExtension extends AbstractExtension
             $blockName,
             implode(', ', array_map(fn (string $theme) => "\"$theme\"", $themes)),
         ));
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     *
-     * @throws TwigException|\Throwable
-     */
-    private function renderBlock(Environment $environment, DataTableView $dataTable, string $blockName, array $context = []): string
-    {
     }
 
     /**

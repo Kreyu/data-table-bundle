@@ -663,39 +663,16 @@
     </div>
 {% endblock %}
 
-{% block action_control %}
-    <div class="d-inline-block" {{ block('attributes') }}>
+{% block action_control -%}
+    {% set attr = attr|merge({ class: ('d-inline-block ' ~ attr.class|default(''))|trim }) %}
+
+    <div{{ _self.attributes(attr) }}>
         {{ parent() }}
     </div>
-{% endblock %}
+{%- endblock %}
 
-{% block action_link_control %}
-    {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
-
-    {% if confirmation %}
-        {% set attr = {
-            'data-bs-toggle': 'modal',
-            'data-bs-target': '#' ~ confirmation.identifier,
-        }|merge(attr) %}
-
-        {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
-
-        {% if batch %}
-            {% set confirm_button_attr = {
-                'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
-            }|merge(confirm_button_attr) %}
-        {% endif %}
-
-        {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
-    {% endif %}
-
-    {{ parent() }}
-{% endblock %}
-
-{% block action_button_control %}
-    {% set attr = {
-        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
-    }|merge(attr) %}
+{% block action_link_control -%}
+    {% set attr = attr|merge({ class: ('text-decoration-none px-2 ' ~ attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% set attr = {
@@ -715,14 +692,36 @@
     {% endif %}
 
     {{ parent() }}
-{% endblock %}
+{%- endblock %}
 
-{% block action_form_control %}
-    {% set attr = { class: 'd-inline-block' }|merge(attr) %}
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
+{% block action_button_control -%}
+    {% set attr = attr|merge({ class: ('btn btn-primary ' ~ attr.class|default(''))|trim }) %}
 
-    {% set button_attr = {
-        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '')
-    }|merge(button_attr) %}
+    {% if confirmation %}
+        {% set attr = {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#' ~ confirmation.identifier,
+        }|merge(attr) %}
+
+        {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
+
+        {% if batch %}
+            {% set confirm_button_attr = {
+                'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+            }|merge(confirm_button_attr) %}
+        {% endif %}
+
+        {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
+    {% endif %}
+
+    {{ parent() }}
+{%- endblock %}
+
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
+{% block action_form_control -%}
+    {% set attr = attr|merge({ class: ('d-inline-block ' ~ attr.class|default(''))|trim }) %}
+    {% set button_attr = button_attr|merge({ class: ('btn btn-primary ' ~ button_attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% with {
@@ -742,7 +741,7 @@
     {% else %}
         {{ parent() }}
     {% endif %}
-{% endblock %}
+{%- endblock %}
 
 {% block action_modal_control %}
     <div
@@ -885,3 +884,9 @@
         {% endwith %}
     </div>
 {% endblock %}
+
+{% block column_icon_value -%}
+    {% with { icon_attr: { height: '1em' }|merge(icon_attr) } -%}
+        {{ parent() }}
+    {%- endwith %}
+{%- endblock %}

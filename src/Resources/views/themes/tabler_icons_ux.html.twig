@@ -1,0 +1,8 @@
+{# Tabler UX Icons Theme #}
+{# @see https://ux.symfony.com/icons?set=tabler #}
+
+{% block icon -%}
+    {# @var icon string #}
+    {# @var icon_attr array #}
+    {{ ux_icon('tabler:' ~ icon, icon_attr) }}
+{%- endblock %}

@@ -1,0 +1,8 @@
+{# Bootstrap UX Icons Theme #}
+{# @see https://ux.symfony.com/icons?set=bi #}
+
+{% block icon -%}
+    {# @var icon string #}
+    {# @var icon_attr array #}
+    {{ ux_icon('bi:' ~ icon, icon_attr) }}
+{%- endblock %}

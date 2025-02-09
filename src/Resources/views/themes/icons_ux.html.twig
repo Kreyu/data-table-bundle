@@ -1,0 +1,8 @@
+{# Generic UX Icons Theme #}
+{# @see https://symfony.com/bundles/ux-icons/current/index.html #}
+
+{% block icon -%}
+    {# @var icon string #}
+    {# @var icon_attr array #}
+    {{ ux_icon(icon, icon_attr) }}
+{%- endblock %}

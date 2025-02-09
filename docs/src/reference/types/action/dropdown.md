@@ -65,7 +65,7 @@ $builder
 
 Whether to render a caret icon next to the dropdown label. For example:
 
-![Dropdown action with and without caret example](../../../public/dropdown_action_type_with_caret_example.png)
+![Dropdown action with and without caret example](/dropdown_action_type_with_caret_example.png)
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;

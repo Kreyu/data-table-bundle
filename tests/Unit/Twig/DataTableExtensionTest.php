@@ -35,17 +35,17 @@ class DataTableExtensionTest extends TestCase
         $this->assertEquals(['bar'], $view->vars['themes']);
     }
 
-    public function testRenderThemeBlockRendersFirstOccurrence(): void
+    public function testRenderThemeBlockRendersLastOccurrence(): void
     {
         $environment = new Environment(new ArrayLoader([
             'base.html.twig' => '',
-            // This theme contains the block, and is the first occurrence, so it should be rendered.
+            // This theme contains the block, and is the first occurrence.
             'bootstrap_5.html.twig' => <<<TWIG
                 {% block content -%}
                     Hello from bootstrap_5.html.twig
                 {%- endblock %}
             TWIG,
-            // This theme contains the block, but is second occurrence.
+            // This theme contains the block, but is second occurrence, so it overrides the Bootstrap 5.
             'tabler.html.twig' => <<<TWIG
                 {% block content -%}
                     Hello from tabler.html.twig
@@ -63,7 +63,7 @@ class DataTableExtensionTest extends TestCase
             blockName: 'content',
         );
 
-        $this->assertEquals('Hello from bootstrap_5.html.twig', $html);
+        $this->assertEquals('Hello from tabler.html.twig', $html);
     }
 
     public function testRenderThemeBlockThrowsExceptionOnMissingBlock(): void

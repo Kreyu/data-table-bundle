@@ -94,9 +94,9 @@ $builder
 
 > [!TIP] Wondering how does the icon gets rendered?
 > Name of the icon depends on the icon set you are using in the application,
-> and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../docs/features/theming.md#icon-themes) for more information.
+> and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../../docs/features/theming.md#icon-themes) for more information.
 
-When action is a [row action](../../../docs/components/actions.md), you can provide a callable
+When action is a [row action](./../../../../docs/components/actions.md), you can provide a callable
 that will receive the row data as an argument and should return a string:
 
 ```php
@@ -129,7 +129,7 @@ $builder
 ;
 ```
 
-When action is a [row action](../../../docs/components/actions.md), you can provide a callable
+When action is a [row action](../../../../docs/components/actions.md), you can provide a callable
 that will receive the row data as an argument and should return a string:
 
 ```php

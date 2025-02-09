@@ -110,6 +110,30 @@ class DataTableExtensionTest extends TestCase
         $this->assertEquals('Hello World', $html);
     }
 
+    public function testRenderThemeBlockWithResetAttr(): void
+    {
+        $environment = new Environment(new ArrayLoader([
+            'base.html.twig' => <<<TWIG
+                {% block content -%}
+                    {{ attr.label ?? 'n/a' }}
+                {%- endblock %}
+            TWIG,
+        ]));
+
+        $dataTable = new DataTableView();
+        $dataTable->vars['themes'] = ['base.html.twig'];
+
+        $html = $this->createExtension()->renderThemeBlock(
+            environment: $environment,
+            context: ['label' => 'Hello World'],
+            dataTable: $dataTable,
+            blockName: 'content',
+            resetAttr: true,
+        );
+
+        $this->assertEquals('n/a', $html);
+    }
+
     private function createExtension(): DataTableExtension
     {
         return new DataTableExtension(

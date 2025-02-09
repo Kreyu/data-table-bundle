@@ -1,5 +1,15 @@
-{# Bootstrap Webfont Icons Theme #}
-{# @see https://icons.getbootstrap.com/ #}
+{#
+    Bootstrap Webfont Icons Theme
+    @see https://icons.getbootstrap.com/
+
+    The "class" icon attribute gets concatenated to the default class. For example, when:
+     - "icon" variable equals "eye"
+     - "icon_attr" equals { class: "text-danger" }
+
+    The resulting HTML will equal to:
+
+    <i class="bi bi-eye text-danger"></i>
+#}
 
 {% block icon -%}
     {% from '@KreyuDataTable/themes/base.html.twig' import attributes %}

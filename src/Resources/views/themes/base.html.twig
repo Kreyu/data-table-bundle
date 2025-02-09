@@ -395,11 +395,13 @@
     </button>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType #}
 {% block kreyu_data_table_date_range_widget %}
     {{ form_widget(form.from) }}
     {{ form_widget(form.to) }}
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
 {% block column_header %}
     {% set label_attr = label_attr|default({}) %}
 
@@ -442,6 +444,7 @@
     {% endif %}
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
 {% block column_header_label %}
     {% if translation_domain is not same as false %}
         <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
@@ -576,7 +579,7 @@
 
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType #}
 {% block column_checkbox_header -%}
-    <th {{ block('attributes') }}>
+    <th{{ _self.attributes(attr) }}>
         {% set input_attr = {
             'type': 'checkbox',
             'aria-label': 'Select all checkbox',
@@ -585,7 +588,7 @@
             'data-action': 'input->kreyu--data-table-bundle--batch#selectAll'
         }|merge(input_attr|default({})) %}
 
-        <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
+        <input{{ _self.attributes(input_attr) }}>
     </th>
 {%- endblock %}
 
@@ -601,78 +604,101 @@
         'data-action': 'input->kreyu--data-table-bundle--batch#selectRow'
     }|merge(input_attr|default({})) %}
 
-    <input {% with { attr: input_attr } %}{{ block('attributes') }}{% endwith %}>
+    <input{{ _self.attributes(input_attr) }}>
 {%- endblock %}
 
 {# Action type templates #}
 
-{% block action_control_icon %}{% endblock %}
-
-{% block action_control %}
-    {% if icon %}{{ data_table_theme_block(data_table, 'icon') }}{% endif %}
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ActionType #}
+{% block action_control -%}
+    {%- if icon %}{{ data_table_theme_block(data_table, 'icon') }}{% endif -%}
     {{- label|trans(translation_parameters, translation_domain) -}}
-{% endblock %}
+{%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType #}
 {% block action_link_control %}
-    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr) %}
+    {% set tag = tag ?? 'a' %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-    </a>
+    <{{ tag }}{{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+    </{{ tag }}>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
 {% block action_button_control %}
-    {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
+    {% set attr = { href, target }|filter(v => v != null)|merge(attr) %}
+    {% set tag = tag ?? 'a' %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-    </a>
+    {# Button action should work like a link action styled to look like a button #}
+
+    <{{ tag }}{{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+    </{{ tag }}>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
 {% block action_form_control %}
-    {% set attr = { action, method: html_friendly_method }|merge(attr|default({})) %}
+    {# @var string form_id - Unique identifier of the form #}
+    {# @var string action - URL that the form will be submitted to #}
+    {# @var string method - Form method, e.g. GET, POST, PATCH, PUT, DELETE #}
+    {# @var string html_friendly_method - HTML-friendly form method, so only GET or POST #}
+
+    {% set attr = { id: form_id, action, method: html_friendly_method }|merge(attr) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <form id="{{ form_id }}" {{- block('attributes') -}}>
-        {# Reset attributes to prevent bubbling #}
-        {% set attr = {} %}
+    {% set button_tag = button_tag ?? 'button' %}
+    {% set button_attr = { type: 'submit' }|merge(button_attr) %}
 
-        <input type="hidden" name="_method" value="{{ method }}"/>
+    {# Form action should work like a button action wrapped in a form to allow methods other than GET #}
 
-        {% set button_tag = button_tag|default('button') %}
+    <form{{ _self.attributes(attr) }}>
+        {% if method != html_friendly_method -%}
+            <input type="hidden" name="_method" value="{{ method }}" />
+        {%- endif -%}
 
-        <{{ button_tag }} {% with { attr: { type: 'submit' }|merge(button_attr) } %}{{- block('attributes') -}}{% endwith %}>
-            {{- block('action_control', theme, _context) -}}
+        <{{ button_tag }}{{ _self.attributes(button_attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
         </{{ button_tag }}>
     </form>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType #}
 {% block action_modal_control %}
-    {% set attr = { href }|filter(v => v != null)|merge(attr|default({})) %}
+    {# @var string href - URL that will respond with the modal contents #}
+
+    {% set attr = { href }|filter(v => v != null)|merge(attr) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <button {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-    </button>
+    {% set tag = tag ?? 'button' %}
+
+    {# Themes that extend base theme should provide their own implementation of modal #}
+
+    <{{ tag }}{{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+    </{{ tag }}>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType #}
 {% block action_dropdown_control %}
     {# Themes that extend base theme should provide their own implementation of dropdown #}
-    <button>{{- block('action_control', theme, _context) -}}</button>
+    <button>
+        {{- data_table_theme_block(data_table, 'action_control') -}}
+    </button>
     <ul>
         {% for action in actions %}
             <li>{{ data_table_action(action) }}</li>
@@ -680,6 +706,7 @@
     </ul>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType #}
 {% block action_link_dropdown_item_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
@@ -687,9 +714,11 @@
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <a {% with { attr } %}{{- block('attributes') -}}{% endwith %}>
-        {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-    </a>
+    {% set tag = tag ?? 'a' %}
+
+    <{{ tag }}{{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+    </{{ tag }}>
 {% endblock %}
 
 {% block sort_arrow_none %}{% endblock %}
@@ -699,11 +728,11 @@
 {% block sort_arrow_desc %}↓{% endblock %}
 
 {% block attributes -%}
-    {% for key, value in attr|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor %}
+    {%- for key, value in attr|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor -%}
 {%- endblock %}
 
-{% macro attributes(attributes) -%}
-    {% for key, value in attributes|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor %}
+{% macro attributes(attr) -%}
+    {{- block('attributes') -}}
 {%- endmacro %}
 
 {# Transforms given array to form inputs. Supports nested arrays. #}

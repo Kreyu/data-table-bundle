@@ -208,6 +208,74 @@ When creating your own theme, you can either create a template that extends one 
 
 Remember that in the second case, you cannot call the `parent()` function in the block.
 
+### Rendering HTML attributes
+
+The `@KreyuDataTable/themes/base.html.twig` theme provides `attributes` macro can be used to render HTML attributes from an array:
+
+```twig
+{% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+<span{{ attributes({ id: 'foo', class: 'text-center' }) }}></span>
+
+{# Rendered as: #}
+<span id="foo" class="text-center"></span>
+```
+
+If you pass an empty array to the `attributes` macro, it will render an empty string:
+
+```twig
+<span{{ attributes([]) }}></span>
+
+{# Rendered as: #}
+<span></span>
+```
+
+The `attributes` macro will start with a whitespace if at least one attribute is passed.
+Because of that, you shouldn't add the whitespace manually:
+
+```twig
+{% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+<span {{ attributes({ id: 'foo', class: 'text-center' }) }}></span>
+
+{# Rendered as: #}
+<span  id="foo" class="text-center"></span>
+```
+
+Notice the double whitespace before the `id` attribute.
+
+In some cases you may want to merge the class attribute with some defaults. To do so, use the Twig `merge` filter:
+
+```twig
+{% set attr = { class: 'btn-sm' } #}
+
+{% set attr = attr|merge({ class: 'btn btn-primary ' ~ attr.class }) %}
+
+{# Now "attr" equals to: { class: 'btn btn-primary btn-sm' } #}
+```
+
+You can also append the class, instead of prepending:
+
+```twig
+{% set attr = { class: 'btn' } #}
+
+{% set attr = attr|merge({ class: (attr.class|default(''))|trim ~ ' btn-primary' }) %}
+
+{# Now "attr" equals to: { class: 'btn btn-primary' } #}
+```
+
+If you have no idea whether the `attr` variable contains any `class`, you can use the Twig `default` and `trim` filters to prevent unnecessary whitespace:
+
+```twig
+{% set attr = {} #}
+
+{% set attr = attr|merge({ class: ('btn btn-primary ' ~ attr.class|default(''))|trim }) %}
+
+{# Now "attr" equals to: { class: 'btn btn-primary' } #}
+```
+
+### Rendering blocks with hierarchy
+
 When creating custom themes, you may find the `data_table_theme_block` Twig function useful.
 For example, let's assume the data table has two themes:
 
@@ -248,3 +316,64 @@ However, if you use the `data_table_theme_block` instead of the `block`:
 
 In this case, the `column_header` will render "Label B". The `data_table_theme_block` function will iterate 
 through the data table themes in reverse and render the first block that matches the name.
+
+In some cases, the `attr` variable may be incorrectly rendered on each nested element. For example:
+
+```twig
+{% block column_header %}
+    {% set attr = { class: 'text-center' } %}
+ 
+    <span{{ _self.attributes(attr) }}>
+        {{ data_table_theme_block(data_table, 'column_label') }}
+    </span>
+{% endblock %}
+
+{% block column_label %}
+    {# When rendered from "column_header", the variable "attr" equals { class: 'text-center' } #}
+    <span{{ _self.attributes(attr) }}>
+        Label
+    </span>
+{% endblock %}
+```
+
+Rendering the `column_header` block will result in the following HTML:
+
+```
+<span class="text-center">
+    <span class="text-center">
+        Label
+    </span>
+</span>
+```
+
+This is because the `data_table_theme_block` passes the context, so `attr` will be rendered twice.
+In some cases this is fine, but sometimes you may want to prevent this behavior. 
+To do so, you can pass the `resetAttr` argument set to `true` to the `data_table_theme_block` function.
+This will reset the `attr` to an empty array:
+
+```twig
+{% block column_header %}
+    {% set attr = { class: 'text-center' } %}
+ 
+    <span{{ _self.attributes(attr) }}>
+        {{ data_table_theme_block(data_table, 'column_label', resetAttr = true) }}
+    </span>
+{% endblock %}
+
+{% block column_label %}
+    {# When rendered from "column_header", the variable "attr" now equals [] #}
+    <span{{ _self.attributes(attr) }}>
+        Label
+    </span>
+{% endblock %}
+```
+
+Now, rendering the `column_header` block will result in the following HTML:
+
+```twig
+<span class="text-center">
+    <span>
+        Label
+    </span>
+</span>
+```

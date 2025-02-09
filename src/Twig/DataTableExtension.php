@@ -385,9 +385,13 @@ class DataTableExtension extends AbstractExtension
      *
      * @throws RuntimeError if the block is not found in any of the given data table themes
      */
-    public function renderThemeBlock(Environment $environment, array $context, DataTableView $dataTable, string $blockName): string
+    public function renderThemeBlock(Environment $environment, array $context, DataTableView $dataTable, string $blockName, bool $resetAttr = false): string
     {
         $themes = $dataTable->vars['themes'];
+
+        if (!empty($context['attr']) && $resetAttr) {
+            $context['attr'] = [];
+        }
 
         foreach (array_reverse($themes) as $theme) {
             $wrapper = $environment->load($theme);

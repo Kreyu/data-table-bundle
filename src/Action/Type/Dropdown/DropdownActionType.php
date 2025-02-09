@@ -35,7 +35,10 @@ class DropdownActionType extends AbstractActionType
             $itemActions[] = $itemAction->createView($view->parent);
         }
 
-        $view->vars['actions'] = $itemActions;
+        $view->vars = array_replace($view->vars, [
+            'actions' => $itemActions,
+            'with_caret' => $options['with_caret'],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -43,6 +46,13 @@ class DropdownActionType extends AbstractActionType
         $resolver->define('actions')
             ->allowedTypes(ActionBuilderInterface::class.'[]', 'callable')
             ->required()
+            ->info('The actions to display in the dropdown.')
+        ;
+
+        $resolver->define('with_caret')
+            ->default(true)
+            ->allowedTypes('bool')
+            ->info('Whether to display a caret next to the dropdown label.')
         ;
     }
 }

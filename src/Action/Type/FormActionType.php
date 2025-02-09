@@ -26,7 +26,7 @@ final class FormActionType extends AbstractActionType
 
         $method = $htmlFriendlyMethod = strtoupper($options['method']);
 
-        if ('GET' !== $method) {
+        if (!in_array($method, ['GET', 'POST'])) {
             $htmlFriendlyMethod = 'POST';
         }
 

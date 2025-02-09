@@ -1,8 +1,34 @@
-{# Tabler UX Icons Theme #}
-{# @see https://ux.symfony.com/icons?set=tabler #}
+{#
+    Tabler UX Icons Theme
+    @see https://ux.symfony.com/icons?set=tabler
+
+    Need to change the default height in Twig?
+    Just override the "height" attribute in the "icon_attr" variable:
+
+    {% extends '@KreyuDataTable/themes/tabler_icons_ux.html.twig' %}
+
+    {% block icon -%}
+        {% with { icon_attr: { height: '1.75em' }|merge(icon_attr) %}
+            {{ parent() }}
+        {% endwith %}
+    {%- endblock %}
+
+    You can also remove the "height" attribute completely by setting it to `false`:
+
+    {% extends '@KreyuDataTable/themes/tabler_icons_ux.html.twig' %}
+
+    {% block icon -%}
+        {% with { icon_attr: { height: false }|merge(icon_attr) %}
+            {{ parent() }}
+        {% endwith %}
+    {%- endblock %}
+
+    Remember to merge with the "icon_attr" variable to allow passing the "icon_attr" option!
+    Attributes from the "icon_attr" should always override the defaults.
+#}
 
 {% block icon -%}
     {# @var icon string #}
     {# @var icon_attr array #}
-    {{ ux_icon('tabler:' ~ icon, icon_attr) }}
+    {{ ux_icon('tabler:' ~ icon, { height: '1.4em' }|merge(icon_attr)|filter(e => e != false)) }}
 {%- endblock %}

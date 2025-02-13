@@ -16,7 +16,13 @@ final class NumberColumnType extends AbstractColumnType
         $view->vars = array_merge($view->vars, [
             'use_intl_formatter' => $options['use_intl_formatter'],
             'intl_formatter_options' => $options['intl_formatter_options'],
+            'badge' => $options['badge'],
         ]);
+
+        if ($options['badge']) {
+            $badgeClass = is_callable($options['badge']) ? $options['badge']($view->data) : $options['badge'];
+            $view->vars['attr']['class'] = trim(($view->vars['attr']['class'] ?? '') . ' badge ' . $badgeClass);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -34,8 +40,11 @@ final class NumberColumnType extends AbstractColumnType
                         ->setAllowedTypes('style', 'string')
                     ;
                 },
+                'badge' => false,
             ])
             ->setAllowedTypes('use_intl_formatter', 'bool')
+            ->setAllowedTypes('badge', ['bool', 'string', 'callable'])
+            ->setInfo('badge', 'Defines whether the value should be rendered as a badge. Can be a boolean, string, or callable.')
         ;
     }
 

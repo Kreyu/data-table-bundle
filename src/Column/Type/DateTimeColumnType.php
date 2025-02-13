@@ -16,7 +16,13 @@ final class DateTimeColumnType extends AbstractColumnType
         $view->vars = array_replace($view->vars, [
             'format' => $options['format'],
             'timezone' => $options['timezone'],
+            'badge' => $options['badge'],
         ]);
+
+        if ($options['badge']) {
+            $badgeClass = is_callable($options['badge']) ? $options['badge']($view->data) : $options['badge'];
+            $view->vars['attr']['class'] = trim(($view->vars['attr']['class'] ?? '') . ' badge ' . $badgeClass);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -25,6 +31,7 @@ final class DateTimeColumnType extends AbstractColumnType
             ->setDefaults([
                 'format' => 'd.m.Y H:i:s',
                 'timezone' => null,
+                'badge' => false,
             ])
             ->setNormalizer('export', function (Options $options, $value) {
                 if (true === $value) {
@@ -47,8 +54,10 @@ final class DateTimeColumnType extends AbstractColumnType
             })
             ->setAllowedTypes('format', ['string'])
             ->setAllowedTypes('timezone', ['null', 'string'])
+            ->setAllowedTypes('badge', ['bool', 'string', 'callable'])
             ->setInfo('format', 'A date time string format, supported by the PHP date() function.')
             ->setInfo('timezone', 'A timezone used to render the date time as string.')
+            ->setInfo('badge', 'Defines whether the value should be rendered as a badge. Can be a boolean, string, or callable.')
         ;
     }
 

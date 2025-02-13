@@ -16,6 +16,23 @@ The [`EnumColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/
 Formats the enum value. If Symfony Translator component is available, and the enum implements [`TranslatableInterface`](https://github.com/symfony/translation-contracts/blob/main/TranslatableInterface.php),
 the enum will be translated. Otherwise, the enum name will be displayed.
 
+### `badge`
+
+- **type**: `bool`, `string`, or `callable`
+- **default**: `false`
+
+Defines whether the value should be rendered as a badge. Can be a boolean, string, or callable.
+
+Example usage:
+
+```php
+$builder
+    ->addColumn('status', EnumColumnType::class, [
+        'badge' => 'primary',
+    ])
+;
+```
+
 ## Inherited options
 
 <ColumnTypeOptions excludedOptions="['formatter']"/>

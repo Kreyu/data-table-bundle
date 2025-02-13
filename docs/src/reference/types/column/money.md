@@ -95,6 +95,23 @@ For more details, see:
 - [Intl number formatter documentation](https://www.php.net/manual/en/class.numberformatter.php)
 - [Twig `format_currency` filter documentation](https://twig.symfony.com/doc/2.x/filters/format_currency.html)
 
+### `badge`
+
+- **type**: `bool`, `string`, or `callable`
+- **default**: `false`
+
+Defines whether the value should be rendered as a badge. Can be a boolean, string, or callable.
+
+Example usage:
+
+```php
+$builder
+    ->addColumn('price', MoneyColumnType::class, [
+        'badge' => 'primary',
+    ])
+;
+```
+
 ## Inherited options
 
 <ColumnTypeOptions/>

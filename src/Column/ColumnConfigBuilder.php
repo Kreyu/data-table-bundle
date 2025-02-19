@@ -223,6 +223,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
         return $this;
     }
+
     public function getPriority(): int
     {
         if ($this->locked) {

@@ -2,7 +2,31 @@
 
 {# Base HTML Theme #}
 
+{% block data_table %}
+    {# @var string name - Name of the data table #}
+
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state']|merge(stimulus_controllers ?? {}) %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame{{ _self.attributes({ id: 'kreyu_data_table_' ~ name, target: '_top' }) }}>
+        <section>
+            {{ data_table_theme_block('data_table_content', data_table) }}
+        </section>
+    </turbo-frame>
+{% endblock %}
+
+{% block data_table_content %}
+    {{ data_table_theme_block('header', data_table) }}
+    {{ data_table_theme_block('table', data_table) }}
+    {{ data_table_theme_block('footer', data_table) }}
+{% endblock %}
+
 {% block kreyu_data_table %}
+    {{ dump(stimulus_controller('@kreyu/data-table-bundle/state', { url_query_parameters }).toArray()) }}
+
     {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
     {% if has_batch_actions %}

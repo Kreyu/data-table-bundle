@@ -28,18 +28,18 @@ final class LinkColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'href' => '#',
-                'target' => null,
-            ])
-            ->setAllowedTypes('href', ['string', 'callable'])
-            ->setAllowedTypes('target', ['null', 'string', 'callable'])
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/link#href */
+        $resolver->define('href')
+            ->default('#')
+            ->allowedTypes('string', 'callable')
+            ->info('Defines the URL to link to.')
         ;
-    }
 
-    public function getParent(): ?string
-    {
-        return TextColumnType::class;
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/link#target */
+        $resolver->define('target')
+            ->default(null)
+            ->allowedTypes('null', 'string', 'callable')
+            ->info('Sets the value that will be used as a "target" HTML attribute.')
+        ;
     }
 }

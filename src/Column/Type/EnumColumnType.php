@@ -28,9 +28,4 @@ final class EnumColumnType extends AbstractColumnType
 
         return $enum->name;
     }
-
-    public function getParent(): ?string
-    {
-        return TextColumnType::class;
-    }
 }

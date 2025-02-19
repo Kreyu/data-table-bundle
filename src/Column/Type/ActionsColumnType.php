@@ -26,9 +26,14 @@ final class ActionsColumnType extends AbstractColumnType
 
         foreach ($options['actions'] as $name => $action) {
             $action = $this->resolveAction($name, $action, $view);
-            $action?->setDataTable($column->getDataTable());
 
-            $actions[$name] = $action?->createView($view);
+            if (null === $action) {
+                continue;
+            }
+
+            $action->setDataTable($column->getDataTable());
+
+            $actions[$name] = $action->createView($view);
         }
 
         $view->vars['actions'] = array_filter($actions);
@@ -36,14 +41,12 @@ final class ActionsColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'label' => 'Actions',
-                'export' => false,
-                'property_path' => false,
-                'actions' => [],
-            ])
-            ->setNormalizer('actions', function (Options $options, mixed $value) {
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/actions#actions */
+        $resolver->define('actions')
+            ->default([])
+            ->allowedTypes('actions', 'array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]')
+            ->info('An array of actions to render in the column.')
+            ->normalize(function (Options $options, mixed $value) {
                 ($resolver = new OptionsResolver())
                     ->setRequired([
                         'type',
@@ -68,9 +71,12 @@ final class ActionsColumnType extends AbstractColumnType
 
                 return $value;
             })
-            ->setAllowedTypes('actions', ['array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]'])
-            ->setInfo('actions', 'An array of actions configuration, which contains of their type and options.')
         ;
+
+        $resolver->setDefaults([
+            'export' => false,
+            'property_path' => false,
+        ]);
     }
 
     private function resolveAction(

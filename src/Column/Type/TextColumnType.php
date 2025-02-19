@@ -6,5 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 final class TextColumnType extends AbstractColumnType
 {
-    // ...
 }

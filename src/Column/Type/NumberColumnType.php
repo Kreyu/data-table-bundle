@@ -21,26 +21,24 @@ final class NumberColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'use_intl_formatter' => class_exists(IntlFormatter::class),
-                'intl_formatter_options' => function (OptionsResolver $resolver) {
-                    $resolver
-                        ->setDefaults([
-                            'attrs' => [],
-                            'style' => 'decimal',
-                        ])
-                        ->setAllowedTypes('attrs', 'array')
-                        ->setAllowedTypes('style', 'string')
-                    ;
-                },
-            ])
-            ->setAllowedTypes('use_intl_formatter', 'bool')
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/number#use-intl-formatter */
+        $resolver->define('use_intl_formatter')
+            ->default(class_exists(IntlFormatter::class))
+            ->allowedTypes('bool')
         ;
-    }
 
-    public function getParent(): ?string
-    {
-        return TextColumnType::class;
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/number#intl-formatter-options */
+        $resolver->define('intl_formatter_options')
+            ->default(function (OptionsResolver $resolver) {
+                $resolver
+                    ->setDefaults([
+                        'attrs' => [],
+                        'style' => 'decimal',
+                    ])
+                    ->setAllowedTypes('attrs', 'array')
+                    ->setAllowedTypes('style', 'string')
+                ;
+            })
+        ;
     }
 }

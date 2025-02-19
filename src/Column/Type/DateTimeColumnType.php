@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class DateTimeColumnType extends AbstractColumnType
@@ -21,39 +20,18 @@ final class DateTimeColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'format' => 'd.m.Y H:i:s',
-                'timezone' => null,
-            ])
-            ->setNormalizer('export', function (Options $options, $value) {
-                if (true === $value) {
-                    $value = [];
-                }
-
-                if (is_array($value)) {
-                    $value += [
-                        'formatter' => static function (mixed $value, mixed $data, ColumnInterface $column): string {
-                            if ($value instanceof \DateTimeInterface) {
-                                return $value->format($column->getConfig()->getOption('format'));
-                            }
-
-                            return '';
-                        },
-                    ];
-                }
-
-                return $value;
-            })
-            ->setAllowedTypes('format', ['string'])
-            ->setAllowedTypes('timezone', ['null', 'string'])
-            ->setInfo('format', 'A date time string format, supported by the PHP date() function.')
-            ->setInfo('timezone', 'A timezone used to render the date time as string.')
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/date-time#format */
+        $resolver->define('format')
+            ->default('d.m.Y H:i:s')
+            ->allowedTypes('string')
+            ->info('A date time string format, supported by the PHP date() function.')
         ;
-    }
 
-    public function getParent(): ?string
-    {
-        return TextColumnType::class;
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/date-time#format */
+        $resolver->define('timezone')
+            ->default(null)
+            ->allowedTypes('null', 'bool', 'string', \DateTimeZone::class)
+            ->info('Target timezone - null to use the default, false to leave unchanged.')
+        ;
     }
 }

@@ -23,10 +23,16 @@ final class CheckboxColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/checkbox#identifier_name */
+        $resolver->define('identifier_name')
+            ->default('id')
+            ->allowedTypes('string')
+            ->info('The name of the identifier property.')
+        ;
+
         $resolver->setDefaults([
             'label' => '□',
             'property_path' => 'id',
-            'identifier_name' => 'id',
         ]);
     }
 }

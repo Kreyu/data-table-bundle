@@ -795,7 +795,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             'priority' => 10,
         ]);
 
-        $this->assertEquals(10, $column->getPriority());
+        $this->assertEquals(10, $column->getConfig()->getPriority());
     }
 
     public function testPassingVisibleOption(): void
@@ -804,7 +804,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             'visible' => false,
         ]);
 
-        $this->assertFalse($column->isVisible());
+        $this->assertFalse($column->getConfig()->isVisible());
     }
 
     public function testPassingPersonalizableOption(): void

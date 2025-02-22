@@ -1,3 +1,7 @@
+<script setup>
+    import TurboPrefetchingSection from "./../../shared/turbo-prefetching.md";
+</script>
+
 # Asynchronicity
 
 [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html) is a Symfony bundle integrating the [Hotwire Turbo](https://turbo.hotwired.dev/) library in Symfony applications.
@@ -31,3 +35,18 @@ If you're making a data table theme from scratch, make sure the table is wrapped
 </div>
 
 For more information, see [official documentation about the Turbo frames](https://symfony.com/bundles/ux-turbo/current/index.html#decomposing-complex-pages-with-turbo-frames).
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+$builder->addRowAction('show', ButtonActionType::class, [
+    'attr' => [
+        // note that this "false" should be string, not a boolean
+        'data-turbo-prefetch' => 'false',
+    ],
+]);
+```
+
+</TurboPrefetchingSection>

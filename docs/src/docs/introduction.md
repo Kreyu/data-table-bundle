@@ -19,7 +19,7 @@ Just want to try it out? Skip to the [installation](installation.md).
 - [Exporting](features/exporting.md) with or without applied pagination, filters and personalization 
 - [Theming](features/theming.md) of every part of the bundle using Twig
 - [Data source agnostic](features/extensibility.md) with Doctrine ORM supported out of the box
-- [Asynchronicity](features/asynchronicity.md) thanks to integration with Hotwire Turbo
+- [Asynchronicity](features/asynchronicity.md) thanks to integration with Turbo (with prefetching enabled by default)
 
 ## Use cases
 

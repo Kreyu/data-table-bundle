@@ -1,3 +1,7 @@
+<script setup>
+    import TurboPrefetchingSection from "./../../shared/turbo-prefetching.md";
+</script>
+
 # Actions
 
 [[toc]]
@@ -672,3 +676,20 @@ Inside the template, we can render the modal however we want:
 ```
 
 For more details, see the [`ModalActionType`](../../reference/types/action/modal.md) reference page.
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder->addRowAction('show', ButtonActionType::class, [
+    'attr' => [
+        // note that this "false" should be string, not a boolean
+        'data-turbo-prefetch' => 'false',
+    ],
+]);
+```
+
+</TurboPrefetchingSection>

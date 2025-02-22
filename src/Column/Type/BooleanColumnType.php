@@ -9,6 +9,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Represents a column with value displayed as "yes" or "no".
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/boolean
+ */
 final class BooleanColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -21,14 +26,12 @@ final class BooleanColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/boolean#label_true */
         $resolver->define('label_true')
             ->default('Yes')
             ->allowedTypes('string', TranslatableInterface::class)
             ->info('Label displayed when the value is truthy.')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/boolean#label_false */
         $resolver->define('label_false')
             ->default('No')
             ->allowedTypes('string', TranslatableInterface::class)

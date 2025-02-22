@@ -9,6 +9,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\Formatter\IntlFormatter;
 
+/**
+ * Represents a column with monetary value, appropriately formatted and rendered with currency.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/money
+ */
 final class MoneyColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -31,13 +36,11 @@ final class MoneyColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/money#currency */
         $resolver->define('currency')
             ->required()
             ->allowedTypes('string', 'callable')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/money#divisor */
         $resolver->define('divisor')
             ->default(null)
             ->allowedTypes('null', 'int')

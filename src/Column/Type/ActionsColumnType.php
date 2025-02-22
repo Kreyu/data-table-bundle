@@ -10,9 +10,19 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Represents a column that contains row actions.
+ *
+ * In most cases, it is not necessary to use this column type directly.
+ * Instead, use the {@see DataTableBuilderInterface::addRowAction()} method.
+ * If at least one row action is defined and visible, column of this type is added.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/actions
+ */
 final class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
@@ -41,7 +51,6 @@ final class ActionsColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/actions#actions */
         $resolver->define('actions')
             ->default([])
             ->allowedTypes('actions', 'array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]')

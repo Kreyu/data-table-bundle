@@ -25,4 +25,9 @@ class ColumnValueView
     {
         return $this->parent->parent;
     }
+
+    public function getRowData(): mixed
+    {
+        return $this->parent->data;
+    }
 }

@@ -8,6 +8,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Represents a column with value displayed as HTML.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/html
+ */
 final class HtmlColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -21,21 +26,20 @@ final class HtmlColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/html#raw */
         $resolver->define('raw')
             ->default(true)
             ->allowedTypes('bool')
             ->info('Defines whether the value should be rendered as raw HTML.')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/html#strip_tags */
+        /* @see https://www.php.net/strip_tags */
         $resolver->define('strip_tags')
             ->default(false)
             ->allowedTypes('bool')
             ->info('Defines whether the tags should be stripped. Internally uses the "strip_tags" function.')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/html#allowed_tags */
+        /* @see https://www.php.net/strip_tags */
         $resolver->define('allowed_tags')
             ->default(null)
             ->allowedTypes('null', 'string', 'string[]')

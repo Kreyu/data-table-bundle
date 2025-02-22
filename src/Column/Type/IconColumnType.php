@@ -8,6 +8,9 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/icon
+ */
 final class IconColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -26,14 +29,12 @@ final class IconColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/icon#icon */
         $resolver->define('icon')
             ->required()
             ->allowedTypes('string', 'callable')
             ->info('Defines the icon to render.')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/icon#icon_attr */
         $resolver->define('icon_attr')
             ->default([])
             ->allowedTypes('array', 'callable')

@@ -9,6 +9,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\Formatter\IntlFormatter;
 
+/**
+ * Represents a column with value displayed as a number.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/number
+ */
 final class NumberColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -21,13 +26,11 @@ final class NumberColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/number#use-intl-formatter */
         $resolver->define('use_intl_formatter')
             ->default(class_exists(IntlFormatter::class))
             ->allowedTypes('bool')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/number#intl-formatter-options */
         $resolver->define('intl_formatter_options')
             ->default(function (OptionsResolver $resolver) {
                 $resolver

@@ -1,7 +1,3 @@
-<script setup>
-    import { data as version } from './composer-require-version.data';
-</script>
-
 # Installation
 
 This bundle can be installed at any moment during a project’s lifecycle.
@@ -18,12 +14,10 @@ This bundle can be installed at any moment during a project’s lifecycle.
 Use [Composer](https://getcomposer.org/) to install the bundle:
 
 ```shell-vue
-composer require kreyu/data-table-bundle:"{{ version }}"
+composer require kreyu/data-table-bundle
 ```
 
-::: danger This bundle is not production ready!
-It is recommended to lock the minor version, as minor versions can provide breaking changes until the stable release!
-:::
+> [!DANGER] This bundle is not stable yet. Use with caution.
 
 ## Enable the bundle
 

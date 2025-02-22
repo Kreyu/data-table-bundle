@@ -32,24 +32,41 @@ abstract class AbstractDateTimeColumnType extends AbstractColumnType
             ->info('Target timezone - null to use the default, false to leave unchanged.')
         ;
 
-        $resolver->setNormalizer('export', function (Options $options, $value) {
-            if (true === $value) {
-                $value = [];
+        // When exporting, we ensure the export "formatter" option is present, so the value gets pre-formatted.
+        $resolver->addNormalizer('export', function (Options $options, mixed $export) {
+            if (false === $export) {
+                return false;
             }
 
-            if (is_array($value)) {
-                $value += [
-                    'formatter' => static function (mixed $value, mixed $data, ColumnInterface $column): string {
-                        if ($value instanceof \DateTimeInterface) {
-                            return $value->format($column->getConfig()->getOption('format'));
-                        }
-
-                        return '';
-                    },
-                ];
+            if (true === $export) {
+                $export = [];
             }
 
-            return $value;
+            $export['formatter'] ??= $options['formatter'] ?? function (mixed $value) use ($options) {
+                if (!$value instanceof \DateTimeInterface) {
+                    return '';
+                }
+
+                $timezone = $options['timezone'];
+
+                if (null === $timezone) {
+                    $timezone = date_default_timezone_get();
+                }
+
+                if (is_string($timezone)) {
+                    $timezone = new \DateTimeZone($timezone);
+                }
+
+                $dateTime = \DateTime::createFromInterface($value);
+
+                if ($timezone instanceof \DateTimeZone) {
+                    $dateTime->setTimezone($timezone);
+                }
+
+                return $dateTime->format($options['format']);
+            };
+
+            return $export;
         });
     }
 }

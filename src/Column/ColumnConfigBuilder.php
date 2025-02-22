@@ -226,10 +226,6 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getPriority(): int
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         return $this->priority;
     }
 
@@ -246,10 +242,6 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function isVisible(): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
-
         return $this->visible;
     }
 

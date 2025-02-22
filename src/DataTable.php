@@ -174,8 +174,21 @@ class DataTable implements DataTableInterface
     {
         $columns = $this->columns;
 
-        uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB): int {
-            return $columnB->getPriority() <=> $columnA->getPriority();
+        uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB): int {
+            $priorityA = $columnA->getConfig()->getPriority();
+            $priorityB = $columnB->getConfig()->getPriority();
+
+            if ($this->personalizationData) {
+                if ($columnA->getConfig()->isPersonalizable()) {
+                    $priorityA = $this->personalizationData->getColumn($columnA)->getPriority() ?? $priorityA;
+                }
+
+                if ($columnB->getConfig()->isPersonalizable()) {
+                    $priorityB = $this->personalizationData->getColumn($columnB)->getPriority() ?? $priorityB;
+                }
+            }
+
+            return $priorityB <=> $priorityA;
         });
 
         return $columns;
@@ -185,7 +198,7 @@ class DataTable implements DataTableInterface
     {
         return array_filter(
             $this->getColumns(),
-            static fn (ColumnInterface $column) => $column->isVisible(),
+            static fn (ColumnInterface $column) => $column->getConfig()->isVisible(),
         );
     }
 
@@ -193,7 +206,7 @@ class DataTable implements DataTableInterface
     {
         return array_filter(
             $this->getColumns(),
-            static fn (ColumnInterface $column) => !$column->isVisible(),
+            static fn (ColumnInterface $column) => !$column->getConfig()->isVisible(),
         );
     }
 
@@ -560,8 +573,6 @@ class DataTable implements DataTableInterface
         }
 
         $this->setPersonalizationData($data);
-
-        $data->apply($this->getColumns());
 
         $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }

@@ -31,5 +31,4 @@ jobs:
           dependency-versions: ${{ matrix.dependency-version }}
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit
-
+        run: vendor/bin/paratest

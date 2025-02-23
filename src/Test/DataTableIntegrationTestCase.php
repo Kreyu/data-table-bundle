@@ -22,20 +22,13 @@ use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use PHPUnit\Framework\TestCase;
 
-class DataTableIntegrationTestCase extends TestCase
+abstract class DataTableIntegrationTestCase extends TestCase
 {
     protected DataTableFactoryInterface $dataTableFactory;
 
     protected function setUp(): void
     {
-        $this->dataTableFactory = new DataTableFactory(
-            new DataTableRegistry(
-                types: $this->getDataTableTypes(),
-                typeExtensions: $this->getDataTableTypeExtensions(),
-                proxyQueryFactories: $this->getProxyQueryFactories(),
-                resolvedTypeFactory: $this->getResolvedDataTableTypeFactory(),
-            ),
-        );
+        $this->dataTableFactory = $this->createDataTableFactory();
     }
 
     protected function createDataTableFactory(): DataTableFactoryInterface

@@ -31,11 +31,6 @@ class ColumnTypeTest extends ColumnTypeTestCase
         return new ColumnType($this->translator);
     }
 
-    protected function getAdditionalColumnTypes(): array
-    {
-        return [];
-    }
-
     public function testDefaultLabelInheritsFromName(): void
     {
         $column = $this->createNamedColumn('firstName');

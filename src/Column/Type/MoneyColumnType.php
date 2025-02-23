@@ -48,13 +48,11 @@ final class MoneyColumnType extends AbstractColumnType
             ->info('A divisor used to divide the value before rendering.')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/money#use-intl-formatter */
         $resolver->define('use_intl_formatter')
             ->default(class_exists(IntlFormatter::class))
             ->allowedTypes('bool')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/money#intl-formatter-options */
         $resolver->define('intl_formatter_options')
             ->default(function (OptionsResolver $resolver) {
                 $resolver

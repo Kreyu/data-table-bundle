@@ -124,6 +124,22 @@ class ColumnConfigBuilderTest extends TestCase
         $this->assertFalse($builder->setPersonalizable(false)->isPersonalizable());
     }
 
+    public function testIsVisible()
+    {
+        $builder = $this->createBuilder();
+
+        $this->assertTrue($builder->setVisible(true)->isVisible());
+        $this->assertFalse($builder->setVisible(false)->isVisible());
+    }
+
+    public function testGetPriority()
+    {
+        $builder = $this->createBuilder();
+        $builder->setPriority(100);
+
+        $this->assertEquals(100, $builder->getPriority());
+    }
+
     public function testGetColumnFactoryWithoutFactorySet()
     {
         $this->expectException(BadMethodCallException::class);

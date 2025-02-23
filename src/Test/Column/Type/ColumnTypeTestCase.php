@@ -83,8 +83,8 @@ abstract class ColumnTypeTestCase extends TestCase
     {
         return new ColumnRegistry(
             types: [
-                $this->getTestedColumnType(),
                 ...$this->getAdditionalColumnTypes(),
+                $this->getTestedColumnType(),
             ],
             typeExtensions: [],
             resolvedTypeFactory: $this->getResolvedColumnTypeFactory(),

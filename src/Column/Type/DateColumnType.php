@@ -6,15 +6,17 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class DateColumnType extends AbstractColumnType
+/**
+ * Represents a column with value displayed as a date without time.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/date
+ */
+final class DateColumnType extends AbstractDateTimeColumnType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('format', 'd.m.Y');
-    }
+        parent::configureOptions($resolver);
 
-    public function getParent(): ?string
-    {
-        return DateTimeColumnType::class;
+        $resolver->setDefault('format', 'd.m.Y');
     }
 }

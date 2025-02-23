@@ -35,5 +35,9 @@ interface ColumnConfigInterface
 
     public function isPersonalizable(): bool;
 
+    public function getPriority(): int;
+
+    public function isVisible(): bool;
+
     public function getColumnFactory(): ColumnFactoryInterface;
 }

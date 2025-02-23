@@ -10,6 +10,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Represents a column with value displayed as a list.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection
+ */
 final class CollectionColumnType extends AbstractColumnType
 {
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
@@ -45,15 +50,25 @@ final class CollectionColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'entry_type' => TextColumnType::class,
-                'entry_options' => [],
-                'separator' => ', ',
-            ])
-            ->setAllowedTypes('entry_type', 'string')
-            ->setAllowedTypes('entry_options', 'array')
-            ->setAllowedTypes('separator', ['null', 'string'])
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry_type */
+        $resolver->define('entry_type')
+            ->default(TextColumnType::class)
+            ->info('Column type to render for each item in the collection.')
+            ->allowedTypes('string')
+        ;
+
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry_options */
+        $resolver->define('entry_options')
+            ->default([])
+            ->info('Options to pass to the column type for each item in the collection.')
+            ->allowedTypes('array')
+        ;
+
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#separator */
+        $resolver->define('separator')
+            ->default(', ')
+            ->info('Separator to render between each item in the collection.')
+            ->allowedTypes('null', 'string')
         ;
     }
 

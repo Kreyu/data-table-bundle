@@ -8,10 +8,17 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class DatePeriodColumnType extends AbstractColumnType
+/**
+ * Represents a column with value displayed as date range from date period object.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/date-period
+ */
+final class DatePeriodColumnType extends AbstractDateTimeColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
+        parent::buildValueView($view, $column, $options);
+
         $view->vars = array_replace($view->vars, [
             'separator' => $options['separator'],
         ]);
@@ -19,15 +26,14 @@ final class DatePeriodColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefault('separator', ' - ')
-            ->setAllowedTypes('separator', ['null', 'string'])
-            ->setInfo('separator', 'A string used to visually separate start and end dates.')
-        ;
-    }
+        parent::configureOptions($resolver);
 
-    public function getParent(): ?string
-    {
-        return DateTimeColumnType::class;
+        $resolver->setDefault('format', 'd.m.Y');
+
+        $resolver->define('separator')
+            ->default(' - ')
+            ->allowedTypes('null', 'string')
+            ->info('A string used to visually separate start and end dates.')
+        ;
     }
 }

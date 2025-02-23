@@ -4,56 +4,19 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 
-use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class DateTimeColumnType extends AbstractColumnType
+/**
+ * Represents a column with value displayed as date and time.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/date-time
+ */
+final class DateTimeColumnType extends AbstractDateTimeColumnType
 {
-    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
-    {
-        $view->vars = array_replace($view->vars, [
-            'format' => $options['format'],
-            'timezone' => $options['timezone'],
-        ]);
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'format' => 'd.m.Y H:i:s',
-                'timezone' => null,
-            ])
-            ->setNormalizer('export', function (Options $options, $value) {
-                if (true === $value) {
-                    $value = [];
-                }
+        parent::configureOptions($resolver);
 
-                if (is_array($value)) {
-                    $value += [
-                        'formatter' => static function (mixed $value, mixed $data, ColumnInterface $column): string {
-                            if ($value instanceof \DateTimeInterface) {
-                                return $value->format($column->getConfig()->getOption('format'));
-                            }
-
-                            return '';
-                        },
-                    ];
-                }
-
-                return $value;
-            })
-            ->setAllowedTypes('format', ['string'])
-            ->setAllowedTypes('timezone', ['null', 'string'])
-            ->setInfo('format', 'A date time string format, supported by the PHP date() function.')
-            ->setInfo('timezone', 'A timezone used to render the date time as string.')
-        ;
-    }
-
-    public function getParent(): ?string
-    {
-        return TextColumnType::class;
+        $resolver->setDefault('format', 'd.m.Y H:i:s');
     }
 }

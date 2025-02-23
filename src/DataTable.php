@@ -172,37 +172,92 @@ class DataTable implements DataTableInterface
 
     public function getColumns(): array
     {
-        $columns = $this->columns;
+        uasort($this->columns, function (ColumnInterface $columnA, ColumnInterface $columnB): int {
+            $priorityA = $columnA->getConfig()->getPriority();
+            $priorityB = $columnB->getConfig()->getPriority();
 
-        uasort($columns, static function (ColumnInterface $columnA, ColumnInterface $columnB): int {
-            return $columnB->getPriority() <=> $columnA->getPriority();
+            if ($this->getConfig()->isPersonalizationEnabled()) {
+                if ($columnA->getConfig()->isPersonalizable()) {
+                    $priorityA = $this->personalizationData?->getColumn($columnA)?->getPriority() ?? $priorityA;
+                }
+
+                if ($columnB->getConfig()->isPersonalizable()) {
+                    $priorityB = $this->personalizationData?->getColumn($columnB)?->getPriority() ?? $priorityB;
+                }
+            }
+
+            return $priorityB <=> $priorityA;
         });
 
-        return $columns;
+        return $this->columns;
     }
 
     public function getVisibleColumns(): array
     {
-        return array_filter(
-            $this->getColumns(),
-            static fn (ColumnInterface $column) => $column->isVisible(),
-        );
+        return array_filter($this->getColumns(), function (ColumnInterface $column) {
+            $visible = $column->getConfig()->isVisible();
+
+            if ($this->getConfig()->isPersonalizationEnabled() && $column->getConfig()->isPersonalizable()) {
+                $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
+            }
+
+            return $visible;
+        });
     }
 
     public function getHiddenColumns(): array
     {
-        return array_filter(
-            $this->getColumns(),
-            static fn (ColumnInterface $column) => !$column->isVisible(),
-        );
+        return array_filter($this->getColumns(), function (ColumnInterface $column) {
+            $visible = $column->getConfig()->isVisible();
+
+            if ($this->getConfig()->isPersonalizationEnabled() && $column->getConfig()->isPersonalizable()) {
+                $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
+            }
+
+            return !$visible;
+        });
     }
 
     public function getExportableColumns(): array
     {
-        return array_filter(
-            $this->getVisibleColumns(),
-            static fn (ColumnInterface $column) => $column->getConfig()->isExportable(),
-        );
+        $columns = array_filter($this->columns, function (ColumnInterface $column) {
+            if (!$column->getConfig()->isExportable()) {
+                return false;
+            }
+
+            $exportOptions = $column->getConfig()->getOption('export') ?: [];
+
+            $columnPersonalizable = $exportOptions['personalizable'] ?? $column->getConfig()->isPersonalizable();
+            $columnVisible = $exportOptions['visible'] ?? $column->getConfig()->isVisible();
+
+            if ($this->getConfig()->isPersonalizationEnabled() && $columnPersonalizable) {
+                $columnVisible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $columnVisible;
+            }
+
+            return $columnVisible;
+        });
+
+        uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB): int {
+            $exportOptionsA = $columnA->getConfig()->getOption('export') ?: [];
+            $exportOptionsB = $columnB->getConfig()->getOption('export') ?: [];
+
+            $priorityA = $exportOptionsA['priority'] ?? $columnA->getConfig()->getPriority();
+            $priorityB = $exportOptionsB['priority'] ?? $columnB->getConfig()->getPriority();
+
+            if ($this->getConfig()->isPersonalizationEnabled()) {
+                if ($exportOptionsA['personalizable'] ?? $columnA->getConfig()->isPersonalizable()) {
+                    $priorityA = $this->personalizationData?->getColumn($columnA)?->getPriority() ?? $priorityA;
+                }
+
+                if ($exportOptionsB['personalizable'] ?? $columnB->getConfig()->isPersonalizable()) {
+                    $priorityB = $this->personalizationData?->getColumn($columnB)?->getPriority() ?? $priorityB;
+                }
+            }
+
+            return $priorityB <=> $priorityA;
+        });
+
+        return $columns;
     }
 
     public function getColumn(string $name): ColumnInterface
@@ -561,8 +616,6 @@ class DataTable implements DataTableInterface
 
         $this->setPersonalizationData($data);
 
-        $data->apply($this->getColumns());
-
         $this->dispatch(DataTableEvents::POST_PERSONALIZE, new DataTablePersonalizationEvent($this, $data));
     }
 
@@ -588,7 +641,7 @@ class DataTable implements DataTableInterface
         }
 
         if (!$data->includePersonalization) {
-            $dataTable->resetPersonalization();
+            $this->personalizationData = null;
         }
 
         if (null === $data->exporter) {
@@ -961,17 +1014,5 @@ class DataTable implements DataTableInterface
         }
 
         return $provider->provide();
-    }
-
-    private function resetPersonalization(): void
-    {
-        $this->personalizationData = null;
-
-        foreach ($this->columns as $column) {
-            $column
-                ->setPriority($column->getConfig()->getOption('priority'))
-                ->setVisible($column->getConfig()->getOption('visible'))
-            ;
-        }
     }
 }

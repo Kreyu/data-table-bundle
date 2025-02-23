@@ -10,9 +10,19 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Represents a column that contains row actions.
+ *
+ * In most cases, it is not necessary to use this column type directly.
+ * Instead, use the {@see DataTableBuilderInterface::addRowAction()} method.
+ * If at least one row action is defined and visible, column of this type is added.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/actions
+ */
 final class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
@@ -26,9 +36,14 @@ final class ActionsColumnType extends AbstractColumnType
 
         foreach ($options['actions'] as $name => $action) {
             $action = $this->resolveAction($name, $action, $view);
-            $action?->setDataTable($column->getDataTable());
 
-            $actions[$name] = $action?->createView($view);
+            if (null === $action) {
+                continue;
+            }
+
+            $action->setDataTable($column->getDataTable());
+
+            $actions[$name] = $action->createView($view);
         }
 
         $view->vars['actions'] = array_filter($actions);
@@ -36,14 +51,11 @@ final class ActionsColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'label' => 'Actions',
-                'export' => false,
-                'property_path' => false,
-                'actions' => [],
-            ])
-            ->setNormalizer('actions', function (Options $options, mixed $value) {
+        $resolver->define('actions')
+            ->default([])
+            ->allowedTypes('actions', 'array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]')
+            ->info('An array of actions to render in the column.')
+            ->normalize(function (Options $options, mixed $value) {
                 ($resolver = new OptionsResolver())
                     ->setRequired([
                         'type',
@@ -68,9 +80,12 @@ final class ActionsColumnType extends AbstractColumnType
 
                 return $value;
             })
-            ->setAllowedTypes('actions', ['array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]'])
-            ->setInfo('actions', 'An array of actions configuration, which contains of their type and options.')
         ;
+
+        $resolver->setDefaults([
+            'export' => false,
+            'property_path' => false,
+        ]);
     }
 
     private function resolveAction(

@@ -37,7 +37,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
         }
 
         // Clearing the filters should reset the pagination to the first page.
-        if ($dataTableView->vars['pagination_enabled']) {
+        if ($dataTableView->vars['pagination_enabled'] ?? false) {
             $parameters[$dataTableView->vars['page_parameter_name']] = 1;
         }
 

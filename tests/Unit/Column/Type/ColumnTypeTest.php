@@ -31,11 +31,6 @@ class ColumnTypeTest extends ColumnTypeTestCase
         return new ColumnType($this->translator);
     }
 
-    protected function getAdditionalColumnTypes(): array
-    {
-        return [];
-    }
-
     public function testDefaultLabelInheritsFromName(): void
     {
         $column = $this->createNamedColumn('firstName');
@@ -795,7 +790,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             'priority' => 10,
         ]);
 
-        $this->assertEquals(10, $column->getPriority());
+        $this->assertEquals(10, $column->getConfig()->getPriority());
     }
 
     public function testPassingVisibleOption(): void
@@ -804,7 +799,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             'visible' => false,
         ]);
 
-        $this->assertFalse($column->isVisible());
+        $this->assertFalse($column->getConfig()->isVisible());
     }
 
     public function testPassingPersonalizableOption(): void

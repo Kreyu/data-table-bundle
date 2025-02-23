@@ -47,8 +47,8 @@ class PersonalizationColumnData
     {
         return new self(
             $column->getName(),
-            $column->getPriority(),
-            $column->isVisible(),
+            $column->getConfig()->getPriority(),
+            $column->getConfig()->isVisible(),
         );
     }
 

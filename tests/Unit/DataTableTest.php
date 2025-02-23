@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
+use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 
 class DataTableTest extends DataTableIntegrationTestCase
 {
@@ -355,6 +356,6 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     private function createDataTableBuilder(array $options = []): DataTableBuilderInterface
     {
-        return $this->dataTableFactory->createBuilder(data: [], options: $options);
+        return $this->dataTableFactory->createBuilder(DataTableType::class, [], $options);
     }
 }

@@ -45,7 +45,7 @@ class ExpressionFactoryTest extends TestCase
     public static function expectedExpressionProvider(): iterable
     {
         yield 'equals' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::Equals),
             'parameters' => [
                 new Parameter('bar', null),
@@ -54,7 +54,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'not equals' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::NotEquals),
             'parameters' => [
                 new Parameter('bar', null),
@@ -63,7 +63,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'contains' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::Contains),
             'parameters' => [
                 new Parameter('bar', null),
@@ -72,7 +72,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'not contains' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::NotContains),
             'parameters' => [
                 new Parameter('bar', null),
@@ -81,7 +81,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'in' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::In),
             'parameters' => [
                 new Parameter('bar', null),
@@ -90,7 +90,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'not in' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::NotIn),
             'parameters' => [
                 new Parameter('bar', null),
@@ -99,7 +99,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'greater than' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::GreaterThan),
             'parameters' => [
                 new Parameter('bar', null),
@@ -108,7 +108,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'greater than or equals' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::GreaterThanEquals),
             'parameters' => [
                 new Parameter('bar', null),
@@ -117,7 +117,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'less than' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::LessThan),
             'parameters' => [
                 new Parameter('bar', null),
@@ -126,7 +126,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'less than or equals' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::LessThanEquals),
             'parameters' => [
                 new Parameter('bar', null),
@@ -135,7 +135,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'starts with' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::StartsWith),
             'parameters' => [
                 new Parameter('bar', null),
@@ -144,7 +144,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'ends with' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::EndsWith),
             'parameters' => [
                 new Parameter('bar', null),
@@ -153,7 +153,7 @@ class ExpressionFactoryTest extends TestCase
         ];
 
         yield 'between' => [
-            'query_path' => 'foo',
+            'queryPath' => 'foo',
             'data' => new FilterData(null, Operator::Between),
             'parameters' => [
                 'from' => new Parameter('bar', null),

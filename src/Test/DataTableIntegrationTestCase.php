@@ -34,7 +34,7 @@ class DataTableIntegrationTestCase extends TestCase
                 typeExtensions: $this->getDataTableTypeExtensions(),
                 proxyQueryFactories: $this->getProxyQueryFactories(),
                 resolvedTypeFactory: $this->getResolvedDataTableTypeFactory(),
-            )
+            ),
         );
     }
 

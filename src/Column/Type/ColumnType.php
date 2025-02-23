@@ -354,8 +354,8 @@ final class ColumnType implements ColumnTypeInterface
     /**
      * Retrieves the column block prefixes, respecting the type hierarchy.
      *
-     * For example, take a look at the NumberColumnType. It is based on the TextColumnType,
-     * which is based on the ColumnType, therefore its block prefixes are: ["number", "text", "column"].
+     * For example, take a look at the NumberColumnType. It is based on the ColumnType,
+     * therefore its block prefixes are: ["number", "column"].
      *
      * @return array<string>
      */

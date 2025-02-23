@@ -36,8 +36,7 @@
         "phpunit/phpunit": "^10.4",
         "dg/bypass-finals": "dev-master",
         "openspout/openspout": "^4.23",
-        "symfony/http-foundation": "^6.0|^7.0",
-        "brianium/paratest": "^7.3"
+        "symfony/http-foundation": "^6.0|^7.0"
     },
     "autoload": {
         "psr-4": {

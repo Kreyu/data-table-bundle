@@ -12,7 +12,7 @@
     <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
         <div
             data-controller="{{ stimulus_controllers|join(' ') }}"
-            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
         >
             {{ block('action_bar', theme) }}
             {{ block('table', theme) }}

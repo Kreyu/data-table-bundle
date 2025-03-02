@@ -519,6 +519,13 @@
     {{- data_table_theme_block(data_table, 'icon') -}}
 {%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Column\Type\DateColumnType #}
+{% block column_date_value -%}
+    {% with { value: value ? value|date(format, timezone) : value } %}
+        {{- block('column_text_value') -}}
+    {% endwith %}
+{%- endblock %}
+
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType #}
 {% block column_date_time_value -%}
     {% with { value: value ? value|date(format, timezone) : value } %}

@@ -16,8 +16,6 @@ class Column implements ColumnInterface
     private ?DataTableInterface $dataTable = null;
     private ?PropertyPathInterface $propertyPath = null;
     private ?PropertyPathInterface $sortPropertyPath = null;
-    private int $priority = 0;
-    private bool $visible = true;
 
     public function __construct(
         private readonly ColumnConfigInterface $config,
@@ -106,29 +104,5 @@ class Column implements ColumnInterface
         $this->config->getType()->buildExportValueView($view, $this, $this->config->getOptions());
 
         return $view;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
-    }
-
-    public function setPriority(int $priority): static
-    {
-        $this->priority = $priority;
-
-        return $this;
-    }
-
-    public function isVisible(): bool
-    {
-        return $this->visible;
-    }
-
-    public function setVisible(bool $visible): static
-    {
-        $this->visible = $visible;
-
-        return $this;
     }
 }

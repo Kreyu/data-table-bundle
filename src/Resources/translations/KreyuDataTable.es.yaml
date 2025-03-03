@@ -26,6 +26,7 @@ Hidden columns: Columnas ocultas
 
 # Pagination
 Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Mostrando %current_page_first_item_index% - %current_page_last_item_index% de %total_item_count%
+Items per page: Ítems por página
 
 # Export
 Export: Exportar
@@ -50,4 +51,5 @@ Action confirmation: Confirmación de ejecución de acción
 Are you sure you want to execute this action?: ¿Estás seguro de que quieres ejecutar esta acción?
 Confirm: Confirmar
 Cancel: Cancelar
+Loading: Cargando
 Refresh: Refrescar

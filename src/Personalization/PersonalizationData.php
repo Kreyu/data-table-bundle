@@ -69,26 +69,6 @@ class PersonalizationData
         ));
     }
 
-    /**
-     * @param array<ColumnInterface> $columns
-     */
-    public function apply(array $columns): void
-    {
-        foreach ($columns as $column) {
-            if (!$column->getConfig()->isPersonalizable()) {
-                continue;
-            }
-
-            if (null === $data = $this->getColumn($column)) {
-                continue;
-            }
-
-            $column
-                ->setPriority($data->getPriority())
-                ->setVisible($data->isVisible());
-        }
-    }
-
     public function getColumns(): array
     {
         return $this->columns;

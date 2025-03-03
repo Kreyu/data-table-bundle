@@ -30,12 +30,4 @@ interface ColumnInterface
     public function createExportHeaderView(?HeaderRowView $parent = null): ColumnHeaderView;
 
     public function createExportValueView(?ValueRowView $parent = null): ColumnValueView;
-
-    public function getPriority(): int;
-
-    public function setPriority(int $priority): static;
-
-    public function isVisible(): bool;
-
-    public function setVisible(bool $visible): static;
 }

@@ -74,20 +74,72 @@ $builder
 ;
 ```
 
-### `icon_attr`
 
-- **type**: `array`
-- **default**: `[]`
+### `icon`
 
-An array of attributes used to render the action's icon.
+- **type**: `null`, `string` or `callable`
+- **default**: `null`
+
+Defines the icon to render.
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 
 $builder
     ->addAction('remove', ButtonActionType::class, [
+        'icon' => 'trash',
+    ])
+;
+```
+
+> [!TIP] Wondering how does the icon gets rendered?
+> Name of the icon depends on the icon set you are using in the application,
+> and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../../docs/features/theming.md#icon-themes) for more information.
+
+When action is a [row action](./../../../../docs/components/actions.md), you can provide a callable
+that will receive the row data as an argument and should return a string:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('toggle', ButtonActionType::class, [
+        'icon' => fn (User $user) => $user->isActive() ? 'unlock' : 'lock',
+    ])
+;
+```
+
+### `icon_attr`
+
+- **type**: `array` or `callable`
+- **default**: `[]`
+
+Defines the HTML attributes for the icon to render.
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('status', ButtonActionType::class, [
+        'icon' => 'check',
         'icon_attr' => [
-            'class' => 'ti ti-trash',
+            'class' => 'text-success',
+        ],
+    ])
+;
+```
+
+When action is a [row action](../../../../docs/components/actions.md), you can provide a callable
+that will receive the row data as an argument and should return a string:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('toggle', ButtonActionType::class, [
+        'icon' => fn (User $user) => $user->isActive() ? 'unlock' : 'lock',
+        'icon_attr' => fn (User $user) => [
+            'class' => $user->isActive() ? 'text-danger' : 'text-success',        
         ],
     ])
 ;

@@ -24,9 +24,9 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
      * @param array<ColumnTypeExtensionInterface> $typeExtensions
      */
     public function __construct(
-        private readonly ColumnTypeInterface $innerType,
-        private readonly array $typeExtensions = [],
-        private readonly ?ResolvedColumnTypeInterface $parent = null,
+        private ColumnTypeInterface $innerType,
+        private array $typeExtensions = [],
+        private ?ResolvedColumnTypeInterface $parent = null,
     ) {
     }
 

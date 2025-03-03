@@ -8,6 +8,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Represents a column rendered from a Twig template.
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/template
+ */
 final class TemplateColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -28,17 +33,16 @@ final class TemplateColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setRequired([
-                'template_path',
-            ])
-            ->setDefaults([
-                'template_vars' => [],
-            ])
-            ->setAllowedTypes('template_path', ['string', 'callable'])
-            ->setAllowedTypes('template_vars', ['array', 'callable'])
-            ->setInfo('template_path', 'A path to the template that should be rendered.')
-            ->setInfo('template_vars', 'An array of variables passed to the template.')
+        $resolver->define('template_path')
+            ->required()
+            ->allowedTypes('string', 'callable')
+            ->info('A path to the template that should be rendered.')
+        ;
+
+        $resolver->define('template_vars')
+            ->default([])
+            ->allowedTypes('array', 'callable')
+            ->info('An array of variables passed to the template.')
         ;
     }
 }

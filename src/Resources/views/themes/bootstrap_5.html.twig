@@ -663,14 +663,8 @@
     </div>
 {% endblock %}
 
-{% block action_control %}
-    <div class="d-inline-block" {{ block('attributes') }}>
-        {{ parent() }}
-    </div>
-{% endblock %}
-
-{% block action_link_control %}
-    {% set attr = { class: 'text-decoration-none' ~ (label ? ' me-2' : '') }|merge(attr) %}
+{% block action_link_control -%}
+    {% set attr = attr|merge({ class: ('btn btn-link d-inline-flex align-items-center gap-2 text-decoration-none ' ~ attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% set attr = {
@@ -690,12 +684,12 @@
     {% endif %}
 
     {{ parent() }}
-{% endblock %}
+{%- endblock %}
 
-{% block action_button_control %}
-    {% set attr = {
-        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : ''),
-    }|merge(attr) %}
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
+{% block action_button_control -%}
+    {% set attr = attr|merge({ class: ('btn btn-primary d-inline-flex align-items-center gap-2 ' ~ attr.class|default(''))|trim }) %}
+    {% set icon_attr = icon_attr|merge({ class: ('lh-base ' ~ icon_attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% set attr = {
@@ -715,7 +709,7 @@
     {% endif %}
 
     {{ parent() }}
-{% endblock %}
+{%- endblock %}
 
 {% block action_refresh_control %}
     {% set attr = {
@@ -725,12 +719,10 @@
     {{ parent() }}
 {% endblock %}
 
-{% block action_form_control %}
-    {% set attr = { class: 'd-inline-block' }|merge(attr) %}
-
-    {% set button_attr = {
-        class: 'btn btn-primary' ~ (icon_attr and label is same as false ? ' btn-icon' : '')
-    }|merge(button_attr) %}
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
+{% block action_form_control -%}
+    {% set attr = attr|merge({ class: ('d-inline-block ' ~ attr.class|default(''))|trim }) %}
+    {% set button_attr = button_attr|merge({ class: ('btn btn-primary ' ~ button_attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% with {
@@ -750,8 +742,9 @@
     {% else %}
         {{ parent() }}
     {% endif %}
-{% endblock %}
+{%- endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType #}
 {% block action_modal_control %}
     <div
         class="d-inline-block"
@@ -790,47 +783,53 @@
     </div>
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType #}
 {% block action_dropdown_control %}
-    <div class="dropdown d-inline-block">
-        {% set attr = {
-            'class': 'btn btn-primary dropdown-toggle',
-            'type': 'button',
-            'id': data_table.vars.name ~ '--' ~ context.value ~ '-action--' ~ name ~ '--button',
-            'aria-expanded': 'false',
-            'data-bs-toggle': 'dropdown',
-        }|merge(attr) %}
+    {% set class = 'btn btn-primary d-inline-flex align-items-center gap-2' %}
 
-        <button {{ block('attributes') }}>
-            {% with { attr: {} } %}{{- block('action_control', theme) -}}{% endwith %}
-        </button>
+    {% if with_caret %}
+        {% set class = class ~ ' dropdown-toggle' %}
+    {% endif %}
 
-        {# We must define the confirmation modals outside the ul/li, because the ul is in "position: relative" and that does not work properly with modals. #}
-        {% for action in actions %}
-            {% if action.vars.confirmation %}
-                {% set href = action.vars.href %}
-                {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
-                {% set confirmation = action.vars.confirmation %}
+    {% set attr = {
+        'type': 'button',
+        'id': data_table.vars.name ~ '--' ~ context.value ~ '-action--' ~ name ~ '--button',
+        'aria-expanded': 'false',
+        'data-bs-toggle': 'dropdown',
+    }|merge(attr|merge({
+        class: (class ~ ' ' ~ attr.class|default(''))|trim
+    })) %}
 
-                {% if batch %}
-                    {% set confirm_button_attr = {
-                        'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
-                    }|merge(confirm_button_attr) %}
-                {% endif %}
+    <button {{ block('attributes') }}>
+        {% with { attr: {} } %}{{- block('action_control', theme) -}}{% endwith %}
+    </button>
 
-                {% with { confirm_button_attr, confirmation } only %}{{ block('action_confirmation_modal') }}{% endwith %}
+    {# We must define the confirmation modals outside the ul/li, because the ul is in "position: relative" and that does not work properly with modals. #}
+    {% for action in actions %}
+        {% if action.vars.confirmation %}
+            {% set href = action.vars.href %}
+            {% set confirm_button_attr = { href }|merge(confirm_button_attr|default({})) %}
+            {% set confirmation = action.vars.confirmation %}
+
+            {% if batch %}
+                {% set confirm_button_attr = {
+                    'data-kreyu--data-table-bundle--batch-target': 'identifierHolder',
+                }|merge(confirm_button_attr) %}
             {% endif %}
-        {% endfor %}
 
-        <ul class="dropdown-menu" aria-labelledby="{{ name }}-button">
-            {% for action in actions %}
-                <li>{{ data_table_action(action) }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+            {% with { confirm_button_attr, confirmation } only %}{{ block('action_confirmation_modal') }}{% endwith %}
+        {% endif %}
+    {% endfor %}
+
+    <ul class="dropdown-menu" aria-labelledby="{{ name }}-button">
+        {% for action in actions %}
+            <li>{{ data_table_action(action) }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block action_link_dropdown_item_control %}
-    {% set attr = { class: 'dropdown-item' }|merge(attr) %}
+    {% set attr = attr|merge({ class: ('dropdown-item d-inline-flex align-items-center gap-2 ' ~ attr.class|default(''))|trim }) %}
 
     {% if confirmation %}
         {% set attr = {
@@ -893,3 +892,9 @@
         {% endwith %}
     </div>
 {% endblock %}
+
+{% block column_icon_value -%}
+    {% with { icon_attr: { height: '1em' }|merge(icon_attr) } -%}
+        {{ parent() }}
+    {%- endwith %}
+{%- endblock %}

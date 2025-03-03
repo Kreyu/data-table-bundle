@@ -1,10 +1,29 @@
 <script setup>
     import ColumnTypeOptions from "./options/column.md";
+    import TurboPrefetchingSection from "./../../../shared/turbo-prefetching.md";
 </script>
 
 # LinkColumnType
 
 The [`LinkColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/LinkColumnType.php) represents a column with value displayed as a link.
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
+
+$builder->addColumn('show', LinkColumnType::class, [
+    'attr' => [
+        // note that this "false" should be string, not a boolean
+        'data-turbo-prefetch' => 'false',
+    ],
+]);
+```
+
+</TurboPrefetchingSection>
+
 
 ## Options
 

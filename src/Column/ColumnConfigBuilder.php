@@ -19,6 +19,8 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private bool $sortable = false;
     private bool $exportable = false;
     private bool $personalizable = true;
+    private int $priority = 0;
+    private bool $visible = true;
     private ColumnFactoryInterface $columnFactory;
 
     public function __construct(
@@ -218,6 +220,38 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         }
 
         $this->personalizable = $personalizable;
+
+        return $this;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function isVisible(): bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->visible = $visible;
 
         return $this;
     }

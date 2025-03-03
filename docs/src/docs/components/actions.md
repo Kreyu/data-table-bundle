@@ -1,3 +1,7 @@
+<script setup>
+    import TurboPrefetchingSection from "./../../shared/turbo-prefetching.md";
+</script>
+
 # Actions
 
 [[toc]]
@@ -680,3 +684,20 @@ You have the option to add an action that refreshes the content of the DataTable
 Thanks to `Hotwire Turbo`, only the content of the DataTable is refreshed.
 
 This action cannot be added as a `RowAction` or `BatchAction`.
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder->addRowAction('show', ButtonActionType::class, [
+    'attr' => [
+        // note that this "false" should be string, not a boolean
+        'data-turbo-prefetch' => 'false',
+    ],
+]);
+```
+
+</TurboPrefetchingSection>

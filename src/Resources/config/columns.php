@@ -17,8 +17,8 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\DateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DatePeriodColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\EnumColumnType;
-use Kreyu\Bundle\DataTableBundle\Column\Type\FormColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\HtmlColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\IconColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\LinkColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\MoneyColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
@@ -86,11 +86,6 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.column.type.form', FormColumnType::class)
-        ->tag('kreyu_data_table.column.type')
-    ;
-
-    $services
         ->set('kreyu_data_table.column.type.link', LinkColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
@@ -132,6 +127,11 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column.type.text', TextColumnType::class)
+        ->tag('kreyu_data_table.column.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column.type.icon', IconColumnType::class)
         ->tag('kreyu_data_table.column.type')
     ;
 

@@ -1,0 +1,22 @@
+{#
+    Tabler Webfont Icons Theme
+    @see https://tabler.io/icons/
+
+    The "class" icon attribute gets concatenated to the default class. For example, when:
+     - "icon" variable equals "eye"
+     - "icon_attr" equals { class: "text-danger" }
+
+    The resulting HTML will equal to:
+
+    <i class="bi bi-eye text-danger"></i>
+#}
+
+{% block icon -%}
+    {% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+    {# @var icon string #}
+    {# @var icon_attr array #}
+    <i{{ attributes(icon_attr|default({})|merge({
+        class: ('ti ti-' ~ icon ~ ' ' ~ icon_attr.class|default(''))|trim,
+    })) }}></i>
+{%- endblock %}

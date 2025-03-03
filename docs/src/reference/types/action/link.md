@@ -1,10 +1,28 @@
 <script setup>
     import ActionTypeOptions from "./options/action.md";
+    import TurboPrefetchingSection from "./../../../shared/turbo-prefetching.md";
 </script>
 
 # LinkActionType
 
 The [`LinkActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/LinkActionType.php) represents an action rendered as a simple link.
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
+
+$builder->addRowAction('show', LinkActionType::class, [
+    'attr' => [
+        // note that this "false" should be string, not a boolean
+        'data-turbo-prefetch' => 'false',
+    ],
+]);
+```
+
+</TurboPrefetchingSection>
 
 ## Options
 

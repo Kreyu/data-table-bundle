@@ -1,11 +1,36 @@
 <script setup>
     import ActionTypeOptions from "./options/action.md";
+    import TurboPrefetchingSection from "./../../../shared/turbo-prefetching.md";
 </script>
 
 # LinkDropdownItemActionType
 
 The [`LinkDropdownItemActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/Dropdown/LinkDropdownItemActionType.php) 
 represents an action rendered as dropdown item with a simple link.  It is meant to be used as a child of the [`DropdownActionType`](dropdown.md).
+
+## Prefetching
+
+<TurboPrefetchingSection>
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType;
+
+$builder
+    ->addRowAction('advanced', DropdownActionType::class, [
+        'actions' => [
+            $builder->createAction('show', LinkDropdownItemActionType::class, [
+                'attr' => [
+                    // note that this "false" should be string, not a boolean
+                    'data-turbo-prefetch' => 'false',
+                ],
+            ]),
+        ],
+    ])
+;
+```
+
+</TurboPrefetchingSection>
 
 ## Options
 

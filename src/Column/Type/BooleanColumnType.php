@@ -9,6 +9,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Represents a column with value displayed as "yes" or "no".
+ *
+ * @see https://data-table-bundle.swroblewski.pl/reference/types/column/boolean
+ */
 final class BooleanColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
@@ -21,16 +26,18 @@ final class BooleanColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver
-            ->setDefaults([
-                'label_true' => 'Yes',
-                'label_false' => 'No',
-                'value_translation_domain' => 'KreyuDataTable',
-            ])
-            ->setAllowedTypes('label_true', ['string', TranslatableInterface::class])
-            ->setAllowedTypes('label_false', ['string', TranslatableInterface::class])
-            ->setInfo('label_true', 'Label displayed when the value equals true.')
-            ->setInfo('label_false', 'Label displayed when the value equals false.')
+        $resolver->define('label_true')
+            ->default('Yes')
+            ->allowedTypes('string', TranslatableInterface::class)
+            ->info('Label displayed when the value is truthy.')
         ;
+
+        $resolver->define('label_false')
+            ->default('No')
+            ->allowedTypes('string', TranslatableInterface::class)
+            ->info('Label displayed when the value is falsy.')
+        ;
+
+        $resolver->setDefault('value_translation_domain', 'KreyuDataTable');
     }
 }

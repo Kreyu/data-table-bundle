@@ -15,7 +15,7 @@ which wraps the whole table in the `<turbo-frame>` tag:
 ```twig
 {# @KreyuDataTable/themes/base.html.twig #}
 {% block kreyu_data_table %}
-    <turbo-frame id="{{ data_table_name(data_table) }}">
+    <turbo-frame id="{{ data_table_turbo_identifier(data_table) }}">
         {# ... #}
     </turbo-frame>
 {% endblock %}

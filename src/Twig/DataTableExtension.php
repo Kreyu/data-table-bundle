@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\IdentifierGenerator\DataTableTurboIdentifierGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -29,13 +30,13 @@ class DataTableExtension extends AbstractExtension
         private readonly ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
         private readonly FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
         private readonly PaginationUrlGeneratorInterface $paginationUrlGenerator,
+        private readonly DataTableTurboIdentifierGeneratorInterface $dataTableTurboIdentifierGenerator,
     ) {
     }
 
     public function getFunctions(): array
     {
         $definitions = [
-            'data_table_name' => $this->getDataTableName(...),
             'data_table' => $this->renderDataTable(...),
             'data_table_table' => $this->renderDataTableTable(...),
             'data_table_action_bar' => $this->renderDataTableActionBar(...),
@@ -49,6 +50,7 @@ class DataTableExtension extends AbstractExtension
             'data_table_filters_form' => $this->renderFiltersForm(...),
             'data_table_personalization_form' => $this->renderPersonalizationForm(...),
             'data_table_export_form' => $this->renderExportForm(...),
+            'data_table_turbo_identifier' => $this->getDataTableTurboIdentifier(...),
         ];
 
         $functions = [
@@ -89,9 +91,9 @@ class DataTableExtension extends AbstractExtension
         }
     }
 
-    public function getDataTableName(Environment $environment, DataTableView $view): string
+    public function getDataTableTurboIdentifier(Environment $environment, DataTableView $view): string
     {
-        return 'kreyu_data_table_'.$view->vars['name'];
+        return $this->dataTableTurboIdentifierGenerator->generate($view->vars['name']);
     }
 
     /**

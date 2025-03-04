@@ -132,4 +132,6 @@ interface DataTableConfigInterface
     public function getPersonalizationParameterName(): string;
 
     public function getExportParameterName(): string;
+
+    public function getTurboFrameIdentifier(): string;
 }

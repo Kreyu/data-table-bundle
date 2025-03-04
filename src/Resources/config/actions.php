@@ -13,10 +13,12 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\LinkDropdownItemActionType
 use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\RefreshActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactoryInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -53,6 +55,16 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.action.type.link', LinkActionType::class)
         ->tag('kreyu_data_table.action.type')
+    ;
+
+    $services
+        ->set('kreyu_data_table.action.type.refresh', RefreshActionType::class)
+        ->tag('kreyu_data_table.action.type')
+        ->args([
+            service('request_stack'),
+            service(UrlGeneratorInterface::class),
+            service(TranslatorInterface::class),
+        ])
     ;
 
     $services

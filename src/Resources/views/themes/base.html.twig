@@ -9,7 +9,7 @@
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+    <turbo-frame id="{{ data_table.vars.turbo_frame_identifier }}" target="_top">
         <div
             data-controller="{{ stimulus_controllers|join(' ') }}"
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
@@ -33,7 +33,7 @@
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+    <turbo-frame id="{{ data_table.vars.turbo_frame_identifier }}" target="_top">
         <div
             data-controller="{{ stimulus_controllers|join(' ') }}"
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
@@ -650,6 +650,14 @@
     <{{ tag }}{{ _self.attributes(attr) }}>
         {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
     </{{ tag }}>
+{% endblock %}
+
+{% block action_refresh_control %}
+    {% set attr = { href }|filter(v => v != null)|merge(attr|default({'data-turbo-frame': data_table.vars.turbo_frame_identifier })) %}
+
+    <a {{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+    </a>
 {% endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}

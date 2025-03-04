@@ -711,6 +711,14 @@
     {{ parent() }}
 {%- endblock %}
 
+{% block action_refresh_control %}
+    {% set attr = {
+        class: 'btn btn-primary',
+    }|merge(attr) %}
+
+    {{ parent() }}
+{% endblock %}
+
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
 {% block action_form_control -%}
     {% set attr = attr|merge({ class: ('d-inline-block ' ~ attr.class|default(''))|trim }) %}

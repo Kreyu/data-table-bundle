@@ -68,6 +68,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private array $valueRowAttributes = [];
 
     protected bool $locked = false;
+    private string $turboFrameIdentifier;
 
     public function __construct(
         private /* readonly */ string $name,
@@ -803,6 +804,22 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->valueRowAttributes = $valueRowAttributes;
+
+        return $this;
+    }
+
+    public function getTurboFrameIdentifier(): string
+    {
+        return $this->turboFrameIdentifier ?? ('kreyu_data_table_'.$this->getName());
+    }
+
+    public function setTurboFrameIdentifier(string $turboFrameIdentifier): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->turboFrameIdentifier = $turboFrameIdentifier;
 
         return $this;
     }

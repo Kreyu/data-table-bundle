@@ -200,6 +200,8 @@ interface DataTableInterface
 
     public function getExportData(): ?ExportData;
 
+    public function getTurboFrameIdentifier(): string;
+
     public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
     public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface;

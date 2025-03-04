@@ -119,5 +119,7 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setValueRowAttributes(array $valueRowAttributes): static;
 
+    public function setTurboFrameIdentifier(string $turboFrameIdentifier): static;
+
     public function getDataTableConfig(): DataTableConfigInterface;
 }

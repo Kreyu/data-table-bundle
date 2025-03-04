@@ -12,7 +12,6 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
-use Kreyu\Bundle\DataTableBundle\IdentifierGenerator\DataTableTurboIdentifierGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -30,7 +29,6 @@ class DataTableExtension extends AbstractExtension
         private readonly ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
         private readonly FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
         private readonly PaginationUrlGeneratorInterface $paginationUrlGenerator,
-        private readonly DataTableTurboIdentifierGeneratorInterface $dataTableTurboIdentifierGenerator,
     ) {
     }
 
@@ -50,7 +48,6 @@ class DataTableExtension extends AbstractExtension
             'data_table_filters_form' => $this->renderFiltersForm(...),
             'data_table_personalization_form' => $this->renderPersonalizationForm(...),
             'data_table_export_form' => $this->renderExportForm(...),
-            'data_table_turbo_identifier' => $this->getDataTableTurboIdentifier(...),
         ];
 
         $functions = [
@@ -94,11 +91,6 @@ class DataTableExtension extends AbstractExtension
         } else {
             array_push($view->vars['themes'], ...$themes);
         }
-    }
-
-    public function getDataTableTurboIdentifier(Environment $environment, DataTableView $view): string
-    {
-        return $this->dataTableTurboIdentifierGenerator->generate($view->vars['name']);
     }
 
     /**

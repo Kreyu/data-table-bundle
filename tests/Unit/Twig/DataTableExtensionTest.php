@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Twig;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnSortUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGeneratorInterface;
-use Kreyu\Bundle\DataTableBundle\IdentifierGenerator\DataTableTurboIdentifierGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Twig\DataTableExtension;
 use PHPUnit\Framework\TestCase;
@@ -141,7 +140,6 @@ class DataTableExtensionTest extends TestCase
             $this->createStub(ColumnSortUrlGeneratorInterface::class),
             $this->createStub(FilterClearUrlGeneratorInterface::class),
             $this->createStub(PaginationUrlGeneratorInterface::class),
-            $this->createStub(DataTableTurboIdentifierGeneratorInterface::class),
         );
     }
 }

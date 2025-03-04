@@ -17,7 +17,6 @@ return static function (ContainerConfigurator $configurator) {
             service('kreyu_data_table.column.column_sort_url_generator'),
             service('kreyu_data_table.filter.filter_clear_url_generator'),
             service('kreyu_data_table.pagination.url_generator'),
-            service('kreyu_data_table.identifier_generator.datatable_turbo'),
         ])
     ;
 };

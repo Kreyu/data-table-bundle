@@ -42,11 +42,13 @@
                         </div>
                     {% endif %}
 
-                    {% for action in actions %}
+                    {% if actions is not empty %}
                         <div>
-                            {{ data_table_action(action) }}
+                            {% for action in actions %}
+                                {{ data_table_action(action) }}
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    {% endif %}
 
                     {% if display_filter_action %}
                         <div>

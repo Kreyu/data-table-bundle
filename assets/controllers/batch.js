@@ -145,6 +145,12 @@ export default class extends Controller {
         }
 
         for (const [identifierName, identifiers] of identifierMap) {
+            const inputs = identifierHolder.querySelectorAll(`input[name="${identifierName}[]"]`);
+
+            for (const input of inputs) {
+                input.remove();
+            }
+
             for (const identifier of identifiers) {
                 const input = identifierHolder.querySelector(`input[name="${identifierName}[]"][value="${identifier}"]`);
 

@@ -134,11 +134,11 @@ export default class extends Controller {
     }
 
     #updateIdentifierHolderInputs(identifierHolder, identifierMap) {
-        if (identifierMap.size === 0 && this.#previousIdentifierMap) {
-            for (const identifierName of this.#previousIdentifierMap.keys()) {
-                const input = identifierHolder.querySelector(`input[name="${identifierName}[]"]`);
+        for (const identifierName of this.#previousIdentifierMap?.keys() || []) {
+            if (!identifierMap.has(identifierName)) {
+                const inputs = identifierHolder.querySelectorAll(`input[name="${identifierName}[]"]`);
 
-                if (input) {
+                for (const input of inputs) {
                     input.remove();
                 }
             }

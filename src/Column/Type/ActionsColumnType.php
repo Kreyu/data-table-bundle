@@ -83,6 +83,7 @@ final class ActionsColumnType extends AbstractColumnType
         ;
 
         $resolver->setDefaults([
+            'label' => 'Actions',
             'export' => false,
             'property_path' => false,
         ]);

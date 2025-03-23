@@ -67,6 +67,7 @@ final class DataTableType implements DataTableTypeInterface
             'exporting_enabled' => $builder->setExportingEnabled(...),
             'exporting_form_factory' => $builder->setExportFormFactory(...),
             'request_handler' => $builder->setRequestHandler(...),
+            'turbo_frame_identifier' => $builder->setTurboFrameIdentifier(...),
         ];
 
         foreach ($setters as $option => $setter) {
@@ -105,6 +106,7 @@ final class DataTableType implements DataTableTypeInterface
             'sorting_data' => $dataTable->getSortingData(),
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
             'per_page_choices' => $options['per_page_choices'],
+            'turbo_frame_identifier' => $dataTable->getConfig()->getTurboFrameIdentifier(),
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -183,6 +185,7 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
+                'turbo_frame_identifier' => $this->defaults['turbo_frame_identifier'] ?? null,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])

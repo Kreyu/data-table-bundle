@@ -826,6 +826,11 @@ class DataTable implements DataTableInterface
         return (bool) $this->filtrationData?->hasActiveFilters();
     }
 
+    public function getTurboFrameIdentifier(): string
+    {
+        return $this->config->getTurboFrameIdentifier();
+    }
+
     public function handleRequest(mixed $request): void
     {
         if (null === $requestHandler = $this->config->getRequestHandler()) {

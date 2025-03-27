@@ -679,7 +679,7 @@ For more details, see the [`ModalActionType`](../../reference/types/action/modal
 
 ## Action variants
 
-Themes can now define variants for actions.
+Actions can define theme-specific variants to change how they are rendered.
 
 For example, if you have a `delete` action, you may call it being **destructive**:
 

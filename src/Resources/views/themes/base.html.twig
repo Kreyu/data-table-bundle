@@ -129,15 +129,15 @@
 {% endblock %}
 
 {% block kreyu_data_table_column_header -%}
-    {{ block(block_name, block_theme ?? theme) }}
+    {{ data_table_theme_block(data_table, block_name) }}
 {%- endblock %}
 
 {% block kreyu_data_table_column_value -%}
-    {{ block(block_name, block_theme ?? theme) }}
+    {{ data_table_theme_block(data_table, block_name) }}
 {%- endblock %}
 
 {% block kreyu_data_table_action %}
-    {% if visible %}{{- block(block_name, block_theme ?? theme) -}}{% endif %}
+    {% if visible %}{{ data_table_theme_block(data_table, block_name) }}{% endif %}
 {% endblock %}
 
 {# Pagination #}

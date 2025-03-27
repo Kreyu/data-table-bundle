@@ -734,10 +734,26 @@
 
 {% block sort_arrow_desc %}↓{% endblock %}
 
+{# Renders HTML attributes. #}
+{# If at least one attribute is present in "attr" variable, string will be prefixed with a single whitespace. #}
+{# Attributes set to false will be filtered out. Setting an attribute to empty string or true renders it without value. #}
+{# The "class" and "id" are the exception - passing them with empty string does not render them. #}
 {% block attributes -%}
-    {%- for key, value in attr|default({}) %}{{ loop.first ? ' ' }}{{ key }}="{{ value }}"{% endfor -%}
+    {%- for key, value in attr|default({})|filter((value, key) => value is not same as false and ((key != 'class' and key != 'id') or value|length > 0)) -%}
+        {{- loop.first ? ' ' -}}
+
+        {%- if value|length == 0 or value is same as true -%}
+            {{- key -}}
+        {%- else -%}
+            {{ key }}="{{ value }}"
+        {%- endif -%}
+
+        {{- not loop.last ? ' ' -}}
+    {%- endfor -%}
 {%- endblock %}
 
+{# Renders HTML attributes. #}
+{# Simply calls the "attributes" block. Macro can be used to improve readability. #}
 {% macro attributes(attr) -%}
     {{- block('attributes') -}}
 {%- endmacro %}

@@ -145,6 +145,40 @@ $builder
 ;
 ```
 
+### `variant`
+
+- **type**: `null`, `string` or `callable`
+- **default**: `null`
+
+Defines the variant of the action. The action will be rendered differently in each variant.
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('remove', ButtonActionType::class, [
+        'variant' => 'destructive',
+    ])
+;
+```
+
+When action is a [row action](../../../../docs/components/actions.md), you can provide a callable
+that will receive the row data as an argument and should return a string:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
+
+$builder
+    ->addRowAction('toggle', ButtonActionType::class, [
+        'variant' => fn (User $user) => $user->isActive() ? 'success' : 'danger',
+    ])
+;
+```
+
+The value is not strictly defined and depends on the theme you are using.
+
+For more details, see [documentation about action variants](../../../../docs/components/actions.md#action-variants).
+
 ### `confirmation`
 
 - **type**: `bool`, `array` or `callable`

@@ -244,6 +244,39 @@ Because of that, you shouldn't add the whitespace manually:
 
 Notice the double whitespace before the `id` attribute.
 
+If you set the attribute to `false`, it will not be rendered:
+
+```twig
+{% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+<span{{ attributes({ foo: false }) }}></span>
+
+{# Rendered as: #}
+<span></span>
+```
+
+If you set the attribute to `true` or empty string, it will be render without value:
+
+```twig
+{% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+<input{{ attributes({ disabled: true, readonly: '' }) }}></input>
+
+{# Rendered as: #}
+<input disabled readonly></input>
+```
+
+The only exception is `class` and `id` attribute - setting them to empty string does not render them at all:
+
+```twig
+{% from '@KreyuDataTable/themes/base.html.twig' import attributes %}
+
+<span{{ attributes({ id: '', class: '' }) }}></span>
+
+{# Rendered as: #}
+<span></span>
+```
+
 In some cases you may want to merge the class attribute with some defaults. To do so, use the Twig `merge` filter:
 
 ```twig

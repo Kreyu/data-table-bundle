@@ -677,6 +677,171 @@ Inside the template, we can render the modal however we want:
 
 For more details, see the [`ModalActionType`](../../reference/types/action/modal.md) reference page.
 
+## Action variants
+
+Themes can now define variants for actions.
+
+For example, if you have a `delete` action, you may call it being **destructive**:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+
+$builder->addRowAction('delete', FormActionType::class, [
+    'method' => 'DELETE',
+    'variant' => 'destructive', // btn btn-danger [...]
+]);
+```
+
+When using built-in themes, the action will be rendered with a `btn-danger` class.
+
+There are no limitations on the variant name, you can use any string you like, as long as the theme can support it.
+
+You can still use `attr` to add custom attributes to the action. Classes will get concatenated:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+
+$builder->addRowAction('delete', FormActionType::class, [
+    'method' => 'DELETE',
+    'variant' => 'destructive',
+    'attr' => [
+        'class' => 'px-3', // btn btn-danger [...] px-3
+    ],
+]);
+```
+
+If you're defining a row action, you can set the variant based on the row data via a closure.
+For example, look at a `toggle` action that changes its icon and variant based on the post's active state:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+
+$builder->addRowAction('toggle', FormActionType::class, [
+    'method' => 'POST',
+    'icon' => fn (Post $post) => $post->isActive() ? 'lock-open' : 'lock',
+    'variant' => fn (Post $post) => $post->isActive() ? 'success' : 'danger',
+]);
+```
+
+### Variants in built-in themes
+
+Link based action [`LinkActionType`](../../reference/types/action/link.md) supports following variants:
+
+| Variant               | Class                   |
+|-----------------------|-------------------------|
+| `destructive`         | `btn-danger`            |
+| `danger`              | `btn-danger`            |
+| `primary`             | `btn-primary`           |
+| `secondary`           | `btn-secondary`         |
+| `success`             | `btn-success`           |
+| `info`                | `btn-info`              |
+| `warning`             | `btn-warning`           |
+| `light`               | `btn-light`             |
+| `dark`                | `btn-dark`              |
+| `emphasis`            | `btn-body-emphasis`     |
+
+Button-based actions, such as:
+
+- [`ButtonActionType`](../../reference/types/action/button.md)
+- [`FormActionType`](../../reference/types/action/form.md)
+- [`ModalActionType`](../../reference/types/action/modal.md)
+- [`DropdownActionType`](../../reference/types/action/dropdown.md)
+- [`LinkDropdownItemActionType`](../../reference/types/action/link-dropdown-item.md)
+
+...support following variants:
+
+| Variant               | Class                   |
+|-----------------------|-------------------------|
+| `destructive`         | `btn-danger`            |
+| `danger`              | `btn-danger`            |
+| `primary`             | `btn-primary`           |
+| `secondary`           | `btn-secondary`         |
+| `success`             | `btn-success`           |
+| `info`                | `btn-info`              |
+| `warning`             | `btn-warning`           |
+| `light`               | `btn-light`             |
+| `dark`                | `btn-dark`              |
+| `link`                | `btn-link`              |
+| `outline-destructive` | `btn-outline-danger`    |
+| `outline-danger`      | `btn-outline-danger`    |
+| `outline-primary`     | `btn-outline-primary`   |
+| `outline-secondary`   | `btn-outline-secondary` |
+| `outline-success`     | `btn-outline-success`   |
+| `outline-info`        | `btn-outline-info`      |
+| `outline-warning`     | `btn-outline-warning`   |
+| `outline-light`       | `btn-outline-light`     |
+| `outline-dark`        | `btn-outline-dark`      |
+
+### Variants in custom themes
+
+There are multiple ways to support the variants, however, this is how built-in themes do it:
+
+```twig
+{% block action_button_control -%}
+    {%- set variants = {
+        destructive: 'btn-danger',
+        danger: 'btn-danger',
+        primary: 'btn-primary',
+    }|merge(variants ?? {})|filter(e => e is not same as false) -%}
+    
+    {% set base_classes = base_classes ?? 'btn' %}
+    {% set variant_classes = variant_classes ?? variants[variant ?? default_variant ?? 'primary'] %}
+    
+    {% set attr = attr|merge({ 
+        class: (base_classes ~ ' ' ~ variant_classes ~ ' ' ~ attr.class|default(''))|trim 
+    }) %}
+    
+    {# ... #}
+{%- block action_button_control %}
+```
+
+The built-in themes allow for maximum flexibility, which you may not need in your custom theme.
+
+### Adding variants to built-in themes
+
+Assuming you're using the Bootstrap 5 theme, and you want to add a new variant called `custom` for [`ButtonActionType`](../../reference/types/action/button.md).
+To achieve this, override the action block and add the new variant to the `variants` object:
+
+```twig
+{% block button_action_control -%}
+    {% with { variants: { custom: 'btn-custom' } } %}
+        {{ parent() }}
+    {% endwith %}
+{%- block button_action_control %}
+```
+
+In this case, the `variants` variable gets merged with the built-in variants.
+
+### Removing variants from built-in themes
+
+Assuming you're using the Bootstrap 5 theme, and you want to remove a `info` variant from [`ButtonActionType`](../../reference/types/action/button.md).
+To achieve this, override the action block and add the set the variant to `false` in the `variants` object:
+
+```twig
+{% block button_action_control -%}
+    {% with { variants: { info: false } } %}
+        {{ parent() }}
+    {% endwith %}
+{%- block button_action_control %}
+```
+
+In this case, the `info` variant gets removed from the built-in variants, as the built-in themes filter out variants set to false.
+
+### Changing default variant in built-in themes
+
+Assuming you're using the Bootstrap 5 theme, and you want to change the default variant to `outline-primary` for [`ButtonActionType`](../../reference/types/action/button.md).
+To achieve this, override the action block and provide `default_variant` variable:
+
+```twig
+{% block button_action_control -%}
+    {% with { default_variant: 'outline-primary' } %}
+        {{ parent() }}
+    {% endwith %}
+{%- block button_action_control %}
+```
+
+Default variant is applied when the `variant` variable is set to `null` - for example, if `variant` option is not given. 
+
 ## Prefetching
 
 <TurboPrefetchingSection>

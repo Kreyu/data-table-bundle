@@ -151,12 +151,25 @@
     {% endwith %}
 {% endblock %}
 
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
 {% block action_button_control %}
     {% set is_icon_only = icon is not empty and label is empty %}
 
     {% if is_icon_only %}
         {# In Tabler, icon-only buttons require the "btn-icon" class for proper padding #}
         {% set attr = attr|merge({ class: ('btn-icon ' ~ attr.class|default(''))|trim }) %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
+{# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
+{% block action_form_control %}
+    {% set is_icon_only = icon is not empty and label is empty %}
+
+    {% if is_icon_only %}
+        {# In Tabler, icon-only buttons require the "btn-icon" class for proper padding #}
+        {% set button_attr = button_attr|merge({ class: ('btn-icon ' ~ button_attr.class|default(''))|trim }) %}
     {% endif %}
 
     {{ parent() }}

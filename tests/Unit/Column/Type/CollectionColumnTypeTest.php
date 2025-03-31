@@ -8,9 +8,11 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\EnumColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\Test\Column\Type\ColumnTypeTestCase;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Enum\UnitEnum;
 
 class CollectionColumnTypeTest extends ColumnTypeTestCase
 {
@@ -24,6 +26,7 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
         return [
             new NumberColumnType(),
             new TextColumnType(),
+            new EnumColumnType(),
             new ColumnType(),
         ];
     }
@@ -82,6 +85,34 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
             $this->assertEquals($expectedValueRowView, $child->vars['row']);
             $this->assertFalse($child->vars['use_intl_formatter']);
             $this->assertEquals($child->getDataTable(), $columnValueView->getDataTable());
+        }
+    }
+
+    public function testCreatesEnumChild(): void
+    {
+        $column = $this->createColumn([
+            'entry_type' => EnumColumnType::class,
+        ]);
+
+        $data = new class {
+            public array $collection = [
+                UnitEnum::Foo,
+                UnitEnum::Bar,
+            ];
+        };
+
+        $valueRowView = $this->createValueRowView(data: $data);
+        $columnValueView = $this->createColumnValueView($column, $valueRowView);
+
+        $this->assertCount(2, $columnValueView->vars['children']);
+        $this->assertContainsOnlyInstancesOf(ColumnValueView::class, $columnValueView->vars['children']);
+
+        for ($i = 0; $i <= 1; ++$i) {
+            /** @var ColumnValueView $child */
+            $child = $columnValueView->vars['children'][$i];
+
+            $this->assertEquals((string) $i, $child->vars['name']);
+            $this->assertEquals($data->collection[$i]->name, $child->vars['value']);
         }
     }
 }

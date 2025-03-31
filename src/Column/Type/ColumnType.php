@@ -327,6 +327,10 @@ final class ColumnType implements ColumnTypeInterface
             return $getter($rowData, $column, $options);
         }
 
+        if ($rowData instanceof \UnitEnum) {
+            return $rowData;
+        }
+
         $propertyPath = $options['property_path'] ?? $column->getName();
 
         if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($rowData) || is_object($rowData))) {

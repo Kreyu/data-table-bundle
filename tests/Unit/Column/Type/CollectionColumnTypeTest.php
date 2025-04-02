@@ -99,8 +99,11 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
     {
         $column = $this->createColumn();
 
-        $data = new class ($collection) {
-            public function __construct(public array $collection) {}
+        $data = new class($collection) {
+            public function __construct(
+                public array $collection,
+            ) {
+            }
         };
 
         $valueRowView = $this->createValueRowView(data: $data);
@@ -116,6 +119,6 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
 
         yield 'Enums' => [[UnitEnum::Foo, TranslatableEnum::Bar]];
 
-        yield 'stdClass' => [[new \stdClass, (object) ['foo' => 'bar']]];
+        yield 'stdClass' => [[new \stdClass(), (object) ['foo' => 'bar']]];
     }
 }

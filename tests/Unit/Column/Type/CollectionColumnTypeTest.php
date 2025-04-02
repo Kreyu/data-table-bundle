@@ -8,9 +8,15 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\DateTimeColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\EnumColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\Test\Column\Type\ColumnTypeTestCase;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Enum\TranslatableEnum;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Enum\UnitEnum;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CollectionColumnTypeTest extends ColumnTypeTestCase
 {
@@ -22,6 +28,9 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
     protected function getAdditionalColumnTypes(): array
     {
         return [
+            new DateColumnType(),
+            new DateTimeColumnType(),
+            new EnumColumnType(),
             new NumberColumnType(),
             new TextColumnType(),
             new ColumnType(),
@@ -83,5 +92,30 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
             $this->assertFalse($child->vars['use_intl_formatter']);
             $this->assertEquals($child->getDataTable(), $columnValueView->getDataTable());
         }
+    }
+
+    #[DataProvider('provideNonScalarValuesCases')]
+    public function testWithNonScalarValues(array $collection): void
+    {
+        $column = $this->createColumn();
+
+        $data = new class ($collection) {
+            public function __construct(public array $collection) {}
+        };
+
+        $valueRowView = $this->createValueRowView(data: $data);
+        $columnValueView = $this->createColumnValueView($column, $valueRowView);
+
+        $this->assertEquals($collection[0], $columnValueView->vars['children'][0]->vars['value']);
+        $this->assertEquals($collection[1], $columnValueView->vars['children'][1]->vars['value']);
+    }
+
+    public static function provideNonScalarValuesCases(): iterable
+    {
+        yield 'DateTime' => [[new \DateTime('2020-01-01'), new \DateTimeImmutable('2021-02-02')]];
+
+        yield 'Enums' => [[UnitEnum::Foo, TranslatableEnum::Bar]];
+
+        yield 'stdClass' => [[new \stdClass, (object) ['foo' => 'bar']]];
     }
 }

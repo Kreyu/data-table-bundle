@@ -86,6 +86,11 @@ final class CollectionColumnType extends AbstractColumnType
             $valueRowView->index = $index;
             $valueRowView->data = $data;
 
+            // If there's no property path, default to getter that simply returns the value
+            if (false === ($options['entry_options']['property_path'] ?? false)) {
+                $options['entry_options'] += ['getter' => fn ($value) => $value];
+            }
+
             $prototype = $prototypeFactory->createNamed((string) $index, $options['entry_type'], $options['entry_options']);
             $prototype->setDataTable($column->getDataTable());
 

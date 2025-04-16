@@ -551,7 +551,7 @@
 {% block column_collection_value -%}
     {% for child in children -%}
         {{- data_table_column_value(child) -}}
-        <span>{{ not loop.last ? separator }}</span>
+        <span>{{ not loop.last ? (separator_html ? separator|raw : separator) }}</span>
     {%- endfor %}
 {%- endblock %}
 

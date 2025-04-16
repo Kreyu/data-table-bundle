@@ -59,6 +59,26 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
         $this->assertNull($valueView->vars['separator']);
     }
 
+    public function testDefaultSeparatorHtmlOption(): void
+    {
+        $column = $this->createColumn();
+
+        $valueView = $this->createColumnValueView($column);
+
+        $this->assertFalse($valueView->vars['separator_html']);
+    }
+
+    public function testPassingSeparatorHtmlOption(): void
+    {
+        $column = $this->createColumn([
+            'separator_html' => true,
+        ]);
+
+        $valueView = $this->createColumnValueView($column);
+
+        $this->assertTrue($valueView->vars['separator_html']);
+    }
+
     public function testCreatesChildren(): void
     {
         $column = $this->createColumn([

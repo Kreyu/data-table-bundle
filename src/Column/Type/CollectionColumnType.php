@@ -26,6 +26,7 @@ final class CollectionColumnType extends AbstractColumnType
     {
         $view->vars = array_replace($view->vars, [
             'separator' => $options['separator'],
+            'separator_html' => $options['separator_html'],
             'children' => $this->createChildrenColumnValueViews($view, $column, $options),
         ]);
     }
@@ -40,6 +41,7 @@ final class CollectionColumnType extends AbstractColumnType
             'entry_type' => $options['entry_type'],
             'entry_options' => $options['entry_options'],
             'separator' => $options['separator'],
+            'separator_html' => $options['separator_html'],
         ];
 
         $view->value = $view->vars['value'] = implode($options['export']['separator'], array_map(
@@ -50,14 +52,14 @@ final class CollectionColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry_type */
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry-type */
         $resolver->define('entry_type')
             ->default(TextColumnType::class)
             ->info('Column type to render for each item in the collection.')
             ->allowedTypes('string')
         ;
 
-        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry_options */
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry-options */
         $resolver->define('entry_options')
             ->default([])
             ->info('Options to pass to the column type for each item in the collection.')
@@ -69,6 +71,13 @@ final class CollectionColumnType extends AbstractColumnType
             ->default(', ')
             ->info('Separator to render between each item in the collection.')
             ->allowedTypes('null', 'string')
+        ;
+
+        /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#separator-html */
+        $resolver->define('separator_html')
+            ->default(false)
+            ->info('Determines whether the separator should be rendered as HTML instead of text.')
+            ->allowedTypes('bool')
         ;
     }
 

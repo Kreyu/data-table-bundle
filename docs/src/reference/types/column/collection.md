@@ -19,9 +19,9 @@ For example, if you have an array of entities, you'd probably want to use the [L
 ### `entry_options`
 
 - **type**: `array`
-- **default**: `['property_path' => false]`
+- **default**: `[]`
 
-This is the array that's passed to the column type specified in the entry_type option. 
+This is the array that's passed to the column type specified in the [entry_type](#entry-type) option. 
 For example, if you used the [LinkColumnType](link.md) as your `entry_type` option (e.g. for a collection of links of product tags), 
 then you'd want to pass the href option to the underlying type:
 
@@ -46,16 +46,38 @@ $builder
 ;
 ```
 
-!!! Note
-The options resolver normalizer ensures the `property_path` is always present in the `entry_options` array, and it defaults to `false`.
-!!!
-
 ### `separator`
 
 - **type**: `null` or `string`
 - **default**: `', '`
 
 Sets the value displayed between every item in the collection.
+
+### `separator_html`
+
+- **type**: `bool`
+- **default**: `false`
+
+If this option is true, the [separator](#separator) option will be displayed as HTML instead of text.
+This is useful when using HTML elements (e.g. `<br>`) as a more modern visual separator.
+
+Remember that exporting a collection with HTML as separator may result in HTML in cells.
+You can always provide a different separator for exporting:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType;
+
+$builder
+    ->addColumn('tags', CollectionColumnType::class, [
+        'separator' => '<br/>',
+        'separator_html' => true,
+        'export' => [
+            'separator' => ', ',
+            'separator_html' => false, // May not be needed at all. This depends on the exporter.      
+        ],
+    ])
+;
+```
 
 ## Inherited options
 

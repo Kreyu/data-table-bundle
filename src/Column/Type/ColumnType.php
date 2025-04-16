@@ -93,6 +93,15 @@ final class ColumnType implements ColumnTypeInterface
             $attr = $attr($data, $rowData);
         }
 
+        $translationKey = $options['value_translation_key'];
+        $translationDomain = $options['value_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null;
+
+        $translatable = $value instanceof TranslatableInterface || false !== $translationDomain;
+
+        if ($translatable && (is_string($value) || $value instanceof TranslatableInterface)) {
+            $translationKey ??= $value;
+        }
+
         if (is_callable($translationParameters = $options['value_translation_parameters'])) {
             $translationParameters = $translationParameters($data, $rowData);
         }
@@ -105,7 +114,10 @@ final class ColumnType implements ColumnTypeInterface
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'data' => $data,
             'value' => $value,
-            'translation_domain' => $options['value_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
+            'translatable' => $translatable,
+            'is_instance_of_translatable' => $value instanceof TranslatableInterface,
+            'translation_key' => $translationKey,
+            'translation_domain' => $translationDomain,
             'translation_parameters' => $translationParameters ?? [],
             'attr' => $attr,
         ]);
@@ -163,6 +175,7 @@ final class ColumnType implements ColumnTypeInterface
         $options['export']['property_path'] ??= $options['property_path'];
         $options['export']['property_accessor'] ??= $options['property_accessor'];
         $options['export']['formatter'] ??= $options['formatter'];
+        $options['export']['value_translation_key'] ??= $options['value_translation_key'];
         $options['export']['value_translation_domain'] ??= $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
         $options['export']['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
 
@@ -171,16 +184,17 @@ final class ColumnType implements ColumnTypeInterface
         $data = $this->getColumnDataFromRowData($rowData, $column, $options['export']);
         $value = $this->getColumnValueFromColumnData($data, $rowData, $column, $options['export']);
 
-        if ($this->translator && (is_string($value) || $value instanceof TranslatableInterface)) {
+        if ($this->translator && (false !== $options['export']['value_translation_domain'] || $value instanceof TranslatableInterface)) {
+            $locale = null;
+
+            if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                $locale = $this->translator->getLocale();
+            }
+
             if ($value instanceof TranslatableInterface) {
-                $locale = null;
-
-                if (method_exists(TranslatableInterface::class, 'getLocale')) {
-                    $locale = $this->translator->getLocale();
-                }
-
                 $value = $value->trans($this->translator, $locale);
             } else {
+                $translationKey = $options['export']['value_translation_key'];
                 $translationDomain = $options['export']['value_translation_domain'];
                 $translationParameters = $options['export']['value_translation_parameters'];
 
@@ -188,11 +202,16 @@ final class ColumnType implements ColumnTypeInterface
                     $translationParameters = $translationParameters($data, $rowData);
                 }
 
-                if ($translationDomain) {
+                if (is_string($value)) {
+                    $translationKey ??= $value;
+                }
+
+                if ($translationDomain && null !== $translationKey) {
                     $value = $this->translator->trans(
-                        id: $value,
-                        parameters: $translationParameters,
-                        domain: $translationDomain,
+                        $translationKey,
+                        $translationParameters,
+                        $translationDomain,
+                        $locale,
                     );
                 }
             }
@@ -220,6 +239,12 @@ final class ColumnType implements ColumnTypeInterface
             ->default([])
             ->allowedTypes('null', 'array')
             ->info('Translation parameters used to translate the column header.')
+        ;
+
+        $resolver->define('value_translation_key')
+            ->default(null)
+            ->allowedTypes('null', 'string')
+            ->info('Translation key used to translate the column value - used instead of column value if given.')
         ;
 
         $resolver->define('value_translation_domain')

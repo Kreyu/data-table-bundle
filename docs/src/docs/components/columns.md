@@ -274,3 +274,61 @@ Now, automatically, the [`TextColumnType`](../../reference/types/column/text.md)
 and its value is trimmed based on this option.
 
 If your extension aims to cover every column type in the system, provide the base [`ColumnType`](../../reference/types/column/column.md) in the `getExtendedTypes()` method.  
+
+## Translating column values
+
+By default, except for the [BooleanColumnType](../../reference/types/column/boolean.md), column values are not translated.
+
+To enable translation, set the `value_translation_domain` to value other than `false`:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+
+$builder->addColumn('category', TextColumnType::class, [
+    'value_translation_domain' => 'product',
+]);
+```
+
+In more complex cases, you may want to use a custom translation key, instead of translating the value itself.
+Let's assume that we have a column that retrieves an amount of months. We want to translate it to display like "1 month" or "2 months".
+First, we create a translation key in the `product` translation domain:
+
+```yaml
+# translations/product+intl-icu.en.yaml
+number_of_months: >-
+  {months, plural,
+      =1 {# month}
+      other {# months}
+  }
+```
+
+Now, when defining the column, provide following options:
+- `value_translation_key` to provide the `number_of_months` key,
+- `value_translation_domain` to provide the `product` domain and enable translation,
+- `value_translation_parameters` to provide the `months` variable.
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+
+$builder->addColumn('months', TextColumnType::class, [
+    'value_translation_key' => 'number_of_months',
+    'value_translation_domain' => 'product',
+    'value_translation_parameters' => fn (int $value) => [
+        'months' => $value,
+    ],
+]);
+```
+
+Alternatively, if the column value implements the Symfony's [translatable contract](https://github.com/symfony/translation-contracts/blob/main/TranslatableInterface.php),
+the value will be translated without additional configuration, for example:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use function \Symfony\Component\Translation\t;
+
+$builder->addColumn('months', TextColumnType::class, [
+    'formatter' => fn (int $value) => t('number_of_months', [
+        'months' => $value,
+    ], 'product'),
+]);
+```

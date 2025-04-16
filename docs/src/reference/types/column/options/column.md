@@ -43,6 +43,27 @@ Setting the option to `false` disables its translation.
 
 Sets the parameters used when translating the column header.
 
+### `value_translation_key`
+
+- **type**: `null` or `string`
+- **default**: `null`
+
+Sets the translation key used when translating the column value:
+
+```php
+$builder->addColumn('months', options: [
+    'value_translation_key' => 'number_of_months',
+    'value_translation_domain' => 'product',
+    'value_translation_parameters' => fn (int $value) => [
+        'months' => $value,
+    ],
+]);
+```
+
+When translation key is not given, but translation domain is, the column value is used as the translation key.
+
+For more details, see [translating column values](../../../../docs/components/columns.md#translating-column-values) section.
+
 ### `value_translation_domain`
 
 - **type**: `false` or `string`

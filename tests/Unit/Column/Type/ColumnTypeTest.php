@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -223,6 +224,54 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $this->assertEquals(['%first_name%' => 'John'], $columnHeaderView->vars['translation_parameters']);
     }
 
+    public function testPassingValueTranslationKeyOption(): void
+    {
+        $column = $this->createNamedColumn('firstName', [
+            'value_translation_key' => 'first_name',
+        ]);
+
+        $columnValueView = $this->createColumnValueView($column);
+
+        $this->assertEquals('first_name', $columnValueView->vars['translation_key']);
+    }
+
+    public function testDefaultValueTranslationKeyWhenColumnIsNotTranslatableAndValueIsString(): void
+    {
+        $user = new User(firstName: 'John');
+
+        $column = $this->createNamedColumn('firstName');
+
+        $columnValueView = $this->createColumnValueView($column, data: $user);
+
+        $this->assertNull($columnValueView->vars['translation_key']);
+    }
+
+    public function testDefaultValueTranslationKeyWhenColumnIsTranslatableAndValueIsString(): void
+    {
+        $user = new User(firstName: 'John');
+
+        $column = $this->createNamedColumn('firstName', [
+            'value_translation_domain' => 'user',
+        ]);
+
+        $columnValueView = $this->createColumnValueView($column, rowData: $user);
+
+        $this->assertEquals('John', $columnValueView->vars['translation_key']);
+    }
+
+    public function testDefaultValueTranslationKeyWhenColumnIsTranslatableAndValueIsTranslatable(): void
+    {
+        $user = new User(firstName: new TranslatableMessage('John'));
+
+        $column = $this->createNamedColumn('firstName', [
+            'value_translation_domain' => 'user',
+        ]);
+
+        $columnValueView = $this->createColumnValueView($column, rowData: $user);
+
+        $this->assertEquals(new TranslatableMessage('John'), $columnValueView->vars['translation_key']);
+    }
+
     public function testPassingValueTranslationDomainAsNullDefaultsToDataTableTranslationDomain(): void
     {
         $column = $this->createNamedColumn('firstName', [
@@ -300,6 +349,44 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $this->assertEquals('John', $exportColumnValueView->vars['value']);
     }
 
+    public function testValueTranslationVarsWhenValueIsString()
+    {
+        $user = new User(firstName: 'John');
+
+        $column = $this->createNamedColumn('firstName');
+
+        $columnValueView = $this->createColumnValueView($column, rowData: $user);
+
+        $this->assertFalse($columnValueView->vars['translatable']);
+        $this->assertFalse($columnValueView->vars['is_instance_of_translatable']);
+    }
+
+    public function testValueTranslationVarsWhenValueIsTranslatable()
+    {
+        $user = new User(firstName: new TranslatableMessage('John'));
+
+        $column = $this->createNamedColumn('firstName');
+
+        $columnValueView = $this->createColumnValueView($column, rowData: $user);
+
+        $this->assertTrue($columnValueView->vars['translatable']);
+        $this->assertTrue($columnValueView->vars['is_instance_of_translatable']);
+    }
+
+    public function testValueTranslationVarsWhenTranslationDomainOptionIsGiven()
+    {
+        $user = new User(firstName: 'John');
+
+        $column = $this->createNamedColumn('firstName', [
+            'value_translation_domain' => 'user',
+        ]);
+
+        $columnValueView = $this->createColumnValueView($column, rowData: $user);
+
+        $this->assertTrue($columnValueView->vars['translatable']);
+        $this->assertFalse($columnValueView->vars['is_instance_of_translatable']);
+    }
+
     public function testTranslatableExportValue()
     {
         $firstName = $this->createTranslatable(value: 'John');
@@ -355,14 +442,35 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         yield 'inherit all' => [
             [
+                'value_translation_key' => '%first_name%',
                 'value_translation_domain' => 'user',
                 'value_translation_parameters' => ['%first_name%' => 'John'],
                 'export' => true,
             ],
         ];
 
+        yield 'inherit without translation key' => [
+            [
+                'value_translation_domain' => 'user',
+                'value_translation_parameters' => ['%first_name%' => 'John'],
+                'export' => true,
+            ],
+        ];
+
+        yield 'inherit except key' => [
+            [
+                'value_translation_key' => '%last_name%',
+                'value_translation_domain' => 'user',
+                'value_translation_parameters' => ['%first_name%' => 'John'],
+                'export' => [
+                    'value_translation_key' => '%first_name%',
+                ],
+            ],
+        ];
+
         yield 'inherit except parameters' => [
             [
+                'value_translation_key' => '%first_name%',
                 'value_translation_domain' => 'user',
                 'value_translation_parameters' => ['%last_name%' => 'Jane'],
                 'export' => [
@@ -373,6 +481,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         yield 'inherit except domain' => [
             [
+                'value_translation_key' => '%first_name%',
                 'value_translation_domain' => 'messages',
                 'value_translation_parameters' => ['%first_name%' => 'John'],
                 'export' => [

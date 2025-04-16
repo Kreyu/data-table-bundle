@@ -455,9 +455,14 @@
 
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}
 {% block column_value -%}
-    <span {{- block('attributes') -}}>
-        {%- if translation_domain is not same as false -%}
-            {{- value|trans({}, translation_domain) -}}
+    <span{{ _self.attributes(attr) }}>
+        {%- if translatable -%}
+            {%- if is_instance_of_translatable -%}
+                {# @var value Symfony\Contracts\Translation\TranslatableInterface #}
+                {{- translation_key|trans -}}
+            {%- else -%}
+                {{- translation_key|trans(translation_parameters, translation_domain) -}}
+            {%- endif -%}
         {%- else -%}
             {{- value -}}
         {%- endif -%}

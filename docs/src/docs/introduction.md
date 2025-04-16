@@ -6,9 +6,21 @@ DataTableBundle is a Symfony bundle that aims to help with data tables.
 
 <div class="tip custom-block" style="padding-top: 8px; margin-top: 30px;">
 
-Just want to try it out? Skip to the [installation](installation.md).
+Just want to try it out? Skip to the [installation](installation.md) or see [demo applications](#demo-applications).
 
 </div>
+
+## Demo applications
+
+Check out amazing demo applications created by the community :heart:
+
+- [maciazek/kreyu-data-table-bundle-demo](https://github.com/maciazek/kreyu-data-table-bundle-demo) by [@maciazek](https://github.com/maciazek)
+
+<small>
+
+If you want to include your application here, open an issue, create a pull request or contact [by e-mail](mailto:kontakt@swroblewski.pl).
+
+</small>
 
 ## Features
 

@@ -17,12 +17,17 @@ use Kreyu\Bundle\DataTableBundle\Test\Column\Type\ColumnTypeTestCase;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Enum\TranslatableEnum;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Enum\UnitEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function Symfony\Component\Translation\t;
 
 class CollectionColumnTypeTest extends ColumnTypeTestCase
 {
+    private ?TranslatorInterface $translator = null;
+
     protected function getTestedColumnType(): ColumnTypeInterface
     {
-        return new CollectionColumnType();
+        return new CollectionColumnType($this->translator);
     }
 
     protected function getAdditionalColumnTypes(): array
@@ -41,22 +46,67 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
     {
         $column = $this->createColumn([
             'separator' => '|',
+            'export' => true,
         ]);
 
         $valueView = $this->createColumnValueView($column);
 
         $this->assertEquals('|', $valueView->vars['separator']);
+
+        $rowData = new class {
+            public array $collection = [1, 2, 3];
+        };
+
+        $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
+
+        $this->assertEquals('1|2|3', $exportValueView->vars['value']);
+    }
+
+    public function testPassingSeparatorOptionAsTranslatable(): void
+    {
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('separator', [], 'data-table')
+            ->willReturn('translated');
+
+        $column = $this->createColumn([
+            'separator' => $separator = t('separator', domain: 'data-table'),
+            'export' => true,
+        ]);
+
+        $valueView = $this->createColumnValueView($column);
+
+        $this->assertEquals($separator, $valueView->vars['separator']);
+        $this->assertTrue($valueView->vars['separator_translatable']);
+
+        $rowData = new class {
+            public array $collection = [1, 2, 3];
+        };
+
+        $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
+
+        $this->assertEquals('1translated2translated3', $exportValueView->vars['value']);
     }
 
     public function testPassingSeparatorOptionAsNull(): void
     {
         $column = $this->createColumn([
             'separator' => null,
+            'export' => true,
         ]);
 
         $valueView = $this->createColumnValueView($column);
 
         $this->assertNull($valueView->vars['separator']);
+
+        $rowData = new class {
+            public array $collection = [1, 2, 3];
+        };
+
+        $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
+
+        $this->assertEquals('123', $exportValueView->vars['value']);
     }
 
     public function testDefaultSeparatorHtmlOption(): void

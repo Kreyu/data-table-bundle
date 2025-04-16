@@ -556,7 +556,19 @@
 {% block column_collection_value -%}
     {% for child in children -%}
         {{- data_table_column_value(child) -}}
-        <span>{{ not loop.last ? (separator_html ? separator|raw : separator) }}</span>
+        <span>
+            {%- if not loop.last -%}
+                {%- if separator_translatable -%}
+                    {%- set separator = separator|trans -%}
+                {%- endif -%}
+
+                {%- if separator_html -%}
+                    {%- set separator = separator|raw -%}
+                {%- endif -%}
+
+                {{ separator }}
+            {%- endif -%}
+        </span>
     {%- endfor %}
 {%- endblock %}
 

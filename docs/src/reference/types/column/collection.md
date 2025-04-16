@@ -48,7 +48,7 @@ $builder
 
 ### `separator`
 
-- **type**: `null` or `string`
+- **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableInterface`
 - **default**: `', '`
 
 Sets the value displayed between every item in the collection.

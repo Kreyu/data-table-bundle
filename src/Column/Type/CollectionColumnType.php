@@ -9,6 +9,8 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Represents a column with value displayed as a list.
@@ -17,6 +19,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class CollectionColumnType extends AbstractColumnType
 {
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
+    }
+
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
         $builder->setAttribute('prototype_factory', $builder->getColumnFactory());
@@ -27,6 +34,7 @@ final class CollectionColumnType extends AbstractColumnType
         $view->vars = array_replace($view->vars, [
             'separator' => $options['separator'],
             'separator_html' => $options['separator_html'],
+            'separator_translatable' => $options['separator'] instanceof TranslatableInterface,
             'children' => $this->createChildrenColumnValueViews($view, $column, $options),
         ]);
     }
@@ -44,7 +52,19 @@ final class CollectionColumnType extends AbstractColumnType
             'separator_html' => $options['separator_html'],
         ];
 
-        $view->value = $view->vars['value'] = implode($options['export']['separator'], array_map(
+        $separator = $options['export']['separator'] ?? '';
+
+        if ($this->translator && $separator instanceof TranslatableInterface) {
+            $locale = null;
+
+            if (method_exists(TranslatableInterface::class, 'getLocale')) {
+                $locale = $this->translator->getLocale();
+            }
+
+            $separator = $separator->trans($this->translator, $locale);
+        }
+
+        $view->value = $view->vars['value'] = implode($separator, array_map(
             static fn (ColumnValueView $view) => $view->vars['value'],
             $this->createChildrenColumnValueViews($view, $column, $options['export']),
         ));
@@ -70,7 +90,7 @@ final class CollectionColumnType extends AbstractColumnType
         $resolver->define('separator')
             ->default(', ')
             ->info('Separator to render between each item in the collection.')
-            ->allowedTypes('null', 'string')
+            ->allowedTypes('null', 'string', TranslatableInterface::class)
         ;
 
         /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#separator-html */

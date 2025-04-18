@@ -547,9 +547,7 @@
 
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\BooleanColumnType #}
 {% block column_boolean_value -%}
-    {% with { value: value ? label_true : label_false } %}
-        {{- block('column_text_value') -}}
-    {% endwith %}
+    {{- block('column_text_value') -}}
 {%- endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\CollectionColumnType #}

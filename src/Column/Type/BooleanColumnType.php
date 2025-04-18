@@ -21,6 +21,7 @@ final class BooleanColumnType extends AbstractColumnType
         $view->vars = array_replace($view->vars, [
             'label_true' => $options['label_true'],
             'label_false' => $options['label_false'],
+            'translation_key' => $view->value ? $options['label_true'] : $options['label_false'],
         ]);
     }
 

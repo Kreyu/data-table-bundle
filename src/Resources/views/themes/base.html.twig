@@ -560,11 +560,7 @@
                     {%- set separator = separator|trans -%}
                 {%- endif -%}
 
-                {%- if separator_html -%}
-                    {%- set separator = separator|raw -%}
-                {%- endif -%}
-
-                {{ separator }}
+                {{ separator_html ? separator|raw : separator }}
             {%- endif -%}
         </span>
     {%- endfor %}

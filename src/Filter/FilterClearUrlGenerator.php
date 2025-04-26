@@ -46,7 +46,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
     private function getFilterClearQueryParameters(FilterView $filterView): array
     {
-        $parameters = ['value' => ''];
+        $parameters = ['value' => null];
 
         if ($filterView->vars['operator_selectable']) {
             $parameters['operator'] = null;

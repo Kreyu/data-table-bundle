@@ -16,9 +16,11 @@ class FormUtil
             $value = [];
 
             foreach ($view->children as $child) {
-                if (in_array($child->vars['name'], array_keys($view->vars['value'] ?? []))) {
-                    $value[$child->vars['name']] = static::getFormViewValueRecursive($child);
+                if (isset($child->vars['checked']) && false === $child->vars['checked']) {
+                    continue;
                 }
+
+                $value[$child->vars['name']] = static::getFormViewValueRecursive($child);
             }
         }
 

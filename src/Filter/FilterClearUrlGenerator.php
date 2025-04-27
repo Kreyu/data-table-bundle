@@ -46,7 +46,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
     private function getFilterClearQueryParameters(FilterView $filterView): array
     {
-        $value = $filterView->data?->getValue();
+        $value = isset($filterView->data) ? $filterView->data->getValue() : null;
         if (is_array($value)) {
             $parameters = ['value' => array_map(fn () => '', $value)];
         } else {

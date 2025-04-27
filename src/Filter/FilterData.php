@@ -59,6 +59,6 @@ class FilterData
 
     public function hasValue(): bool
     {
-        return (bool) $this->value;
+        return null !== $this->value && '' !== $this->value && [] !== $this->value;
     }
 }

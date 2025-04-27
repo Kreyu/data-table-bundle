@@ -16,7 +16,7 @@ class FormUtil
             $value = [];
 
             foreach ($view->children as $child) {
-                if (null === $child->vars['data']) {
+                if (in_array($child->vars['name'], array_keys($view->vars['value'] ?? []))) {
                     $value[$child->vars['name']] = static::getFormViewValueRecursive($child);
                 }
             }

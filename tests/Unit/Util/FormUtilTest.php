@@ -22,15 +22,22 @@ class FormUtilTest extends TestCase
 
     public function testGetFormViewValueRecursiveWithChildren()
     {
+        $from = new \DateTime('2020-01-01');
+        $to = new \DateTime('2020-12-31');
+
         $formViewFrom = new FormView();
         $formViewFrom->vars['name'] = 'from';
-        $formViewFrom->vars['value'] = '2020-01-01';
+        $formViewFrom->vars['value'] = $from->format('Y-m-d');
 
         $formViewTo = new FormView();
         $formViewTo->vars['name'] = 'to';
-        $formViewTo->vars['value'] = '2020-12-31';
+        $formViewTo->vars['value'] = $to->format('Y-m-d');
 
         $formView = new FormView();
+        $formView->vars['value'] = [
+            'from' => $from,
+            'to' => $to,
+        ];
         $formView->children = [
             $formViewFrom->vars['name'] => $formViewFrom,
             $formViewTo->vars['name'] => $formViewTo,

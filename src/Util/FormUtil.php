@@ -16,7 +16,7 @@ class FormUtil
             $value = [];
 
             foreach ($view->children as $child) {
-                if (isset($child->vars['checked']) && false === $child->vars['checked']) {
+                if (isset($child->vars['checked'])) {
                     continue;
                 }
 

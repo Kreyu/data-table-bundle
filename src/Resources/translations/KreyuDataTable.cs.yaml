@@ -1,0 +1,54 @@
+# Operators
+Equals: rovná se
+Not equals: nerovná se
+Contains: obsahuje
+Not contains: neobsahuje
+Greater than: větší než
+Greater than or equals: větší nebo rovno
+Less than: menší než
+Less than or equals: menší nebo rovno
+Starts with: začíná na
+Ends with: končí na
+
+# Boolean type
+Yes: Ano
+No: Ne
+
+# Date range filter type
+Before %date%: před %date%
+After %date%: po %date%
+
+# Personalization
+Personalization: Personalizace
+Drag items between columns to show/hide relevant data in the list or change their order: Přetáhněte položky mezi sloupci pro zobrazení/skrytí relevantních údajů nebo změnu jejich pořadí
+Visible columns: Viditelné sloupce
+Hidden columns: Skryté sloupce
+
+# Pagination
+Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Zobrazeno %current_page_first_item_index% – %current_page_last_item_index% z %total_item_count%
+Items per page: Počet na stránku
+
+# Export
+Export: Export
+Filename: Název souboru
+Exporter: Exportování
+Strategy: Strategie
+Include personalization: Zahrnout personalizaci
+
+# Export strategy
+Include current page: Pouze aktuální stránka
+Include all: Všechny stránky
+
+# Misc
+Selected: Vybráno
+Filter: Filtrovat
+Apply: Potvrdit
+No results found: Nenalezeny žádné výsledky
+Try adjusting your search or filter to find what you're looking for: Zkuste upravit termín hledání nebo filtry
+Clear filter: Smazat filtr
+Clear all filters: Smazat všechny filtry
+Action confirmation: Potvrzení akce
+Are you sure you want to execute this action?: Opravdu chcete provést tuto akci?
+Confirm: Potvrdit
+Cancel: Zrušit
+Loading: Načítá se

@@ -24,7 +24,7 @@
     {% set display_filter_action = filtration_enabled and filters|length > 0 and filtration_form.children|length > 0 %}
     {% set display_export_action = exporting_enabled and exporters|length > 0 %}
 
-    {% if title or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
+    {% if title or actions is not empty or has_active_filters or display_filter_action or display_export_action or personalization_enabled %}
         <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="card-title mb-0">
                 {% if translation_domain is not same as false %}

@@ -34,6 +34,20 @@ This method accepts _three_ arguments:
 
 For reference, see [available filter types](../../reference/types/filter.md).
 
+### Case-insensitive filters for Postgres or MySQL with a case sensitive collation
+
+If your database does `LIKE` comparisons in a case-sensitive manner (aka `A` is not the same as `a`), but you want
+a filter to be case-insensitive, use the `lower` (or `upper`) option. For optimal performance, it is recommended to
+create an additional index in the database on the column with the `lower` function.
+
+```php
+     $builder
+        ->addFilter('name', StringFilterType::class, [
+            'lower' => true,
+        ])
+    ;
+```
+
 ## Creating filter types
 
 This bundle comes with plenty of the [built-in filter types](../../reference/types/filter.md). 

@@ -148,6 +148,14 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
+Note that you have to specify the table alias for each field, as otherwise the data table will add the alias to the beginning, breaking the DQL parser.
+
+Depending on the database collation, sorting can be case sensitive. You can use the DQL `LOWER` function:
+
+```php
+'sort' => 'LOWER(product.name)',
+```
+
 ## Saving applied sorting
 
 By default, the sorting feature [persistence](persistence.md) is **disabled** for every data table.

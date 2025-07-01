@@ -10,14 +10,14 @@ Determines whether the `TRIM()` function should be applied on the expression. Us
 - **type**: `bool`
 - **default**: `false`
 
-Determines whether the `LOWER()` function should be applied on the expression. Uses the [`LowerExpressionTransformer`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/ExpressionTransformer/LowerExpressionTransformer.php) transformer.
+Determines whether the `LOWER()` function should be applied on the expression for case-insensitive filtering. Uses the [`LowerExpressionTransformer`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/ExpressionTransformer/LowerExpressionTransformer.php) transformer.
 
 ### `upper`
 
 - **type**: `bool`
 - **default**: `false`
 
-Determines whether the `UPPER()` function should be applied on the expression. Uses the [`UpperExpressionTransformer`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/ExpressionTransformer/UpperExpressionTransformer.php) transformer.
+Determines whether the `UPPER()` function should be applied on the expression for case-insensitive filtering. Uses the [`UpperExpressionTransformer`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Bridge/Doctrine/Orm/Filter/ExpressionTransformer/UpperExpressionTransformer.php) transformer.
 
 ### `expression_transformers`
 

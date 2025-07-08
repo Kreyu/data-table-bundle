@@ -115,7 +115,7 @@ class DataTable implements DataTableInterface
 
     public function __construct(
         private ProxyQueryInterface $query,
-        private /* readonly */ DataTableConfigInterface $config,
+        /* readonly */ private DataTableConfigInterface $config,
     ) {
         $this->originalQuery = clone $this->query;
     }

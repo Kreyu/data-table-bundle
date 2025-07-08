@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class DataCollectorListener implements EventSubscriberInterface
 {
     public function __construct(
-        readonly private DataTableDataCollectorInterface $dataCollector,
+        private readonly DataTableDataCollectorInterface $dataCollector,
     ) {
     }
 

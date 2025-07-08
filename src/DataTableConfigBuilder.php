@@ -70,10 +70,10 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     protected bool $locked = false;
 
     public function __construct(
-        private /* readonly */ string $name,
+        /* readonly */ private string $name,
         private ResolvedDataTableTypeInterface $type,
         private EventDispatcherInterface $dispatcher,
-        private /* readonly */ array $options = [],
+        /* readonly */ private array $options = [],
     ) {
     }
 

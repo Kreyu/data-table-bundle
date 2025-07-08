@@ -24,9 +24,9 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private ColumnFactoryInterface $columnFactory;
 
     public function __construct(
-        private /* readonly */ string $name,
+        /* readonly */ private string $name,
         private ResolvedColumnTypeInterface $type,
-        private /* readonly */ array $options = [],
+        /* readonly */ private array $options = [],
     ) {
     }
 

@@ -58,7 +58,7 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
         ];
     }
 
-    private function getOppositeSortDirection(ColumnHeaderView $columnHeaderView): ?string
+    private function getOppositeSortDirection(ColumnHeaderView $columnHeaderView): string
     {
         $sortDirection = mb_strtolower((string) $columnHeaderView->vars['sort_direction']);
 

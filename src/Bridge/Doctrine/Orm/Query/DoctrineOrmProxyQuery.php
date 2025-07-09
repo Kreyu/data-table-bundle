@@ -49,6 +49,10 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         $this->queryBuilder->resetDQLPart('orderBy');
 
         foreach ($sortingData->getColumns() as $sortCriterion) {
+            if ('none' === $sortCriterion->getDirection()) {
+                continue;
+            }
+
             $this->queryBuilder->addOrderBy(
                 $this->getAliasResolver()->resolve((string) $sortCriterion->getPropertyPath(), $this->queryBuilder),
                 $sortCriterion->getDirection(),

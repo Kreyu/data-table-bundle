@@ -272,6 +272,75 @@ which will automatically append the sorting parameters to the URL, even if multi
 }
 ```
 
+## Clearing the sorting
+
+By default, clicking on the column header will cycle through three states:
+
+- ascending
+- descending
+- none
+
+In some cases, you may want to disable the third "none" state, disabling the ability to clear the sorting,
+and only allow cycling between ascending and descending. To achieve this, you set the `sorting_clearable`
+or its global default configuration option to `false`:
+
+::: code-group
+```yaml [Globally (YAML)]
+kreyu_data_table:
+  defaults:
+    sorting:
+      clearable: false
+```
+
+```php [Globally (PHP)]
+use Symfony\Config\KreyuDataTableConfig;
+
+return static function (KreyuDataTableConfig $config) {
+    $defaults = $config->defaults();
+    $defaults->sorting()->clearable(false);
+};
+```
+
+```php [For data table type]
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'sorting_clearable' => false,
+        ]);
+    }
+}
+```
+
+```php [For specific data table]
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class, 
+            query: $query,
+            options: [
+                'sorting_clearable' => false,
+            ],
+        );
+    }
+}
+```
+:::
+
+By default, this option is set to `true`.
+
 ## Default sorting
 
 The default sorting data can be overridden using the data table builder's `setDefaultSortingData()` method:

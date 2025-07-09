@@ -68,7 +68,7 @@ final class ColumnType implements ColumnTypeInterface
             'translation_parameters' => $options['header_translation_parameters'],
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'attr' => $options['header_attr'],
-            'sorted' => null !== $sortColumnData,
+            'sorted' => null !== $sortColumnData && 'none' !== $sortColumnData->getDirection(),
             'sort_field' => $column->getSortPropertyPath(),
             'sort_direction' => $sortColumnData?->getDirection(),
             'sortable' => $column->getConfig()->isSortable(),

@@ -60,6 +60,7 @@ final class DataTableType implements DataTableTypeInterface
             'sorting_persistence_enabled' => $builder->setSortingPersistenceEnabled(...),
             'sorting_persistence_adapter' => $builder->setSortingPersistenceAdapter(...),
             'sorting_persistence_subject_provider' => $builder->setSortingPersistenceSubjectProvider(...),
+            'sorting_clearable' => $builder->setSortingClearable(...),
             'pagination_enabled' => $builder->setPaginationEnabled(...),
             'pagination_persistence_enabled' => $builder->setPaginationPersistenceEnabled(...),
             'pagination_persistence_adapter' => $builder->setPaginationPersistenceAdapter(...),
@@ -103,6 +104,7 @@ final class DataTableType implements DataTableTypeInterface
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
+            'sorting_clearable' => $dataTable->getConfig()->isSortingClearable(),
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
             'per_page_choices' => $options['per_page_choices'],
         ]);
@@ -163,6 +165,7 @@ final class DataTableType implements DataTableTypeInterface
                 'exporter_factory' => $this->defaults['exporting']['exporter_factory'] ?? null,
                 'request_handler' => $this->defaults['request_handler'] ?? null,
                 'sorting_enabled' => $this->defaults['sorting']['enabled'] ?? true,
+                'sorting_clearable' => $this->defaults['sorting']['clearable'] ?? true,
                 'sorting_persistence_enabled' => $this->defaults['sorting']['persistence_enabled'] ?? false,
                 'sorting_persistence_adapter' => $this->defaults['sorting']['persistence_adapter'] ?? null,
                 'sorting_persistence_subject_provider' => $this->defaults['sorting']['persistence_subject_provider'] ?? null,
@@ -194,6 +197,7 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('exporter_factory', ['null', ExporterFactoryInterface::class])
             ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
             ->setAllowedTypes('sorting_enabled', 'bool')
+            ->setAllowedTypes('sorting_clearable', 'bool')
             ->setAllowedTypes('sorting_persistence_enabled', 'bool')
             ->setAllowedTypes('sorting_persistence_adapter', ['null', PersistenceAdapterInterface::class])
             ->setAllowedTypes('sorting_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])

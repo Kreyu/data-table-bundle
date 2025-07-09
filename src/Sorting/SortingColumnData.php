@@ -32,7 +32,7 @@ class SortingColumnData
             ->setDefault('property_path', null)
             ->setAllowedTypes('name', 'string')
             ->setAllowedTypes('property_path', ['null', 'string'])
-            ->setAllowedValues('direction', ['asc', 'desc'])
+            ->setAllowedValues('direction', ['asc', 'desc', 'none'])
             ->addNormalizer('direction', function (Options $options, mixed $value) {
                 return strtolower((string) $value);
             })

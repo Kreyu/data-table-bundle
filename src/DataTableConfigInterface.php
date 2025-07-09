@@ -85,6 +85,8 @@ interface DataTableConfigInterface
 
     public function isSortingPersistenceEnabled(): bool;
 
+    public function isSortingClearable(): bool;
+
     public function getSortingPersistenceAdapter(): ?PersistenceAdapterInterface;
 
     public function getSortingPersistenceSubjectProvider(): ?PersistenceSubjectProviderInterface;

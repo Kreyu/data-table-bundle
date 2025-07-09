@@ -62,6 +62,8 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?ExporterFactoryInterface $exporterFactory = null;
     private ?RequestHandlerInterface $requestHandler = null;
 
+    private bool $sortingClearable = false;
+
     private array $themes = [];
     private array $attributes = [];
     private array $headerRowAttributes = [];
@@ -521,6 +523,22 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->sortingPersistenceEnabled = $sortingPersistenceEnabled;
+
+        return $this;
+    }
+
+    public function isSortingClearable(): bool
+    {
+        return $this->sortingClearable;
+    }
+
+    public function setSortingClearable(bool $sortingClearable): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->sortingClearable = $sortingClearable;
 
         return $this;
     }

@@ -85,6 +85,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static;
 
+    public function setSortingClearable(bool $sortingClearable): static;
+
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static;
 
     public function setSortingPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $sortingPersistenceSubjectProvider): static;

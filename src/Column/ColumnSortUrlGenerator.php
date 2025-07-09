@@ -62,11 +62,13 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
     {
         $sortDirection = mb_strtolower((string) $columnHeaderView->vars['sort_direction']);
 
-        if ('asc' === $sortDirection) {
-            return 'desc';
-        }
+        $isSortingClearable = $columnHeaderView->getDataTable()->vars['sorting_clearable'] ?? true;
 
-        return 'asc';
+        return match ($sortDirection) {
+            'asc' => 'desc',
+            'desc' => $isSortingClearable ? 'none' : 'asc',
+            default => 'asc',
+        };
     }
 
     private function getRequest(): Request

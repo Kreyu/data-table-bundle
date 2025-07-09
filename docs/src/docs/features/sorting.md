@@ -274,7 +274,7 @@ which will automatically append the sorting parameters to the URL, even if multi
 
 ## Clearing the sorting
 
-By default, clicking on the column header will cycle through three states:
+By default, clicking on the header of the sortable column will cycle through three states:
 
 - ascending
 - descending

@@ -412,7 +412,7 @@ final class DataTableType implements DataTableTypeInterface
                     $value = FormUtil::getFormViewValueRecursive($formView);
                 }
 
-                if (empty($value)) {
+                if (null === $value || '' === $value || [] === $value) {
                     continue;
                 }
 

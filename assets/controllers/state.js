@@ -25,7 +25,7 @@ export default class extends Controller {
             window.history.replaceState(null, null, url);
 
             if (typeof Turbo !== 'undefined' && null !== Turbo) {
-                Turbo.navigator.history.push(url);
+                Turbo.navigator.history.replace(url);
             }
         }
     }

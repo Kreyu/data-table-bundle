@@ -871,6 +871,7 @@ class DataTable implements DataTableInterface
     public function setTurboFrameId(?string $turboFrameId): static
     {
         $this->turboFrameId = $turboFrameId;
+
         return $this;
     }
 

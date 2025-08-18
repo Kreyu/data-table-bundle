@@ -112,6 +112,7 @@ class DataTable implements DataTableInterface
     private ?ResultSetInterface $resultSet = null;
 
     private bool $initialized = false;
+    private ?string $turboFrameId = null;
 
     public function __construct(
         private ProxyQueryInterface $query,
@@ -865,6 +866,17 @@ class DataTable implements DataTableInterface
         $type->buildExportView($view, $this, $options);
 
         return $view;
+    }
+
+    public function setTurboFrameId(?string $turboFrameId): static
+    {
+        $this->turboFrameId = $turboFrameId;
+        return $this;
+    }
+
+    public function isRequestFromTurboFrame(): bool
+    {
+        return null !== $this->turboFrameId && 'kreyu_data_table_'.$this->getName() === $this->turboFrameId;
     }
 
     private function dispatch(string $eventName, DataTableEvent $event): void

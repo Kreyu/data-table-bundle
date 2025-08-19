@@ -546,7 +546,7 @@
             <span class="label">Total item count</span>
         </div>
 
-        {% if data.resolved_options.seek('pagination_enabled') %}
+        {% if data.resolved_options.seek('pagination_enabled').value %}
             <div class="metric-group">
                 <div class="metric">
                     <span class="value">{{ data.page }}</span>

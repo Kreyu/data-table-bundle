@@ -440,15 +440,6 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
     public static function provideExportValueTranslationOptions(): iterable
     {
-//        yield 'inherit all' => [
-//            [
-//                'value_translation_key' => '%first_name%',
-//                'value_translation_domain' => 'user',
-//                'value_translation_parameters' => ['%first_name%' => 'John'],
-//                'export' => true,
-//            ],
-//        ];
-
         yield 'inherit without translation key' => [
             [
                 'value_translation_domain' => 'user',

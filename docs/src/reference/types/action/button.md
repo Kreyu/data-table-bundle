@@ -28,7 +28,7 @@ $builder->addRowAction('show', ButtonActionType::class, [
 
 ### `href`
 
-- **type**: `string` or `\Closure`
+- **type**: `string` or `callable`
 - **default**: `'#'`
 
 A value used as an action link [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
@@ -45,7 +45,7 @@ $builder
 
 ### `target`
 
-- **type**: `string` or `\Closure`
+- **type**: `string` or `callable`
 - **default**: `'_self'`
 
 Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).

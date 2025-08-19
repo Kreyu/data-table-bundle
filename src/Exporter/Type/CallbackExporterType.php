@@ -20,7 +20,7 @@ final class CallbackExporterType extends AbstractExporterType
     {
         $resolver
             ->setRequired('callback')
-            ->setAllowedTypes('callback', [\Closure::class])
+            ->setAllowedTypes('callback', ['callable'])
         ;
     }
 }

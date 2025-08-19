@@ -18,7 +18,7 @@ class EntityActiveFilterFormatter
             return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
         }
 
-        if ($choiceLabel instanceof \Closure) {
+        if (is_callable($choiceLabel)) {
             return $choiceLabel($data->getValue());
         }
 

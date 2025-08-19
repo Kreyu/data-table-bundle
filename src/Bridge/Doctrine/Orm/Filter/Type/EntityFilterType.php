@@ -32,7 +32,7 @@ final class EntityFilterType extends AbstractDoctrineOrmFilterType
                 'choice_label' => null,
                 'active_filter_formatter' => new EntityActiveFilterFormatter(),
             ])
-            ->setAllowedTypes('choice_label', ['null', 'string', \Closure::class])
+            ->setAllowedTypes('choice_label', ['null', 'string', 'callable'])
         ;
 
         // The persistence feature is saving the identifier of the entity, not the entire selected entity.

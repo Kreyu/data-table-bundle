@@ -22,7 +22,7 @@ final class CallbackFilterType extends AbstractFilterType implements FilterHandl
     {
         $resolver
             ->setRequired('callback')
-            ->setAllowedTypes('callback', [\Closure::class])
+            ->setAllowedTypes('callback', 'callable')
         ;
     }
 

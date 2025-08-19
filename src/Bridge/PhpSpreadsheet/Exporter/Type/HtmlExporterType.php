@@ -30,7 +30,7 @@ final class HtmlExporterType extends AbstractPhpSpreadsheetExporterType
             ->setAllowedTypes('embed_images', 'bool')
             ->setAllowedTypes('use_inline_css', 'bool')
             ->setAllowedTypes('generate_sheet_navigation_block', 'bool')
-            ->setAllowedTypes('edit_html_callback', ['null', \Closure::class])
+            ->setAllowedTypes('edit_html_callback', ['null', 'callable'])
             ->setAllowedTypes('decimal_separator', 'string')
             ->setAllowedTypes('thousands_separator', 'string')
         ;

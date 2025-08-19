@@ -18,9 +18,7 @@ final class MoneyColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        $currency = $options['currency'];
-
-        if ($currency instanceof \Closure) {
+        if (is_callable($currency = $options['currency'])) {
             $currency = $currency($view->parent->data);
         }
 
@@ -40,7 +38,7 @@ final class MoneyColumnType extends AbstractColumnType
     {
         $resolver->define('currency')
             ->required()
-            ->allowedTypes('string', \Closure::class)
+            ->allowedTypes('string', 'callable')
         ;
 
         $resolver->define('divisor')

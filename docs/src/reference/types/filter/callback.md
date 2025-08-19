@@ -10,9 +10,9 @@ The [`CallbackFilterType`](https://github.com/Kreyu/data-table-bundle/blob/main/
 
 ### `callback`
 
-- **type**: `\Closure`
+- **type**: `callable`
 
-Sets closure that works as a filter handler.
+Sets callable that works as a filter handler.
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Type\CallbackFilterType;

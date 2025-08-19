@@ -18,7 +18,7 @@ final class FormActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['method', 'action', 'button_attr'] as $optionName) {
-                if ($options[$optionName] instanceof \Closure) {
+                if (is_callable($options[$optionName])) {
                     $options[$optionName] = $options[$optionName]($value);
                 }
             }
@@ -47,9 +47,9 @@ final class FormActionType extends AbstractActionType
                 'action' => '#',
                 'button_attr' => [],
             ])
-            ->setAllowedTypes('method', ['string', \Closure::class])
-            ->setAllowedTypes('action', ['string', \Closure::class])
-            ->setAllowedTypes('button_attr', ['array', \Closure::class])
+            ->setAllowedTypes('method', ['string', 'callable'])
+            ->setAllowedTypes('action', ['string', 'callable'])
+            ->setAllowedTypes('button_attr', ['array', 'callable'])
         ;
     }
 

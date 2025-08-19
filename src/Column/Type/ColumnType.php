@@ -89,9 +89,7 @@ final class ColumnType implements ColumnTypeInterface
         $view->data = $data;
         $view->value = $value;
 
-        $attr = $options['value_attr'];
-
-        if ($attr instanceof \Closure) {
+        if (is_callable($attr = $options['value_attr'])) {
             $attr = $attr($data, $rowData);
         }
 
@@ -104,9 +102,7 @@ final class ColumnType implements ColumnTypeInterface
             $translationKey ??= $value;
         }
 
-        $translationParameters = $options['value_translation_parameters'];
-
-        if ($translationParameters instanceof \Closure) {
+        if (is_callable($translationParameters = $options['value_translation_parameters'])) {
             $translationParameters = $translationParameters($data, $rowData);
         }
 
@@ -202,7 +198,7 @@ final class ColumnType implements ColumnTypeInterface
                 $translationDomain = $options['export']['value_translation_domain'];
                 $translationParameters = $options['export']['value_translation_parameters'];
 
-                if ($translationParameters instanceof \Closure) {
+                if (is_callable($translationParameters)) {
                     $translationParameters = $translationParameters($data, $rowData);
                 }
 
@@ -259,7 +255,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $resolver->define('value_translation_parameters')
             ->default([])
-            ->allowedTypes('array', \Closure::class)
+            ->allowedTypes('array', 'callable')
             ->info('Translation parameters used to translate the column value.')
         ;
 
@@ -283,7 +279,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $resolver->define('formatter')
             ->default(null)
-            ->allowedTypes('null', \Closure::class)
+            ->allowedTypes('null', 'callable')
             ->info('Formatter to use on non-empty value to customize it even further before rendering. Column value and row data are passed as arguments.')
         ;
 
@@ -301,8 +297,8 @@ final class ColumnType implements ColumnTypeInterface
 
         $resolver->define('getter')
             ->default(null)
-            ->allowedTypes('null', \Closure::class)
-            ->info('Closure used to retrieve column value from row data. If set, it is used instead of property accessor.')
+            ->allowedTypes('null', 'callable')
+            ->info('Callable used to retrieve column value from row data. If set, it is used instead of property accessor.')
         ;
 
         $resolver->define('header_attr')
@@ -313,7 +309,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $resolver->define('value_attr')
             ->default([])
-            ->allowedTypes('array', \Closure::class)
+            ->allowedTypes('array', 'callable')
             ->info('Extra HTML attributes to render on the column value.')
         ;
 
@@ -352,9 +348,7 @@ final class ColumnType implements ColumnTypeInterface
             return null;
         }
 
-        $getter = $options['getter'];
-
-        if ($getter instanceof \Closure) {
+        if (is_callable($getter = $options['getter'])) {
             return $getter($rowData, $column, $options);
         }
 
@@ -375,9 +369,7 @@ final class ColumnType implements ColumnTypeInterface
 
         $value = $data;
 
-        $formatter = $options['formatter'];
-
-        if ($formatter instanceof \Closure) {
+        if (is_callable($formatter = $options['formatter'])) {
             $value = $formatter($data, $rowData, $column, $options);
         }
 

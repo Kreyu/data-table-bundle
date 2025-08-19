@@ -206,7 +206,7 @@ final class ColumnType implements ColumnTypeInterface
                     $translationParameters = $translationParameters($data, $rowData);
                 }
 
-                if ($value instanceof \Closure) {
+                if (is_string($value)) {
                     $translationKey ??= $value;
                 }
 

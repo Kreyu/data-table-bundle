@@ -41,7 +41,7 @@ final class ActionType implements ActionTypeInterface
             ];
 
             foreach ($closureOptions as $optionName) {
-                if ($options[$optionName] instanceof \Closure) {
+                if (is_callable($options[$optionName])) {
                     $options[$optionName] = $options[$optionName]($value);
                 }
             }

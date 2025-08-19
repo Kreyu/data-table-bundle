@@ -22,8 +22,8 @@ This kind of action can be used, for example, for "Update" button that redirects
 
 **Batch actions**
 
-Actions that are bound to a multiple rows, selected by a checkbox column. 
-Batch actions require `batch` Stimulus controller enabled: 
+Actions that are bound to a multiple rows, selected by a checkbox column.
+Batch actions require `batch` Stimulus controller enabled:
 
 ```json5
 // assets/controllers.json
@@ -56,11 +56,11 @@ class ProductDataTableType extends AbstractDataTableType
             ->addAction('create', ButtonActionType::class, [
                 'href' => $this->urlGenerator->generate('app_product_create'),
             ])
-            // note that row action has access to a row data in a callable
+            // note that row action has access to a row data in a closure
             ->addRowAction('update', ButtonActionType::class, [
                 'href' => function (Product $product) {
                     return $this->urlGenerator->generate('app_product_update', [
-                        'id' => $product->getId(),                
+                        'id' => $product->getId(),
                     ]);
                 }
             ])
@@ -82,7 +82,7 @@ For reference, see [available action types](../../reference/types/action.md).
 
 ## Creating action types
 
-If built-in action types are not enough, you can create your own. In following chapters, we'll be creating an action that opens a modal. 
+If built-in action types are not enough, you can create your own. In following chapters, we'll be creating an action that opens a modal.
 
 Action types are classes that implement [ActionTypeInterface](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionTypeInterface.php), although, it is recommended to extend from the [AbstractActionType](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php) class:
 
@@ -119,7 +119,7 @@ class ModalActionType extends AbstractActionType
 ```
 
 ::: tip
-If you take a look at the [`AbstractActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php), 
+If you take a look at the [`AbstractActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/AbstractActionType.php),
 you'll see that `getParent()` method returns fully-qualified name of the [`ActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ActionType.php) type class.
 This is the type that defines all the basic options, such as `attr`, `label`, etc.
 :::
@@ -138,7 +138,7 @@ First, create a custom theme for the data table, and create a `action_modal_valu
     <button class="btn btn-primary" data-bs-toggle="modal", data-bs-target="#action-modal-{{ name }}">
         {{ label }}
     </button>
-    
+
     <div class="modal fade" id="#action-modal-{{ name }}">
         {# Bootstrap modal contents... #}
     </div>
@@ -261,7 +261,7 @@ Now we can update the template of the type class to use the newly added variable
     <button class="btn btn-primary" data-bs-toggle="modal", data-bs-target="#action-modal-{{ name }}">
         {{ label }}
     </button>
-    
+
     <div class="modal fade" id="action-modal-{{ name }}">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -277,32 +277,32 @@ Now we can update the template of the type class to use the newly added variable
 > What if I want to pass an option based on the row data?
 
 If the action type is used for a row action, the `ActionView` parent will be an instance of `ColumnValueView`,
-which can be used to retrieve a data of the row. This can be used in combination with accepting the `callable` options:
+which can be used to retrieve a data of the row. This can be used in combination with accepting the closure options:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
-use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView; // [!code ++] 
+use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView; // [!code ++]
 
 class ModalActionType extends ButtonActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        if ($view->parent instanceof ColumnValueView) { // [!code ++] 
-            $value = $view->parent->vars['value']; // [!code ++] 
+        if ($view->parent instanceof ColumnValueView) { // [!code ++]
+            $value = $view->parent->vars['value']; // [!code ++]
 
-            foreach (['template_path', 'template_vars'] as $optionName) { // [!code ++] 
-                if (is_callable($options[$optionName])) { // [!code ++] 
-                    $options[$optionName] = $options[$optionName]($value); // [!code ++] 
+            foreach (['template_path', 'template_vars'] as $optionName) { // [!code ++]
+                if ($options[$optionName] instanceof \Closure) { // [!code ++]
+                    $options[$optionName] = $options[$optionName]($value); // [!code ++]
                 } // [!code ++]
             } // [!code ++]
         } // [!code ++]
-    
+
         $view->vars['template_path'] = $options['template_path'];
         $view->vars['template_vars'] = $options['template_vars'];
     }
-    
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
@@ -314,15 +314,15 @@ class ModalActionType extends ButtonActionType
             ])
             // optionally you can restrict type of the options
             ->setAllowedTypes('template_path', 'string') // [!code --]
-            ->setAllowedTypes('template_path', ['string', 'callable']) // [!code ++]
+            ->setAllowedTypes('template_path', ['string', \Closure::class// [!code ++]
             ->setAllowedTypes('template_vars', 'array') // [!code --]
-            ->setAllowedTypes('template_vars', ['array', 'callable']) // [!code ++]
+            ->setAllowedTypes('template_vars', ['array', \Closure::class]) // [!code ++]
         ;
     }
 }
 ```
 
-Now, you can use the `callable` options when defining the modal row action: 
+Now, you can pass the options as closure when defining the modal row action:
 
 ```php
 class UserDataTableType extends AbstractDataTableType
@@ -364,13 +364,13 @@ class TooltipActionTypeExtension extends AbstractActionTypeExtension
         if (!$options['tooltip']) {
             return;
         }
-        
+
         $title = $view->vars['attr']['title'] ?? null;
-        
+
         if (empty($title)) {
             return;
         }
-        
+
         $view->vars['attr']['data-bs-toggle'] = 'tooltip';
         $view->vars['attr']['data-bs-placement'] = 'top';
         $view->vars['attr']['data-bs-title'] = $title;
@@ -383,7 +383,7 @@ class TooltipActionTypeExtension extends AbstractActionTypeExtension
             ->setAllowedTypes('tooltip', 'bool')
         ;
     }
-    
+
     public static function getExtendedTypes(): iterable
     {
         return [ButtonActionType::class];
@@ -611,7 +611,7 @@ You can define an action to open a modal with contents loaded from given URL.
 For example, let's define a modal that displays a post details.
 
 First things first, the built-in modal action type requires additional JavaScript to work properly.
-If using the built-in Bootstrap 5 or Tabler (based on Bootstrap) theme, we have to enable the `bootstrap-modal` 
+If using the built-in Bootstrap 5 or Tabler (based on Bootstrap) theme, we have to enable the `bootstrap-modal`
 script in your `controllers.json` file, because **it is disabled by default**:
 
 ```json
@@ -783,14 +783,14 @@ There are multiple ways to support the variants, however, this is how built-in t
         danger: 'btn-danger',
         primary: 'btn-primary',
     }|merge(variants ?? {})|filter(e => e is not same as false) -%}
-    
+
     {% set base_classes = base_classes ?? 'btn' %}
     {% set variant_classes = variant_classes ?? variants[variant ?? default_variant ?? 'primary'] %}
-    
-    {% set attr = attr|merge({ 
-        class: (base_classes ~ ' ' ~ variant_classes ~ ' ' ~ attr.class|default(''))|trim 
+
+    {% set attr = attr|merge({
+        class: (base_classes ~ ' ' ~ variant_classes ~ ' ' ~ attr.class|default(''))|trim
     }) %}
-    
+
     {# ... #}
 {%- block action_button_control %}
 ```
@@ -840,7 +840,7 @@ To achieve this, override the action block and provide `default_variant` variabl
 {%- block button_action_control %}
 ```
 
-Default variant is applied when the `variant` variable is set to `null` - for example, if `variant` option is not given. 
+Default variant is applied when the `variant` variable is set to `null` - for example, if `variant` option is not given.
 
 ## Prefetching
 

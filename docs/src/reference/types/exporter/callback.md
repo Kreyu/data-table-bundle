@@ -10,9 +10,9 @@ The [`CallbackExporterType`](https://github.com/Kreyu/data-table-bundle/blob/mai
 
 ### `callback`
 
-- **type**: `callable`
+- **type**: `\Closure`
 
-Sets callable that works as an exporter handler.
+Sets closure that works as an exporter handler.
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\CallbackExporterType;

@@ -31,7 +31,7 @@ class CallbackFilterType extends AbstractDoctrineOrmFilterType
         $resolver
             ->setDefault('supported_operators', Operator::cases())
             ->setRequired('callback')
-            ->setAllowedTypes('callback', ['callable'])
+            ->setAllowedTypes('callback', [\Closure::class])
         ;
     }
 }

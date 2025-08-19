@@ -10,7 +10,7 @@ The [`IconColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/
 
 ### `icon`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 
 Defines the icon to render.
 
@@ -25,10 +25,10 @@ $builder
 ```
 
 > [!TIP] Wondering how does the icon gets rendered?
-> Name of the icon depends on the icon set you are using in the application, 
-> and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../docs/features/theming.md#icon-themes) for more information. 
+> Name of the icon depends on the icon set you are using in the application,
+> and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../docs/features/theming.md#icon-themes) for more information.
 
-You can provide a callable that will receive a column value as an argument:
+You can provide a closure that will receive a column value as an argument:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Column\Type\IconColumnType;
@@ -45,7 +45,7 @@ $builder
 
 ### `icon_attr`
 
-- **type**: `array` or `callable`
+- **type**: `array` or `\Closure`
 - **default**: `[]`
 
 Defines the HTML attributes for the icon to render.
@@ -63,7 +63,7 @@ $builder
 ;
 ```
 
-You can provide a callable that will receive a column value as an argument:
+You can provide a closure that will receive a column value as an argument:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Column\Type\IconColumnType;
@@ -78,7 +78,7 @@ $builder
             'class' => match ($status) {
                 'draft' => 'text-warning',
                 'completed' => 'text-success',
-            },        
+            },
         ],
     ])
 ;

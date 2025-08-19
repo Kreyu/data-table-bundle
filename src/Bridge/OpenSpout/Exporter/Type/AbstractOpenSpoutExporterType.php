@@ -109,7 +109,7 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
     {
         $style = $options[$optionName] ?? null;
 
-        if (is_callable($style)) {
+        if ($style instanceof \Closure) {
             $style = $style($view, $options);
         }
 

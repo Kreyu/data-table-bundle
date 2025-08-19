@@ -17,11 +17,14 @@ final class TemplateColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (is_callable($templatePath = $options['template_path'])) {
+        $templatePath = $options['template_path'];
+        $templateVars = $options['template_vars'];
+
+        if ($templatePath instanceof \Closure) {
             $templatePath = $templatePath($view->data, $column);
         }
 
-        if (is_callable($templateVars = $options['template_vars'])) {
+        if ($templateVars instanceof \Closure) {
             $templateVars = $templateVars($view->data, $column);
         }
 
@@ -35,13 +38,13 @@ final class TemplateColumnType extends AbstractColumnType
     {
         $resolver->define('template_path')
             ->required()
-            ->allowedTypes('string', 'callable')
+            ->allowedTypes('string', \Closure::class)
             ->info('A path to the template that should be rendered.')
         ;
 
         $resolver->define('template_vars')
             ->default([])
-            ->allowedTypes('array', 'callable')
+            ->allowedTypes('array', \Closure::class)
             ->info('An array of variables passed to the template.')
         ;
     }

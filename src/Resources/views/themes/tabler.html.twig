@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block action_filter %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -47,7 +47,7 @@
 {% endblock %}
 
 {% block action_export %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Export'|trans({}, 'KreyuDataTable') } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Export'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -64,7 +64,7 @@
 {% endblock %}
 
 {% block action_personalize %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Personalize'|trans({}, 'KreyuDataTable') } } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Personalize'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}

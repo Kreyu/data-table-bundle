@@ -24,6 +24,6 @@ class FormUtil
             }
         }
 
-        return $value;
+        return empty($value) ? $view->vars['value'] : $value;
     }
 }

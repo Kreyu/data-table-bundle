@@ -28,7 +28,7 @@ $builder->addRowAction('show', LinkActionType::class, [
 
 ### `href`
 
-- **type**: `string` or `\Closure` (if using as a row action)
+- **type**: `string` or `callable` (if using as a row action)
 - **default**: `'#'`
 
 A value used as an action link [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
@@ -43,7 +43,7 @@ $builder
 ;
 ```
 
-When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
+When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
 that will receive the row data as an argument and should return a string.
 
 ```php
@@ -53,7 +53,7 @@ $builder
     ->addAction('back', LinkActionType::class, [
         'href' => function (Category $category) {
             return $this->urlGenerator->generate('category_index', [
-                'id' => $category->getId(),
+                'id' => $category->getId(),        
             ]);
         },
     ])
@@ -62,7 +62,7 @@ $builder
 
 ### `target`
 
-- **type**: `string` or `\Closure` (if using as a row action)
+- **type**: `string` or `callable` (if using as a row action)
 - **default**: `'_self'`
 
 Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
@@ -77,7 +77,7 @@ $builder
 ;
 ```
 
-When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
+When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
 that will receive the row data as an argument and should return a string.
 
 ```php

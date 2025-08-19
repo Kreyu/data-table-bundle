@@ -16,7 +16,7 @@ final class IconColumnType extends AbstractColumnType
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         foreach (['icon', 'icon_attr'] as $optionName) {
-            if ($options[$optionName] instanceof \Closure) {
+            if (is_callable($options[$optionName])) {
                 $options[$optionName] = $options[$optionName]($view->value);
             }
         }
@@ -31,13 +31,13 @@ final class IconColumnType extends AbstractColumnType
     {
         $resolver->define('icon')
             ->required()
-            ->allowedTypes('string', \Closure::class)
+            ->allowedTypes('string', 'callable')
             ->info('Defines the icon to render.')
         ;
 
         $resolver->define('icon_attr')
             ->default([])
-            ->allowedTypes('array', \Closure::class)
+            ->allowedTypes('array', 'callable')
             ->info('Defines the HTML attributes for the icon to render.')
         ;
     }

@@ -314,7 +314,7 @@ final class DataTableType implements DataTableTypeInterface
             $valueRowView->vars['row'] = $valueRowView;
 
             foreach ($dataTable->getConfig()->getValueRowAttributes() as $key => $value) {
-                if ($value instanceof \Closure) {
+                if (is_callable($value)) {
                     $value = $value($data, $dataTable);
                 }
 

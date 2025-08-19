@@ -10,25 +10,25 @@ The [`MoneyColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src
 
 ### `currency`
 
-- **type**: `string` or `\Closure` - any [3-letter ISO 4217 code](https://en.wikipedia.org/wiki/ISO_4217)
+- **type**: `string` or `callable` - any [3-letter ISO 4217 code](https://en.wikipedia.org/wiki/ISO_4217) 
 
-Specifies the currency that the money is being specified in.
+Specifies the currency that the money is being specified in. 
 This determines the currency symbol that should be shown in the column.
 
-When using the [Intl number formatter](https://www.php.net/manual/en/class.numberformatter.php),
+When using the [Intl number formatter](https://www.php.net/manual/en/class.numberformatter.php), 
 the ISO code will be automatically converted to the appropriate currency sign, for example:
 
 - `EUR` becomes `€`;
 - `PLN` becomes `zł`;
 
-Please note that the end result is also dependent on the locale used in the application, for example, with value of `1000`:
+Please note that the end result is also dependent on the locale used in the application, for example, with value of `1000`: 
 
 - `USD` currency will be rendered as `$1,000.00` when using the `en` locale;
 - `USD` currency will be rendered as `1 000,00 USD` when using the `pl` locale;
 
 When the Intl formatter is **NOT** used, given currency is simply rendered after the raw value, e.g. `1000 USD`.
 
-Additionally, the option accepts a closure, which gets a row data as first argument:
+Additionally, the option accepts a callable, which gets a row data as first argument:
 
 ```php
 $builder
@@ -43,8 +43,8 @@ $builder
 - **type**: `integer`
 - **default**: `1`
 
-If you need to divide your starting value by a number before rendering it to the user,
-you can use the `divisor` option. For example if you need to show amounts as integer in order to avoid
+If you need to divide your starting value by a number before rendering it to the user, 
+you can use the `divisor` option. For example if you need to show amounts as integer in order to avoid 
 rounding errors, you can transform values in cents automatically:
 
 ```php

@@ -70,7 +70,7 @@ Determines whether the sheet navigation block should be generated or not.
 
 ### `edit_html_callback`
 
-- **type**: `null` or `\Closure`
+- **type**: `null` or `callable`
 - **default**: `null`
 
 Accepts a callback function to edit the generated html before saving.
@@ -87,7 +87,7 @@ $builder
                 '{border: 2px dashed red;}',
                 $html,
             );
-        }
+        } 
     ])
 ;
 ```

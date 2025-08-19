@@ -10,8 +10,8 @@ The [`EnumColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/
 
 ### `formatter`
 
-- **type**: `null` or `\Closure`
-- **default**: closure that translates the enum if possible
+- **type**: `null` or `callable`
+- **default**: callable that translates the enum if possible
 
 Formats the enum value. If Symfony Translator component is available, and the enum implements [`TranslatableInterface`](https://github.com/symfony/translation-contracts/blob/main/TranslatableInterface.php),
 the enum will be translated. Otherwise, the enum name will be displayed.

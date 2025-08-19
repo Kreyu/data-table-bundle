@@ -28,9 +28,9 @@ class ProductDataTableType extends AbstractDataTableType
 }
 ```
 
-Defining a search handler automatically adds search filter. 
+Defining a search handler automatically adds search filter.
 
-To disable this behavior, use the `setAutoAddingSearchFilter()` method: 
+To disable this behavior, use the `setAutoAddingSearchFilter()` method:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
@@ -70,9 +70,9 @@ class ProductDataTableType extends AbstractDataTableType
 
 ### `handler`
 
-- **type**: `callable`
+- **type**: `\Closure`
 
-Sets callable that operates on the query passed as a first argument:
+Sets closure that operates on the query passed as a first argument:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;

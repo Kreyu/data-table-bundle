@@ -27,7 +27,7 @@ final class ActionType implements ActionTypeInterface
         if ($view->parent instanceof ColumnValueView) {
             $value = $view->parent->value;
 
-            $callableOptions = [
+            $closureOptions = [
                 'label',
                 'translation_domain',
                 'translation_parameters',
@@ -40,7 +40,7 @@ final class ActionType implements ActionTypeInterface
                 'variant',
             ];
 
-            foreach ($callableOptions as $optionName) {
+            foreach ($closureOptions as $optionName) {
                 if (is_callable($options[$optionName])) {
                     $options[$optionName] = $options[$optionName]($value);
                 }
@@ -107,16 +107,16 @@ final class ActionType implements ActionTypeInterface
                 'visible' => true,
                 'variant' => null,
             ])
-            ->setAllowedTypes('label', ['null', 'bool', 'string', 'callable', TranslatableInterface::class])
-            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', 'callable'])
-            ->setAllowedTypes('translation_parameters', ['array', 'callable'])
-            ->setAllowedTypes('block_prefix', ['null', 'string', 'callable'])
-            ->setAllowedTypes('attr', ['array', 'callable'])
-            ->setAllowedTypes('icon', ['null', 'string', 'callable'])
-            ->setAllowedTypes('icon_attr', ['array', 'callable'])
-            ->setAllowedTypes('confirmation', ['bool', 'array', 'callable'])
-            ->setAllowedTypes('visible', ['bool', 'callable'])
-            ->setAllowedTypes('variant', ['null', 'string', 'callable'])
+            ->setAllowedTypes('label', ['null', 'bool', 'string', \Closure::class, TranslatableInterface::class])
+            ->setAllowedTypes('translation_domain', ['null', 'bool', 'string', \Closure::class])
+            ->setAllowedTypes('translation_parameters', ['array', \Closure::class])
+            ->setAllowedTypes('block_prefix', ['null', 'string', \Closure::class])
+            ->setAllowedTypes('attr', ['array', \Closure::class])
+            ->setAllowedTypes('icon', ['null', 'string', \Closure::class])
+            ->setAllowedTypes('icon_attr', ['array', \Closure::class])
+            ->setAllowedTypes('confirmation', ['bool', 'array', \Closure::class])
+            ->setAllowedTypes('visible', ['bool', \Closure::class])
+            ->setAllowedTypes('variant', ['null', 'string', \Closure::class])
         ;
     }
 

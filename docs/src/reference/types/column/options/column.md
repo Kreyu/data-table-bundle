@@ -17,7 +17,7 @@ const props = defineProps({
 ### `label`
 
 - **type**: `null`, `string` or `Symfony\Component\Translation\TranslatableInterface`
-- **default**: `{{ defaults.label }}` 
+- **default**: `{{ defaults.label }}`
 
 Sets the label that will be used in column header and personalization column list.
 
@@ -33,7 +33,7 @@ When value equals `null`, a sentence cased column name is used as a label, for e
 - **type**: `false` or `string`
 - **default**: `'KreyuDataTable'`
 
-Sets the translation domain used when translating the column header.  
+Sets the translation domain used when translating the column header.
 Setting the option to `false` disables its translation.
 
 ### `header_translation_parameters`
@@ -69,17 +69,17 @@ For more details, see [translating column values](../../../../docs/components/co
 - **type**: `false` or `string`
 - **default**: inherited from the data table translation domain
 
-Sets the translation domain used when translating the column value.  
+Sets the translation domain used when translating the column value.
 Setting the option to `false` disables its translation.
 
 ### `value_translation_parameters`
 
-- **type**: `array` or `callable` that returns an array
+- **type**: `array` or `\Closure` that returns an array
 - **default**: `[]`
 
 Sets the parameters used when translating the column value.
 
-If given the callable, it will receive two arguments:
+If given the closure, it will receive two arguments:
 - column value, e.g. column (row) data formatted by the optional `formatter` option;
 - column (row) data, e.g. value returned by property accessor or getter;
 
@@ -92,14 +92,14 @@ $builder->addColumn('firstName', options: [
 ]);
 ```
 
-The `ColumnValueView` will contain the resolved callable.
+The `ColumnValueView` will contain the resolved closure.
 
 ### `property_path`
 
 - **type**: `null`, `false` or `string`
 - **default**: `{{ defaults.property_path }}`
 
-Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.  
+Sets the property path used by the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html) to retrieve column value of each row.
 Setting the option to `false` disables property accessor.
 
 ```php
@@ -114,10 +114,10 @@ When value equals `null`, the column name is used as a property path.
 
 ### `getter`
 
-- **type**: `null` or `callable`
+- **type**: `null` or `\Closure`
 - **default**: `null`
 
-When provided, this callable will be invoked to read the value from the underlying object that will be used within the column.
+When provided, this closure will be invoked to read the value from the underlying object that will be used within the column.
 This disables the usage of the [PropertyAccessor](https://symfony.com/doc/current/components/property_access.html), described in the [property_path](#property_path) option.
 
 ```php
@@ -151,7 +151,7 @@ the rendering of some of them, without the need to create a new column type.
 
 ### `formatter`
 
-- **type**: `null` or `callable`
+- **type**: `null` or `\Closure`
 - **default**: `null`
 
 Formats the value to the desired string.
@@ -193,7 +193,7 @@ $builder
 
 Rest of the options are inherited from the column options.
 
-Setting this option to `true` automatically copies the column options as the export column options.  
+Setting this option to `true` automatically copies the column options as the export column options.
 Setting this option to `false` excludes the column from the exports.
 
 ### `header_attr`
@@ -217,7 +217,7 @@ $builder
 
 ### `value_attr`
 
-- **type**: `array` or `callable`
+- **type**: `array` or `\Closure`
 - **default**: `[]`
 
 If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
@@ -234,7 +234,7 @@ $builder
 ;
 ```
 
-You can pass a `callable` to perform a dynamic attribute generation:
+You can pass a `\Closure` to perform a dynamic attribute generation:
 
 ```php
 $builder
@@ -246,7 +246,7 @@ $builder
         },
     ])
 ;
-``` 
+```
 
 ### `priority`
 

@@ -10,13 +10,13 @@ The [`TemplateColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/
 
 ### `template_path`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 
 Sets the path to the template that should be rendered.
 
 ### `template_vars`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 
 Sets the variables used within the template.
 

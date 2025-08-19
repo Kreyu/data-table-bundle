@@ -5,7 +5,7 @@
 
 # LinkDropdownItemActionType
 
-The [`LinkDropdownItemActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/Dropdown/LinkDropdownItemActionType.php) 
+The [`LinkDropdownItemActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/Dropdown/LinkDropdownItemActionType.php)
 represents an action rendered as dropdown item with a simple link.  It is meant to be used as a child of the [`DropdownActionType`](dropdown.md).
 
 ## Prefetching
@@ -36,7 +36,7 @@ $builder
 
 ### `href`
 
-- **type**: `string` or `callable` (if using as a row action)
+- **type**: `string` or `\Closure` (if using as a row action)
 - **default**: `'#'`
 
 A value used as an action link [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
@@ -49,14 +49,14 @@ $builder
     ->addAction('advanced', DropdownActionType::class, [
         'actions' => [
             $builder->createAction('update', LinkDropdownItemActionType::class, [
-                'href' => '#',           
+                'href' => '#',
             ]),
         ],
     ])
 ;
 ```
 
-When using the `LinkDropdownItemActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `LinkDropdownItemActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return an array of actions.
 
 ```php
@@ -80,7 +80,7 @@ $builder
 
 ### `target`
 
-- **type**: `string` or `callable` (if using as a row action)
+- **type**: `string` or `\Closure` (if using as a row action)
 - **default**: `'_self'`
 
 Sets the value that will be used as an anchor [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
@@ -101,7 +101,7 @@ $builder
 ;
 ```
 
-When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `LinkActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a string.
 
 ```php
@@ -118,7 +118,7 @@ $builder
             ])
         ],
     ])
-    
+
 ;
 ```
 

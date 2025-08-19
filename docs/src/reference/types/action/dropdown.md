@@ -10,7 +10,7 @@ The [`DropdownActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/
 
 ### `actions`
 
-- **type**: `array` or `callable` (if using as a row action)
+- **type**: `array` or `\Closure` (if using as a row action)
 
 An array of actions that will be rendered as dropdown items.
 Each action can be created using `createAction`, `createRowAction` or `createBatchAction` method, depending on the context:
@@ -23,7 +23,7 @@ $builder
     ->addAction('advanced', DropdownActionType::class, [
         'actions' => [
             $builder->createAction('update', LinkDropdownItemActionType::class, [
-                'href' => '#'            
+                'href' => '#'
             ]),
         ],
     ])
@@ -33,7 +33,7 @@ $builder
 While theoretically you _can_ use wrong method for dropdown items, e.g. `createBatchAction` for a dropdown action created by `addRowAction`,
 the bundle will automatically change the context of the action to the proper one. However, try to use proper methods for better readability.
 
-When using the `DropdownActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `DropdownActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return an array of actions.
 
 ```php
@@ -70,7 +70,7 @@ Whether to render a caret icon next to the dropdown label. For example:
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType;
 
-$builder 
+$builder
     ->addRowAction('dropdownWithCaret', DropdownActionType::class, [
         'label' => 'Dropdown with caret',
         'with_caret' => true,

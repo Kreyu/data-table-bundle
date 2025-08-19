@@ -28,7 +28,7 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
                 'label' => false,
             ])
             ->setRequired('handler')
-            ->setAllowedTypes('handler', 'callable')
+            ->setAllowedTypes('handler', [\Closure::class])
             ->addNormalizer('form_options', function (Options $options, array $value): array {
                 return $value + [
                     'attr' => ($value['attr'] ?? []) + ['placeholder' => 'Search...'],

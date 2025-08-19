@@ -29,7 +29,7 @@ $builder->addColumn('show', LinkColumnType::class, [
 
 ### `href`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 - **default**: `'#'`
 
 Sets the value that will be used as a [href attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href).
@@ -62,11 +62,11 @@ $builder
 
 ### `target`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 - **default**: `'_self'`
 
-Sets the value that will be used as a [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target). 
-Similar to [`href`](#href) option, you can pass a callable that receives three arguments.
+Sets the value that will be used as a [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target).
+Similar to [`href`](#href) option, you can pass a closure that receives three arguments.
 
 ## Inherited options
 

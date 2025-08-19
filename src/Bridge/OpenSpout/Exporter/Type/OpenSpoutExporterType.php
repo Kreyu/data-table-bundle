@@ -33,10 +33,10 @@ final class OpenSpoutExporterType extends AbstractExporterType
                 'value_row_style' => null,
                 'value_cell_style' => null,
             ])
-            ->setAllowedTypes('header_row_style', ['null', 'callable', Style::class])
-            ->setAllowedTypes('header_cell_style', ['null', 'callable', Style::class])
-            ->setAllowedTypes('value_row_style', ['null', 'callable', Style::class])
-            ->setAllowedTypes('value_cell_style', ['null', 'callable', Style::class])
+            ->setAllowedTypes('header_row_style', ['null', \Closure::class, Style::class])
+            ->setAllowedTypes('header_cell_style', ['null', \Closure::class, Style::class])
+            ->setAllowedTypes('value_row_style', ['null', \Closure::class, Style::class])
+            ->setAllowedTypes('value_cell_style', ['null', \Closure::class, Style::class])
         ;
     }
 }

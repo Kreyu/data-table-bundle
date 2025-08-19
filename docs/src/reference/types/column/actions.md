@@ -21,23 +21,23 @@ If at least one row action is defined and is visible, an `ActionColumnType` is a
 This option contains a list of actions. Each action consists of _three_ options:
 
 > #### `type`
-> 
+>
 > - **type**: `string`
-> 
+>
 > Fully qualified class name of the [action type](#).
 > <br/><br/>
-> 
+>
 > #### `type_options`
-> 
+>
 > - **type**: `array`
-> - **default**: `[]`  
-> 
+> - **default**: `[]`
+>
 > Options passed to the action type.
 > <br/><br/>
-> 
+>
 > #### `visible`
-> 
-> - **type**: `bool`or `callable`
+>
+> - **type**: `bool`or `\Closure`
 > - **default**: `true`
 
 Determines whether the action should be visible.
@@ -58,7 +58,7 @@ $builder
                         return $this->urlGenerator->generate('category_show', [
                             'id' => $product->getId(),
                         ]);
-                    }),                
+                    }),
                 ],
                 'visible' => function (Product $product): bool {
                     return $product->isActive();

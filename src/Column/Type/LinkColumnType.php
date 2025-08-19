@@ -20,11 +20,15 @@ final class LinkColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (is_callable($href = $options['href'])) {
+        $href = $options['href'];
+
+        if ($href instanceof \Closure) {
             $href = $href($view->vars['data'], $view->parent->data, $column);
         }
 
-        if (is_callable($target = $options['target'])) {
+        $target = $options['target'];
+
+        if ($target instanceof \Closure) {
             $target = $target($view->vars['data'], $view->parent->data, $column);
         }
 
@@ -38,13 +42,13 @@ final class LinkColumnType extends AbstractColumnType
     {
         $resolver->define('href')
             ->default('#')
-            ->allowedTypes('string', 'callable')
+            ->allowedTypes('string', \Closure::class)
             ->info('Defines the URL to link to.')
         ;
 
         $resolver->define('target')
             ->default(null)
-            ->allowedTypes('null', 'string', 'callable')
+            ->allowedTypes('null', 'string', \Closure::class)
             ->info('Sets the value that will be used as a "target" HTML attribute.')
         ;
     }

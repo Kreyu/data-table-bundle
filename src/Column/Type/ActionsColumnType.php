@@ -65,8 +65,8 @@ final class ActionsColumnType extends AbstractColumnType
                         'visible' => true,
                     ])
                     ->setAllowedTypes('type', ['string'])
-                    ->setAllowedTypes('type_options', ['array', 'callable'])
-                    ->setAllowedTypes('visible', ['bool', 'callable'])
+                    ->setAllowedTypes('type_options', ['array', \Closure::class])
+                    ->setAllowedTypes('visible', ['bool', \Closure::class])
                     ->setInfo('type', 'A fully-qualified class name of the action type.')
                     ->setInfo('type_options', 'An array of options passed to the action type.')
                     ->setInfo('visible', 'Determines whether the action should be visible.')
@@ -104,7 +104,7 @@ final class ActionsColumnType extends AbstractColumnType
 
         $visible = $action['visible'];
 
-        if ($view instanceof ColumnValueView && is_callable($visible)) {
+        if ($view instanceof ColumnValueView && $visible instanceof \Closure) {
             $visible = $visible($view->value);
         }
 

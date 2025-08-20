@@ -217,5 +217,6 @@ interface DataTableInterface
     public function createExportView(): DataTableView;
 
     public function setTurboFrameId(string $turboFrameId): static;
+
     public function isRequestFromTurboFrame(): bool;
 }

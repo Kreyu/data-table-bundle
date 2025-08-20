@@ -574,6 +574,21 @@ class DataTable implements DataTableInterface
 
         $filters = $this->getFilters();
 
+        foreach ($this->getColumns() as $column) {
+            $typeFqcn = $column->getConfig()->getOption('filter', false);
+            if ($typeFqcn && is_string($typeFqcn)) {
+                $name = $column->getName();
+                // Avoid overriding an existing filter with the same name
+                if (!isset($filters[$name])) {
+                    $options = $column->getConfig()->getOption('filter_options', []);
+                    $filter = $this->config->getFilterFactory()->createNamed($name, $typeFqcn, $options);
+                    // Attach data table context for consistency
+                    $filter->setDataTable($this);
+                    $filters[$name] = $filter;
+                }
+            }
+        }
+
         $data->appendMissingFilters($filters);
         $data->removeRedundantFilters($filters);
 
@@ -767,6 +782,23 @@ class DataTable implements DataTableInterface
             options: [
                 'data_table' => $this,
                 'data_table_view' => $view,
+            ],
+        );
+    }
+
+    public function createColumnFiltrationFormBuilder(?DataTableView $view = null, array $filters = []): FormBuilderInterface
+    {
+        if (!$this->config->isFiltrationEnabled()) {
+            throw new RuntimeException('The data table has filtration feature disabled.');
+        }
+
+        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+            name: $this->config->getColumnFiltrationParameterName(),
+            type: FiltrationDataType::class,
+            options: [
+                'data_table' => $this,
+                'data_table_view' => $view,
+                'filters' => $filters,
             ],
         );
     }

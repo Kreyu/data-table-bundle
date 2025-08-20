@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -73,6 +74,8 @@ final class ColumnType implements ColumnTypeInterface
             'sort_direction' => $sortColumnData?->getDirection(),
             'sortable' => $column->getConfig()->isSortable(),
             'export' => $column->getConfig()->isExportable(),
+            'filter' => $options['filter'],
+            'filter_options' => $options['filter_options'],
         ]);
     }
 
@@ -329,6 +332,24 @@ final class ColumnType implements ColumnTypeInterface
             ->default(true)
             ->allowedTypes('bool')
             ->info('Defines whether the column can be personalized by the user in personalization feature.')
+        ;
+
+        $resolver->define('filter')
+            ->default(null)
+            ->allowedTypes('string', 'null')
+            ->allowedValues(function (?string $value): bool {
+                if (null === $value) {
+                    return true;
+                }
+                return is_subclass_of($value, AbstractFilterType::class);
+            })
+            ->info('Provide a Filter Type FQCN (extending AbstractFilterType) to render a per-column filter.')
+        ;
+
+        $resolver->define('filter_options')
+            ->default([])
+            ->allowedTypes('array')
+            ->info('Options passed to the per-column filter type when rendering the inline filter in the header.')
         ;
     }
 

@@ -15,6 +15,7 @@
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
         >
             {{ block('action_bar', theme) }}
+            {{ block('kreyu_data_table_column_filters_form', theme) }}
             {{ block('table', theme) }}
 
             {% if pagination_enabled %}
@@ -367,6 +368,28 @@
     {% endif %}
 {% endblock %}
 
+{# Column filtration (per-column filters), independent from header filters #}
+{% block kreyu_data_table_column_filters_form %}
+    {% set form = data_table.vars.column_filtration_form|default(null) %}
+    {% if form %}
+        {% form_theme form with form_themes|default([_self]) %}
+        {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
+        {{ form_end(form, { render_rest: false }) }}
+
+        {% set data_table = form.vars.data_table_view %}
+        {% if data_table.vars.pagination_enabled %}
+            {% set url_query_parameters = [] %}
+            {% if should_reset_to_first_page ?? true %}
+                {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+            {% endif %}
+            {% if should_keep_per_page ?? true %}
+                {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.per_page_parameter_name): data_table.vars.pagination.vars.item_number_per_page }) %}
+            {% endif %}
+            {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
 {% block filtration_widget %}
     <div {{ block('attributes') }}>{{ block('filtration_form', theme) }}</div>
 {% endblock %}
@@ -434,12 +457,50 @@
                     {{ block('sort_arrow_none', theme, _context) }}
                 {% endif %}
             </a>
+            {# Inline column filter input (optional) - also render for sortable columns #}
+            {% if data_table.vars.filtration_enabled and filter %}
+                {% set column_form = data_table.vars.column_filtration_form|default(null) %}
+                {% if column_form %}
+                    {% set filter_name = header_filter_name|default(name) %}
+{#                    {% set filter_child_name = filter_name|replace({'.':'__'}) %}#}
+                    {% if attribute(column_form, filter_name, [], 'any', true, true) is defined %}
+                        <div class="dtb-column-filter">
+                            {# Prefer rendering the value field for compactness; if not available, render whole child #}
+                            {% set child = attribute(column_form, filter_name) %}
+                            {% if attribute(child, 'value', [], 'any', true, true) is defined %}
+                                {{ form_widget(child.value, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', onchange: 'this.form.requestSubmit()' } }) }}
+                            {% else %}
+                                {{ form_widget(child, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' } }) }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
         </th>
     {% else %}
         <th {{ block('attributes') }}>
             <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
             </span>
+            {# Inline column filter input (optional) #}
+            {% if data_table.vars.filtration_enabled and filter %}
+                {% set column_form = data_table.vars.column_filtration_form|default(null) %}
+                {% if column_form %}
+                    {% set filter_name = header_filter_name|default(name) %}
+                    {% set filter_child_name = filter_name|replace({'.':'__'}) %}
+                    {% if attribute(column_form, filter_child_name, [], 'any', true, true) is defined %}
+                        <div class="dtb-column-filter">
+                            {# Prefer rendering the value field for compactness; if not available, render whole child #}
+                            {% set child = attribute(column_form, filter_child_name) %}
+                            {% if attribute(child, 'value', [], 'any', true, true) is defined %}
+                                {{ form_widget(child.value, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', onchange: 'this.form.requestSubmit()' } }) }}
+                            {% else %}
+                                {{ form_widget(child, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' } }) }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
         </th>
     {% endif %}
 {% endblock %}

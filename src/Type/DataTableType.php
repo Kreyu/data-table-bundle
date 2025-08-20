@@ -99,6 +99,7 @@ final class DataTableType implements DataTableTypeInterface
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
+            'column_filtration_parameter_name' => $dataTable->getConfig()->getColumnFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
@@ -128,6 +129,19 @@ final class DataTableType implements DataTableTypeInterface
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
             $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
+
+            // Build a column filtration form using filters defined per column (type + options)
+            $columnFilters = [];
+            foreach ($view->headerRow->children as $name => $columnHeaderView) {
+                $filterType = $columnHeaderView->vars['filter'] ?? false;
+                if ($filterType) {
+                    $filterOptions = $columnHeaderView->vars['filter_options'] ?? [];
+                    $columnFilters[] = $dataTable->getConfig()->getFilterFactory()->createNamed($name, $filterType, $filterOptions);
+                }
+            }
+            $columnForm = $dataTable->createColumnFiltrationFormBuilder($view, $columnFilters)->getForm();
+            $columnForm->setData($dataTable->getFiltrationData());
+            $view->vars['column_filtration_form'] = $this->createFormView($columnForm, $view, $dataTable);
         }
 
         if ($dataTable->getConfig()->isPersonalizationEnabled()) {
@@ -270,12 +284,27 @@ final class DataTableType implements DataTableTypeInterface
             return [];
         }
 
+        $filters = $dataTable->getFilters();
+
+        foreach ($dataTable->getColumns() as $column) {
+            if (null !== $column->getConfig()->getOption('filter')) {
+                // If the column has a filter defined, we can add it to the filters list
+                $filter = $dataTable->getConfig()->getFilterFactory()->createNamed(
+                    $column->getName(),
+                    $column->getConfig()->getOption('filter'),
+                    $column->getConfig()->getOption('filter_options', []),
+                );
+                $filter->setDataTable($dataTable);
+                $filters[$column->getName()] = $filter;
+            }
+        }
+
         return array_map(
             static fn (FilterInterface $filter) => $filter->createView(
                 $dataTable->getFiltrationData()?->getFilterData($filter) ?? new FilterData(),
                 $view,
             ),
-            $dataTable->getFilters(),
+            $filters,
         );
     }
 

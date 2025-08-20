@@ -202,6 +202,8 @@ interface DataTableInterface
 
     public function createFiltrationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
+    public function createColumnFiltrationFormBuilder(?DataTableView $view = null, array $filters = []): FormBuilderInterface;
+
     public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface;
 
     public function createExportFormBuilder(?DataTableView $view = null): FormBuilderInterface;

@@ -845,6 +845,11 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         return $this->getParameterName(static::FILTRATION_PARAMETER);
     }
 
+    public function getColumnFiltrationParameterName(): string
+    {
+        return $this->getParameterName(static::COLUMN_FILTRATION_PARAMETER);
+    }
+
     public function getPersonalizationParameterName(): string
     {
         return $this->getParameterName(static::PERSONALIZATION_PARAMETER);

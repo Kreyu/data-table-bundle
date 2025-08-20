@@ -24,7 +24,17 @@ class FiltrationDataType extends AbstractType
          */
         $dataTable = $options['data_table'];
 
-        foreach ($dataTable->getFilters() as $filter) {
+        $filters = $dataTable->getFilters();
+
+        if (null !== $options['filters']) {
+            $selected = [];
+            foreach ($options['filters'] as $filter) {
+                $selected[$filter->getName()] = $filter;
+            }
+            $filters = $selected;
+        }
+
+        foreach ($filters as $filter) {
             $builder->add($filter->getFormName(), FilterDataType::class, $filter->getFormOptions() + [
                 'getter' => fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
                 'setter' => fn (FiltrationData $filtrationData, FilterData $filterData) => $filtrationData->setFilterData($filter, $filterData),
@@ -50,20 +60,22 @@ class FiltrationDataType extends AbstractType
         $view->vars['attr']['id'] = $id;
 
         foreach ($view as $name => $filterFormView) {
-            $filterView = $dataTableView->filters[$name];
-
-            $filterFormView->vars['label'] = $filterView->vars['label'];
-            $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
+            if (isset($dataTableView->filters[$name])) {
+                $filterView = $dataTableView->filters[$name];
+                $filterFormView->vars['label'] = $filterView->vars['label'];
+                $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
+            }
         }
 
         $searchFields = [];
 
         foreach ($form as $child) {
-            try {
-                $filter = $dataTable->getFilter($child->getName());
-            } catch (\InvalidArgumentException) {
+            if (!$dataTable->hasFilter($child->getName())) {
+                // This may be a column filter not registered in DataTable->getFilters(); skip.
                 continue;
             }
+
+            $filter = $dataTable->getFilter($child->getName());
 
             if ($filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
                 $searchFields[] = $view[$child->getName()];
@@ -83,10 +95,12 @@ class FiltrationDataType extends AbstractType
                 'data_class' => FiltrationData::class,
                 'csrf_protection' => false,
                 'data_table_view' => null,
+                'filters' => null,
             ])
             ->setRequired('data_table')
             ->setAllowedTypes('data_table', DataTableInterface::class)
             ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
+            ->setAllowedTypes('filters', ['null', 'array'])
         ;
     }
 

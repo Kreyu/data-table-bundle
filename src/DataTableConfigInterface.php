@@ -26,6 +26,7 @@ interface DataTableConfigInterface
     public const PER_PAGE_PARAMETER = 'limit';
     public const SORT_PARAMETER = 'sort';
     public const FILTRATION_PARAMETER = 'filter';
+    public const COLUMN_FILTRATION_PARAMETER = 'filter_column';
     public const PERSONALIZATION_PARAMETER = 'personalization';
     public const EXPORT_PARAMETER = 'export';
 
@@ -130,6 +131,8 @@ interface DataTableConfigInterface
     public function getSortParameterName(): string;
 
     public function getFiltrationParameterName(): string;
+
+    public function getColumnFiltrationParameterName(): string;
 
     public function getPersonalizationParameterName(): string;
 

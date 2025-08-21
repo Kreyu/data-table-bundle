@@ -6,7 +6,6 @@ namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
-use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
@@ -46,53 +45,25 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        $mainForm = $dataTable->createFiltrationFormBuilder()->getForm();
+        $form = $dataTable->createFiltrationFormBuilder()->getForm();
 
-        // Build ad-hoc per-column filters from column configuration (type + options)
-        $columnFilters = [];
-        foreach ($dataTable->getColumns() as $column) {
-            $typeFqcn = $column->getConfig()->getOption('filter', false);
-            if ($typeFqcn && is_string($typeFqcn)) {
-                $filterName = $column->getName();
-                $options = $column->getConfig()->getOption('filter_options', []);
-                $columnFilters[] = $dataTable->getConfig()->getFilterFactory()->createNamed($filterName, $typeFqcn, $options);
-            }
+        if ($data = $request->get($form->getName())) {
+            $form->submit($data);
         }
-        $columnForm = $dataTable->createColumnFiltrationFormBuilder(null, $columnFilters)->getForm();
 
-        if ($data = $request->get($mainForm->getName())) {
-            $mainForm->submit($data);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dataTable->filter($form->getData());
         }
+
+        $columnForm = $dataTable->createColumnFiltrationFormBuilder()->getForm();
+
         if ($data = $request->get($columnForm->getName())) {
             $columnForm->submit($data);
         }
 
-        $submitted = ($mainForm->isSubmitted() && $mainForm->isValid()) || ($columnForm->isSubmitted() && $columnForm->isValid());
-        if (!$submitted) {
-            return;
-        }
-
-        // Start from current filtration data (or defaults), then override with submitted values.
-        $merged = $dataTable->getFiltrationData();
-        if (null === $merged) {
-            $merged = $dataTable->getConfig()->getDefaultFiltrationData() ?? FiltrationData::fromDataTable($dataTable);
-        }
-
-        if ($mainForm->isSubmitted() && $mainForm->isValid()) {
-            $data = $mainForm->getData();
-            foreach ($data->getFilters() as $name => $filterData) {
-                $merged->setFilterData($name, $filterData);
-            }
-        }
-
         if ($columnForm->isSubmitted() && $columnForm->isValid()) {
-            $data = $columnForm->getData();
-            foreach ($data->getFilters() as $name => $filterData) {
-                $merged->setFilterData($name, $filterData);
-            }
+            $dataTable->filter($columnForm->getData());
         }
-
-        $dataTable->filter($merged);
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void

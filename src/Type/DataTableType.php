@@ -129,19 +129,7 @@ final class DataTableType implements DataTableTypeInterface
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
             $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
-
-            // Build a column filtration form using filters defined per column (type + options)
-            $columnFilters = [];
-            foreach ($view->headerRow->children as $name => $columnHeaderView) {
-                $filterType = $columnHeaderView->vars['filter'] ?? false;
-                if ($filterType) {
-                    $filterOptions = $columnHeaderView->vars['filter_options'] ?? [];
-                    $columnFilters[] = $dataTable->getConfig()->getFilterFactory()->createNamed($name, $filterType, $filterOptions);
-                }
-            }
-            $columnForm = $dataTable->createColumnFiltrationFormBuilder($view, $columnFilters)->getForm();
-            $columnForm->setData($dataTable->getFiltrationData());
-            $view->vars['column_filtration_form'] = $this->createFormView($columnForm, $view, $dataTable);
+            $view->vars['column_filtration_form'] = $this->createFiltrationColumnView($view, $dataTable);
         }
 
         if ($dataTable->getConfig()->isPersonalizationEnabled()) {
@@ -284,27 +272,12 @@ final class DataTableType implements DataTableTypeInterface
             return [];
         }
 
-        $filters = $dataTable->getFilters();
-
-        foreach ($dataTable->getColumns() as $column) {
-            if (null !== $column->getConfig()->getOption('filter')) {
-                // If the column has a filter defined, we can add it to the filters list
-                $filter = $dataTable->getConfig()->getFilterFactory()->createNamed(
-                    $column->getName(),
-                    $column->getConfig()->getOption('filter'),
-                    $column->getConfig()->getOption('filter_options', []),
-                );
-                $filter->setDataTable($dataTable);
-                $filters[$column->getName()] = $filter;
-            }
-        }
-
         return array_map(
             static fn (FilterInterface $filter) => $filter->createView(
                 $dataTable->getFiltrationData()?->getFilterData($filter) ?? new FilterData(),
                 $view,
             ),
-            $filters,
+            $dataTable->getFilters(),
         );
     }
 
@@ -402,6 +375,22 @@ final class DataTableType implements DataTableTypeInterface
         $form->setData($dataTable->getFiltrationData());
 
         return $this->createFormView($form, $view, $dataTable);
+    }
+
+    private function createFiltrationColumnView(DataTableView $view, DataTableInterface $dataTable): FormView
+    {
+        $columnFilters = [];
+        foreach ($view->headerRow->children as $name => $columnHeaderView) {
+            $filterType = $columnHeaderView->vars['filter'] ?? false;
+            if ($filterType) {
+                $filterOptions = $columnHeaderView->vars['filter_options'] ?? [];
+                $columnFilters[] = $dataTable->getConfig()->getFilterFactory()->createNamed($name, $filterType, $filterOptions);
+            }
+        }
+        $columnForm = $dataTable->createColumnFiltrationFormBuilder($view, $columnFilters)->getForm();
+        $columnForm->setData($dataTable->getFiltrationData());
+
+        return $this->createFormView($columnForm, $view, $dataTable);
     }
 
     private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView

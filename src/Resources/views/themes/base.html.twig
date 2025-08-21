@@ -462,7 +462,6 @@
                 {% set column_form = data_table.vars.column_filtration_form|default(null) %}
                 {% if column_form %}
                     {% set filter_name = header_filter_name|default(name) %}
-{#                    {% set filter_child_name = filter_name|replace({'.':'__'}) %}#}
                     {% if attribute(column_form, filter_name, [], 'any', true, true) is defined %}
                         <div class="dtb-column-filter">
                             {# Prefer rendering the value field for compactness; if not available, render whole child #}

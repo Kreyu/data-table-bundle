@@ -27,6 +27,7 @@ final class FilterType implements FilterTypeInterface
             'default_operator' => $builder->setDefaultOperator(...),
             'supported_operators' => $builder->setSupportedOperators(...),
             'operator_selectable' => $builder->setOperatorSelectable(...),
+            'is_header_filter' => $builder->setIsHeaderFilter(...),
         ];
 
         foreach ($setters as $option => $setter) {
@@ -62,6 +63,7 @@ final class FilterType implements FilterTypeInterface
             'operator_selectable' => $filter->getConfig()->isOperatorSelectable(),
             'default_operator' => $filter->getConfig()->getDefaultOperator(),
             'supported_operators' => $filter->getConfig()->getSupportedOperators(),
+            'is_header_filter' => $filter->getConfig()->isHeaderFilter(),
             'data' => $view->data,
             'value' => $view->value,
         ]);
@@ -83,6 +85,7 @@ final class FilterType implements FilterTypeInterface
                 'supported_operators' => [],
                 'operator_selectable' => false,
                 'active_filter_formatter' => null,
+                'is_header_filter' => true,
             ])
             ->setAllowedTypes('label', ['null', 'bool', 'string', TranslatableInterface::class])
             ->setAllowedTypes('label_translation_parameters', 'array')
@@ -96,6 +99,7 @@ final class FilterType implements FilterTypeInterface
             ->setAllowedTypes('supported_operators', Operator::class.'[]')
             ->setAllowedTypes('operator_selectable', 'bool')
             ->setAllowedTypes('active_filter_formatter', ['null', 'callable'])
+            ->setAllowedTypes('is_header_filter', ['bool'])
             ->setAllowedValues('translation_domain', function (mixed $value): bool {
                 return is_null($value) || false === $value || is_string($value);
             })

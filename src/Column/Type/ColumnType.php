@@ -341,6 +341,7 @@ final class ColumnType implements ColumnTypeInterface
                 if (null === $value) {
                     return true;
                 }
+
                 return is_subclass_of($value, AbstractFilterType::class);
             })
             ->info('Provide a Filter Type FQCN (extending AbstractFilterType) to render a per-column filter.')

@@ -468,6 +468,9 @@
                 {% set filter_name = header_filter_name|default(name) %}
                 {% if attribute(column_form, filter_name, [], 'any', true, true) is defined %}
                     {% set child = attribute(column_form, filter_name) %}
+                    {% if child.operator is defined %}
+                        {{ form_widget(child.operator) }}
+                    {% endif %}
                     {{ form_widget(child.value, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', onchange: 'this.form.requestSubmit()' } }) }}
                 {% endif %}
             {% endif %}

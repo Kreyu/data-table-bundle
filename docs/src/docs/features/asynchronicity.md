@@ -40,11 +40,11 @@ For more information, see [official documentation about the Turbo frames](https:
 
 When a request originates from a Turbo Frame, you can return only the HTML of the data table instead of rendering the entire page. This significantly improves performance on pages with lots of content.
 
-This bundle provides a helper for that: the DataTableTurboResponseTrait. It renders just the table's markup so Turbo can replace the content of the requesting frame.
+This bundle provides a helper for that: the `DataTableTurboResponseTrait`. It renders just the table's markup so Turbo can replace the content of the requesting frame.
 
 How it works under the hood:
-- The HttpFoundationRequestHandler reads the Turbo-Frame request header and stores it in the DataTable instance.
-- The DataTable::isRequestFromTurboFrame() method returns true when the header matches the table frame id (`kreyu_data_table_<name>`).
+- The `HttpFoundationRequestHandler` reads the Turbo-Frame request header and stores it in the `DataTable` instance.
+- The `DataTable::isRequestFromTurboFrame()` method returns true when the header matches the table frame id (`kreyu_data_table_<name>`).
 - In that case, you can short-circuit the controller and return only the table HTML using the trait method.
 
 Example controller usage:
@@ -81,9 +81,9 @@ class ProductController extends AbstractController
 ```
 
 Notes:
-- Make sure your table is wrapped in a <turbo-frame> as shown above; built-in themes already do this.
+- Make sure your table is wrapped in a `<turbo-frame>` as shown above; built-in themes already do this.
 - Turbo sends the Turbo-Frame header with the frame id; the bundle reads it for you. You don't need to access headers directly.
-- The trait requires Twig to be available in your controller service (it is auto-wired by Symfony via the #[Required] setter).
+- The trait requires Twig to be available in your controller service (it is auto-wired by Symfony via the `#[Required]` setter).
 
 ## Prefetching
 

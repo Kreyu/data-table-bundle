@@ -38,6 +38,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ResultSet;
 use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -670,7 +671,16 @@ class DataTable implements DataTableInterface
 
     private function getResultSet(): ResultSetInterface
     {
-        return $this->resultSet ??= $this->query->getResult();
+        if (
+            !$this->config->isAsync()
+            || $this->isRequestFromTurboFrame()
+        ) {
+            return $this->resultSet ??= $this->query->getResult();
+        }
+
+        // In this case, we don't want to fetch the results immediately,
+        // but rather return an empty result set that will be filled later through AJAX.
+        return new ResultSet(new \ArrayIterator([]), 0, 0);
     }
 
     private function createPagination(): PaginationInterface

@@ -85,6 +85,36 @@ Notes:
 - Turbo sends the Turbo-Frame header with the frame id; the bundle reads it for you. You don't need to access headers directly.
 - The trait requires Twig to be available in your controller service (it is auto-wired by Symfony via the #[Required] setter).
 
+## Asynchronous Data Table Loading
+
+You can enable asynchronous loading for your data tables using the `async` option. This feature is especially useful for tables with slow data sources or when displaying multiple tables on a single page.
+
+### Enabling Asynchronous Loading
+
+To enable asynchronous loading, set the async option to true in your data table type:
+```php
+class ProductDataTableType extends AbstractDataTableType
+{
+    // ...
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'async' => true,
+        ]);
+    }
+}
+```
+
+With this option enabled, the data table will not load its content immediately when the page is rendered. Instead, it will trigger a backend request to fetch and display the table data.
+
+### How It Works
+
+- When 'async' is enabled, the table's initial HTML does not include its data rows.
+- The table content is loaded asynchronously via a backend call after the page loads.
+- If the data table is not visible in the user's viewport, its content is not loaded until the user scrolls to it. This optimizes performance, especially on pages with multiple or heavy tables.
+- If you need the table to load immediately regardless of visibility, keep async set to false (the default).
+
+
 ## Prefetching
 
 <TurboPrefetchingSection>

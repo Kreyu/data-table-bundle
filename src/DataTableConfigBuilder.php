@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
@@ -60,6 +61,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?FilterFactoryInterface $filterFactory = null;
     private ?ActionFactoryInterface $actionFactory = null;
     private ?ExporterFactoryInterface $exporterFactory = null;
+    private ?ColumnVisibilityGroupBuilderInterface $columnVisibilityGroupBuilder = null;
     private ?RequestHandlerInterface $requestHandler = null;
 
     private bool $sortingClearable = false;
@@ -187,6 +189,26 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->columnFactory = $columnFactory;
+
+        return $this;
+    }
+
+    public function getColumnVisibilityGroupBuilder(): ColumnVisibilityGroupBuilderInterface
+    {
+        if (!isset($this->columnVisibilityGroupBuilder)) {
+            throw new BadMethodCallException(sprintf('The column factory is not set, use the "%s::setColumnVisibilityGroupBuilder()" method to set the column factory.', $this::class));
+        }
+
+        return $this->columnVisibilityGroupBuilder;
+    }
+
+    public function setColumnVisibilityGroupBuilder(ColumnVisibilityGroupBuilderInterface $columnVisibilityGroupBuilder): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->columnVisibilityGroupBuilder = $columnVisibilityGroupBuilder;
 
         return $this;
     }
@@ -848,6 +870,11 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     public function getPersonalizationParameterName(): string
     {
         return $this->getParameterName(static::PERSONALIZATION_PARAMETER);
+    }
+
+    public function getColumnVisibilityGroupParameterName(): string
+    {
+        return $this->getParameterName(static::COLUMN_VISIBILITY_GROUP_PARAMETER);
     }
 
     public function getExportParameterName(): string

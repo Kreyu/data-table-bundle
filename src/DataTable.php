@@ -113,6 +113,7 @@ class DataTable implements DataTableInterface
 
     private bool $initialized = false;
     private ?string $turboFrameId = null;
+    private ?string $columnVisibilityGroup = null;
 
     public function __construct(
         private ProxyQueryInterface $query,
@@ -200,6 +201,12 @@ class DataTable implements DataTableInterface
 
             if ($this->getConfig()->isPersonalizationEnabled() && $column->getConfig()->isPersonalizable()) {
                 $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
+            }
+
+            if ($visible && $column->getConfig()->getOption('column_visibility_groups')) {
+                return
+                    null === $this->columnVisibilityGroup
+                    || in_array($this->columnVisibilityGroup, (array) $column->getConfig()->getOption('column_visibility_groups'), true);
             }
 
             return $visible;
@@ -878,6 +885,13 @@ class DataTable implements DataTableInterface
     public function isRequestFromTurboFrame(): bool
     {
         return null !== $this->turboFrameId && 'kreyu_data_table_'.$this->getName() === $this->turboFrameId;
+    }
+
+    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): self
+    {
+        $this->columnVisibilityGroup = $columnVisibilityGroup;
+
+        return $this;
     }
 
     private function dispatch(string $eventName, DataTableEvent $event): void

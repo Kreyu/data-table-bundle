@@ -26,6 +26,8 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TemplateColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupBuilder;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupBuilderInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -54,6 +56,11 @@ return static function (ContainerConfigurator $configurator) {
         ->set('kreyu_data_table.column.factory', ColumnFactory::class)
         ->args([service('kreyu_data_table.column.registry')])
         ->alias(ColumnFactoryInterface::class, 'kreyu_data_table.column.factory')
+    ;
+
+    $services
+        ->set('kreyu_data_table.column_visibility_group.builder', ColumnVisibilityGroupBuilder::class)
+        ->alias(ColumnVisibilityGroupBuilderInterface::class, 'kreyu_data_table.column_visibility_group.builder')
     ;
 
     $services

@@ -219,4 +219,6 @@ interface DataTableInterface
     public function setTurboFrameId(string $turboFrameId): static;
 
     public function isRequestFromTurboFrame(): bool;
+
+    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): self;
 }

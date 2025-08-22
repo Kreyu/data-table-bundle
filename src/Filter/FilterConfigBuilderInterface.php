@@ -46,4 +46,6 @@ interface FilterConfigBuilderInterface extends FilterConfigInterface
     public function setOperatorSelectable(bool $operatorSelectable): static;
 
     public function getFilterConfig(): FilterConfigInterface;
+
+    public function setIsHeaderFilter(bool $isHeaderFilter): self;
 }

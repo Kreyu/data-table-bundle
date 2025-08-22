@@ -99,6 +99,7 @@ final class DataTableType implements DataTableTypeInterface
             'per_page_parameter_name' => $dataTable->getConfig()->getPerPageParameterName(),
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
+            'column_filtration_parameter_name' => $dataTable->getConfig()->getColumnFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
@@ -128,6 +129,7 @@ final class DataTableType implements DataTableTypeInterface
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
             $view->vars['filtration_form'] = $this->createFiltrationFormView($view, $dataTable);
+            $view->vars['column_filtration_form'] = $this->createFiltrationColumnView($view, $dataTable);
         }
 
         if ($dataTable->getConfig()->isPersonalizationEnabled()) {
@@ -373,6 +375,22 @@ final class DataTableType implements DataTableTypeInterface
         $form->setData($dataTable->getFiltrationData());
 
         return $this->createFormView($form, $view, $dataTable);
+    }
+
+    private function createFiltrationColumnView(DataTableView $view, DataTableInterface $dataTable): FormView
+    {
+        $columnFilters = [];
+        foreach ($view->headerRow->children as $name => $columnHeaderView) {
+            $filterType = $columnHeaderView->vars['filter'] ?? false;
+            if ($filterType) {
+                $filterOptions = $columnHeaderView->vars['filter_options'] ?? [];
+                $columnFilters[] = $dataTable->getConfig()->getFilterFactory()->createNamed($name, $filterType, $filterOptions);
+            }
+        }
+        $columnForm = $dataTable->createColumnFiltrationFormBuilder($view, $columnFilters)->getForm();
+        $columnForm->setData($dataTable->getFiltrationData());
+
+        return $this->createFormView($columnForm, $view, $dataTable);
     }
 
     private function createPersonalizationFormView(DataTableView $view, DataTableInterface $dataTable): FormView

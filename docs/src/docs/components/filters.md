@@ -34,6 +34,43 @@ This method accepts _three_ arguments:
 
 For reference, see [available filter types](../../reference/types/filter.md).
 
+### Column filters
+
+You can also add a filter directly to a column, which will display the filter in the column header.  
+To do this, use the `filter` and (optionally) `filter_options` keys in the column definition:
+
+```php
+$builder
+    ->addColumn('name', TextColumnType::class, [
+        'label' => 'Full name',
+        'sort' => true,
+        'filter' => StringFilterType::class,
+    ]);
+```
+
+You can pass options to the filter using the `filter_options` array:
+
+```php
+$builder
+    ->addColumn('name', TextColumnType::class, [
+        'label' => 'Full name',
+        'sort' => true,
+        'filter' => StringFilterType::class,
+        'filter_options' => [
+            'operator_selectable' => true,
+        ],
+    ]);
+```
+
+- `filter`: The filter type class (e.g. `StringFilterType::class`)
+- `filter_options`: An array of options passed to the filter (e.g. `operator_selectable`, `default_operator`, etc.)
+
+Column filters are rendered inside the column header and are scoped to the column they are defined on.
+
+> **Note:**  
+> A field cannot have both a header filter (via `addFilter()`) and a column filter (via the column's `filter` option) at the same time.  
+> Attempting to add both types of filters for the same field will result in an `InvalidArgumentException`.
+
 ### Case-insensitive filters for Postgres or MySQL with a case sensitive collation
 
 If your database does `LIKE` comparisons in a case-sensitive manner (aka `A` is not the same as `a`), but you want

@@ -25,6 +25,10 @@ class FiltrationDataType extends AbstractType
         $dataTable = $options['data_table'];
 
         foreach ($dataTable->getFilters() as $filter) {
+            if ($filter->getConfig()->isHeaderFilter() !== $options['is_header_form']) {
+                continue;
+            }
+
             $builder->add($filter->getFormName(), FilterDataType::class, $filter->getFormOptions() + [
                 'getter' => fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
                 'setter' => fn (FiltrationData $filtrationData, FilterData $filterData) => $filtrationData->setFilterData($filter, $filterData),
@@ -83,10 +87,12 @@ class FiltrationDataType extends AbstractType
                 'data_class' => FiltrationData::class,
                 'csrf_protection' => false,
                 'data_table_view' => null,
+                'is_header_form' => true,
             ])
             ->setRequired('data_table')
             ->setAllowedTypes('data_table', DataTableInterface::class)
             ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
+            ->setAllowedTypes('is_header_form', ['bool'])
         ;
     }
 

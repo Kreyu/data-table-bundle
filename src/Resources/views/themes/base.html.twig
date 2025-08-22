@@ -15,6 +15,7 @@
             data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
         >
             {{ block('action_bar', theme) }}
+            {{ block('kreyu_data_table_column_filters_form', theme) }}
             {{ block('table', theme) }}
 
             {% if pagination_enabled %}
@@ -367,6 +368,27 @@
     {% endif %}
 {% endblock %}
 
+{% block kreyu_data_table_column_filters_form %}
+    {% set form = data_table.vars.column_filtration_form|default(null) %}
+    {% if form %}
+        {% form_theme form with form_themes|default([_self]) %}
+        {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
+        {{ form_end(form, { render_rest: false }) }}
+
+        {% set data_table = form.vars.data_table_view %}
+        {% if data_table.vars.pagination_enabled %}
+            {% set url_query_parameters = [] %}
+            {% if should_reset_to_first_page ?? true %}
+                {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
+            {% endif %}
+            {% if should_keep_per_page ?? true %}
+                {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.per_page_parameter_name): data_table.vars.pagination.vars.item_number_per_page }) %}
+            {% endif %}
+            {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
 {% block filtration_widget %}
     <div {{ block('attributes') }}>{{ block('filtration_form', theme) }}</div>
 {% endblock %}
@@ -405,43 +427,55 @@
 {% block column_header %}
     {% set label_attr = label_attr|default({}) %}
 
-    {% if data_table.vars.sorting_enabled and sortable %}
-        {% set active_attr = active_attr|default({}) %}
-        {% set inactive_attr = inactive_attr|default({}) %}
 
-        {% set sorted_attr = sorted ? active_attr : inactive_attr %}
+    <th {{ block('attributes') }}>
+        {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
+        {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
 
-        {# Merge the sorted attr with column header attr, but merge its classes. #}
-        {# The column header attr class is added after the sorted attr class. #}
-        {% set attr = attr|merge(sorted_attr|merge({
-            class: (sorted_attr.class|default('') ~ ' ' ~ attr.class|default(''))|trim
-        })) %}
+        {% if data_table.vars.sorting_enabled and sortable %}
+            {% set active_attr = active_attr|default({}) %}
+            {% set inactive_attr = inactive_attr|default({}) %}
 
-        <th {{ block('attributes') }}>
-            {% set label_attr = { href: data_table_column_sort_url(data_table, column) }|merge(label_attr) %}
-            {% set label_attr = { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self' }|merge(label_attr) %}
+            {% set sorted_attr = sorted ? active_attr : inactive_attr %}
 
-            <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
-                {{- block('column_header_label', theme, _context) -}}
+            {# Merge the sorted attr with column header attr, but merge its classes. #}
+            {# The column header attr class is added after the sorted attr class. #}
+            {% set attr = attr|merge(sorted_attr|merge({
+                class: (sorted_attr.class|default('') ~ ' ' ~ attr.class|default(''))|trim
+            })) %}
+                <a {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
+                    {{- block('column_header_label', theme, _context) -}}
 
-                {% if sorted %}
-                    {% if sort_direction == 'asc' %}
-                        {{ block('sort_arrow_asc', theme, _context) }}
+                    {% if sorted %}
+                        {% if sort_direction == 'asc' %}
+                            {{ block('sort_arrow_asc', theme, _context) }}
+                        {% else %}
+                            {{ block('sort_arrow_desc', theme, _context) }}
+                        {% endif %}
                     {% else %}
-                        {{ block('sort_arrow_desc', theme, _context) }}
+                        {{ block('sort_arrow_none', theme, _context) }}
                     {% endif %}
-                {% else %}
-                    {{ block('sort_arrow_none', theme, _context) }}
-                {% endif %}
-            </a>
-        </th>
-    {% else %}
-        <th {{ block('attributes') }}>
+                </a>
+        {% else %}
             <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
             </span>
-        </th>
-    {% endif %}
+        {% endif %}
+
+        {% if data_table.vars.filtration_enabled and filter %}
+            {% set column_form = data_table.vars.column_filtration_form|default(null) %}
+            {% if column_form %}
+                {% set filter_name = header_filter_name|default(name) %}
+                {% if attribute(column_form, filter_name, [], 'any', true, true) is defined %}
+                    {% set child = attribute(column_form, filter_name) %}
+                    {% if child.operator is defined %}
+                        {{ form_widget(child.operator) }}
+                    {% endif %}
+                    {{ form_widget(child.value, { attr: { form: column_form.vars.id, 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', onchange: 'this.form.requestSubmit()' } }) }}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </th>
 {% endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType #}

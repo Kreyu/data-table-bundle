@@ -55,6 +55,16 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         if ($form->isSubmitted() && $form->isValid()) {
             $dataTable->filter($form->getData());
         }
+
+        $columnForm = $dataTable->createColumnFiltrationFormBuilder()->getForm();
+
+        if ($data = $request->get($columnForm->getName())) {
+            $columnForm->submit($data);
+        }
+
+        if ($columnForm->isSubmitted() && $columnForm->isValid()) {
+            $dataTable->filter($columnForm->getData());
+        }
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void

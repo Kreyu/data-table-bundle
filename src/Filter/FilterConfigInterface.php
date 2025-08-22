@@ -52,4 +52,6 @@ interface FilterConfigInterface
     public function getDefaultOperator(): Operator;
 
     public function isOperatorSelectable(): bool;
+
+    public function isHeaderFilter(): bool;
 }

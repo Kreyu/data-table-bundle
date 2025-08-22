@@ -66,7 +66,7 @@
 {% block column_visibility_group_selector %}
     {% if data_table.columnVisibilityGroups is not empty %}
 
-        {% set form_attr = { 'data-turbo-frame': '_self' }|merge(form_attr ?? {}) %}
+        {% set form_attr = { 'data-turbo-frame': '_self', 'data-turbo-action': 'advance'  }|merge(form_attr ?? {}) %}
 
         <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
             {% set select_attr = {

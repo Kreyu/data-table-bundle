@@ -12,8 +12,10 @@
 {% endblock %}
 
 {% block table_body_row_no_results %}
+    {% set table_body_row_no_results_attr = { colspan: column_count }|merge(table_body_row_no_results_attr ?? {}) %}
+
     <tr>
-        <td colspan="{{ column_count }}" {% with { attr: table_body_row_no_results_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
+        <td{{ _self.attributes(table_body_row_no_results_attr) }}>
             <div class="empty">
                 <div class="empty-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -34,7 +36,7 @@
 {% endblock %}
 
 {% block action_filter %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Filter'|trans({}, 'KreyuDataTable') }|merge(attr ?? {}) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -47,7 +49,7 @@
 {% endblock %}
 
 {% block action_export %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Export'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Export'|trans({}, 'KreyuDataTable') }|merge(attr ?? {}) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -64,7 +66,7 @@
 {% endblock %}
 
 {% block action_personalize %}
-    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Personalize'|trans({}, 'KreyuDataTable') }|merge(attr|default({})) } %}
+    {% with { attr: { class: 'btn btn-primary btn-icon', title: 'Personalize'|trans({}, 'KreyuDataTable') }|merge(attr ?? {}) } %}
         {{ parent() }}
     {% endwith %}
 {% endblock %}
@@ -140,8 +142,8 @@
 
 {% block batch_action_bar %}
     <div class="card-header" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
-        {{ block('batch_action_bar_title', theme) }}
-        {{ block('batch_action_bar_actions', theme) }}
+        {{ data_table_theme_block(data_table, 'batch_action_bar_title') }}
+        {{ data_table_theme_block(data_table, 'batch_action_bar_actions') }}
     </div>
 {% endblock %}
 

@@ -103,6 +103,7 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
+            'column_visibility_group_parameter_name' => $dataTable->getConfig()->getColumnVisibilityGroupParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
@@ -117,6 +118,7 @@ final class DataTableType implements DataTableTypeInterface
         $view->pagination = $this->createPaginationView($view, $dataTable);
         $view->filters = $this->createFilterViews($view, $dataTable);
         $view->actions = $this->createActionViews($view, $dataTable);
+        $view->columnVisibilityGroups = $dataTable->getColumnVisibilityGroups();
 
         $view->vars = array_replace($view->vars, [
             'header_row' => $view->headerRow,

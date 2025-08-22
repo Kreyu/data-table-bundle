@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
@@ -219,6 +220,10 @@ interface DataTableInterface
     public function setTurboFrameId(string $turboFrameId): static;
 
     public function isRequestFromTurboFrame(): bool;
+    public function setRequestedColumnVisibilityGroup(?string $requestedColumnVisibilityGroup): self;
 
-    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): self;
+    /**
+     * @return array<string, ColumnVisibilityGroupInterface>
+     */
+    public function getColumnVisibilityGroups(): array;
 }

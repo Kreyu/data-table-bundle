@@ -59,7 +59,30 @@
     {{ block('action_bar', theme) }}
 {% endblock %}
 
-{% block action_bar %}{% endblock %}
+{% block action_bar %}
+    {{ block('column_visibility_group_selector', theme) }}
+{% endblock %}
+
+{% block column_visibility_group_selector %}
+    {% if data_table.columnVisibilityGroups is not empty %}
+
+        {% set form_attr = { 'data-turbo-frame': '_self' }|merge(form_attr ?? {}) %}
+
+        <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
+            {% set select_attr = {
+                name: data_table.vars.column_visibility_group_parameter_name,
+                autocomplete: 'off',
+                onchange: 'this.form.requestSubmit()',
+            }|merge(select_attr|default({})) %}
+
+            <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
+                {% for column_visibility_group in data_table.columnVisibilityGroups %}
+                    <option value="{{ column_visibility_group.name }}" {% if column_visibility_group.isDefault %}selected{% endif %}>{{ column_visibility_group.label }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    {% endif %}
+{% endblock %}
 
 {% block table %}
     <table {% with { attr: table_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>

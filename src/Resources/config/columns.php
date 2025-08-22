@@ -60,6 +60,7 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.column_visibility_group.builder', ColumnVisibilityGroupBuilder::class)
+        ->args([service('translator')])
         ->alias(ColumnVisibilityGroupBuilderInterface::class, 'kreyu_data_table.column_visibility_group.builder')
     ;
 

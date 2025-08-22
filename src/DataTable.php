@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupInterface;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableExportEvent;
@@ -75,6 +76,11 @@ class DataTable implements DataTableInterface
     private array $exporters = [];
 
     /**
+     * @var array<string, ColumnVisibilityGroupInterface>
+     */
+    private array $columnVisibilityGroups = [];
+
+    /**
      * The sorting data currently applied to the data table.
      */
     private ?SortingData $sortingData = null;
@@ -113,7 +119,7 @@ class DataTable implements DataTableInterface
 
     private bool $initialized = false;
     private ?string $turboFrameId = null;
-    private ?string $columnVisibilityGroup = null;
+    private ?string $requestedColumnVisibilityGroup = null;
 
     public function __construct(
         private ProxyQueryInterface $query,
@@ -205,8 +211,8 @@ class DataTable implements DataTableInterface
 
             if ($visible && $column->getConfig()->getOption('column_visibility_groups')) {
                 return
-                    null === $this->columnVisibilityGroup
-                    || in_array($this->columnVisibilityGroup, (array) $column->getConfig()->getOption('column_visibility_groups'), true);
+                    null === $this->requestedColumnVisibilityGroup
+                    || in_array($this->requestedColumnVisibilityGroup, (array) $column->getConfig()->getOption('column_visibility_groups'), true);
             }
 
             return $visible;
@@ -513,6 +519,18 @@ class DataTable implements DataTableInterface
         unset($this->exporters[$name]);
 
         return $this;
+    }
+
+    public function addColumnVisibilityGroup(ColumnVisibilityGroupInterface $columnVisibilityGroup): static
+    {
+        $this->columnVisibilityGroups[$columnVisibilityGroup->getName()] = $columnVisibilityGroup;
+
+        return $this;
+    }
+
+    public function getColumnVisibilityGroups(): array
+    {
+        return $this->columnVisibilityGroups;
     }
 
     public function paginate(PaginationData $data, bool $persistence = true): void
@@ -887,9 +905,9 @@ class DataTable implements DataTableInterface
         return null !== $this->turboFrameId && 'kreyu_data_table_'.$this->getName() === $this->turboFrameId;
     }
 
-    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): self
+    public function setRequestedColumnVisibilityGroup(?string $requestedColumnVisibilityGroup): self
     {
-        $this->columnVisibilityGroup = $columnVisibilityGroup;
+        $this->requestedColumnVisibilityGroup = $requestedColumnVisibilityGroup;
 
         return $this;
     }

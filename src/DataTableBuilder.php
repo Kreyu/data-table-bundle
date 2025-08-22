@@ -141,7 +141,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     /**
      * The column visibility groups defined for the data table.
      *
-     * @var array<ColumnVisibilityGroupBuilderInterface>
+     * @var array<ColumnVisibilityGroupInterface>
      */
     private array $columnVisibilityGroups = [];
 
@@ -804,12 +804,16 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             $this->addSearchFilter();
         }
 
-        $this->resolveColumnVisibilityGroups();
-
         $this->resolveColumns();
 
         foreach ($this->columns as $column) {
             $dataTable->addColumn($column->getColumn());
+        }
+
+        $this->resolveColumnVisibilityGroups();
+
+        foreach ($this->columnVisibilityGroups as $columnVisibilityGroup) {
+            $dataTable->addColumnVisibilityGroup($columnVisibilityGroup);
         }
 
         $this->resolveFilters();

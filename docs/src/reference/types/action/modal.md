@@ -27,7 +27,7 @@ that opens a modal dialog with contents loaded from given URL.
 
 ### `href`
 
-- **type**: `null`, `string` or `callable` (if using as a row action)
+- **type**: `null`, `string` or `\Closure` (if using as a row action)
 - **default**: `null`
 
 A URL to load the modal contents from. Can be used instead of [`route`](#route) and [`route_params`](#route_params) options,
@@ -43,7 +43,7 @@ $builder
 ;
 ```
 
-When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a URL.
 
 ```php
@@ -66,7 +66,7 @@ $builder
 
 ### `route`
 
-- **type**: `null`, `string` or `callable` (if using as a row action)
+- **type**: `null`, `string` or `\Closure` (if using as a row action)
 - **default**: `null`
 
 A route name to generate the URL from. Can be used instead of [`href`](#href) option.
@@ -81,7 +81,7 @@ $builder
 ;
 ```
 
-When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a route name.
 
 ```php
@@ -98,7 +98,7 @@ $builder
 
 ### `route_params`
 
-- **type**: `array` or `callable` (if using as a row action)
+- **type**: `array` or `\Closure` (if using as a row action)
 - **default**: `[]`
 
 A route params passed to the route provided in [`route`](#route) option. Can be used instead of [`href`](#href) option.
@@ -116,7 +116,7 @@ $builder
 ;
 ```
 
-When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a callable
+When using the `ModalActionType` as a [row action](../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a route params array.
 
 ```php

@@ -28,14 +28,14 @@ final class ModalActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['href', 'route', 'route_params'] as $optionName) {
-                if (isset($options[$optionName]) && is_callable($options[$optionName])) {
+                if (isset($options[$optionName]) && $options[$optionName] instanceof \Closure) {
                     $options[$optionName] = $options[$optionName]($value);
                 }
             }
         } else {
             foreach (['href', 'route', 'route_params'] as $optionName) {
-                if (isset($options[$optionName]) && is_callable($options[$optionName])) {
-                    throw new LogicException(sprintf('Callable used for option "%s", but it\'s only available for RowActions.', $optionName));
+                if (isset($options[$optionName]) && $options[$optionName] instanceof \Closure) {
+                    throw new LogicException(sprintf('Closure used for option "%s", but it\'s only available for row actions.', $optionName));
                 }
             }
         }
@@ -52,19 +52,19 @@ final class ModalActionType extends AbstractActionType
         $resolver
             ->define('route')
             ->default(null)
-            ->allowedTypes('null', 'string', 'callable')
+            ->allowedTypes('null', 'string', \Closure::class)
         ;
 
         $resolver
             ->define('route_params')
-            ->allowedTypes('array', 'callable')
+            ->allowedTypes('array', \Closure::class)
             ->default([])
         ;
 
         $resolver
             ->define('href')
             ->default(null)
-            ->allowedTypes('null', 'string', 'callable')
+            ->allowedTypes('null', 'string', \Closure::class)
         ;
     }
 }

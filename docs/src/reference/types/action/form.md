@@ -10,7 +10,7 @@ The [`FormActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/
 
 ### `action`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 - **default**: `'#'`
 
 Sets the value that will be used as a form's `action` attribute.
@@ -27,7 +27,7 @@ $builder
 
 ### `method`
 
-- **type**: `string` or `callable`
+- **type**: `string` or `\Closure`
 - **default**: `'GET'`
 
 Sets the value that will be used as a form's `method` attribute.
@@ -44,7 +44,7 @@ $builder
 
 ### `button_attr`
 
-- **type**: `array` or `callable`
+- **type**: `array` or `\Closure`
 - **default**: `[]`
 
 An array of attributes used to render the form submit button.

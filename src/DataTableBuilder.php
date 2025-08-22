@@ -13,7 +13,6 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
-use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;

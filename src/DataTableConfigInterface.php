@@ -27,6 +27,7 @@ interface DataTableConfigInterface
     public const SORT_PARAMETER = 'sort';
     public const FILTRATION_PARAMETER = 'filter';
     public const PERSONALIZATION_PARAMETER = 'personalization';
+    public const COLUMN_VISIBILITY_GROUP_PARAMETER = 'column_visibility_group';
     public const EXPORT_PARAMETER = 'export';
 
     public function getEventDispatcher(): EventDispatcherInterface;
@@ -132,6 +133,8 @@ interface DataTableConfigInterface
     public function getFiltrationParameterName(): string;
 
     public function getPersonalizationParameterName(): string;
+
+    public function getColumnVisibilityGroupParameterName(): string;
 
     public function getExportParameterName(): string;
 }

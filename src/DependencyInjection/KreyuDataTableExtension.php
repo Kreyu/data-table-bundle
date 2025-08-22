@@ -116,6 +116,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'action_factory',
             'filter_factory',
             'exporter_factory',
+            'column_visibility_group_builder',
             'request_handler',
         ];
 

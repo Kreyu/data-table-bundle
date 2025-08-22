@@ -36,6 +36,8 @@
 
             <div class="card-actions">
                 <div class="d-flex flex-row gap-1">
+                    {{ block('column_visibility_group_selector', theme) }}
+
                     {% if filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
                         <div>
                             {{ data_table_theme_block(data_table, 'action_search') }}
@@ -487,6 +489,12 @@
 {% endblock %}
 
 {% block pagination_per_page_form %}
+    {% with { select_attr: { class: 'col form-select' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block column_visibility_group_selector %}
     {% with { select_attr: { class: 'col form-select' } } %}
         {{ parent() }}
     {% endwith %}

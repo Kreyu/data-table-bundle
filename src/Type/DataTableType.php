@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
@@ -43,6 +44,7 @@ final class DataTableType implements DataTableTypeInterface
         $setters = [
             'themes' => $builder->setThemes(...),
             'column_factory' => $builder->setColumnFactory(...),
+            'column_visibility_group_builder' => $builder->setColumnVisibilityGroupBuilder(...),
             'filter_factory' => $builder->setFilterFactory(...),
             'action_factory' => $builder->setActionFactory(...),
             'exporter_factory' => $builder->setExporterFactory(...),
@@ -101,6 +103,7 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
+            'column_visibility_group_parameter_name' => $dataTable->getConfig()->getColumnVisibilityGroupParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
@@ -115,6 +118,7 @@ final class DataTableType implements DataTableTypeInterface
         $view->pagination = $this->createPaginationView($view, $dataTable);
         $view->filters = $this->createFilterViews($view, $dataTable);
         $view->actions = $this->createActionViews($view, $dataTable);
+        $view->columnVisibilityGroups = $dataTable->getColumnVisibilityGroups();
 
         $view->vars = array_replace($view->vars, [
             'header_row' => $view->headerRow,
@@ -163,6 +167,7 @@ final class DataTableType implements DataTableTypeInterface
                 'filter_factory' => $this->defaults['filtration']['filter_factory'] ?? null,
                 'action_factory' => $this->defaults['action_factory'] ?? null,
                 'exporter_factory' => $this->defaults['exporting']['exporter_factory'] ?? null,
+                'column_visibility_group_builder' => $this->defaults['column_visibility_group_builder'] ?? null,
                 'request_handler' => $this->defaults['request_handler'] ?? null,
                 'sorting_enabled' => $this->defaults['sorting']['enabled'] ?? true,
                 'sorting_clearable' => $this->defaults['sorting']['clearable'] ?? true,
@@ -195,6 +200,7 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('filter_factory', ['null', FilterFactoryInterface::class])
             ->setAllowedTypes('action_factory', ['null', ActionFactoryInterface::class])
             ->setAllowedTypes('exporter_factory', ['null', ExporterFactoryInterface::class])
+            ->setAllowedTypes('column_visibility_group_builder', ['null', ColumnVisibilityGroupBuilderInterface::class])
             ->setAllowedTypes('request_handler', ['null', RequestHandlerInterface::class])
             ->setAllowedTypes('sorting_enabled', 'bool')
             ->setAllowedTypes('sorting_clearable', 'bool')

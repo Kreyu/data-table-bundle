@@ -37,6 +37,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->personalize($dataTable, $request);
         $this->paginate($dataTable, $request);
         $this->export($dataTable, $request);
+        $this->turbo($dataTable, $request);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
@@ -133,5 +134,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     private function extractQueryParameter(Request $request, string $path): mixed
     {
         return $this->propertyAccessor->getValue($request->query->all(), $path);
+    }
+
+    private function turbo(DataTableInterface $dataTable, Request $request): void
+    {
+        $dataTable->setTurboFrameId($request->headers->get('Turbo-Frame'));
     }
 }

@@ -84,6 +84,10 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
                 ),
             ],
         );
+
+        if (!$dataTable->getConfig()->isPaginationEnabled()) {
+            $this->data[$dataTable->getName()]['total_count'] = iterator_count($dataTable->getItems());
+        }
     }
 
     public function collectDataTableView(DataTableInterface $dataTable, DataTableView $view): void

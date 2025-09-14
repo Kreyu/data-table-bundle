@@ -36,12 +36,12 @@ the rendering of some of them, without the need to create a new action type.
 
 ### `visible`
 
-- **type**: `bool` or `callable`
+- **type**: `bool` or `\Closure`
 - **default**: `true`
 
 Determines whether the action should be visible to the user.
 
-The callable can only be used by the row actions to determine visibility [based on the row data](../../../../docs/components/actions.md#using-row-data-in-options):
+The closure can only be used by the row actions to determine visibility [based on the row data](../../../../docs/components/actions.md#using-row-data-in-options):
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType;
@@ -77,7 +77,7 @@ $builder
 
 ### `icon`
 
-- **type**: `null`, `string` or `callable`
+- **type**: `null`, `string` or `\Closure`
 - **default**: `null`
 
 Defines the icon to render.
@@ -96,7 +96,7 @@ $builder
 > Name of the icon depends on the icon set you are using in the application,
 > and which icon theme is configured for the data table. See the [icon themes documentation section](./../../../../docs/features/theming.md#icon-themes) for more information.
 
-When action is a [row action](./../../../../docs/components/actions.md), you can provide a callable
+When action is a [row action](./../../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a string:
 
 ```php
@@ -111,7 +111,7 @@ $builder
 
 ### `icon_attr`
 
-- **type**: `array` or `callable`
+- **type**: `array` or `\Closure`
 - **default**: `[]`
 
 Defines the HTML attributes for the icon to render.
@@ -129,7 +129,7 @@ $builder
 ;
 ```
 
-When action is a [row action](../../../../docs/components/actions.md), you can provide a callable
+When action is a [row action](../../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a string:
 
 ```php
@@ -147,7 +147,7 @@ $builder
 
 ### `variant`
 
-- **type**: `null`, `string` or `callable`
+- **type**: `null`, `string` or `\Closure`
 - **default**: `null`
 
 Defines the variant of the action. The action will be rendered differently in each variant.
@@ -162,7 +162,7 @@ $builder
 ;
 ```
 
-When action is a [row action](../../../../docs/components/actions.md), you can provide a callable
+When action is a [row action](../../../../docs/components/actions.md), you can provide a closure
 that will receive the row data as an argument and should return a string:
 
 ```php
@@ -181,7 +181,7 @@ For more details, see [documentation about action variants](../../../../docs/com
 
 ### `confirmation`
 
-- **type**: `bool`, `array` or `callable`
+- **type**: `bool`, `array` or `\Closure`
 - **default**: `false`
 
 Determines whether the action is confirmable, which displays a modal where user have to acknowledge the process.

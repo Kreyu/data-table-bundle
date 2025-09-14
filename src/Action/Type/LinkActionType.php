@@ -17,7 +17,7 @@ final class LinkActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['href', 'target'] as $optionName) {
-                if (is_callable($options[$optionName])) {
+                if ($options[$optionName] instanceof \Closure) {
                     $options[$optionName] = $options[$optionName]($value);
                 }
             }
@@ -36,8 +36,8 @@ final class LinkActionType extends AbstractActionType
                 'href' => '#',
                 'target' => null,
             ])
-            ->setAllowedTypes('href', ['string', 'callable'])
-            ->setAllowedTypes('target', ['null', 'string', 'callable'])
+            ->setAllowedTypes('href', ['string', \Closure::class])
+            ->setAllowedTypes('target', ['null', 'string', \Closure::class])
         ;
     }
 }

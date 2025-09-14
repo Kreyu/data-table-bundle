@@ -208,7 +208,7 @@
 {% block pagination_per_page_message 'Items per page'|trans %}
 
 {% block pagination_per_page_form %}
-    {% set form_attr = { 'data-turbo-frame': '_self' }|merge(form_attr ?? {}) %}
+    {% set form_attr = { 'data-turbo-frame': '_self', 'data-turbo-action': 'advance' }|merge(form_attr ?? {}) %}
 
     <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
         {% set url_query_parameters = [] %}

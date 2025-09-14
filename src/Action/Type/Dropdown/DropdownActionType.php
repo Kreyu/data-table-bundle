@@ -18,7 +18,7 @@ class DropdownActionType extends AbstractActionType
     {
         $itemActions = [];
 
-        if (is_callable($options['actions']) && $view->parent instanceof ColumnValueView) {
+        if ($options['actions'] instanceof \Closure && $view->parent instanceof ColumnValueView) {
             $options['actions'] = $options['actions']($view->parent->value);
         }
 
@@ -44,7 +44,7 @@ class DropdownActionType extends AbstractActionType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define('actions')
-            ->allowedTypes(ActionBuilderInterface::class.'[]', 'callable')
+            ->allowedTypes(ActionBuilderInterface::class.'[]', \Closure::class)
             ->required()
             ->info('The actions to display in the dropdown.')
         ;

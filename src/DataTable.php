@@ -642,7 +642,7 @@ class DataTable implements DataTableInterface
         }
 
         if (!$data->includePersonalization) {
-            $this->personalizationData = null;
+            $dataTable->personalizationData = PersonalizationData::fromDataTable($dataTable);
         }
 
         if (null === $data->exporter) {

@@ -46,7 +46,7 @@ final class ActionsColumnType extends AbstractColumnType
             $actions[$name] = $action->createView($view);
         }
 
-        $view->vars['actions'] = array_filter($actions);
+        $view->vars['actions'] = $actions;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

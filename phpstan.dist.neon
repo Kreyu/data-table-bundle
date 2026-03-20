@@ -1,5 +1,9 @@
 parameters:
     level: 5
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        -
+            identifier: trait.unused
     paths:
     	- src
     	- tests

@@ -32,7 +32,7 @@ final class PdfExporterType extends AbstractPhpSpreadsheetExporterType
         ;
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return HtmlExporterType::class;
     }

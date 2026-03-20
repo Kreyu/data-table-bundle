@@ -33,7 +33,7 @@
         "doctrine/doctrine-bundle": "^2.9",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10.4",
-        "dg/bypass-finals": "dev-master",
+        "dg/bypass-finals": "^1.9",
         "openspout/openspout": "^4.23",
         "symfony/http-foundation": "^6.0|^7.0"
     },

@@ -22,6 +22,8 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupingConfiguration;
+use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupProcessor;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
@@ -35,6 +37,7 @@ final class DataTableType implements DataTableTypeInterface
 {
     public function __construct(
         private readonly array $defaults = [],
+        private readonly ?RowGroupProcessor $rowGroupProcessor = null,
     ) {
     }
 
@@ -68,6 +71,8 @@ final class DataTableType implements DataTableTypeInterface
             'exporting_enabled' => $builder->setExportingEnabled(...),
             'exporting_form_factory' => $builder->setExportFormFactory(...),
             'request_handler' => $builder->setRequestHandler(...),
+            'row_grouping_enabled' => $builder->setRowGroupingEnabled(...),
+            'row_grouping_configuration' => $builder->setRowGroupingConfiguration(...),
         ];
 
         foreach ($setters as $option => $setter) {
@@ -111,7 +116,21 @@ final class DataTableType implements DataTableTypeInterface
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
         $view->nonPersonalizedHeaderRow = $this->createHeaderRowView($view, $dataTable, $columns);
-        $view->valueRows = new RowIterator(fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns));
+
+        $rowGroupingEnabled = $dataTable->getConfig()->isRowGroupingEnabled();
+        $rowGroupingConfig = $dataTable->getConfig()->getRowGroupingConfiguration();
+
+        if ($rowGroupingEnabled && null !== $rowGroupingConfig && null !== $this->rowGroupProcessor) {
+            $processor = $this->rowGroupProcessor;
+            $cols = $visibleColumns;
+            $view->valueRows = new RowIterator(function () use ($view, $dataTable, $cols, $processor, $rowGroupingConfig) {
+                $innerRows = $this->createValueRowsViews($view, $dataTable, $cols);
+                yield from $processor->process($innerRows, $rowGroupingConfig, $view, $cols);
+            });
+        } else {
+            $view->valueRows = new RowIterator(fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns));
+        }
+
         $view->pagination = $this->createPaginationView($view, $dataTable);
         $view->filters = $this->createFilterViews($view, $dataTable);
         $view->actions = $this->createActionViews($view, $dataTable);
@@ -124,6 +143,7 @@ final class DataTableType implements DataTableTypeInterface
             'actions' => $view->actions,
             'batch_actions' => $this->createBatchActionViews($view, $dataTable),
             'column_count' => count($view->headerRow),
+            'row_grouping_enabled' => $rowGroupingEnabled,
         ]);
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
@@ -186,6 +206,8 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
+                'row_grouping_enabled' => false,
+                'row_grouping_configuration' => null,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
@@ -217,6 +239,8 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('row_grouping_enabled', 'bool')
+            ->setAllowedTypes('row_grouping_configuration', ['null', RowGroupingConfiguration::class])
         ;
     }
 

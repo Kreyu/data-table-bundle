@@ -16,6 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupingConfiguration;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -63,6 +64,9 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?RequestHandlerInterface $requestHandler = null;
 
     private bool $sortingClearable = false;
+
+    private bool $rowGroupingEnabled = false;
+    private ?RowGroupingConfiguration $rowGroupingConfiguration = null;
 
     private array $themes = [];
     private array $attributes = [];
@@ -683,6 +687,38 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    public function isRowGroupingEnabled(): bool
+    {
+        return $this->rowGroupingEnabled;
+    }
+
+    public function setRowGroupingEnabled(bool $rowGroupingEnabled): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->rowGroupingEnabled = $rowGroupingEnabled;
+
+        return $this;
+    }
+
+    public function getRowGroupingConfiguration(): ?RowGroupingConfiguration
+    {
+        return $this->rowGroupingConfiguration;
+    }
+
+    public function setRowGroupingConfiguration(?RowGroupingConfiguration $rowGroupingConfiguration): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->rowGroupingConfiguration = $rowGroupingConfiguration;
 
         return $this;
     }

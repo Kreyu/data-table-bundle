@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupFooterView;
 use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupHeaderView;
 use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupingConfiguration;
 use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupProcessor;
+use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use PHPUnit\Framework\TestCase;
 
@@ -53,7 +54,7 @@ class RowGroupProcessorTest extends TestCase
         ];
         $rows = $this->createValueRows($view, $data);
 
-        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['col1' => true, 'col2' => true]));
+        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['col1' => $this->createMock(ColumnInterface::class), 'col2' => $this->createMock(ColumnInterface::class)]));
 
         // Expected: Header(Tokyo), Alice, Bob, Header(London), Charlie, Dave
         $this->assertCount(6, $result);
@@ -227,7 +228,7 @@ class RowGroupProcessorTest extends TestCase
         ];
         $rows = $this->createValueRows($view, $data);
 
-        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['a' => 1, 'b' => 2]));
+        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['a' => $this->createMock(ColumnInterface::class), 'b' => $this->createMock(ColumnInterface::class)]));
 
         $header = $result[0];
         $this->assertInstanceOf(RowGroupHeaderView::class, $header);
@@ -250,7 +251,7 @@ class RowGroupProcessorTest extends TestCase
         ];
         $rows = $this->createValueRows($view, $data);
 
-        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['a' => 1]));
+        $result = iterator_to_array($this->processor->process($rows, $config, $view, ['a' => $this->createMock(ColumnInterface::class)]));
 
         $footers = array_values(array_filter($result, fn ($r) => $r instanceof RowGroupFooterView));
         $this->assertCount(1, $footers);

@@ -15,6 +15,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Request\RequestHandlerInterface;
+use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupingConfiguration;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -104,6 +105,10 @@ interface DataTableConfigInterface
     public function getDefaultPaginationData(): ?PaginationData;
 
     public function getRequestHandler(): ?RequestHandlerInterface;
+
+    public function isRowGroupingEnabled(): bool;
+
+    public function getRowGroupingConfiguration(): ?RowGroupingConfiguration;
 
     public function getAttributes(): array;
 

@@ -14,6 +14,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\StaticPersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Persistence\TokenStoragePersistenceSubjectProvider;
 use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
+use Kreyu\Bundle\DataTableBundle\RowGroup\RowGroupProcessor;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
@@ -32,8 +33,13 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
+        ->set('kreyu_data_table.row_group.processor', RowGroupProcessor::class)
+    ;
+
+    $services
         ->set('kreyu_data_table.type.data_table', DataTableType::class)
         ->arg('$defaults', abstract_arg('Default options, provided by KreyuDataTableExtension and DefaultConfigurationPass'))
+        ->arg('$rowGroupProcessor', service('kreyu_data_table.row_group.processor'))
         ->tag('kreyu_data_table.type')
     ;
 

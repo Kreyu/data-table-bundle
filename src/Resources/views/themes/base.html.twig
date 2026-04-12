@@ -90,8 +90,36 @@
 
 {% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {% if value_row.vars.row_type|default('data') == 'group_header' %}
+            {{ block('table_body_row_group_header', theme) }}
+        {% elseif value_row.vars.row_type|default('data') == 'group_footer' %}
+            {{ block('table_body_row_group_footer', theme) }}
+        {% else %}
+            <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {% endif %}
     {% endfor %}
+{% endblock %}
+
+{% block table_body_row_group_header %}
+    <tr class="data-table-row-group-header data-table-row-group-level-{{ value_row.level }}" {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
+        <td colspan="{{ value_row.columnCount }}">
+            <strong>{{ value_row.groupValue }}</strong>
+            {% for aggregation in value_row.aggregations %}
+                <span class="data-table-row-group-aggregation">{{ aggregation.label ?? aggregation.columnName }}: {{ aggregation.value }}</span>
+            {% endfor %}
+        </td>
+    </tr>
+{% endblock %}
+
+{% block table_body_row_group_footer %}
+    <tr class="data-table-row-group-footer data-table-row-group-level-{{ value_row.level }}" {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
+        <td colspan="{{ value_row.columnCount }}">
+            {{ 'Rows'|trans({}, 'KreyuDataTable') }}: {{ value_row.rowCount }}
+            {% for aggregation in value_row.aggregations %}
+                <span class="data-table-row-group-aggregation">{{ aggregation.label ?? aggregation.columnName }}: {{ aggregation.value }}</span>
+            {% endfor %}
+        </td>
+    </tr>
 {% endblock %}
 
 {% block table_body_row_no_results %}

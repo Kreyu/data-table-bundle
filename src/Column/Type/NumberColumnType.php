@@ -40,7 +40,7 @@ final class NumberColumnType extends AbstractColumnType
                 $resolver->setAllowedTypes('attrs', 'array');
                 $resolver->setAllowedTypes('style', 'string');
             });
-        } else {
+        } else { // BC layer for Symfony <7.3
             $resolver->define('intl_formatter_options')
                 ->default(function (OptionsResolver $resolver) {
                     $resolver

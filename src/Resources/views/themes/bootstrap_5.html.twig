@@ -864,7 +864,7 @@
         'outline-dark': 'btn-outline-dark',
     }|merge(variants ?? {})|filter(e => e is not same as false) -%}
 
-    {% set base_classes = base_classes ?? 'btn d-inline-flex align-items-center gap-2' ~ (with_caret ? ' dropdown-toggle') %}
+    {% set base_classes = (base_classes ?? 'btn d-inline-flex align-items-center gap-2') ~ (with_caret ? ' dropdown-toggle') %}
     {% set variant_classes = variant_classes ?? variants[variant ?? default_variant ?? 'primary'] %}
 
     {% set attr = {

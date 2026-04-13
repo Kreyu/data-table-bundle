@@ -31,17 +31,28 @@ final class NumberColumnType extends AbstractColumnType
             ->allowedTypes('bool')
         ;
 
-        $resolver->define('intl_formatter_options')
-            ->default(function (OptionsResolver $resolver) {
-                $resolver
-                    ->setDefaults([
-                        'attrs' => [],
-                        'style' => 'decimal',
-                    ])
-                    ->setAllowedTypes('attrs', 'array')
-                    ->setAllowedTypes('style', 'string')
-                ;
-            })
-        ;
+        if (method_exists($resolver, 'setOptions')) {
+            $resolver->setOptions('intl_formatter_options', function (OptionsResolver $resolver): void {
+                $resolver->setDefaults([
+                    'attrs' => [],
+                    'style' => 'decimal',
+                ]);
+                $resolver->setAllowedTypes('attrs', 'array');
+                $resolver->setAllowedTypes('style', 'string');
+            });
+        } else { // BC layer for Symfony <7.3
+            $resolver->define('intl_formatter_options')
+                ->default(function (OptionsResolver $resolver) {
+                    $resolver
+                        ->setDefaults([
+                            'attrs' => [],
+                            'style' => 'decimal',
+                        ])
+                        ->setAllowedTypes('attrs', 'array')
+                        ->setAllowedTypes('style', 'string')
+                    ;
+                })
+            ;
+        }
     }
 }

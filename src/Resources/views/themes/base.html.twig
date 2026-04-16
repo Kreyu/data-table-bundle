@@ -9,19 +9,27 @@
         {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
-        <div
-            data-controller="{{ stimulus_controllers|join(' ') }}"
-            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
-        >
-            {{ block('action_bar', theme) }}
-            {{ block('table', theme) }}
+    {% if data_table.vars.is_async and not data_table.vars.is_request_from_turbo_frame %}
+        <turbo-frame id="kreyu_data_table_{{ name }}" src="{{ app.request.uri }}" loading="lazy">
+            <div>
+                <progress style="width: 100%">{{ 'Loading'|trans({}, 'KreyuDataTable') }}</progress>
+            </div>
+        </turbo-frame>
+    {% else %}
+        <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+            <div
+                data-controller="{{ stimulus_controllers|join(' ') }}"
+                data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+            >
+                {{ block('action_bar', theme) }}
+                {{ block('table', theme) }}
 
-            {% if pagination_enabled %}
-                {{ data_table_pagination(pagination) }}
-            {% endif %}
-        </div>
-    </turbo-frame>
+                {% if pagination_enabled %}
+                    {{ data_table_pagination(pagination) }}
+                {% endif %}
+            </div>
+        </turbo-frame>
+    {% endif %}
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}

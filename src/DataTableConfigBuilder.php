@@ -876,4 +876,9 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     {
         return new BadMethodCallException('DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
     }
+
+    public function isAsync(): bool
+    {
+        return $this->options['async'];
+    }
 }

@@ -134,4 +134,6 @@ interface DataTableConfigInterface
     public function getPersonalizationParameterName(): string;
 
     public function getExportParameterName(): string;
+
+    public function isAsync(): bool;
 }

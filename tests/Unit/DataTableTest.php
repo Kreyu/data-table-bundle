@@ -7,10 +7,13 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
+use Kreyu\Bundle\DataTableBundle\Tests\ReflectionTrait;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 
 class DataTableTest extends DataTableIntegrationTestCase
 {
+    use ReflectionTrait;
+
     public function testGetColumns()
     {
         $dataTable = $this->createDataTableBuilder()
@@ -354,8 +357,65 @@ class DataTableTest extends DataTableIntegrationTestCase
         $this->assertEquals(['third', 'fourth', 'first'], $columns);
     }
 
+    public function testGetItemsReturnsEmptyWhenAsyncAndNotTurboFrame()
+    {
+        $dataTable = $this->createDataTableBuilderWithData(
+            [['id' => 1], ['id' => 2]],
+            ['async' => true],
+        )->getDataTable();
+
+        $items = iterator_to_array($dataTable->getItems());
+
+        $this->assertEmpty($items);
+    }
+
+    public function testGetItemsReturnsDataWhenAsyncAndTurboFrame()
+    {
+        $dataTable = $this->createDataTableBuilderWithData(
+            [['id' => 1], ['id' => 2]],
+            ['async' => true],
+        )->getDataTable();
+
+        $dataTable->setTurboFrameId('kreyu_data_table_'.$dataTable->getName());
+
+        $items = iterator_to_array($dataTable->getItems());
+
+        $this->assertCount(2, $items);
+    }
+
+    public function testGetItemsReturnsDataWhenNotAsync()
+    {
+        $dataTable = $this->createDataTableBuilderWithData(
+            [['id' => 1], ['id' => 2]],
+            ['async' => false],
+        )->getDataTable();
+
+        $items = iterator_to_array($dataTable->getItems());
+
+        $this->assertCount(2, $items);
+    }
+
+    public function testGetItemsReturnsDataWhenAsyncAndExporting()
+    {
+        $dataTable = $this->createDataTableBuilderWithData(
+            [['id' => 1], ['id' => 2]],
+            ['async' => true],
+        )->getDataTable();
+
+        $this->setPrivatePropertyValue($dataTable, 'exporting', true);
+
+        $items = iterator_to_array($dataTable->getItems());
+
+        $this->assertCount(2, $items);
+    }
+
     private function createDataTableBuilder(array $options = []): DataTableBuilderInterface
     {
         return $this->dataTableFactory->createBuilder(DataTableType::class, [], $options);
+    }
+
+    private function createDataTableBuilderWithData(array $data, array $options = []): DataTableBuilderInterface
+    {
+        return $this->dataTableFactory->createBuilder(DataTableType::class, $data, $options);
     }
 }

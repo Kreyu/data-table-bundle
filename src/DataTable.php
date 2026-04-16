@@ -38,6 +38,7 @@ use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataType;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Query\ResultSet;
 use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -112,6 +113,7 @@ class DataTable implements DataTableInterface
     private ?ResultSetInterface $resultSet = null;
 
     private bool $initialized = false;
+    private bool $exporting = false;
     private ?string $turboFrameId = null;
 
     public function __construct(
@@ -627,6 +629,7 @@ class DataTable implements DataTableInterface
         }
 
         $dataTable = clone $this;
+        $dataTable->exporting = true;
 
         $data ??= $this->exportData ?? $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
@@ -670,7 +673,18 @@ class DataTable implements DataTableInterface
 
     private function getResultSet(): ResultSetInterface
     {
-        return $this->resultSet ??= $this->query->getResult();
+        if (
+            !$this->config->isAsync()
+            || $this->isRequestFromTurboFrame()
+            || $this->exporting
+        ) {
+            return $this->resultSet ??= $this->query->getResult();
+        }
+
+        // Return an empty result set: the real data will be loaded via a Turbo Frame lazy request.
+        // Not memoized intentionally — each call within the same request creates a new empty instance,
+        // which is inconsequential since the async and Turbo Frame paths are separate HTTP requests.
+        return new ResultSet(new \ArrayIterator([]), 0, 0);
     }
 
     private function createPagination(): PaginationInterface

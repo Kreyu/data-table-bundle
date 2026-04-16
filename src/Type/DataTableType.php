@@ -107,6 +107,8 @@ final class DataTableType implements DataTableTypeInterface
             'sorting_clearable' => $dataTable->getConfig()->isSortingClearable(),
             'has_batch_actions' => !empty($dataTable->getBatchActions()),
             'per_page_choices' => $options['per_page_choices'],
+            'is_request_from_turbo_frame' => $dataTable->isRequestFromTurboFrame(),
+            'is_async' => $dataTable->getConfig()->isAsync(),
         ]);
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
@@ -186,6 +188,7 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
+                'async' => $this->defaults['async'] ?? false,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
@@ -217,6 +220,7 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('async', ['bool'])
         ;
     }
 

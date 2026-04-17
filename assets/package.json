@@ -24,6 +24,11 @@
                 "main": "controllers/bootstrap/modal.js",
                 "fetch": "eager",
                 "enabled": false
+            },
+            "responsive": {
+                "main": "controllers/responsive.js",
+                "fetch": "eager",
+                "enabled": true
             }
         },
         "importmap": {

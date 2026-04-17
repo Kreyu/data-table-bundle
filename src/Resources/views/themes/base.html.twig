@@ -10,10 +10,7 @@
     {% endif %}
 
     <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
-        <div
-            data-controller="{{ stimulus_controllers|join(' ') }}"
-            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
-        >
+        <div {{ block('kreyu_data_table_attributes', theme) }}>
             {{ block('action_bar', theme) }}
             {{ block('table', theme) }}
 
@@ -22,6 +19,11 @@
             {% endif %}
         </div>
     </turbo-frame>
+{% endblock %}
+
+{% block kreyu_data_table_attributes %}
+    data-controller="{{ stimulus_controllers|join(' ') }}"
+    data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
@@ -90,8 +92,12 @@
 
 {% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {{ block('table_body_value_row', theme) }}
     {% endfor %}
+{% endblock %}
+
+{% block table_body_value_row %}
+    <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
 {% endblock %}
 
 {% block table_body_row_no_results %}

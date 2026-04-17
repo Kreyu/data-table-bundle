@@ -73,6 +73,7 @@ final class ColumnType implements ColumnTypeInterface
             'sort_direction' => $sortColumnData?->getDirection(),
             'sortable' => $column->getConfig()->isSortable(),
             'export' => $column->getConfig()->isExportable(),
+            'visible_from' => $options['visible_from'],
         ]);
     }
 
@@ -120,6 +121,7 @@ final class ColumnType implements ColumnTypeInterface
             'translation_domain' => $translationDomain,
             'translation_parameters' => $translationParameters ?? [],
             'attr' => $attr,
+            'visible_from' => $options['visible_from'],
         ]);
     }
 
@@ -329,6 +331,13 @@ final class ColumnType implements ColumnTypeInterface
             ->default(true)
             ->allowedTypes('bool')
             ->info('Defines whether the column can be personalized by the user in personalization feature.')
+        ;
+
+        $resolver->define('visible_from')
+            ->default(null)
+            ->allowedTypes('null', 'string', 'bool')
+            ->allowedValues(static fn ($value) => $value !== true)
+            ->info('Minimum breakpoint from which the column is directly visible. null = always visible, string (e.g. "md") = visible from that breakpoint, false = always in collapsible row.')
         ;
     }
 

@@ -113,6 +113,7 @@ class DataTable implements DataTableInterface
 
     private bool $initialized = false;
     private ?string $turboFrameId = null;
+    private ?string $activeBreakpoint = null;
 
     public function __construct(
         private ProxyQueryInterface $query,
@@ -878,6 +879,18 @@ class DataTable implements DataTableInterface
     public function isRequestFromTurboFrame(): bool
     {
         return null !== $this->turboFrameId && 'kreyu_data_table_'.$this->getName() === $this->turboFrameId;
+    }
+
+    public function getActiveBreakpoint(): ?string
+    {
+        return $this->activeBreakpoint;
+    }
+
+    public function setActiveBreakpoint(?string $activeBreakpoint): static
+    {
+        $this->activeBreakpoint = $activeBreakpoint;
+
+        return $this;
     }
 
     private function dispatch(string $eventName, DataTableEvent $event): void

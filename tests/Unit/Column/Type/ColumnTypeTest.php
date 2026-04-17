@@ -1058,6 +1058,50 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $this->assertEquals($expectedBlockPrefixes, $columnValueView->vars['block_prefixes']);
     }
 
+    public function testDefaultVisibleFromIsNull(): void
+    {
+        $column = $this->createNamedColumn('firstName');
+
+        $columnHeaderView = $this->createColumnHeaderView($column);
+        $columnValueView = $this->createColumnValueView($column);
+
+        $this->assertNull($columnHeaderView->vars['visible_from']);
+        $this->assertNull($columnValueView->vars['visible_from']);
+    }
+
+    #[DataProvider('provideVisibleFromOptions')]
+    public function testPassingVisibleFromOption(string|false|null $visibleFrom): void
+    {
+        $column = $this->createNamedColumn('firstName', [
+            'visible_from' => $visibleFrom,
+        ]);
+
+        $columnHeaderView = $this->createColumnHeaderView($column);
+        $columnValueView = $this->createColumnValueView($column);
+
+        $this->assertSame($visibleFrom, $columnHeaderView->vars['visible_from']);
+        $this->assertSame($visibleFrom, $columnValueView->vars['visible_from']);
+    }
+
+    public static function provideVisibleFromOptions(): iterable
+    {
+        yield 'null (always visible)' => [null];
+        yield 'sm' => ['sm'];
+        yield 'md' => ['md'];
+        yield 'lg' => ['lg'];
+        yield 'xl' => ['xl'];
+        yield 'false (always collapsed)' => [false];
+    }
+
+    public function testVisibleFromRejectsTrueValue(): void
+    {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+
+        $this->createNamedColumn('firstName', [
+            'visible_from' => true,
+        ]);
+    }
+
     protected function expectTranslation(
         string $expected,
         string $id,

@@ -1,0 +1,39 @@
+.kreyu-dt-responsive-pending {
+    visibility: hidden;
+}
+
+.kreyu-dt-collapsible-row td {
+    padding: 0 !important;
+}
+
+.kreyu-dt-collapsible-row dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+}
+
+.kreyu-dt-collapsible-row dt {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.kreyu-dt-collapsible-row dd {
+    margin: 0;
+}
+
+.kreyu-dt-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+    font-size: 1.1rem;
+    color: inherit;
+    opacity: 0.6;
+}
+
+.kreyu-dt-toggle-btn:hover {
+    opacity: 1;
+}

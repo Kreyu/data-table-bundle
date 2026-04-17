@@ -219,4 +219,8 @@ interface DataTableInterface
     public function setTurboFrameId(string $turboFrameId): static;
 
     public function isRequestFromTurboFrame(): bool;
+
+    public function getActiveBreakpoint(): ?string;
+
+    public function setActiveBreakpoint(?string $activeBreakpoint): static;
 }

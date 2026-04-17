@@ -1,0 +1,127 @@
+{% trans_default_domain 'KreyuDataTable' %}
+
+{# Responsive blocks — import via {% use %} in responsive themes #}
+{# Provides collapsible rows for columns hidden at the current breakpoint #}
+
+{% block kreyu_data_table %}
+    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+
+    {% if responsive_enabled|default(false) %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--responsive']) %}
+    {% endif %}
+
+    {% if has_batch_actions %}
+        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% endif %}
+
+    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
+        <div{% if responsive_enabled|default(false) %} class="kreyu-dt-responsive-pending"{% endif %} {{ block('kreyu_data_table_attributes', theme) }}>
+            {{ block('action_bar', theme) }}
+            {{ block('table', theme) }}
+
+            {% if pagination_enabled %}
+                {{ data_table_pagination(pagination) }}
+            {% endif %}
+        </div>
+    </turbo-frame>
+{% endblock %}
+
+{% block kreyu_data_table_attributes %}
+    data-controller="{{ stimulus_controllers|join(' ') }}"
+    data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+    {% if responsive_enabled|default(false) %}
+    data-kreyu--data-table-bundle--responsive-breakpoints-value="{{ responsive_breakpoints|json_encode }}"
+    data-kreyu--data-table-bundle--responsive-current-breakpoint-value="{{ active_breakpoint|default('') }}"
+    {% endif %}
+{% endblock %}
+
+{% block table_head_row %}
+    <tr>
+        {% if responsive_hidden_columns|default([])|length > 0 %}
+            {{ block('responsive_toggle_header', theme) }}
+        {% endif %}
+
+        {% for column_header in header_row %}
+            {% if column_header.vars.name not in responsive_hidden_columns|default([]) %}
+                {{- data_table_column_header(column_header) -}}
+            {% endif %}
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block table_body_value_row %}
+    {% set visible_columns = [] %}
+    {% set hidden_columns = [] %}
+    {% set row_index = value_row.vars.row.index|default(loop.index0) %}
+
+    {% for column_name, column_value in value_row %}
+        {% if column_name in responsive_hidden_columns|default([]) %}
+            {% set hidden_columns = hidden_columns|merge({ (column_name): column_value }) %}
+        {% else %}
+            {% set visible_columns = visible_columns|merge({ (column_name): column_value }) %}
+        {% endif %}
+    {% endfor %}
+
+    <tr{% for key, value in value_row.vars.attr|default({}) %} {{ key }}="{{ value }}"{% endfor %}>
+        {% if hidden_columns|length > 0 %}
+            {{ block('responsive_toggle_cell', theme) }}
+        {% endif %}
+
+        {% for column_name, column_value in visible_columns %}
+            <td>{{- data_table_column_value(column_value) -}}</td>
+        {% endfor %}
+    </tr>
+
+    {% if hidden_columns|length > 0 %}
+        {{ block('responsive_collapsible_row', theme) }}
+    {% endif %}
+{% endblock %}
+
+{% block responsive_toggle_header %}
+    <th class="kreyu-dt-toggle-col" style="width: 1px;"></th>
+{% endblock %}
+
+{% block responsive_toggle_cell %}
+    <td class="kreyu-dt-toggle-col">
+        <button
+            type="button"
+            class="kreyu-dt-toggle-btn"
+            aria-expanded="false"
+            aria-label="{{ 'Toggle details'|trans }}"
+            data-row-index="{{ row_index }}"
+            data-action="click->kreyu--data-table-bundle--responsive#toggle"
+            data-kreyu--data-table-bundle--responsive-target="toggleButton"
+        >
+            <span class="kreyu-dt-toggle-icon">+</span>
+        </button>
+    </td>
+{% endblock %}
+
+{% block responsive_collapsible_row %}
+    <tr
+        class="kreyu-dt-collapsible-row"
+        hidden
+        data-row-index="{{ row_index }}"
+        data-kreyu--data-table-bundle--responsive-target="collapsibleRow"
+    >
+        <td colspan="{{ visible_columns|length + 1 }}">
+            <dl>
+                {% for column_name, column_value in hidden_columns %}
+                    <dt>
+                        {% set col_header = header_row[column_name]|default(null) %}
+                        {% if col_header %}
+                            {% if col_header.vars.translation_domain is not same as false %}
+                                {{ col_header.vars.label|trans(col_header.vars.translation_parameters|default({}), col_header.vars.translation_domain) }}
+                            {% else %}
+                                {{ col_header.vars.label }}
+                            {% endif %}
+                        {% else %}
+                            {{ column_name }}
+                        {% endif %}
+                    </dt>
+                    <dd>{{- data_table_column_value(column_value) -}}</dd>
+                {% endfor %}
+            </dl>
+        </td>
+    </tr>
+{% endblock %}

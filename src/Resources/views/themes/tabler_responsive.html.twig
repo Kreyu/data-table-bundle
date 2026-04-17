@@ -1,0 +1,12 @@
+{% extends '@KreyuDataTable/themes/tabler.html.twig' %}
+{% use '@KreyuDataTable/themes/_responsive.html.twig' with
+    kreyu_data_table as _responsive_kreyu_data_table,
+    kreyu_data_table_attributes as _responsive_kreyu_data_table_attributes,
+    table_head_row as _responsive_table_head_row,
+    table_body_value_row as _responsive_table_body_value_row
+%}
+
+{% block kreyu_data_table %}{{ responsive_enabled|default(false) ? block('_responsive_kreyu_data_table') : parent() }}{% endblock %}
+{% block kreyu_data_table_attributes %}{{ responsive_enabled|default(false) ? block('_responsive_kreyu_data_table_attributes') : parent() }}{% endblock %}
+{% block table_head_row %}{{ responsive_enabled|default(false) ? block('_responsive_table_head_row') : parent() }}{% endblock %}
+{% block table_body_value_row %}{{ responsive_enabled|default(false) ? block('_responsive_table_body_value_row') : parent() }}{% endblock %}

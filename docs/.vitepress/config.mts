@@ -50,6 +50,7 @@ export default defineConfig({
             { text: 'Exporting', link: '/docs/features/exporting' },
             { text: 'Pagination', link: '/docs/features/pagination' },
             { text: 'Personalization', link: '/docs/features/personalization' },
+            { text: 'Responsive', link: '/docs/features/responsive' },
             { text: 'Persistence', link: '/docs/features/persistence' },
             { text: 'Theming', link: '/docs/features/theming' },
             { text: 'Asynchronicity', link: '/docs/features/asynchronicity' },

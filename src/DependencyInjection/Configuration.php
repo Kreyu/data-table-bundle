@@ -151,6 +151,24 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('responsive')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')
+                            ->defaultFalse()
+                        ->end()
+                        ->arrayNode('breakpoints')
+                            ->useAttributeAsKey('name')
+                            ->defaultValue([
+                                'sm' => 576,
+                                'md' => 768,
+                                'lg' => 992,
+                                'xl' => 1200,
+                            ])
+                            ->prototype('integer')->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('profiler')
                     ->addDefaultsIfNotSet()
                     ->children()

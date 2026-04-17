@@ -8,6 +8,8 @@ use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Responsive\BreakpointResolver;
+use Kreyu\Bundle\DataTableBundle\Responsive\DeviceDetectorInterface;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -17,8 +19,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
     private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly ?DeviceDetectorInterface $deviceDetector = null,
+    ) {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -32,6 +35,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             throw new UnexpectedTypeException($request, Request::class);
         }
 
+        $this->detectDevice($dataTable, $request);
         $this->filter($dataTable, $request);
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
@@ -147,6 +151,27 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     private function extractQueryParameter(Request $request, string $path): mixed
     {
         return $this->propertyAccessor->getValue($request->query->all(), $path);
+    }
+
+    private function detectDevice(DataTableInterface $dataTable, Request $request): void
+    {
+        if (!($dataTable->getConfig()->getOption('responsive_enabled') ?? false)) {
+            return;
+        }
+
+        $breakpoints = $dataTable->getConfig()->getOption('responsive_breakpoints') ?? [];
+        $resolver = new BreakpointResolver($breakpoints);
+        $breakpoint = $request->query->get('_breakpoint');
+
+        if (null !== $breakpoint && $resolver->has($breakpoint)) {
+            $dataTable->setActiveBreakpoint($breakpoint);
+
+            return;
+        }
+
+        if (null !== $this->deviceDetector) {
+            $dataTable->setActiveBreakpoint($resolver->resolveUaFallback($this->deviceDetector->detect($request)));
+        }
     }
 
     private function turbo(DataTableInterface $dataTable, Request $request): void

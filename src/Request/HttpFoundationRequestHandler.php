@@ -38,6 +38,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->paginate($dataTable, $request);
         $this->export($dataTable, $request);
         $this->turbo($dataTable, $request);
+        $this->columnVisibilityGroup($dataTable, $request);
     }
 
     private function filter(DataTableInterface $dataTable, Request $request): void
@@ -152,5 +153,33 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     private function turbo(DataTableInterface $dataTable, Request $request): void
     {
         $dataTable->setTurboFrameId($request->headers->get('Turbo-Frame'));
+    }
+
+    private function columnVisibilityGroup(DataTableInterface $dataTable, Request $request): void
+    {
+        $groups = $dataTable->getColumnVisibilityGroups();
+
+        if (empty($groups)) {
+            return;
+        }
+
+        $parameterName = $dataTable->getConfig()->getColumnVisibilityGroupParameterName();
+        $requested = $this->extractQueryParameter($request, "[$parameterName]");
+
+        if (null !== $requested && isset($groups[$requested])) {
+            $dataTable->setRequestedColumnVisibilityGroup($requested);
+
+            return;
+        }
+
+        foreach ($groups as $group) {
+            if ($group->isDefault()) {
+                $dataTable->setRequestedColumnVisibilityGroup($group->getName());
+
+                return;
+            }
+        }
+
+        $dataTable->setRequestedColumnVisibilityGroup(array_key_first($groups));
     }
 }

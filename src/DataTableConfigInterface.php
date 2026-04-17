@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
@@ -27,6 +28,7 @@ interface DataTableConfigInterface
     public const SORT_PARAMETER = 'sort';
     public const FILTRATION_PARAMETER = 'filter';
     public const PERSONALIZATION_PARAMETER = 'personalization';
+    public const COLUMN_VISIBILITY_GROUP_PARAMETER = 'column_visibility_group';
     public const EXPORT_PARAMETER = 'export';
 
     public function getEventDispatcher(): EventDispatcherInterface;
@@ -50,6 +52,8 @@ interface DataTableConfigInterface
     public function getActionFactory(): ActionFactoryInterface;
 
     public function getExporterFactory(): ExporterFactoryInterface;
+
+    public function getColumnVisibilityGroupFactory(): ColumnVisibilityGroupFactoryInterface;
 
     public function isExportingEnabled(): bool;
 
@@ -132,6 +136,8 @@ interface DataTableConfigInterface
     public function getFiltrationParameterName(): string;
 
     public function getPersonalizationParameterName(): string;
+
+    public function getColumnVisibilityGroupParameterName(): string;
 
     public function getExportParameterName(): string;
 }

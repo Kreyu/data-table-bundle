@@ -21,6 +21,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableBuilder;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
@@ -41,6 +42,7 @@ use Kreyu\Bundle\DataTableBundle\Tests\ReflectionTrait;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DataTableBuilderTest extends TestCase
 {
@@ -717,6 +719,78 @@ class DataTableBuilderTest extends TestCase
         $this->assertEquals($expectedActions, $dataTable->getActions());
     }
 
+    public function testAddColumnVisibilityGroupAsString()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnVisibilityGroupFactory($this->createColumnVisibilityGroupFactory());
+
+        $builder->addColumnVisibilityGroup('foo');
+
+        $this->assertTrue($builder->hasColumnVisibilityGroup('foo'));
+    }
+
+    public function testAddColumnVisibilityGroupAsObject()
+    {
+        $factory = $this->createColumnVisibilityGroupFactory();
+        $group = $factory->create('foo');
+
+        $builder = $this->createBuilder();
+        $builder->addColumnVisibilityGroup($group);
+
+        $this->assertTrue($builder->hasColumnVisibilityGroup('foo'));
+    }
+
+    public function testRemoveColumnVisibilityGroup()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnVisibilityGroupFactory($this->createColumnVisibilityGroupFactory());
+
+        $builder->addColumnVisibilityGroup('foo');
+        $builder->removeColumnVisibilityGroup('foo');
+
+        $this->assertFalse($builder->hasColumnVisibilityGroup('foo'));
+    }
+
+    public function testCreateColumnVisibilityGroup()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnVisibilityGroupFactory($this->createColumnVisibilityGroupFactory());
+
+        $group = $builder->createColumnVisibilityGroup('foo', ['label' => 'Foo group']);
+
+        $this->assertSame('foo', $group->getName());
+        $this->assertSame('Foo group', $group->getLabel());
+    }
+
+    public function testGetDataTableResolvesColumnVisibilityGroups()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnVisibilityGroupFactory($this->createColumnVisibilityGroupFactory());
+        $builder->addColumnVisibilityGroup('foo');
+        $builder->addColumnVisibilityGroup('bar', ['is_default' => true]);
+
+        $dataTable = $builder->getDataTable();
+
+        $groups = $dataTable->getColumnVisibilityGroups();
+
+        $this->assertCount(2, $groups);
+        $this->assertFalse($groups['foo']->isDefault());
+        $this->assertTrue($groups['bar']->isDefault());
+    }
+
+    public function testGetDataTableThrowsWhenMultipleDefaultGroups()
+    {
+        $builder = $this->createBuilder();
+        $builder->setColumnVisibilityGroupFactory($this->createColumnVisibilityGroupFactory());
+        $builder->addColumnVisibilityGroup('foo', ['is_default' => true]);
+        $builder->addColumnVisibilityGroup('bar', ['is_default' => true]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one column visibility group can be marked as default');
+
+        $builder->getDataTable();
+    }
+
     public function testGetDataTableResolvesExporters()
     {
         $builder = $this->createBuilder();
@@ -789,6 +863,14 @@ class DataTableBuilderTest extends TestCase
                 resolvedTypeFactory: new ResolvedActionTypeFactory(),
             ),
         );
+    }
+
+    private function createColumnVisibilityGroupFactory(): ColumnVisibilityGroupFactory
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnArgument(0);
+
+        return new ColumnVisibilityGroupFactory($translator);
     }
 
     private function createExporterFactory(): ExporterFactory

@@ -13,6 +13,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\CheckboxColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
@@ -135,6 +136,20 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
      * @var array<array{0: class-string<ExporterTypeInterface>, 1: array}>
      */
     private array $unresolvedExporters = [];
+
+    /**
+     * The column visibility groups defined for the data table.
+     *
+     * @var array<ColumnVisibilityGroupInterface>
+     */
+    private array $columnVisibilityGroups = [];
+
+    /**
+     * The data of column visibility groups that haven't been converted to column visibility group yet.
+     *
+     * @var array<array>
+     */
+    private array $unresolvedColumnVisibilityGroups = [];
 
     public function __construct(
         string $name,
@@ -715,6 +730,55 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this;
     }
 
+    public function addColumnVisibilityGroup(ColumnVisibilityGroupInterface|string $columnVisibilityGroup, array $options = []): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        if ($columnVisibilityGroup instanceof ColumnVisibilityGroupInterface) {
+            $this->columnVisibilityGroups[$columnVisibilityGroup->getName()] = $columnVisibilityGroup;
+
+            unset($this->unresolvedColumnVisibilityGroups[$columnVisibilityGroup->getName()]);
+
+            return $this;
+        }
+
+        $this->columnVisibilityGroups[$columnVisibilityGroup] = null;
+        $this->unresolvedColumnVisibilityGroups[$columnVisibilityGroup] = $options;
+
+        return $this;
+    }
+
+    public function hasColumnVisibilityGroup(string $name): bool
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return isset($this->columnVisibilityGroups[$name]) || isset($this->unresolvedColumnVisibilityGroups[$name]);
+    }
+
+    public function removeColumnVisibilityGroup(string $name): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        unset($this->unresolvedColumnVisibilityGroups[$name], $this->columnVisibilityGroups[$name]);
+
+        return $this;
+    }
+
+    public function createColumnVisibilityGroup(string $name, array $options = []): ColumnVisibilityGroupInterface
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        return $this->getColumnVisibilityGroupFactory()->create($name, $options);
+    }
+
     public function getDataTable(): DataTableInterface
     {
         if ($this->locked) {
@@ -743,6 +807,12 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
         foreach ($this->columns as $column) {
             $dataTable->addColumn($column->getColumn());
+        }
+
+        $this->resolveColumnVisibilityGroups();
+
+        foreach ($this->columnVisibilityGroups as $columnVisibilityGroup) {
+            $dataTable->addColumnVisibilityGroup($columnVisibilityGroup);
         }
 
         $this->resolveFilters();
@@ -881,6 +951,43 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         foreach (array_keys($this->unresolvedExporters) as $exporter) {
             $this->resolveExporter($exporter);
         }
+    }
+
+    private function resolveColumnVisibilityGroups(): void
+    {
+        foreach (array_keys($this->unresolvedColumnVisibilityGroups) as $name) {
+            $this->resolveColumnVisibilityGroup($name);
+        }
+
+        $defaults = array_filter(
+            $this->columnVisibilityGroups,
+            static fn (ColumnVisibilityGroupInterface $group) => $group->isDefault(),
+        );
+
+        if (count($defaults) > 1) {
+            throw new InvalidArgumentException(sprintf('Only one column visibility group can be marked as default, but %d were found: "%s".', count($defaults), implode('", "', array_keys($defaults))));
+        }
+
+        foreach ($this->columns as $column) {
+            $referenced = (array) $column->getColumnConfig()->getOption('column_visibility_groups');
+
+            foreach ($referenced as $groupName) {
+                if (!isset($this->columnVisibilityGroups[$groupName])) {
+                    throw new InvalidArgumentException(sprintf('Column "%s" references the column visibility group "%s", but no such group has been defined on the data table. Available groups: %s.', $column->getName(), $groupName, $this->columnVisibilityGroups ? '"'.implode('", "', array_keys($this->columnVisibilityGroups)).'"' : 'none'));
+                }
+            }
+        }
+    }
+
+    private function resolveColumnVisibilityGroup(string $name): ColumnVisibilityGroupInterface
+    {
+        $options = $this->unresolvedColumnVisibilityGroups[$name];
+
+        unset($this->unresolvedColumnVisibilityGroups[$name]);
+
+        $columnVisibilityGroup = $this->getColumnVisibilityGroupFactory()->create($name, $options);
+
+        return $this->columnVisibilityGroups[$name] = $columnVisibilityGroup;
     }
 
     private function shouldPrependBatchCheckboxColumn(): bool

@@ -9,6 +9,7 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ActionsColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
@@ -196,4 +197,12 @@ interface DataTableBuilderInterface extends DataTableConfigBuilderInterface
     public function setQuery(?ProxyQueryInterface $query): static;
 
     public function getDataTable(): DataTableInterface;
+
+    public function addColumnVisibilityGroup(ColumnVisibilityGroupInterface|string $columnVisibilityGroup, array $options = []): static;
+
+    public function removeColumnVisibilityGroup(string $name): static;
+
+    public function hasColumnVisibilityGroup(string $name): bool;
+
+    public function createColumnVisibilityGroup(string $name, array $options = []): ColumnVisibilityGroupInterface;
 }

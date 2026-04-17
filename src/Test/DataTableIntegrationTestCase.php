@@ -12,6 +12,8 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupFactory;
+use Kreyu\Bundle\DataTableBundle\ColumnVisibilityGroup\ColumnVisibilityGroupFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
@@ -21,6 +23,7 @@ use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class DataTableIntegrationTestCase extends TestCase
 {
@@ -54,6 +57,7 @@ abstract class DataTableIntegrationTestCase extends TestCase
         return [
             new DataTableType([
                 'column_factory' => $this->createColumnFactory(),
+                'column_visibility_group_factory' => $this->createColumnVisibilityGroupFactory(),
             ]),
         ];
     }
@@ -105,5 +109,18 @@ abstract class DataTableIntegrationTestCase extends TestCase
     protected function getResolvedColumnTypeFactory(): ResolvedColumnTypeFactoryInterface
     {
         return new ResolvedColumnTypeFactory();
+    }
+
+    protected function createColumnVisibilityGroupFactory(): ColumnVisibilityGroupFactoryInterface
+    {
+        return new ColumnVisibilityGroupFactory($this->createTranslator());
+    }
+
+    protected function createTranslator(): TranslatorInterface
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnArgument(0);
+
+        return $translator;
     }
 }

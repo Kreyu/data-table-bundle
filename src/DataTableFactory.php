@@ -31,6 +31,12 @@ class DataTableFactory implements DataTableFactoryInterface
 
     public function createNamedBuilder(string $name, string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableBuilderInterface
     {
+        $type = $this->registry->getType($type);
+
+        $builder = $type->createBuilder($this, $name, $options);
+
+        $data ??= $type->createQuery($builder->getOptions());
+
         $query = $data;
 
         if (null !== $data && !$data instanceof ProxyQueryInterface) {
@@ -42,9 +48,7 @@ class DataTableFactory implements DataTableFactoryInterface
             }
         }
 
-        $type = $this->registry->getType($type);
-
-        $builder = $type->createBuilder($this, $name, $query, $options);
+        $builder->setQuery($query);
 
         $type->buildDataTable($builder, $builder->getOptions());
 

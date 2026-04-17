@@ -136,10 +136,11 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
      */
     private array $unresolvedExporters = [];
 
+    private ?ProxyQueryInterface $query = null;
+
     public function __construct(
         string $name,
         ResolvedDataTableTypeInterface $type,
-        private ?ProxyQueryInterface $query = null,
         EventDispatcherInterface $dispatcher = new EventDispatcher(),
         array $options = [],
     ) {

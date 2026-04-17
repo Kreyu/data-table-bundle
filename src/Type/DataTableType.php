@@ -151,6 +151,11 @@ final class DataTableType implements DataTableTypeInterface
         $view->valueRows = new RowIterator(fn () => $this->createExportValueRowsViews($view, $dataTable, $columns));
     }
 
+    public function createQuery(array $options): mixed
+    {
+        return null;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

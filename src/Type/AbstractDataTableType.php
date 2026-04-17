@@ -24,6 +24,11 @@ abstract class AbstractDataTableType implements DataTableTypeInterface
     {
     }
 
+    public function createQuery(array $options): mixed
+    {
+        return null;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
     }

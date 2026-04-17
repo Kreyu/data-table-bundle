@@ -10,7 +10,6 @@ use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -52,7 +51,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
+    public function createBuilder(DataTableFactoryInterface $factory, string $name, array $options = []): DataTableBuilderInterface
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);
@@ -60,7 +59,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
             throw new $exception(sprintf('An error has occurred resolving the options of the data table "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
+        return new DataTableBuilder($name, $this, new EventDispatcher(), $options);
     }
 
     public function createView(DataTableInterface $dataTable): DataTableView
@@ -71,6 +70,11 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     public function createExportView(DataTableInterface $dataTable): DataTableView
     {
         return new DataTableView();
+    }
+
+    public function createQuery(array $options): mixed
+    {
+        return $this->innerType->createQuery($options) ?? $this->parent?->createQuery($options);
     }
 
     public function buildDataTable(DataTableBuilderInterface $builder, array $options): void

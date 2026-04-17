@@ -31,6 +31,7 @@ If you want to include your application here, open an issue, create a pull reque
 - [Exporting](features/exporting.md) with or without applied pagination, filters and personalization 
 - [Theming](features/theming.md) of every part of the bundle using Twig
 - [Data source agnostic](features/extensibility.md) with Doctrine ORM supported out of the box
+- [Query](features/query.md) to fetch the data from any source
 - [Asynchronicity](features/asynchronicity.md) thanks to integration with Turbo (with prefetching enabled by default)
 
 ## Use cases

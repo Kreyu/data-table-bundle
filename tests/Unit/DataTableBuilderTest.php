@@ -735,13 +735,16 @@ class DataTableBuilderTest extends TestCase
 
     private function createBuilder(): DataTableBuilder
     {
-        return new DataTableBuilder(
+        $builder = new DataTableBuilder(
             name: 'foo',
             type: $this->createStub(ResolvedDataTableTypeInterface::class),
-            query: $this->createStub(ProxyQueryInterface::class),
             dispatcher: $this->createStub(EventDispatcherInterface::class),
             options: [],
         );
+
+        $builder->setQuery(query: $this->createStub(ProxyQueryInterface::class));
+
+        return $builder;
     }
 
     private function createColumnFactory(): ColumnFactory

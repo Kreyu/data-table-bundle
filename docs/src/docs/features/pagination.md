@@ -307,6 +307,67 @@ Can be used to execute additional logic after the pagination is applied.
 
 The dispatched events are instance of the [`DataTablePaginationEvent`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Event/DataTablePaginationEvent.php):
 
+### Listening for a given data table
+
+Attach listeners directly in your data table type using the builder. This scopes the listener to that single table:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_PAGINATE, function (DataTablePaginationEvent $event) {
+            $data = $event->getPaginationData();
+            // mutate $data as needed, then persist it back
+            $event->setPaginationData($data);
+        });
+    }
+}
+```
+
+Alternatively, use an event subscriber and add it to the builder:
+
+```php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
+
+final class ProductPaginationSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            DataTableEvents::PRE_PAGINATE => 'onPrePaginate',
+        ];
+    }
+
+    public function onPrePaginate(DataTablePaginationEvent $event): void
+    {
+        // mutate pagination data as needed
+        $event->setPaginationData($event->getPaginationData());
+    }
+}
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function __construct(private readonly ProductPaginationSubscriber $subscriber) {}
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventSubscriber($this->subscriber);
+    }
+}
+```
+
+### Listening globally (all data tables)
+
+To react for every data table, add a DataTable type extension and register a listener there:
+
 ```php
 use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
 
@@ -322,3 +383,71 @@ class DataTablePaginationListener
     }
 }
 ```
+
+```php
+use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use App\Listener\DataTablePaginationListener;
+
+final class AppDataTablePaginationExtension extends AbstractDataTableTypeExtension
+{
+    public function __construct(private readonly DataTablePaginationListener $listener) {}
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [DataTableType::class];
+    }
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_PAGINATE, [$this->listener, '__invoke']);
+    }
+}
+```
+
+Or wire a subscriber globally via the type extension:
+
+```php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
+
+final class GlobalPaginationSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [DataTableEvents::PRE_PAGINATE => 'onPrePaginate'];
+    }
+
+    public function onPrePaginate(DataTablePaginationEvent $event): void
+    {
+        // global logic for all data tables
+    }
+}
+
+final class AppDataTablePaginationExtension extends AbstractDataTableTypeExtension
+{
+    public function __construct(private readonly GlobalPaginationSubscriber $subscriber) {}
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventSubscriber($this->subscriber);
+    }
+}
+```
+
+Register the extension as a service with autoconfiguration so it’s discovered automatically:
+
+```yaml
+# config/services.yaml
+services:
+  App\DataTable\AppDataTablePaginationExtension:
+    autowire: true
+    autoconfigure: true
+```
+
+::: warning
+Data table events are dispatched on a per-table dispatcher. Using `#[AsEventListener]` on a service that listens on Symfony’s global dispatcher will not receive these events — add listeners via the builder or a type extension as shown above.
+:::

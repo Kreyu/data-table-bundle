@@ -257,3 +257,129 @@ class DataTableFiltrationListener
     }
 }
 ```
+
+### Listening for a given data table
+
+Attach listeners in your data table type to scope them to a single table:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_FILTER, function (DataTableFiltrationEvent $event) {
+            $data = $event->getFiltrationData();
+            // mutate $data as needed, then persist it back
+            $event->setFiltrationData($data);
+        });
+    }
+}
+```
+
+Alternatively, use an event subscriber and add it to the builder:
+
+```php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+
+final class ProductFiltrationSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [DataTableEvents::PRE_FILTER => 'onPreFilter'];
+    }
+
+    public function onPreFilter(DataTableFiltrationEvent $event): void
+    {
+        $event->setFiltrationData($event->getFiltrationData());
+    }
+}
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function __construct(private readonly ProductFiltrationSubscriber $subscriber) {}
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventSubscriber($this->subscriber);
+    }
+}
+```
+
+### Listening globally (all data tables)
+
+Use a DataTable type extension to register a listener for every table:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use App\Listener\DataTableFiltrationListener; // invokable class from above
+
+final class AppDataTableFiltrationExtension extends AbstractDataTableTypeExtension
+{
+    public function __construct(private readonly DataTableFiltrationListener $listener) {}
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [DataTableType::class];
+    }
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_FILTER, [$this->listener, '__invoke']);
+    }
+}
+```
+
+Or wire a subscriber globally via the type extension:
+
+```php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
+
+final class GlobalFiltrationSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [DataTableEvents::PRE_FILTER => 'onPreFilter'];
+    }
+
+    public function onPreFilter(DataTableFiltrationEvent $event): void
+    {
+        // global filtration logic
+    }
+}
+
+final class AppDataTableFiltrationExtension extends AbstractDataTableTypeExtension
+{
+    public function __construct(private readonly GlobalFiltrationSubscriber $subscriber) {}
+
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventSubscriber($this->subscriber);
+    }
+}
+```
+
+Register the extension as a service with autoconfiguration so it’s discovered automatically:
+
+```yaml
+# config/services.yaml
+services:
+  App\DataTable\AppDataTableFiltrationExtension:
+    autowire: true
+    autoconfigure: true
+```
+
+::: warning
+Data table events are dispatched on a per-table dispatcher. Using `#[AsEventListener]` on a service that listens on Symfony’s global dispatcher will not receive these events — add listeners via the builder or a type extension as shown above.
+:::

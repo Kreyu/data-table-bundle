@@ -10,13 +10,6 @@ export default class extends Controller {
         'identifierHolder',
     ];
 
-    static values = {
-        identifierHolderAttribute: {
-            type: String,
-            default: 'href',
-        }
-    }
-
     #previousIdentifierMap = null;
 
     connect() {
@@ -84,7 +77,7 @@ export default class extends Controller {
         }
 
         for (const identifierHolder of this.identifierHolderTargets) {
-            this.#updateIdentifierHolderAttribute(identifierHolder, identifierMap);
+            this.#updateIdentifierHolderHrefAttribute(identifierHolder, identifierMap);
             this.#updateIdentifierHolderDataParam(identifierHolder, identifierMap);
 
             if (identifierHolder.tagName === 'FORM') {
@@ -95,11 +88,11 @@ export default class extends Controller {
         this.#previousIdentifierMap = identifierMap;
     }
 
-    #updateIdentifierHolderAttribute(identifierHolder, identifierMap) {
+    #updateIdentifierHolderHrefAttribute(identifierHolder, identifierMap) {
         let url;
 
         try {
-            url = new URL(identifierHolder.getAttribute(this.identifierHolderAttributeValue), window.location.origin);
+            url = new URL(identifierHolder.getAttribute('href'), window.location.origin);
         } catch (exception) {
             return;
         }
@@ -118,7 +111,7 @@ export default class extends Controller {
             }
         }
 
-        identifierHolder.setAttribute(this.identifierHolderAttributeValue, url.toString());
+        identifierHolder.setAttribute('href', url.toString());
     }
 
     #updateIdentifierHolderDataParam(identifierHolder, identifierMap) {

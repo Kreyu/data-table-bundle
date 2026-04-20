@@ -12,7 +12,7 @@ export default class extends Controller {
         event.preventDefault();
         const modalContent = this.modalTarget;
 
-        fetch(this.urlValue)
+        fetch(this.element.getAttribute('href'))
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error loading content.');

@@ -25,6 +25,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
     private array $supportedOperators = [];
     private Operator $defaultOperator = Operator::Equals;
     private bool $operatorSelectable = false;
+    private bool $isHeaderFilter = true;
     private FilterData $emptyData;
 
     public function __construct(
@@ -289,6 +290,22 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         $config->locked = true;
 
         return $config;
+    }
+
+    public function isHeaderFilter(): bool
+    {
+        return $this->isHeaderFilter;
+    }
+
+    public function setIsHeaderFilter(bool $isHeaderFilter): self
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->isHeaderFilter = $isHeaderFilter;
+
+        return $this;
     }
 
     private function createBuilderLockedException(): BadMethodCallException

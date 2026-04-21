@@ -24,6 +24,11 @@
                 "main": "controllers/bootstrap/modal.js",
                 "fetch": "eager",
                 "enabled": false
+            },
+            "column-filter": {
+                "main": "controllers/column-filter.js",
+                "fetch": "eager",
+                "enabled": true
             }
         },
         "importmap": {

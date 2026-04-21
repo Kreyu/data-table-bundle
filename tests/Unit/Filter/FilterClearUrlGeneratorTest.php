@@ -159,6 +159,7 @@ class FilterClearUrlGeneratorTest extends TestCase
         $filterView = $this->createMock(FilterView::class);
         $filterView->vars['name'] = $name;
         $filterView->vars['operator_selectable'] = $operatorSelectable;
+        $filterView->vars['is_header_filter'] = true;
 
         $filterView->parent = $this->createDataTableViewMock();
 

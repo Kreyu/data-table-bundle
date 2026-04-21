@@ -772,6 +772,23 @@ class DataTable implements DataTableInterface
         );
     }
 
+    public function createColumnFiltrationFormBuilder(?DataTableView $view = null, array $filters = []): FormBuilderInterface
+    {
+        if (!$this->config->isFiltrationEnabled()) {
+            throw new RuntimeException('The data table has filtration feature disabled.');
+        }
+
+        return $this->config->getFiltrationFormFactory()->createNamedBuilder(
+            name: $this->config->getColumnFiltrationParameterName(),
+            type: FiltrationDataType::class,
+            options: [
+                'data_table' => $this,
+                'data_table_view' => $view,
+                'is_header_form' => false,
+            ],
+        );
+    }
+
     public function createPersonalizationFormBuilder(?DataTableView $view = null): FormBuilderInterface
     {
         if (!$this->config->isPersonalizationEnabled()) {

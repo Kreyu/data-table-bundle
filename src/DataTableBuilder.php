@@ -262,11 +262,16 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         if (isset($this->unresolvedFilters[$name])) {
-            return $this->resolveFilter($name);
+            return $this->resolveHeaderFilter($name);
         }
 
         if (isset($this->filters[$name])) {
             return $this->filters[$name];
+        }
+
+        $filter = $this->resolveColumnFilter($name);
+        if (null !== $filter) {
+            return $filter;
         }
 
         throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
@@ -794,7 +799,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
     }
 
-    private function resolveFilter(string $name): FilterBuilderInterface
+    private function resolveHeaderFilter(string $name): FilterBuilderInterface
     {
         [$type, $options] = $this->unresolvedFilters[$name];
 
@@ -803,10 +808,40 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->filters[$name] = $this->getFilterFactory()->createNamedBuilder($name, $type, $options);
     }
 
+    private function resolveColumnFilter(string $name): ?FilterBuilderInterface
+    {
+        if (isset($this->filters[$name])) {
+            throw new InvalidArgumentException(sprintf('A filter named "%s" is already registered as a header filter. Only one filter with the same name (column + header) can be active at a time. Remove or replace the existing filter before adding a new one.', $name));
+        }
+
+        $column = $this->columns[$name] ?? null;
+
+        if (null === $column) {
+            return null;
+        }
+
+        $type = $column->getOption('filter');
+
+        if (null === $type) {
+            return null;
+        }
+
+        $options = $column->getOption('filter_options');
+        $options['is_header_filter'] = false;
+
+        return $this->filters[$name] = $this->getFilterFactory()->createNamedBuilder($name, $type, $options);
+    }
+
     private function resolveFilters(): void
     {
         foreach (array_keys($this->unresolvedFilters) as $filter) {
-            $this->resolveFilter($filter);
+            $this->resolveHeaderFilter($filter);
+        }
+
+        foreach ($this->columns as $column) {
+            if (null !== $column->getOptions()['filter']) {
+                $this->resolveColumnFilter($column->getName());
+            }
         }
     }
 

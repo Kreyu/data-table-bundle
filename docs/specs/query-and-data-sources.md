@@ -57,6 +57,90 @@ out of range with a non-empty result; `DataTable::createPagination` catches it a
 Request: `HttpFoundationRequestHandler::paginate` skips entirely when no page parameter is present
 (`:77-98`).
 
+### 3a. Pagination factory & adjustable page window (#219)
+
+> **Status: Implemented** ([issue #219](https://github.com/Kreyu/data-table-bundle/issues/219)). §3a
+> describes the implemented design; line citations are against the working tree. Keyset (cursor)
+> pagination remains a separate proposal on the same `paginate(PaginationData)` seam — see
+> [pagination-keyset.md](pagination-keyset.md) (#175), which consumes the factory seam defined here.
+>
+> **BC note:** adding `getPaginationFactory`/`setPaginationFactory` to `DataTableConfigInterface` and
+> `DataTableConfigBuilderInterface` breaks any *external* class that implements those interfaces directly
+> (the bundle's own `DataTableConfigBuilder` is updated). Release-note this for the next minor.
+
+**Problem (verified).** `Pagination` is instantiated in exactly one place — `new Pagination(...)` at
+`src/DataTable.php:681` — with no factory seam, and `SIDE_PAGE_LIMIT = 3` is a `public const`
+(`src/Pagination/Pagination.php:9`) used only by the view-window methods (`:64-74`). A user cannot adjust
+the window or substitute their own `Pagination` without forking `createPagination`.
+
+**Design.** New types under `src/Pagination/`:
+
+```php
+final class PaginationContext { // factory's single named parameter object (DTO)
+    public function __construct(
+        public readonly int $currentPageNumber,
+        public readonly int $currentPageItemCount,
+        public readonly int $totalItemCount,
+        public readonly ?int $itemNumberPerPage,
+        public readonly int $visiblePagesRange,
+    ) {}
+}
+interface PaginationFactoryInterface { public function create(PaginationContext $context): PaginationInterface; }
+final class PaginationFactory implements PaginationFactoryInterface { /* returns new Pagination(...) */ }
+```
+
+- `PaginationFactory::create` must let `Pagination`'s constructor `CurrentPageOutOfRangeException`
+  **propagate** — `DataTable::createPagination` depends on the throw to reset to page 1 (`:687-695`).
+- `Pagination::__construct` gains one **optional, trailing** param `int $visiblePagesRange = self::SIDE_PAGE_LIMIT`;
+  the two window methods read `$this->visiblePagesRange`. The const is retained, so all existing call
+  sites and constant-readers are unaffected (BC-safe for construction + the constant; a subclass that
+  overrides the window methods is unaffected unless it opts to read the new property). `PaginationInterface`
+  is untouched — the range stays a view-window detail.
+- `DataTable::createPagination` (`:676-696`) delegates:
+  `$factory = $this->config->getPaginationFactory() ?? new PaginationFactory();` then
+  `$factory->create(new PaginationContext(..., visiblePagesRange: $this->config->getOption('page_visible_range', 3)))`,
+  keeping the existing `CurrentPageOutOfRangeException` catch/reset loop unchanged.
+- The factory is an injected, overridable service → it gets a config member + `get/setPaginationFactory`
+  on `DataTableConfigInterface`/`DataTableConfigBuilder`, modelled on the **nested** feature-factory
+  members `filterFactory`/`exporterFactory` (setter throws if `locked`). `page_visible_range` is a plain
+  resolved option read via `getOption` (`src/DataTableConfigInterface.php:42`), mirroring `per_page_choices`
+  (`src/Type/DataTableType.php:176`) — no builder setter or config getter; default `3` = current behavior.
+
+**Wiring** (factory mirrors nested `filter_factory`/`exporter_factory`; `page_visible_range` mirrors
+`per_page_choices`):
+
+| # | File / location | Change |
+|---|-----------------|--------|
+| 1 | `src/Type/DataTableType.php` `configureOptions` (`:160-200`) | Option `pagination_factory` default `$this->defaults['pagination']['pagination_factory'] ?? null`, `setAllowedTypes(['null', PaginationFactoryInterface::class])`. Option `page_visible_range` default `$this->defaults['pagination']['page_visible_range'] ?? 3`, `setAllowedTypes('int')`, `setAllowedValues(fn (int $v) => $v >= 0)`. |
+| 2 | `src/Type/DataTableType.php` `buildDataTable` `$setters` (`:43-71`) | Add **only** `'pagination_factory' => $builder->setPaginationFactory(...)`. Do **not** add `page_visible_range` (read at use-site, like `per_page_choices`). |
+| 3 | `src/DependencyInjection/Configuration.php` inside `arrayNode('pagination')` (`:74-94`) | `->scalarNode('pagination_factory')->defaultValue('kreyu_data_table.pagination.factory')->end()` and `->integerNode('page_visible_range')->defaultValue(3)->min(0)->end()`. |
+| 4 | `src/DependencyInjection/KreyuDataTableExtension.php` `$serviceReferenceNodes` (`:111-120`) | Add `'pagination_factory'` so the config string becomes a `Reference`. |
+| 5 | `src/Resources/config/pagination.php` (beside the existing `url_generator` block) | Register `kreyu_data_table.pagination.factory` → `PaginationFactory::class`; alias `PaginationFactoryInterface`. Not `core.php` (which holds no pagination services). |
+
+No Twig change: `PaginationView` already exposes `first/last_visible_page_number` (`:27-28`), now reflecting
+the configured range.
+
+**End-user surface (after the change):** per-table window via the `page_visible_range` option (or globally
+via `kreyu_data_table.defaults.pagination.page_visible_range`); decorate `PaginationFactoryInterface`
+(`#[AsDecorator('kreyu_data_table.pagination.factory')]`); or replace `Pagination` wholesale via a custom
+factory service set on the `pagination_factory` option / global default.
+
+**Window algorithm (verified, asymmetric — NOT `current ± range`).** From `Pagination.php:64-74`:
+`leftSideAddition = max(range − (pageCount − current), 0)`; `first = max(current − range − leftSideAddition, 1)`;
+`last = min(first + range·2, pageCount)`. Anchors (`PaginationTest.php:90-130`, 25 pages, range 3):
+current=10 → 7..13; current=1 → 1..7; current=25 → 19..25.
+
+**#219 tests to add:** `PaginationFactoryTest` (creates a configured `Pagination`; propagates
+`CurrentPageOutOfRangeException`); extend `PaginationTest` with the `visiblePagesRange` param (anchors
+above); extend `DataTableConfigBuilderTest` for the locked-`setPaginationFactory` guard; extend
+`DataTableTest` for default-factory + `page_visible_range` end-to-end.
+
+**#219 assumptions / open question:** the nested-feature-factory wiring (scalar node → `Reference` →
+option → builder setter → config getter) is the bundle's standard for an injectable overridable service
+(verified across `filter_factory`/`exporter_factory`/`request_handler` at `0ad7af1`). Final names are
+fixed: option `page_visible_range`, service id `kreyu_data_table.pagination.factory`. Open (cosmetic):
+whether to `@deprecate` `Pagination::SIDE_PAGE_LIMIT` — default is to keep it as the documented default.
+
 ## 4. Sorting
 
 `SortingColumnData` (`src/Sorting/SortingColumnData.php`): `name`, `direction` (`'asc'`|`'desc'`|`'none'`,
@@ -87,6 +171,11 @@ default, else an empty value, and is applied with `persistence:false` (see
 | Trust request sort data as-is | Let `sort()` validate it | `removeRedundantColumns`/`ensureValidPropertyPaths` sanitize (`src/DataTable.php:547-548`) |
 | Hand-roll `Direction`/`SortDirection` enum usage | Use `'asc'`/`'desc'`/`'none'` strings | The enums are unused; strings are the contract (`src/Sorting/SortingColumnData.php:35`) |
 | Assume a page is always paginated | Page param may be absent → skipped | `HttpFoundationRequestHandler::paginate` returns early (`:93-95`) |
+| *(§3a #219)* `new Pagination(...)` directly | Go through `PaginationFactoryInterface::create` | The factory is the substitution seam (`src/DataTable.php:681`) |
+| *(§3a #219)* Make the factory catch `CurrentPageOutOfRangeException` | Let it propagate | `createPagination` resets to page 1 on the throw (`:687-695`) |
+| *(§3a #219)* Add a required param to `Pagination::__construct` | Add it optional + trailing with the const default | Keeps direct construction BC-safe |
+| *(§3a #219)* Wire `page_visible_range` as a service/config member | Read it as a plain option via `getOption` (like `per_page_choices`) | It is render-time data, not an injected service |
+| *(§3a #219)* Default the new config nodes to anything but current behavior | `page_visible_range = 3`, factory = shipped default service | Any other default silently changes every existing table |
 
 ## Error Handling Matrix
 | Condition | Detection | Response | Exception | Source |
@@ -96,6 +185,9 @@ default, else an empty value, and is applied with `persistence:false` (see
 | Invalid page/perPage in `fromArray` | OptionsResolver | abort | validation exception | `src/Pagination/PaginationData.php:32-37` |
 | Invalid sort direction | OptionsResolver `allowedValues` | abort | validation exception | `src/Sorting/SortingColumnData.php:35` |
 | Non-factory tagged as proxy factory | `instanceof` | abort | `UnexpectedTypeException` | `src/DataTableRegistry.php:132-133` |
+| *(§3a #219)* `pagination_factory` neither null nor `PaginationFactoryInterface` | `OptionsResolver` allowed types | abort at build | options validation exception | §3a wiring row 1 |
+| *(§3a #219)* `page_visible_range` not int / negative | `OptionsResolver` allowed types + value | abort at build | options validation exception | §3a wiring row 1 |
+| *(§3a #219)* `pagination_factory` option user-set to null | `buildDataTable` skips setter (`src/Type/DataTableType.php:73-77`) | fall back to `new PaginationFactory()` | (handled) | §3a design |
 
 ## Invariants & Existing Tests
 | Invariant | Test |
@@ -104,6 +196,7 @@ default, else an empty value, and is applied with `persistence:false` (see
 | Pagination math & out-of-range reset | `tests/Unit/Pagination/PaginationTest.php`, `PaginationUrlGeneratorTest.php` |
 | Doctrine proxy query / result set / paginator | `tests/Unit/Bridge/Doctrine/Orm/Query/*`, `Paginator/PaginatorFactoryTest.php` |
 | Custom proxy factory selection | `tests/Fixtures/DataTable/Query/*` + `tests/Unit/DataTableFactoryTest.php` |
+| *(§3a #219)* Factory creates configured `Pagination` from a context; propagates out-of-range; window-range param incl. edge/zero; BC default | `tests/Unit/Pagination/PaginationFactoryTest.php`, `tests/Unit/Pagination/PaginationTest.php` |
 
 ## Open Questions
 | Question | Why it matters | Blocks |

@@ -24,6 +24,12 @@ how the bundle is built internally, with file+line citations. Pinned to commit `
 - [bridges.md](bridges.md) — Doctrine ORM, OpenSpout, PhpSpreadsheet
 - [infrastructure.md](infrastructure.md) — DI/config, Twig & theming, profiler, maker, events, exceptions
 
+## Proposals (forward-looking — not yet implemented)
+- [pagination-keyset.md](pagination-keyset.md) — keyset/cursor pagination design proposal (#175)
+
+> Implemented since: replaceable pagination factory + adjustable page window (#219) —
+> documented in [query-and-data-sources.md](query-and-data-sources.md) §3a.
+
 ## Method note
 Each implementation spec carries Anti-Patterns and an Error-Handling Matrix derived from the actual
 guards in the code. The "Invariants & Existing Tests" sections point to the **real** test suite under

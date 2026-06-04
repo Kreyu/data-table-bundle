@@ -11,6 +11,14 @@
     </div>
 {% endblock %}
 
+{% block async_placeholder %}
+    <div class="d-flex justify-content-center p-4">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">{{ 'Loading'|trans({}, 'KreyuDataTable') }}</span>
+        </div>
+    </div>
+{% endblock %}
+
 {% block column_header %}
     {% with {
         active_attr: { class: 'border-bottom border-primary text-primary' },

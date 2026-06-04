@@ -23,6 +23,10 @@ kreyu_data_table:
       - '@KreyuDataTable/themes/base.html.twig'
     column_factory: kreyu_data_table.column.factory
     request_handler: kreyu_data_table.request_handler.http_foundation
+    # defer data loading until after the page has loaded (requires Symfony UX Turbo)
+    async: false
+    # when async is enabled: "lazy" fetches when the table scrolls into view, "eager" right after load
+    async_loading: lazy
     sorting:
       enabled: true
       persistence_enabled: false
@@ -38,6 +42,10 @@ kreyu_data_table:
       # if persistence is enabled and symfony/security-bundle is installed, null otherwise 
       persistence_subject_provider: kreyu_data_table.persistence.subject_provider.token_storage
       per_page_choices: [10, 25, 50, 100]
+      # service used to create the Pagination object; decorate or replace it to customize pagination
+      pagination_factory: kreyu_data_table.pagination.factory
+      # how many page numbers are shown on each side of the current page in the pagination controls
+      page_visible_range: 3
     filtration:
       enabled: true
       persistence_enabled: false
@@ -75,6 +83,10 @@ return static function (KreyuDataTableConfig $config) {
         ])
         ->columnFactory('kreyu_data_table.column.factory')
         ->requestHandler('kreyu_data_table.request_handler.http_foundation')
+        // defer data loading until after the page has loaded (requires Symfony UX Turbo)
+        ->async(false)
+        // when async is enabled: "lazy" fetches when the table scrolls into view, "eager" right after load
+        ->asyncLoading('lazy')
     ;
 
     $defaults->sorting()
@@ -94,6 +106,10 @@ return static function (KreyuDataTableConfig $config) {
         // if persistence is enabled and symfony/security-bundle is installed, null otherwise
         ->persistenceSubjectProvider('kreyu_data_table.persistence.subject_provider.token_storage')
         ->perPageChoices([10, 25, 50, 100])
+        // service used to create the Pagination object; decorate or replace it to customize pagination
+        ->paginationFactory('kreyu_data_table.pagination.factory')
+        // how many page numbers are shown on each side of the current page in the pagination controls
+        ->pageVisibleRange(3)
     ;
 
     $defaults->filtration()

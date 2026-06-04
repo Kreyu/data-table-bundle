@@ -3,51 +3,75 @@
 {# Base HTML Theme #}
 
 {% block kreyu_data_table %}
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+    {% set frame_attr = { id: 'kreyu_data_table_' ~ name, target: '_top' } %}
 
-    {% if has_batch_actions %}
-        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% if async_deferred %}
+        {% set frame_attr = frame_attr|merge({ src: app.request.requestUri, loading: async_loading }) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
-        <div
-            data-controller="{{ stimulus_controllers|join(' ') }}"
-            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
-        >
-            {{ block('action_bar', theme) }}
-            {{ block('table', theme) }}
+    <turbo-frame {% with { attr: frame_attr } %}{{ block('attributes') }}{% endwith %}>
+        {% if async_deferred %}
+            {{ block('async_placeholder', theme) }}
+        {% else %}
+            {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
-            {% if pagination_enabled %}
-                {{ data_table_pagination(pagination) }}
+            {% if has_batch_actions %}
+                {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
             {% endif %}
-        </div>
+
+            <div
+                data-controller="{{ stimulus_controllers|join(' ') }}"
+                data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+            >
+                {{ block('action_bar', theme) }}
+                {{ block('table', theme) }}
+
+                {% if pagination_enabled %}
+                    {{ data_table_pagination(pagination) }}
+                {% endif %}
+            </div>
+        {% endif %}
     </turbo-frame>
+{% endblock %}
+
+{% block async_placeholder %}
+    <progress style="width: 100%">{{ 'Loading'|trans({}, 'KreyuDataTable') }}</progress>
 {% endblock %}
 
 {% block kreyu_data_table_form_aware %}
     {% deprecated 'The "kreyu_data_table_form_aware" block is deprecated. Instead of wrapping the data table with form, reference it by using the "form" HTML attribute.' %}
 
-    {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
+    {% set frame_attr = { id: 'kreyu_data_table_' ~ name, target: '_top' } %}
 
-    {% if has_batch_actions %}
-        {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
+    {% if async_deferred %}
+        {% set frame_attr = frame_attr|merge({ src: app.request.requestUri, loading: async_loading }) %}
     {% endif %}
 
-    <turbo-frame id="kreyu_data_table_{{ name }}" target="_top">
-        <div
-            data-controller="{{ stimulus_controllers|join(' ') }}"
-            data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
-        >
-            {{ block('action_bar', theme) }}
+    <turbo-frame {% with { attr: frame_attr } %}{{ block('attributes') }}{% endwith %}>
+        {% if async_deferred %}
+            {{ block('async_placeholder', theme) }}
+        {% else %}
+            {% set stimulus_controllers = ['kreyu--data-table-bundle--state'] %}
 
-            {{ form_start(form, form_variables) }}
-                {{ block('table', theme) }}
-            {{ form_end(form, { render_rest: false }) }}
-
-            {% if pagination_enabled %}
-                {{ data_table_pagination(pagination) }}
+            {% if has_batch_actions %}
+                {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
             {% endif %}
-        </div>
+
+            <div
+                data-controller="{{ stimulus_controllers|join(' ') }}"
+                data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
+            >
+                {{ block('action_bar', theme) }}
+
+                {{ form_start(form, form_variables) }}
+                    {{ block('table', theme) }}
+                {{ form_end(form, { render_rest: false }) }}
+
+                {% if pagination_enabled %}
+                    {{ data_table_pagination(pagination) }}
+                {% endif %}
+            </div>
+        {% endif %}
     </turbo-frame>
 {% endblock %}
 

@@ -84,8 +84,14 @@ final class DataTableType implements DataTableTypeInterface
         $columns = $dataTable->getColumns();
         $visibleColumns = $dataTable->getVisibleColumns();
 
+        $async = $options['async'];
+        $deferred = $async && !$dataTable->isRequestFromTurboFrame();
+
         $view->vars = array_replace($view->vars, [
             'data_table' => $view,
+            'is_async' => $async,
+            'async_loading' => $options['async_loading'],
+            'async_deferred' => $deferred,
             'themes' => $dataTable->getConfig()->getThemes(),
             'title' => $options['title'],
             'title_translation_parameters' => $options['title_translation_parameters'],
@@ -113,8 +119,15 @@ final class DataTableType implements DataTableTypeInterface
 
         $view->headerRow = $this->createHeaderRowView($view, $dataTable, $visibleColumns);
         $view->nonPersonalizedHeaderRow = $this->createHeaderRowView($view, $dataTable, $columns);
-        $view->valueRows = new RowIterator(fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns));
-        $view->pagination = $this->createPaginationView($view, $dataTable);
+
+        if ($deferred) {
+            $view->valueRows = [];
+            $view->pagination = null;
+        } else {
+            $view->valueRows = new RowIterator(fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns));
+            $view->pagination = $this->createPaginationView($view, $dataTable);
+        }
+
         $view->filters = $this->createFilterViews($view, $dataTable);
         $view->actions = $this->createActionViews($view, $dataTable);
 
@@ -140,7 +153,7 @@ final class DataTableType implements DataTableTypeInterface
             $view->vars['export_form'] = $this->createExportFormView($view, $dataTable);
         }
 
-        $view->vars['url_query_parameters'] = $this->getUrlQueryParameters($view, $dataTable);
+        $view->vars['url_query_parameters'] = $deferred ? [] : $this->getUrlQueryParameters($view, $dataTable);
     }
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
@@ -190,6 +203,8 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
+                'async' => $this->defaults['async'] ?? false,
+                'async_loading' => $this->defaults['async_loading'] ?? 'lazy',
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
@@ -224,6 +239,9 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('async', 'bool')
+            ->setAllowedTypes('async_loading', 'string')
+            ->setAllowedValues('async_loading', ['lazy', 'eager'])
         ;
     }
 

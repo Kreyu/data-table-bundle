@@ -94,7 +94,9 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
         );
 
         if (!$dataTable->getConfig()->isPaginationEnabled()) {
-            $this->data[$dataTable->getName()]['total_count'] = iterator_count($dataTable->getItems());
+            $this->data[$dataTable->getName()]['total_count'] = $this->isDeferred($dataTable)
+                ? null
+                : iterator_count($dataTable->getItems());
         }
     }
 
@@ -141,7 +143,15 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
     {
         $this->data[$dataTable->getName()]['page'] = $data->getPage();
         $this->data[$dataTable->getName()]['per_page'] = $data->getPerPage();
-        $this->data[$dataTable->getName()]['total_count'] = $dataTable->getPagination()->getTotalItemCount();
+
+        $this->data[$dataTable->getName()]['total_count'] = $this->isDeferred($dataTable)
+            ? null
+            : $dataTable->getPagination()->getTotalItemCount();
+    }
+
+    private function isDeferred(DataTableInterface $dataTable): bool
+    {
+        return $dataTable->getConfig()->getOption('async', false) && !$dataTable->isRequestFromTurboFrame();
     }
 
     public function collectFilterView(FilterInterface $filter, FilterView $view): void

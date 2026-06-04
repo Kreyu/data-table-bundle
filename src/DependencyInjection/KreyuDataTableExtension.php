@@ -117,6 +117,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'filter_factory',
             'exporter_factory',
             'request_handler',
+            'pagination_factory',
         ];
 
         array_walk_recursive($config, function (&$item, $key) use ($serviceReferenceNodes) {

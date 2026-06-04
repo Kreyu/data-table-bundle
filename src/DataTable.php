@@ -29,8 +29,9 @@ use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\FiltrationDataType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\CurrentPageOutOfRangeException;
-use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationContext;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactory;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceContext;
@@ -677,13 +678,16 @@ class DataTable implements DataTableInterface
     {
         $resultSet = $this->getResultSet();
 
+        $factory = $this->config->getPaginationFactory() ?? new PaginationFactory();
+
         try {
-            return new Pagination(
+            return $factory->create(new PaginationContext(
                 currentPageNumber: $this->paginationData?->getPage() ?? 1,
                 currentPageItemCount: $resultSet->getCurrentPageItemCount(),
                 totalItemCount: $resultSet->getTotalItemCount(),
                 itemNumberPerPage: $this->paginationData?->getPerPage(),
-            );
+                visiblePagesRange: $this->config->getOption('page_visible_range', 3),
+            ));
         } catch (CurrentPageOutOfRangeException) {
             $this->paginationData ??= new PaginationData();
             $this->paginationData->setPage(1);

@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -61,6 +62,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?ActionFactoryInterface $actionFactory = null;
     private ?ExporterFactoryInterface $exporterFactory = null;
     private ?RequestHandlerInterface $requestHandler = null;
+    private ?PaginationFactoryInterface $paginationFactory = null;
 
     private bool $sortingClearable = false;
 
@@ -683,6 +685,22 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    public function getPaginationFactory(): ?PaginationFactoryInterface
+    {
+        return $this->paginationFactory;
+    }
+
+    public function setPaginationFactory(?PaginationFactoryInterface $paginationFactory): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->paginationFactory = $paginationFactory;
 
         return $this;
     }

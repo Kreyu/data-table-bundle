@@ -152,4 +152,67 @@ class PaginationTest extends TestCase
 
         $this->assertSame(100, $pagination->getCurrentPageLastItemIndex());
     }
+
+    public function testVisiblePagesRangeDefaultsToSidePageLimit()
+    {
+        $default = new Pagination(
+            currentPageNumber: 10,
+            currentPageItemCount: 10,
+            totalItemCount: 250,
+            itemNumberPerPage: 10,
+        );
+
+        $explicit = new Pagination(
+            currentPageNumber: 10,
+            currentPageItemCount: 10,
+            totalItemCount: 250,
+            itemNumberPerPage: 10,
+            visiblePagesRange: Pagination::SIDE_PAGE_LIMIT,
+        );
+
+        $this->assertSame($default->getFirstVisiblePageNumber(), $explicit->getFirstVisiblePageNumber());
+        $this->assertSame($default->getLastVisiblePageNumber(), $explicit->getLastVisiblePageNumber());
+    }
+
+    public function testConfigurableVisiblePagesRange()
+    {
+        $pagination = new Pagination(
+            currentPageNumber: 10,
+            currentPageItemCount: 10,
+            totalItemCount: 250,
+            itemNumberPerPage: 10,
+            visiblePagesRange: 5,
+        );
+
+        $this->assertSame(5, $pagination->getFirstVisiblePageNumber());
+        $this->assertSame(15, $pagination->getLastVisiblePageNumber());
+    }
+
+    public function testConfigurableVisiblePagesRangeAtUpperEdge()
+    {
+        $pagination = new Pagination(
+            currentPageNumber: 25,
+            currentPageItemCount: 10,
+            totalItemCount: 250,
+            itemNumberPerPage: 10,
+            visiblePagesRange: 5,
+        );
+
+        $this->assertSame(15, $pagination->getFirstVisiblePageNumber());
+        $this->assertSame(25, $pagination->getLastVisiblePageNumber());
+    }
+
+    public function testZeroVisiblePagesRange()
+    {
+        $pagination = new Pagination(
+            currentPageNumber: 10,
+            currentPageItemCount: 10,
+            totalItemCount: 250,
+            itemNumberPerPage: 10,
+            visiblePagesRange: 0,
+        );
+
+        $this->assertSame(10, $pagination->getFirstVisiblePageNumber());
+        $this->assertSame(10, $pagination->getLastVisiblePageNumber());
+    }
 }

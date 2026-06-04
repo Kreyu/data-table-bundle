@@ -18,6 +18,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
@@ -68,6 +69,7 @@ final class DataTableType implements DataTableTypeInterface
             'exporting_enabled' => $builder->setExportingEnabled(...),
             'exporting_form_factory' => $builder->setExportFormFactory(...),
             'request_handler' => $builder->setRequestHandler(...),
+            'pagination_factory' => $builder->setPaginationFactory(...),
         ];
 
         foreach ($setters as $option => $setter) {
@@ -174,6 +176,8 @@ final class DataTableType implements DataTableTypeInterface
                 'pagination_persistence_adapter' => $this->defaults['pagination']['persistence_adapter'] ?? null,
                 'pagination_persistence_subject_provider' => $this->defaults['pagination']['persistence_subject_provider'] ?? null,
                 'per_page_choices' => $this->defaults['pagination']['per_page_choices'] ?? [10, 25, 50, 100],
+                'pagination_factory' => $this->defaults['pagination']['pagination_factory'] ?? null,
+                'page_visible_range' => $this->defaults['pagination']['page_visible_range'] ?? 3,
                 'filtration_enabled' => $this->defaults['filtration']['enabled'] ?? false,
                 'filtration_persistence_enabled' => $this->defaults['filtration']['persistence_enabled'] ?? false,
                 'filtration_persistence_adapter' => $this->defaults['filtration']['persistence_adapter'] ?? null,
@@ -205,6 +209,9 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('pagination_persistence_enabled', 'bool')
             ->setAllowedTypes('pagination_persistence_adapter', ['null', PersistenceAdapterInterface::class])
             ->setAllowedTypes('pagination_persistence_subject_provider', ['null', PersistenceSubjectProviderInterface::class])
+            ->setAllowedTypes('pagination_factory', ['null', PaginationFactoryInterface::class])
+            ->setAllowedTypes('page_visible_range', 'int')
+            ->setAllowedValues('page_visible_range', fn (int $value): bool => $value >= 0)
             ->setAllowedTypes('filtration_enabled', 'bool')
             ->setAllowedTypes('filtration_persistence_enabled', 'bool')
             ->setAllowedTypes('filtration_persistence_adapter', ['null', PersistenceAdapterInterface::class])

@@ -16,6 +16,7 @@ class Pagination implements PaginationInterface
         private readonly int $currentPageItemCount,
         private readonly int $totalItemCount,
         private readonly ?int $itemNumberPerPage = null,
+        private readonly int $visiblePagesRange = self::SIDE_PAGE_LIMIT,
     ) {
         if ($totalItemCount > 0 && $this->isCurrentPageNumberOutOfRange()) {
             throw new CurrentPageOutOfRangeException();
@@ -63,14 +64,14 @@ class Pagination implements PaginationInterface
 
     public function getFirstVisiblePageNumber(): int
     {
-        $leftSideAddition = max(self::SIDE_PAGE_LIMIT - ($this->getPageCount() - $this->getCurrentPageNumber()), 0);
+        $leftSideAddition = max($this->visiblePagesRange - ($this->getPageCount() - $this->getCurrentPageNumber()), 0);
 
-        return max($this->getCurrentPageNumber() - self::SIDE_PAGE_LIMIT - $leftSideAddition, 1);
+        return max($this->getCurrentPageNumber() - $this->visiblePagesRange - $leftSideAddition, 1);
     }
 
     public function getLastVisiblePageNumber(): int
     {
-        return min($this->getFirstVisiblePageNumber() + (self::SIDE_PAGE_LIMIT * 2), $this->getPageCount());
+        return min($this->getFirstVisiblePageNumber() + ($this->visiblePagesRange * 2), $this->getPageCount());
     }
 
     public function getCurrentPageFirstItemIndex(): int

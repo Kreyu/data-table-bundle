@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceAdapterInterface;
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectProviderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
@@ -104,6 +105,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static;
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static;
+
+    public function setPaginationFactory(?PaginationFactoryInterface $paginationFactory): static;
 
     public function addTheme(string $theme): static;
 

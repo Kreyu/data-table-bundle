@@ -286,6 +286,135 @@ class ProductController extends AbstractController
 
 Setting the `per_page_choices` to an empty array will hide the per-page select field.
 
+## Configuring the visible page range
+
+The pagination controls show a window of page numbers around the current page.
+The `page_visible_range` option controls how many page numbers are shown on **each side** of the current
+page — the default of `3` shows up to 7 numbers (current ± 3), shifting to stay within range near the
+first and last page.
+
+::: code-group
+```yaml [Globally (YAML)]
+kreyu_data_table:
+  defaults:
+    pagination:
+      page_visible_range: 3
+```
+
+```php [Globally (PHP)]
+use Symfony\Config\KreyuDataTableConfig;
+
+return static function (KreyuDataTableConfig $config) {
+    $defaults = $config->defaults();
+    $defaults->pagination()
+        ->pageVisibleRange(3)
+    ;
+};
+```
+
+```php [For data table type]
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'page_visible_range' => 3,
+        ]);
+    }
+}
+```
+
+```php [For specific data table]
+use App\DataTable\Type\ProductDataTableType;
+use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class ProductController extends AbstractController
+{
+    use DataTableFactoryAwareTrait;
+
+    public function index()
+    {
+        $dataTable = $this->createDataTable(
+            type: ProductDataTableType::class,
+            query: $query,
+            options: [
+                'page_visible_range' => 3,
+            ],
+        );
+    }
+}
+```
+:::
+
+::: tip
+Setting `page_visible_range` to `0` shows only the current page number (the first/previous/next/last
+controls remain). The value must be `0` or greater.
+:::
+
+## Replacing the pagination factory
+
+The [`Pagination`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Pagination/Pagination.php)
+object is built through the `kreyu_data_table.pagination.factory` service, which implements
+[`PaginationFactoryInterface`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Pagination/PaginationFactoryInterface.php).
+You can **decorate** it to tweak how pagination is created, or **replace** it entirely with your own
+implementation — for example, to return a custom `Pagination` subclass.
+
+The simplest approach is to decorate the default service:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationContext;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+
+#[AsDecorator('kreyu_data_table.pagination.factory')]
+class CustomPaginationFactory implements PaginationFactoryInterface
+{
+    public function __construct(
+        private PaginationFactoryInterface $inner,
+    ) {
+    }
+
+    public function create(PaginationContext $context): PaginationInterface
+    {
+        // delegate to the default factory, or build your own PaginationInterface here
+        return $this->inner->create($context);
+    }
+}
+```
+
+::: warning
+Do not catch `CurrentPageOutOfRangeException` inside the factory — the data table relies on it being
+thrown to reset an out-of-range page back to the first one.
+:::
+
+To swap the factory for a single data table type (or specific data table), set the `pagination_factory`
+option to your service instead of decorating the default:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function __construct(
+        private PaginationFactoryInterface $paginationFactory,
+    ) {
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'pagination_factory' => $this->paginationFactory,
+        ]);
+    }
+}
+```
 
 ## Events
 

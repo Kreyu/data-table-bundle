@@ -1,0 +1,9 @@
+# PHPStan config for the Docker test environment. Reuses the project config but
+# caps the worker pool to a single process — the parallel pool can exhaust memory
+# and fail to fork inside a memory-constrained container ("Cannot allocate memory").
+includes:
+    - ../phpstan.dist.neon
+
+parameters:
+    parallel:
+        maximumNumberOfProcesses: 1

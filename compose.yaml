@@ -1,0 +1,18 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+    image: kreyu-data-table-bundle:php${PHP_VERSION:-8.1}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    volumes:
+      - .:/app
+      # Container-private vendor: keeps the container's resolved dependencies
+      # isolated from the host's (which may be resolved on a different PHP version).
+      - vendor:/app/vendor
+
+volumes:
+  vendor:

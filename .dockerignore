@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+vendor
+var
+node_modules
+docs/node_modules
+docs/.vitepress/cache
+.phpunit.cache
+.php-cs-fixer.cache

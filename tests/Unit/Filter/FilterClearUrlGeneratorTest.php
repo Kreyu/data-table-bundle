@@ -9,8 +9,6 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterClearUrlGenerator;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -22,18 +20,17 @@ class FilterClearUrlGeneratorTest extends TestCase
     private const PAGE_PARAMETER_NAME = 'page_'.self::DATA_TABLE_NAME;
     private const FILTRATION_PARAMETER_NAME = 'filter_'.self::DATA_TABLE_NAME;
 
-    private MockObject&Request $request;
-    private MockObject&RequestStack $requestStack;
+    private Request $request;
+    private RequestStack $requestStack;
     private MockObject&UrlGeneratorInterface $urlGenerator;
 
     protected function setUp(): void
     {
-        $this->request = $this->createMock(Request::class);
-        $this->request->attributes = new ParameterBag(['_route' => self::ROUTE_NAME]);
-        $this->request->query = new InputBag();
+        $this->request = new Request();
+        $this->request->attributes->set('_route', self::ROUTE_NAME);
 
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($this->request);
 
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->urlGenerator->method('generate')->willReturn('');

@@ -9,6 +9,9 @@ This bundle can be installed at any moment during a project’s lifecycle.
 - PHP version 8.1 or higher
 - Symfony version 6.0 or higher
 
+The bundle is continuously tested against PHP 8.1–8.5 and Symfony 6, 7 and 8 (including
+Symfony 8.1), with Twig 3 and 4.
+
 ## Download the bundle
 
 Use [Composer](https://getcomposer.org/) to install the bundle:

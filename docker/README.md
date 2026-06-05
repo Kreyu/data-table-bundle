@@ -29,16 +29,16 @@ Run `make` (or `make help`) to list all targets.
 
 ## Choosing a PHP version
 
-The CI test matrix is PHP 8.1–8.4. Override `PHP_VERSION` on any target:
+The CI test matrix is PHP 8.1–8.5. Override `PHP_VERSION` on any target:
 
 ```bash
-make test PHP_VERSION=8.4
+make test PHP_VERSION=8.5
 ```
 
 ## Reproducing the full CI matrix
 
 ```bash
-make matrix         # PHPUnit across PHP 8.1-8.4 x {lowest, highest} dependencies
+make matrix         # PHPUnit across PHP 8.1-8.5 x {lowest, highest} dependencies
 ```
 
 `matrix` copies the project into a throwaway path inside the container and runs

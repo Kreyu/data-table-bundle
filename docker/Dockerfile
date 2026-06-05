@@ -1,5 +1,5 @@
 # Mirrors the CI environment (.github/workflows): PHP 8.1 floor, extensions
-# "dom fileinfo filter libxml xmlreader zip gd". Override PHP_VERSION (8.1-8.4)
+# "dom fileinfo filter libxml xmlreader zip gd". Override PHP_VERSION (8.1-8.5)
 # to reproduce the test matrix.
 ARG PHP_VERSION=8.1
 

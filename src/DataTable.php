@@ -806,10 +806,7 @@ class DataTable implements DataTableInterface
         }
 
         $data = $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
-
-        if (null !== $data) {
-            $data->filename ??= $this->getName();
-        }
+        $data->filename ??= $this->getName();
 
         return $formFactory->createNamedBuilder(
             name: $this->config->getExportParameterName(),

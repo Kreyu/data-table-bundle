@@ -97,13 +97,11 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
 
     public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
     {
-        if ($this->parent && method_exists($this->parent, 'buildExportView')) {
+        if (null !== $this->parent) {
             $this->parent->buildExportView($view, $dataTable, $options);
         }
 
-        if (method_exists($this->innerType, 'buildExportView')) {
-            $this->innerType->buildExportView($view, $dataTable, $options);
-        }
+        $this->innerType->buildExportView($view, $dataTable, $options);
     }
 
     public function getOptionsResolver(): OptionsResolver

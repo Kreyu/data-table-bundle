@@ -1,5 +1,26 @@
+includes:
+    # PHPStan 2.x (required on PHP 8.5, where PHPUnit 13 is installed) flags 6 findings that
+    # cannot be fixed in code without breaking a supported version or the public API:
+    #   - 2x trait.unused: ColumnFactoryAwareTrait / DataTableTurboResponseTrait are PUBLIC API
+    #     consumed by applications; PHPStan cannot see those consumers.
+    #   - 2x function.alreadyNarrowedType: real cross-version method_exists() guards —
+    #     AbstractDataCollector::__serialize (absent on Symfony 6/7) and
+    #     ORM Configuration::enableNativeLazyObjects (absent on doctrine/orm 2.x). Removing
+    #     either breaks that matrix cell; PHPStan only sees the one resolved version.
+    #   - 2x return.unusedType: getParent(): ?string on two final leaf types — kept uniform
+    #     with the *TypeInterface::getParent(): ?string signature shared by all 38 type classes.
+    # (Genuinely-dead findings were fixed in code instead of being baselined.)
+    - phpstan-baseline.neon
+
 parameters:
     level: 5
+    # PHPStan 2.x treats PHPDoc array-of-X types as certain, flagging the suite's
+    # assertContainsOnlyInstancesOf() calls as "always true". That certainty comes
+    # from PHPDoc, not the runtime.
+    treatPhpDocTypesAsCertain: false
+    # Baselined entries are version-dependent (Symfony/Doctrine APIs differ across the
+    # 6/7/8 matrix), so some won't match on every cell — don't fail on that.
+    reportUnmatchedIgnoredErrors: false
     paths:
     	- src
     	- tests

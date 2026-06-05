@@ -1,0 +1,37 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Kreyu\\Bundle\\DataTableBundle\\Action\\Type\\ButtonActionType\:\:getParent\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Action/Type/ButtonActionType.php
+
+		-
+			message: '#^Method Kreyu\\Bundle\\DataTableBundle\\Bridge\\PhpSpreadsheet\\Exporter\\Type\\PdfExporterType\:\:getParent\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bridge/PhpSpreadsheet/Exporter/Type/PdfExporterType.php
+
+		-
+			message: '#^Trait Kreyu\\Bundle\\DataTableBundle\\Column\\ColumnFactoryAwareTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Column/ColumnFactoryAwareTrait.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Symfony\\\\Bundle\\\\FrameworkBundle\\\\DataCollector\\\\AbstractDataCollector'' and ''__serialize'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/DataCollector/DataTableDataCollector.php
+
+		-
+			message: '#^Trait Kreyu\\Bundle\\DataTableBundle\\DataTableTurboResponseTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/DataTableTurboResponseTrait.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Doctrine\\ORM\\Configuration and ''enableNativeLazyObj…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Bridge/Doctrine/Orm/Fixtures/TestEntityManagerFactory.php

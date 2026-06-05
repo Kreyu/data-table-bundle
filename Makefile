@@ -1,6 +1,6 @@
 # Dockerised test environment — mirrors the GitHub Actions CI.
 # Usage: `make install` once, then `make test` / `make phpstan` / `make cs-check`.
-# Override the PHP version: `make test PHP_VERSION=8.4`.
+# Override the PHP version: `make test PHP_VERSION=8.5`.
 
 PHP_VERSION ?= 8.1
 HOST_UID := $(shell id -u)
@@ -42,8 +42,8 @@ ci: install test phpstan cs-check ## Reproduce the full CI run on PHP $(PHP_VERS
 shell: ## Open a shell in the container
 	$(RUN) bash
 
-matrix: ## Run PHPUnit across PHP 8.1-8.4 x {lowest,highest} (host files untouched)
-	@for v in 8.1 8.2 8.3 8.4; do \
+matrix: ## Run PHPUnit across PHP 8.1-8.5 x {lowest,highest} (host files untouched)
+	@for v in 8.1 8.2 8.3 8.4 8.5; do \
 		for d in lowest highest; do \
 			echo "==> PHP $$v / $$d dependencies"; \
 			PHP_VERSION=$$v $(DC) build >/dev/null || exit 1; \

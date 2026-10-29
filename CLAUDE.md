@@ -38,7 +38,8 @@ A change is done when `make test` and `make quality` pass.
 - **Share behavior through `getParent()`**, never PHP inheritance. Built-in types are `final`.
 - **Other classes: interface or `final`.** Anything replaceable (factories, generators, adapters) gets an interface and stays open; classes without one (value objects, events) are `final`.
 - **New types and extensions register themselves.** Implement the interface; DI autoconfiguration adds the tag.
-- **Expose features through interfaces.** New config and behavior get methods on the matching interface (e.g. `DataTableConfigInterface::getPaginationFactory()`). That breaks third-party implementers, so name the added methods in the commit title.
+- **Expose features through interfaces.** New config and behavior get methods on the matching interface (e.g. `DataTableConfigInterface::getPaginationFactory()`). That breaks third-party implementers, so list the added methods under "Breaking changes" in `CHANGELOG.md`.
+- **Commit titles follow upstream style.** One imperative sentence, no prefix, no period, issue or PR at the end: `Add column visibility groups #241`, `Fix BooleanColumnType not rendering after 0.30.0`, `Improve documentation about action variants`.
 - **Static methods only for pure functions.** Anything that reads services or state (request stack, config) is an instance method, shared through a base class or trait.
 - **Shared markup goes in `base.html.twig`.** `bootstrap_5` and `tabler` override single blocks only.
 - **Keep the user docs current in the same change.** Anything users touch counts: options, config keys, public methods, theme blocks, behavior. Update:

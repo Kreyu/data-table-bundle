@@ -196,8 +196,10 @@
             {{ block('pagination_previous', theme) }}
         {% endwith %}
     {%- else -%}
-        {{ block('pagination_first_disabled', theme) }}
-        {{ block('pagination_previous_disabled', theme) }}
+        {% with { attr: attr|default({})|merge(disabled_attr|default({})) } %}
+            {{ block('pagination_first_disabled', theme) }}
+            {{ block('pagination_previous_disabled', theme) }}
+        {% endwith %}
     {%- endif -%}
 
     {% for page_number in range(first_visible_page_number, last_visible_page_number) %}
@@ -219,8 +221,10 @@
             {{ block('pagination_last', theme) }}
         {% endwith %}
     {%- else -%}
-        {{ block('pagination_next_disabled', theme) }}
-        {{ block('pagination_last_disabled', theme) }}
+        {% with { attr: attr|default({})|merge(disabled_attr|default({})) } %}
+            {{ block('pagination_next_disabled', theme) }}
+            {{ block('pagination_last_disabled', theme) }}
+        {% endwith %}
     {%- endif -%}
 {% endblock %}
 
@@ -728,20 +732,29 @@
 {%- endblock %}
 
 {% block action_confirmation_modal %}
-    <dialog id="{{ confirmation.identifier }}" aria-labelledby="{{ confirmation.identifier }}--title" data-kreyu--data-table-bundle--dialog-target="dialog">
+    {% set modal_attr = {
+        id: confirmation.identifier,
+        'aria-labelledby': confirmation.identifier ~ '--title',
+        'data-kreyu--data-table-bundle--dialog-target': 'dialog',
+    }|merge(modal_attr|default({})) %}
+
+    {% set modal_content_attr = modal_content_attr|default({}) %}
+
+    <dialog{{ _self.attributes(modal_attr) }}>
+        {% if modal_content_attr is not empty %}<div{{ _self.attributes(modal_content_attr) }}>{% endif %}
         {% block action_confirmation_modal_header %}
-            <h2 id="{{ confirmation.identifier }}--title">
+            <h2{{ _self.attributes({ id: confirmation.identifier ~ '--title' }|merge(modal_title_attr|default({}))) }}>
                 {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
             </h2>
         {% endblock %}
         {% block action_confirmation_modal_body %}
-            <p>
+            <p{{ _self.attributes(modal_description_attr|default({})) }}>
                 {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
             </p>
         {% endblock %}
         {% block action_confirmation_modal_footer %}
             {% block action_confirmation_modal_cancel_button %}
-                <button type="button" data-action="kreyu--data-table-bundle--dialog#close">
+                <button{{ _self.attributes({ type: 'button', 'data-action': 'kreyu--data-table-bundle--dialog#close' }|merge(cancel_button_attr|default({}))) }}>
                     {{ confirmation.label_cancel|trans({}, confirmation.translation_domain) }}
                 </button>
             {% endblock %}
@@ -753,6 +766,7 @@
                 </{{ confirm_button_tag }}>
             {% endblock %}
         {% endblock %}
+        {% if modal_content_attr is not empty %}</div>{% endif %}
     </dialog>
 {% endblock %}
 
@@ -870,9 +884,9 @@
         <{{ tag }}{{ _self.attributes(attr) }}>
             {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
         </{{ tag }}>
-        <dialog data-kreyu--data-table-bundle--dialog-target="dialog">
-            <div data-kreyu--data-table-bundle--dialog-target="content">{{ 'Loading'|trans({}, 'KreyuDataTable') }}</div>
-            <button type="button" data-action="kreyu--data-table-bundle--dialog#close">{{ 'Close'|trans({}, 'KreyuDataTable') }}</button>
+        <dialog{{ _self.attributes({ 'data-kreyu--data-table-bundle--dialog-target': 'dialog' }|merge(modal_attr|default({}))) }}>
+            <div{{ _self.attributes({ 'data-kreyu--data-table-bundle--dialog-target': 'content' }|merge(modal_content_attr|default({}))) }}>{{ 'Loading'|trans({}, 'KreyuDataTable') }}</div>
+            <button{{ _self.attributes({ type: 'button', 'data-action': 'kreyu--data-table-bundle--dialog#close' }|merge(modal_close_button_attr|default({}))) }}>{{ 'Close'|trans({}, 'KreyuDataTable') }}</button>
         </dialog>
     </div>
 {% endblock %}
@@ -894,15 +908,19 @@
 {% block action_link_dropdown_item_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr|default({})) %}
 
-    {% if not confirmation and batch %}
+    {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
     {% set tag = tag ?? 'a' %}
 
-    <{{ tag }}{{ _self.attributes(attr) }}>
-        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
-    </{{ tag }}>
+    {% if confirmation %}
+        {{ block('action_confirmable_control') }}
+    {% else %}
+        <{{ tag }}{{ _self.attributes(attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        </{{ tag }}>
+    {% endif %}
 {% endblock %}
 
 {% block sort_arrow_none %}{% endblock %}

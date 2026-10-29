@@ -4,6 +4,16 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
     static targets = ['dialog', 'content'];
 
+    #closeBeforeCache = () => this.close();
+
+    connect() {
+        document.addEventListener('turbo:before-cache', this.#closeBeforeCache);
+    }
+
+    disconnect() {
+        document.removeEventListener('turbo:before-cache', this.#closeBeforeCache);
+    }
+
     open(event) {
         event.preventDefault();
 

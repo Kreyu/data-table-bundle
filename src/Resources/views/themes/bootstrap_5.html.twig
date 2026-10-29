@@ -929,7 +929,7 @@
         }|merge(attr) %}
     {% endif %}
 
-    {{ parent() }}
+    {% with { confirmation: false, batch: batch and not confirmation } %}{{ parent() }}{% endwith %}
 {% endblock %}
 
 {% block sort_arrow_none %}

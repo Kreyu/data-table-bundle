@@ -232,6 +232,22 @@ No type sets these. Pass them to `data_table()`, or set them with `{% with %}` i
 
 See [Theming](../docs/features/theming.md#adding-html-attributes) for more.
 
+### Dialog and pagination variables
+
+Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes:
+
+| Variable                  | Block                                               | Rendered on                                                             |
+|---------------------------|-----------------------------------------------------|-------------------------------------------------------------------------|
+| `modal_attr`              | `action_modal_control`, `action_confirmation_modal` | `<dialog>`                                                              |
+| `modal_content_attr`      | `action_modal_control`                              | `<div>` the loaded content goes into                                    |
+|                           | `action_confirmation_modal`                         | `<div>` around the dialog content. Not rendered unless set.             |
+| `modal_close_button_attr` | `action_modal_control`                              | Close button                                                            |
+| `modal_title_attr`        | `action_confirmation_modal`                         | Title `<h2>`                                                            |
+| `modal_description_attr`  | `action_confirmation_modal`                         | Description `<p>`                                                       |
+| `cancel_button_attr`      | `action_confirmation_modal`                         | Cancel button                                                           |
+| `confirm_button_attr`     | `action_confirmation_modal`                         | Confirm button                                                          |
+| `disabled_attr`           | `pagination_controls`                               | Disabled first, previous, next and last links. Merged over their `attr`. |
+
 ::: tip
 Behind the scenes, these variables are made available to the `DataTableView`, `ColumnView` and `FilterView` objects of your data table
 when the DataTable component calls `buildView()`. To see what "view" variables a particular type has,

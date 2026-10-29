@@ -209,7 +209,7 @@ When creating your own theme, you can either create a template that extends one 
 Remember that in the second case, you cannot call the `parent()` function in the block.
 
 ::: warning Upgrading a custom theme
-- **Link, button and form actions now render their own confirmation dialog in `base`.**
+- **Link, button, form and dropdown item actions now render their own confirmation dialog in `base`.**
   Your block renders its own confirmation, then calls `parent()`? Turn the built-in one off:
   ```twig
   {% with { confirmation: false } %}
@@ -258,6 +258,22 @@ Remember that in the second case, you cannot call the `parent()` function in the
 ```
 
 > `bootstrap_5` and `tabler` overwrite `label_attr`, so it only applies to themes built on `base`. `active_filters_attr` works in every theme, but a `class` there replaces Bootstrap's default `d-flex flex-wrap gap-1`.
+
+**Dialogs and disabled pagination links** → set the [dialog and pagination variables](../../reference/twig.md#dialog-and-pagination-variables) in the block that renders them. Restyle the `base` dialogs without copying their markup:
+
+```twig
+{% block action_confirmation_modal %}
+    {% with {
+        modal_attr: { class: 'modal' },
+        modal_content_attr: { class: 'modal-box' },
+        cancel_button_attr: { class: 'btn' },
+    } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+```
+
+> `bootstrap_5` and `tabler` render Bootstrap modals, so the dialog variables only apply to themes built on `base`.
 
 ### Rendering HTML attributes
 

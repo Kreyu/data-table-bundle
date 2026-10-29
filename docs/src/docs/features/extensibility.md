@@ -268,3 +268,53 @@ so the chain proxy query factory will know to skip that factory and check other 
 Proxy query factories must be registered as services and tagged with the `kreyu_data_table.proxy_query.factory` tag.
 If you're using the [default services.yaml configuration](https://symfony.com/doc/current/service_container.html#service-container-services-load-example),
 this is already done for you, thanks to [autoconfiguration](https://symfony.com/doc/current/service_container.html#services-autoconfigure).
+
+## Registering event listeners
+
+**Each data table has its own event dispatcher.** Add listeners in `buildDataTable()`:
+
+::: code-group
+```php [For one data table type]
+use App\DataTable\EventListener\DataTableFiltrationListener;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_FILTER, new DataTableFiltrationListener());
+    }
+}
+```
+
+```php [For every data table]
+use App\DataTable\EventListener\DataTableFiltrationListener;
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Event\DataTableEvents;
+use Kreyu\Bundle\DataTableBundle\Extension\AbstractDataTableTypeExtension;
+use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+
+class DataTableFiltrationExtension extends AbstractDataTableTypeExtension
+{
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(DataTableEvents::PRE_FILTER, new DataTableFiltrationListener());
+    }
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [DataTableType::class];
+    }
+}
+```
+:::
+
+With the [default services.yaml configuration](https://symfony.com/doc/current/service_container.html#service-container-services-load-example), the type extension is registered automatically.
+
+One class for several events → implement `EventSubscriberInterface` and call `$builder->addEventSubscriber(new DataTableSubscriber())`.
+
+::: warning
+`#[AsEventListener]` and listeners on Symfony's global event dispatcher don't receive data table events.
+:::

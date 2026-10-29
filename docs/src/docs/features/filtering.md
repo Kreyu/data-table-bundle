@@ -280,3 +280,5 @@ class DataTableFiltrationListener
     }
 }
 ```
+
+To register the listener, see [Registering event listeners](extensibility.md#registering-event-listeners).

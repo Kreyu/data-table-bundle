@@ -408,7 +408,7 @@ $builder->addRowAction('remove', ButtonActionType::class, [
 ]);
 ```
 
-**Works in every theme.** The base theme opens a native `<dialog>` through the `dialog` Stimulus controller ([enable it](../installation.md#enable-the-stimulus-controllers)). Bootstrap 5 and Tabler use their own Bootstrap modal.
+**Works in every theme.** The base and daisyUI themes open a native `<dialog>` through the `dialog` Stimulus controller ([enable it](../installation.md#enable-the-stimulus-controllers)). Bootstrap 5 and Tabler use their own Bootstrap modal.
 
 To configure the confirmation modal, pass the array as the `confirmation` option:
 
@@ -614,7 +614,7 @@ $builder
 You can define an action to open a modal with contents loaded from given URL.
 For example, let's define a modal that displays a post details.
 
-**The base theme opens a native `<dialog>`; Bootstrap 5 and Tabler open a Bootstrap modal.** Both need the `dialog` Stimulus controller — [enable it](../installation.md#enable-the-stimulus-controllers).
+**The base and daisyUI themes open a native `<dialog>`; Bootstrap 5 and Tabler open a Bootstrap modal.** Both need the `dialog` Stimulus controller — [enable it](../installation.md#enable-the-stimulus-controllers).
 
 ::: warning
 The `bootstrap-modal` controller is deprecated. Enable `dialog` instead.
@@ -657,7 +657,7 @@ public function details(Post $post): Response
 
 The response replaces the modal contents as is. What to render depends on the theme.
 
-**Base theme** → just the body content:
+**Base, daisyUI** → just the body content:
 
 ```twig
 {# templates/posts/details_modal.html.twig #}

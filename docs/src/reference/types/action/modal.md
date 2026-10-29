@@ -15,6 +15,7 @@ What the URL should return depends on the theme:
 | Theme | Modal | Response |
 |-------|-------|----------|
 | Base | native `<dialog>` | dialog body content |
+| daisyUI | native `<dialog class="modal">` | `.modal-box` content |
 | Bootstrap 5, Tabler | Bootstrap modal | full `.modal-dialog` markup |
 
 > [!WARNING]

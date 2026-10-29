@@ -1,0 +1,502 @@
+{% extends '@KreyuDataTable/themes/base.html.twig' %}
+
+{% trans_default_domain 'KreyuDataTable' %}
+
+{% block kreyu_data_table %}
+    {% set root_attr = root_attr|default({}) %}
+
+    {% with { root_attr: root_attr|merge({ class: (_self.box_class() ~ ' divide-y divide-base-300 ' ~ root_attr.class|default(''))|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block async_placeholder %}
+    <div class="{{ _self.box_class() }} flex justify-center p-8">
+        {{- block('loading_spinner') -}}
+    </div>
+{% endblock %}
+
+{% block loading_spinner %}
+    <span class="loading loading-spinner" aria-label="{{ 'Loading'|trans }}"></span>
+{% endblock %}
+
+{% block action_bar %}
+    {% set display_search = filtration_enabled and filtration_form and filtration_form.vars.search_fields|length > 0 %}
+    {% set display_filters = filtration_enabled and filtration_form and filters|length > 0 %}
+    {% set display_export_action = exporting_enabled and exporters|length > 0 %}
+
+    {% if title or actions is not empty or display_search or display_export_action or personalization_enabled %}
+        <div class="flex flex-wrap items-center gap-2 p-4">
+            {% if title %}
+                <h2 class="text-lg font-semibold">
+                    {{- translation_domain is same as false ? title : title|trans(title_translation_parameters, translation_domain) -}}
+                </h2>
+            {% endif %}
+
+            <div class="ms-auto flex flex-wrap items-center gap-2">
+                {% if display_search %}
+                    {{ data_table_theme_block(data_table, 'action_search') }}
+                {% endif %}
+
+                {% for action in actions %}
+                    {{ data_table_action(action) }}
+                {% endfor %}
+
+                {% if display_export_action %}
+                    {{ data_table_theme_block(data_table, 'action_export') }}
+                {% endif %}
+
+                {% if personalization_enabled %}
+                    {{ data_table_theme_block(data_table, 'action_personalize') }}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if display_filters and filtration_form.children|length > 0 %}
+        <details class="collapse collapse-arrow rounded-none"{{ has_active_non_search_filters ? ' open' }}>
+            <summary class="collapse-title text-sm font-semibold">{{ 'Filter'|trans }}</summary>
+            <div class="collapse-content">{{ data_table_filters_form(filtration_form) }}</div>
+        </details>
+    {% elseif display_filters %}
+        {{ data_table_filters_form(filtration_form) }}
+    {% endif %}
+
+    {% if has_active_filters %}
+        {{ data_table_theme_block(data_table, 'active_filters') }}
+    {% endif %}
+
+    {% if has_batch_actions %}
+        {{ data_table_theme_block(data_table, 'batch_action_bar') }}
+    {% endif %}
+{% endblock %}
+
+{% block batch_action_bar %}
+    <div class="flex flex-wrap items-center gap-2 bg-base-200 px-4 py-2" hidden data-kreyu--data-table-bundle--batch-target="batchActionBar">
+        {{ data_table_theme_block(data_table, 'batch_action_bar_title') }}
+        {{ data_table_theme_block(data_table, 'batch_action_bar_actions') }}
+    </div>
+{% endblock %}
+
+{% block batch_action_bar_title %}
+    <span class="me-auto text-sm">
+        {{ 'Selected'|trans }}: <span data-kreyu--data-table-bundle--batch-target="selectedCounter">0</span>
+    </span>
+{% endblock %}
+
+{% block batch_action_bar_actions %}
+    {% for action in batch_actions %}
+        {{ data_table_action(action) }}
+    {% endfor %}
+{% endblock %}
+
+{% block action_search %}
+    {% for child in filtration_form.vars.search_fields %}
+        {{ form_widget(child.value, { attr: { form: filtration_form.vars.id, class: 'input w-56' } }) }}
+    {% endfor %}
+{% endblock %}
+
+{% block action_export %}
+    {% set dialog_body %}{{ data_table_export_form(export_form) }}{% endset %}
+
+    {% with { dialog_name: 'export', dialog_title: 'Export'|trans, dialog_icon: 'action_export_icon' } %}
+        {{ block('toolbar_dialog') }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_export_icon %}
+    {{ _self.icon('M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2 M7 11l5 5l5 -5 M12 4v12', 'size-5') }}
+{% endblock %}
+
+{% block action_personalize %}
+    {% set dialog_body %}{{ data_table_personalization_form(personalization_form) }}{% endset %}
+
+    {% with { dialog_name: 'personalization', dialog_title: 'Personalization'|trans, dialog_icon: 'action_personalize_icon' } %}
+        {{ block('toolbar_dialog') }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_personalize_icon %}
+    {{ _self.icon('M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0', 'size-5') }}
+{% endblock %}
+
+{% block toolbar_dialog %}
+    {% set dialog_title_id = name ~ '--' ~ dialog_name ~ '--title' %}
+
+    <div data-controller="kreyu--data-table-bundle--dialog">
+        <button type="button" class="btn btn-square btn-ghost" title="{{ dialog_title }}" data-action="kreyu--data-table-bundle--dialog#open">
+            {{- data_table_theme_block(data_table, dialog_icon) -}}
+        </button>
+
+        <dialog class="modal" aria-labelledby="{{ dialog_title_id }}" data-kreyu--data-table-bundle--dialog-target="dialog">
+            <div class="modal-box">
+                <h3 id="{{ dialog_title_id }}" class="mb-4 text-lg font-bold">{{ dialog_title }}</h3>
+                {{ dialog_body }}
+                {{ block('action_modal_close_button') }}
+            </div>
+        </dialog>
+    </div>
+{% endblock %}
+
+{% block active_filters %}
+    {% with { active_filters_attr: active_filters_attr|default({})|merge({ class: ('flex flex-wrap items-center gap-2 px-4 py-3 ' ~ active_filters_attr.class|default(''))|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filter_clear_all_button %}
+    {% set attr = attr|default({})|merge({ class: ('badge badge-error badge-soft ' ~ attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block filter_clear_button %}
+    {% set attr = attr|default({})|merge({ class: ('badge badge-outline hover:badge-error ' ~ attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block kreyu_data_table_filters_form %}
+    {% with { form_themes: form_themes|default([_self]) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filtration_form_content %}
+    {% with { attr: attr|default({})|merge({ class: ('flex flex-wrap items-end gap-4 ' ~ attr.class|default(''))|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block filtration_form_submit %}
+    {% with { attr: { class: 'btn btn-primary' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block kreyu_data_table_filter_data_row %}
+    <div class="flex flex-col">
+        {{ form_label(form) }}
+
+        <div class="flex gap-2">
+            {% if form.operator is defined %}
+                {{ form_widget(form.operator) }}
+            {% endif %}
+
+            {{ form_widget(form.value) }}
+        </div>
+
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_date_range_widget %}
+    <div class="flex gap-2">{{ parent() }}</div>
+{% endblock %}
+
+{% block kreyu_data_table_personalization_form %}
+    {% form_theme form with form_themes|default([_self]) %}
+
+    <div data-controller="kreyu--data-table-bundle--personalization">
+        {{ form_start(form, { attr: { 'data-turbo-frame': '_self' } }) }}
+            {% if form._token is defined %}
+                {{ form_row(form._token) }}
+            {% endif %}
+
+            {{ block('personalization_form_help') }}
+            {{ block('personalization_form_columns') }}
+            {{ block('personalization_form_submit') }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
+{% block personalization_form_help %}
+    <p class="text-sm text-base-content/70">{{ 'Drag items between columns to show/hide relevant data in the list or change their order'|trans }}</p>
+{% endblock %}
+
+{% block personalization_form_columns %}
+    <div class="my-4 grid grid-cols-2 gap-4">
+        {% for visible in [true, false] %}
+            <div>
+                <h4 class="mb-2 text-sm font-semibold">{{ visible ? 'Visible columns'|trans : 'Hidden columns'|trans }}</h4>
+
+                <ul class="flex min-h-12 flex-col gap-1 rounded-box border border-base-300 p-2"
+                    data-visible="{{ visible ? 1 : 0 }}"
+                    data-kreyu--data-table-bundle--personalization-target="{{ visible ? 'visibleColumns' : 'hiddenColumns' }}"
+                >
+                    {% for child in form.children.columns|filter(child => child.vars.value.visible == visible) %}
+                        {{ form_row(child) }}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block personalization_form_submit %}
+    <div class="modal-action">
+        <button class="btn btn-primary">{{ 'Apply'|trans }}</button>
+    </div>
+{% endblock %}
+
+{% block kreyu_data_table_personalization_column_data_row %}
+    <li class="cursor-move rounded-field bg-base-200 px-3 py-2 text-sm">
+        {{ form.vars.label|trans(form.vars.translation_parameters|default({}), form.vars.translation_domain) }}
+        {{ form_widget(form.name) }}
+        {{ form_widget(form.priority) }}
+        {{ form_widget(form.visible) }}
+    </li>
+{% endblock %}
+
+{% block kreyu_data_table_export_form %}
+    {{ form_start(form, { attr: { 'data-turbo': 'false' } }) }}
+        {{ form_widget(form) }}
+
+        <div class="modal-action">
+            <button class="btn btn-primary">{{ 'Apply'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block table %}
+    <div class="overflow-x-auto">
+        {% with { table_attr: table_attr|default({})|merge({ class: ('table ' ~ table_attr.class|default(''))|trim }) } %}
+            {{ parent() }}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block table_body_row_no_results %}
+    {% with { table_body_row_no_results_attr: table_body_row_no_results_attr|default({})|merge({ class: ('py-8 text-center text-base-content/60 ' ~ table_body_row_no_results_attr.class|default(''))|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block column_header %}
+    {% with {
+        active_attr: active_attr|default({})|merge({ class: ('text-primary ' ~ active_attr.class|default(''))|trim }),
+        label_attr: label_attr|default({})|merge({ class: ('inline-flex items-center gap-1 ' ~ label_attr.class|default(''))|trim }),
+    } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block sort_arrow_none %}
+    {{ _self.icon('M8 9l4 -4l4 4 M16 15l-4 4l-4 -4', 'size-4 opacity-40') }}
+{% endblock %}
+
+{% block sort_arrow_asc %}
+    {{ _self.icon('M6 15l6 -6l6 6') }}
+{% endblock %}
+
+{% block sort_arrow_desc %}
+    {{ _self.icon('M6 9l6 6l6 -6') }}
+{% endblock %}
+
+{% block dropdown_caret %}
+    {{ _self.icon('M6 9l6 6l6 -6') }}
+{% endblock %}
+
+{% block column_number_value %}
+    {{ block('end_aligned_column_value') }}
+{% endblock %}
+
+{% block column_money_value %}
+    {{ block('end_aligned_column_value') }}
+{% endblock %}
+
+{% block end_aligned_column_value %}
+    <div class="text-end whitespace-nowrap">{{ block(block_name, '@KreyuDataTable/themes/base.html.twig') }}</div>
+{% endblock %}
+
+{% block column_icon_value -%}
+    {% with { icon_attr: icon_attr|merge({ class: ('size-[1.2em] ' ~ icon_attr.class|default(''))|trim }) } %}
+        {{- parent() -}}
+    {% endwith %}
+{%- endblock %}
+
+{% block column_actions_value -%}
+    <div class="flex items-center gap-1">{{ parent() }}</div>
+{%- endblock %}
+
+{% block column_checkbox_header %}
+    {{ block('checkbox_column_input') }}
+{% endblock %}
+
+{% block column_checkbox_value %}
+    {{ block('checkbox_column_input') }}
+{% endblock %}
+
+{% block checkbox_column_input %}
+    {% with { input_attr: input_attr|default({})|merge({ class: ('checkbox checkbox-sm ' ~ input_attr.class|default(''))|trim }) } %}
+        {{ block(block_name, '@KreyuDataTable/themes/base.html.twig') }}
+    {% endwith %}
+{% endblock %}
+
+{% block pagination_widget %}
+    <div class="flex flex-wrap items-center justify-between gap-4 p-4 text-sm">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_controls %}
+    {% set attr = attr|default({})|merge({ class: ('join-item btn btn-sm ' ~ attr.class|default(''))|trim }) %}
+    {% set disabled_attr = disabled_attr|default({})|merge({ class: (attr.class ~ ' btn-disabled ' ~ disabled_attr.class|default(''))|trim }) %}
+
+    <div class="join">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_page_active %}
+    {% with { attr: attr|merge({ class: (attr.class|default('') ~ ' btn-active')|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block pagination_per_page %}
+    <div class="flex items-center gap-2">{{ parent() }}</div>
+{% endblock %}
+
+{% block pagination_per_page_form %}
+    {% with { select_attr: select_attr|default({})|merge({ class: ('select select-sm w-auto ' ~ select_attr.class|default(''))|trim }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_control -%}
+    {% with { icon_attr: icon_attr|merge({ class: ('size-[1.2em] ' ~ icon_attr.class|default(''))|trim }) } %}
+        {{- parent() -}}
+    {% endwith %}
+{%- endblock %}
+
+{% block action_link_control %}
+    {% set attr = attr|merge({ class: (_self.link_class(variant ?? default_variant ?? 'primary', variants ?? {}) ~ ' ' ~ attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block action_button_control %}
+    {% set attr = attr|merge({ class: (_self.button_class(variant ?? default_variant ?? null, context, variants ?? {}) ~ ' ' ~ attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block action_form_control %}
+    {% set button_attr = button_attr|merge({ class: (_self.button_class(variant ?? default_variant ?? null, context, variants ?? {}) ~ ' ' ~ button_attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block action_modal_control %}
+    {% set attr = attr|merge({ class: (_self.button_class(variant ?? default_variant ?? null, context, variants ?? {}) ~ ' ' ~ attr.class|default(''))|trim }) %}
+
+    {% with {
+        modal_attr: modal_attr|default({})|merge({ class: ('modal ' ~ modal_attr.class|default(''))|trim }),
+        modal_box_attr: modal_box_attr|default({})|merge({ class: ('modal-box ' ~ modal_box_attr.class|default(''))|trim }),
+    } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block action_modal_loading %}
+    {{- block('loading_spinner') -}}
+{% endblock %}
+
+{% block action_modal_close_button %}
+    {% set modal_close_button_attr = {
+        type: 'button',
+        'aria-label': 'Close'|trans,
+        'data-action': 'kreyu--data-table-bundle--dialog#close',
+    }|merge(modal_close_button_attr|default({}))|merge({ class: ('btn btn-sm btn-circle btn-ghost absolute end-2 top-2 ' ~ modal_close_button_attr.class|default(''))|trim }) %}
+
+    <button{{ _self.attributes(modal_close_button_attr) }}>✕</button>
+{% endblock %}
+
+{% block action_dropdown_control %}
+    {% set popover_id = identifier ~ '--dropdown' %}
+
+    {% set attr = {
+        class: (_self.button_class(variant ?? default_variant ?? null, context, variants ?? {}) ~ ' ' ~ attr.class|default(''))|trim,
+        type: 'button',
+        popovertarget: popover_id,
+        style: ['anchor-name: --' ~ popover_id, attr.style|default(null)]|filter(rule => rule)|join('; '),
+    }|merge(attr|filter((value, key) => key not in ['class', 'style'])) %}
+
+    <button{{ _self.attributes(attr) }}>
+        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        {%- if with_caret %}{{ block('dropdown_caret') }}{% endif -%}
+    </button>
+
+    <ul class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="{{ popover_id }}" style="position-anchor: --{{ popover_id }}">
+        {% for action in actions %}
+            <li class="[&>div]:block [&>div]:p-0 [&>div>button]:w-full [&>div>button]:px-3 [&>div>button]:py-1.5 [&>div>button]:text-start">{{ data_table_action(action) }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block action_link_dropdown_item_control %}
+    {% set attr = attr|default({}) %}
+    {% set attr = attr|merge({ class: (_self.link_class(variant, variants ?? {}, '') ~ ' ' ~ attr.class|default(''))|trim }) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{% block action_confirmation_modal %}
+    {% set confirm_button_class = { info: 'btn btn-primary', warning: 'btn btn-warning', danger: 'btn btn-error' }[confirmation.type ?? 'info'] %}
+
+    {% with {
+        modal_attr: modal_attr|default({})|merge({ class: ('modal ' ~ modal_attr.class|default(''))|trim }),
+        modal_box_attr: modal_box_attr|default({})|merge({ class: ('modal-box grid grid-cols-2 gap-4 ' ~ modal_box_attr.class|default(''))|trim }),
+        modal_title_attr: modal_title_attr|default({})|merge({ class: ('col-span-2 text-lg font-bold ' ~ modal_title_attr.class|default(''))|trim }),
+        modal_description_attr: modal_description_attr|default({})|merge({ class: ('col-span-2 ' ~ modal_description_attr.class|default(''))|trim }),
+        cancel_button_attr: cancel_button_attr|default({})|merge({ class: ('btn ' ~ cancel_button_attr.class|default(''))|trim }),
+        confirm_button_attr: confirm_button_attr|default({})|merge({ class: (confirm_button_class ~ ' ' ~ confirm_button_attr.class|default(''))|trim }),
+    } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% macro box_class() -%}
+    rounded-box border border-base-300 bg-base-100
+{%- endmacro %}
+
+{% macro icon(path, class = 'size-4') -%}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ class }}" aria-hidden="true"><path d="{{ path }}"/></svg>
+{%- endmacro %}
+
+{% macro button_class(variant, context, variants) -%}
+    {%- set colors = {
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        accent: 'btn-accent',
+        neutral: 'btn-neutral',
+        info: 'btn-info',
+        success: 'btn-success',
+        warning: 'btn-warning',
+        error: 'btn-error',
+        danger: 'btn-error',
+        destructive: 'btn-error',
+        ghost: 'btn-ghost',
+        link: 'btn-link',
+    }|merge(variants)|filter(class => class is not same as false) -%}
+    {%- set is_row = context.value == 'row' -%}
+    {%- set variant = variant ?? (is_row ? 'ghost' : 'primary') -%}
+    {%- set color = variant|replace({ 'outline-': '' }) -%}
+    {%- set is_outline = color != variant -%}
+
+    {{- ['btn', is_row ? 'btn-sm', is_outline ? 'btn-outline', colors[color] ?? null]|filter(class => class)|join(' ') -}}
+{%- endmacro %}
+
+{% macro link_class(variant, variants, base_classes = 'link link-hover inline-flex items-center gap-1') -%}
+    {%- set colors = {
+        primary: 'link-primary',
+        secondary: 'link-secondary',
+        accent: 'link-accent',
+        neutral: 'link-neutral',
+        info: 'link-info',
+        success: 'link-success',
+        warning: 'link-warning',
+        error: 'link-error',
+        danger: 'link-error',
+        destructive: 'link-error',
+    }|merge(variants)|filter(class => class is not same as false) -%}
+
+    {{- [base_classes, colors[variant] ?? null]|filter(class => class)|join(' ') -}}
+{%- endmacro %}

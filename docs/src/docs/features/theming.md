@@ -10,9 +10,50 @@ The following themes are natively available in the bundle:
 
 - [`@KreyuDataTable/themes/bootstrap_5.html.twig`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/bootstrap_5.html.twig) - integrates [Bootstrap 5](https://getbootstrap.com/docs/5.0/)
 - [`@KreyuDataTable/themes/tabler.html.twig`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/tabler.html.twig) - integrates [Tabler UI Kit](https://tabler.io/)
+- [`@KreyuDataTable/themes/daisyui.html.twig`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/daisyui.html.twig) - integrates [daisyUI 5](https://daisyui.com/) on Tailwind CSS 4, see [daisyUI theme](#daisyui-theme)
 - [`@KreyuDataTable/themes/base.html.twig`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) - base HTML template
 
 By default, the [`@KreyuDataTable/themes/base.html.twig`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Resources/views/themes/base.html.twig) theme is used.
+
+## daisyUI theme
+
+**Built for daisyUI 5 and Tailwind CSS 4.** Modals and confirmations are native `<dialog>` elements, filters sit in a collapse that opens on its own while non-search filters are active.
+
+1. `config/packages/kreyu_data_table.yaml` — pair it with a generic icon theme:
+
+   ```yaml
+   kreyu_data_table:
+     defaults:
+       themes:
+         - '@KreyuDataTable/themes/daisyui.html.twig'
+         - '@KreyuDataTable/themes/icons_ux.html.twig'
+   ```
+
+2. Your Tailwind entry CSS — Tailwind doesn't scan `vendor/`, so point it at the theme and Symfony's daisyUI form theme:
+
+   ```css
+   @import "tailwindcss";
+   @plugin "daisyui";
+
+   @source "../../vendor/kreyu/data-table-bundle/src/Resources/views/themes/daisyui.html.twig";
+   @source "../../vendor/symfony/twig-bridge/Resources/views/Form/daisyui_5_layout.html.twig";
+   ```
+
+   The paths are relative to the CSS file; adjust them if yours isn't in `assets/styles/`.
+
+3. `config/packages/twig.yaml` — the theme doesn't style form fields (filters, export). Use Symfony's daisyUI form theme:
+
+   ```yaml
+   twig:
+     form_themes:
+       - 'daisyui_5_layout.html.twig'
+   ```
+
+   > `daisyui_5_layout.html.twig` ships with Symfony 8.1+. On Symfony 6, 7 and 8.0, filter and export inputs stay unstyled until you add your own form theme; drop the second `@source` line.
+
+4. `assets/controllers.json` — keep the `dialog` controller enabled. Modal actions, confirmations, export and personalization use it.
+
+> Dropdown actions open as a [popover](https://daisyui.com/components/dropdown/) placed with CSS anchor positioning, so the scrolling table doesn't clip them.
 
 ## Icon themes
 

@@ -11,7 +11,7 @@ Types resolve through a registry. Each table goes builder → config → `DataTa
 | `src/{Column,Filter,Action,Exporter}/Type/` | Built-in types |
 | `src/Bridge/` | Doctrine ORM, OpenSpout, PhpSpreadsheet integrations |
 | `src/Resources/config/*.php` | Service definitions |
-| `src/Resources/views/themes/` | Twig themes: `base` → `bootstrap_5` → `tabler`; `*icons*` themes define only the `icon` block |
+| `src/Resources/views/themes/` | Twig themes: `base` → `bootstrap_5` → `tabler`, `base` → `daisyui`; `*icons*` themes define only the `icon` block |
 | `src/Resources/translations/` | `KreyuDataTable.<locale>.yaml` |
 | `tests/Unit/`, `tests/Integration/` | PHPUnit; shared fixtures in `tests/Fixtures/` |
 | `docs/src/` | User docs (VitePress) |

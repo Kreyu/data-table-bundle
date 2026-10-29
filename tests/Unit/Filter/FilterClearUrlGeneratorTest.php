@@ -81,11 +81,18 @@ class FilterClearUrlGeneratorTest extends TestCase
 
     public function testItIncludesEmptyFilterParameters()
     {
+        $this->request->query->set(self::FILTRATION_PARAMETER_NAME, [
+            'author__name' => ['value' => 'John'],
+        ]);
+
         $this->urlGenerator
             ->expects($this->once())
             ->method('generate')
             ->with(self::ROUTE_NAME, [
                 self::FILTRATION_PARAMETER_NAME => [
+                    'author__name' => [
+                        'value' => '',
+                    ],
                     'firstName' => [
                         'value' => '',
                         'operator' => null,
@@ -101,6 +108,7 @@ class FilterClearUrlGeneratorTest extends TestCase
             $this->createDataTableViewMock(),
             $this->createFilterViewMock('firstName', operatorSelectable: true),
             $this->createFilterViewMock('lastName', operatorSelectable: false),
+            $this->createFilterViewMock('author.name', operatorSelectable: false, formName: 'author__name'),
         );
     }
 
@@ -175,10 +183,14 @@ class FilterClearUrlGeneratorTest extends TestCase
         return $dataTableView;
     }
 
-    private function createFilterViewMock(string $name, bool $operatorSelectable): MockObject&FilterView
-    {
+    private function createFilterViewMock(
+        string $name,
+        bool $operatorSelectable,
+        ?string $formName = null,
+    ): MockObject&FilterView {
         $filterView = $this->createMock(FilterView::class);
         $filterView->vars['name'] = $name;
+        $filterView->vars['form_name'] = $formName ?? $name;
         $filterView->vars['operator_selectable'] = $operatorSelectable;
 
         $filterView->parent = $this->createDataTableViewMock();

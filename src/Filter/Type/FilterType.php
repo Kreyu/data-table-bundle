@@ -51,6 +51,7 @@ final class FilterType implements FilterTypeInterface
 
         $view->vars = array_replace($view->vars, [
             'name' => $filter->getName(),
+            'form_name' => $filter->getFormName(),
             'query_path' => $filter->getQueryPath(),
             'label' => $options['label'] ?? StringUtil::camelToSentence($filter->getName()),
             'label_translation_parameters' => $options['label_translation_parameters'],

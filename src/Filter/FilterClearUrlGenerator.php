@@ -60,7 +60,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
         return [
             $dataTableView->vars['filtration_parameter_name'] => [
-                $filterView->vars['name'] => $parameters,
+                $filterView->vars['form_name'] => $parameters,
             ],
         ];
     }

@@ -93,6 +93,13 @@ final class ColumnType implements ColumnTypeInterface
             $attr = $attr($data, $rowData);
         }
 
+        $cellAttr = $options['value_cell_attr'];
+        $isCellAttrCallable = is_callable($cellAttr);
+
+        if ($isCellAttrCallable) {
+            $cellAttr = $cellAttr($data, $rowData);
+        }
+
         $translationKey = $options['value_translation_key'];
         $translationDomain = $options['value_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null;
 
@@ -120,6 +127,7 @@ final class ColumnType implements ColumnTypeInterface
             'translation_domain' => $translationDomain,
             'translation_parameters' => $translationParameters ?? [],
             'attr' => $attr,
+            'cell_attr' => $cellAttr,
         ]);
     }
 
@@ -339,6 +347,13 @@ final class ColumnType implements ColumnTypeInterface
             ->default([])
             ->allowedTypes('array', 'callable')
             ->info('Extra HTML attributes to render on the column value.')
+        ;
+
+        $resolver
+            ->define('value_cell_attr')
+            ->default([])
+            ->allowedTypes('array', 'callable')
+            ->info('Extra HTML attributes to render on the column value cell.')
         ;
 
         $resolver

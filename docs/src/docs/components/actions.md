@@ -408,6 +408,8 @@ $builder->addRowAction('remove', ButtonActionType::class, [
 ]);
 ```
 
+**Works in every theme.** The base theme opens a native `<dialog>` through the `dialog` Stimulus controller ([enable it](../installation.md#enable-the-stimulus-controllers)). Bootstrap 5 and Tabler use their own Bootstrap modal.
+
 To configure the confirmation modal, pass the array as the `confirmation` option:
 
 ```php
@@ -424,6 +426,8 @@ $builder->addRowAction('remove', ButtonActionType::class, [
 ```
 
 For reference, see details about the [`confirmation`](#) option.
+
+Form actions send a CSRF token once you set [`csrf_token_id`](../../reference/types/action/form.md#csrf-token-id).
 
 ## Conditionally rendering the action
 
@@ -610,23 +614,13 @@ $builder
 You can define an action to open a modal with contents loaded from given URL.
 For example, let's define a modal that displays a post details.
 
-First things first, the built-in modal action type requires additional JavaScript to work properly.
-If using the built-in Bootstrap 5 or Tabler (based on Bootstrap) theme, we have to enable the `bootstrap-modal` 
-script in your `controllers.json` file, because **it is disabled by default**:
+**The base theme opens a native `<dialog>`; Bootstrap 5 and Tabler open a Bootstrap modal.** Both need the `dialog` Stimulus controller — [enable it](../installation.md#enable-the-stimulus-controllers).
 
-```json
-{
-  "controllers": {
-    "@kreyu/data-table-bundle": {
-      "bootstrap-modal": {
-        "enabled": true
-      }
-    }
-  }
-}
-```
+::: warning
+The `bootstrap-modal` controller is deprecated. Enable `dialog` instead.
+:::
 
-Then, simply add a row action using the `ModalActionType`:
+Add a row action using the `ModalActionType`:
 
 ```php
 use Kreyu\Bundle\DataTableBundle\Action\Type\ModalActionType;
@@ -661,14 +655,27 @@ public function details(Post $post): Response
 }
 ```
 
-Inside the template, we can render the modal however we want:
+The response replaces the modal contents as is. What to render depends on the theme.
+
+**Base theme** → just the body content:
+
+```twig
+{# templates/posts/details_modal.html.twig #}
+<h5>{{ post.title }}</h5>
+<p>{{ post.content }}</p>
+```
+
+**Bootstrap 5, Tabler** → the full `.modal-dialog` markup:
 
 ```twig
 {# templates/posts/details_modal.html.twig #}
 <div class="modal-dialog">
     <div class="modal-content">
-        <div class="modal-body">
+        <div class="modal-header">
             <h5 class="modal-title">{{ post.title }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
             <p>{{ post.content }}</p>
         </div>
     </div>

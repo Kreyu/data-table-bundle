@@ -208,6 +208,57 @@ When creating your own theme, you can either create a template that extends one 
 
 Remember that in the second case, you cannot call the `parent()` function in the block.
 
+::: warning Upgrading a custom theme
+- **Link, button and form actions now render their own confirmation dialog in `base`.**
+  Your block renders its own confirmation, then calls `parent()`? Turn the built-in one off:
+  ```twig
+  {% with { confirmation: false } %}
+      {{ parent() }}
+  {% endwith %}
+  ```
+- **`base` now shows active filter chips in `action_bar`.** Your theme renders its own chips outside `action_bar`? They now show twice. Remove yours, or override `action_bar`.
+- **The `bootstrap-modal` controller is deprecated.** Modal actions and `base` confirmations use the `dialog` controller. Enable it in `assets/controllers.json`:
+  ```json
+  {
+      "controllers": {
+          "@kreyu/data-table-bundle": {
+              "dialog": {
+                  "enabled": true
+              }
+          }
+      }
+  }
+  ```
+:::
+
+### Adding HTML attributes
+
+**Pass attributes for built-in elements as variables**, no block override needed:
+
+```twig
+{{ data_table(products, {
+    root_attr: { class: 'products-table', 'data-controller': 'products' },
+    active_filters_attr: { class: 'chips' },
+}) }}
+```
+
+| Variable              | Rendered on                                                          |
+|-----------------------|----------------------------------------------------------------------|
+| `root_attr`           | Root `<div>`. Its `data-controller` is appended to the bundle's own. |
+| `active_filters_attr` | Filter chips wrapper.                                                |
+
+**Column header label** → set `label_attr` in the `column_header` block. It lands on the sort link (`<a>`), or on a `<span>` when the column isn't sortable:
+
+```twig
+{% block column_header %}
+    {% with { label_attr: { class: 'text-nowrap' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+```
+
+> `bootstrap_5` and `tabler` overwrite `label_attr`, so it only applies to themes built on `base`. `active_filters_attr` works in every theme, but a `class` there replaces Bootstrap's default `d-flex flex-wrap gap-1`.
+
 ### Rendering HTML attributes
 
 The `@KreyuDataTable/themes/base.html.twig` theme provides `attributes` macro can be used to render HTML attributes from an array:

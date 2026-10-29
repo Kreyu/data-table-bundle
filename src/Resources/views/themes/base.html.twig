@@ -19,10 +19,13 @@
                 {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
             {% endif %}
 
-            <div
-                data-controller="{{ stimulus_controllers|join(' ') }}"
-                data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')) }}"
-            >
+            {% set root_attr = root_attr|default({}) %}
+            {% set root_attr = root_attr|merge({
+                'data-controller': (stimulus_controllers|join(' ') ~ ' ' ~ root_attr['data-controller']|default(''))|trim,
+                'data-kreyu--data-table-bundle--state-url-query-parameters-value': url_query_parameters|default({})|json_encode(constant('JSON_FORCE_OBJECT')),
+            }) %}
+
+            <div{% with { attr: root_attr } %}{{ block('attributes') }}{% endwith %}>
                 {{ block('action_bar', theme) }}
                 {{ block('table', theme) }}
 
@@ -57,10 +60,13 @@
                 {% set stimulus_controllers = stimulus_controllers|merge(['kreyu--data-table-bundle--batch']) %}
             {% endif %}
 
-            <div
-                data-controller="{{ stimulus_controllers|join(' ') }}"
-                data-kreyu--data-table-bundle--state-url-query-parameters-value="{{ url_query_parameters|default({})|json_encode }}"
-            >
+            {% set root_attr = root_attr|default({}) %}
+            {% set root_attr = root_attr|merge({
+                'data-controller': (stimulus_controllers|join(' ') ~ ' ' ~ root_attr['data-controller']|default(''))|trim,
+                'data-kreyu--data-table-bundle--state-url-query-parameters-value': url_query_parameters|default({})|json_encode,
+            }) %}
+
+            <div{% with { attr: root_attr } %}{{ block('attributes') }}{% endwith %}>
                 {{ block('action_bar', theme) }}
 
                 {{ form_start(form, form_variables) }}
@@ -83,7 +89,11 @@
     {{ block('action_bar', theme) }}
 {% endblock %}
 
-{% block action_bar %}{% endblock %}
+{% block action_bar %}
+    {% if has_active_filters %}
+        {{ data_table_theme_block(data_table, 'active_filters') }}
+    {% endif %}
+{% endblock %}
 
 {% block table %}
     <table {% with { attr: table_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>
@@ -138,18 +148,14 @@
 
 {% block kreyu_data_table_value_row %}
     {% for column_value in row %}
-        <td>
+        <td{{ _self.attributes(column_value.vars.cell_attr) }}>
             {{- data_table_column_value(column_value) -}}
         </td>
     {% endfor %}
 {% endblock %}
 
 {% block kreyu_data_table_column_label %}
-    {% if translation_domain is not same as false %}
-        <span>{{- label|trans(translation_parameters, translation_domain) -}}</span>
-    {% else %}
-        <span>{{- label -}}</span>
-    {% endif %}
+    {{ data_table_theme_block(data_table, 'column_header_label') }}
 {% endblock %}
 
 {% block kreyu_data_table_column_header -%}
@@ -419,6 +425,70 @@
     </button>
 {% endblock %}
 
+{% block active_filters %}
+    <div{{ _self.attributes(active_filters_attr|default({})) }}>
+        {% if has_active_filters %}
+            {{ data_table_theme_block(data_table, 'filter_clear_all_button') }}
+        {% endif %}
+
+        {% for filter_name, filter_data in filtration_data.filters|default([])|filter(filter => filter.hasValue()) %}
+            {% with { filter: filters[filter_name] } %}
+                {{ data_table_theme_block(data_table, 'filter_clear_button') }}
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block filter_clear_all_button %}
+    {% set attr = {
+        'href': data_table_filter_clear_url(data_table, filters),
+        'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
+        'data-turbo-action': 'advance',
+        'data-turbo-frame': '_self',
+    }|merge(attr|default({})) %}
+
+    <a{{ _self.attributes(attr) }}>{{ data_table_theme_block(data_table, 'filter_clear_all_button_icon') }}</a>
+{% endblock %}
+
+{% block filter_clear_all_button_icon '×' %}
+
+{% block filter_clear_button %}
+    {% set attr = {
+        'href': data_table_filter_clear_url(data_table, filter),
+        'title': 'Clear filter'|trans({}, 'KreyuDataTable'),
+        'data-turbo-action': 'advance',
+        'data-turbo-frame': '_self',
+    }|merge(attr|default({})) %}
+
+    <a{{ _self.attributes(attr) }}>
+        <strong>{{ filter.vars.label|trans({}, filter.vars.translation_domain) }}</strong>
+
+        {% if filter.vars.operator_selectable %}
+            <span>{{ filter.vars.data.operator.label|trans({}, 'KreyuDataTable') }}</span>
+        {% endif %}
+
+        <span>{{ data_table_theme_block(data_table, 'filter_clear_button_value') }}</span>
+
+        <span aria-hidden="true">{{ data_table_theme_block(data_table, 'filter_clear_button_icon') }}</span>
+    </a>
+{% endblock %}
+
+{% block filter_clear_button_value %}
+    {%- set values = filter.vars.value is iterable ? filter.vars.value : [filter.vars.value] -%}
+
+    {%- for value in values -%}
+        {%- if filter.vars.translation_domain is same as false -%}
+            {{ value }}
+        {%- else -%}
+            {{ value|trans({}, filter.vars.translation_domain) }}
+        {%- endif -%}
+
+        {{- not loop.last ? ', ' -}}
+    {%- endfor -%}
+{% endblock %}
+
+{% block filter_clear_button_icon '×' %}
+
 {# @see Kreyu\Bundle\DataTableBundle\Filter\Form\Type\DateRangeType #}
 {% block kreyu_data_table_date_range_widget %}
     {{ form_widget(form.from) }}
@@ -657,6 +727,52 @@
     {{- label|trans(translation_parameters, translation_domain) -}}
 {%- endblock %}
 
+{% block action_confirmation_modal %}
+    <dialog id="{{ confirmation.identifier }}" aria-labelledby="{{ confirmation.identifier }}--title" data-kreyu--data-table-bundle--dialog-target="dialog">
+        {% block action_confirmation_modal_header %}
+            <h2 id="{{ confirmation.identifier }}--title">
+                {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
+            </h2>
+        {% endblock %}
+        {% block action_confirmation_modal_body %}
+            <p>
+                {{ confirmation.label_description|trans({}, confirmation.translation_domain) }}
+            </p>
+        {% endblock %}
+        {% block action_confirmation_modal_footer %}
+            {% block action_confirmation_modal_cancel_button %}
+                <button type="button" data-action="kreyu--data-table-bundle--dialog#close">
+                    {{ confirmation.label_cancel|trans({}, confirmation.translation_domain) }}
+                </button>
+            {% endblock %}
+            {% block action_confirmation_modal_confirm_button %}
+                {% set confirm_button_tag = confirm_button_tag|default('a') %}
+
+                <{{ confirm_button_tag }}{{ _self.attributes(confirm_button_attr|default({})) }}>
+                    {{ confirmation.label_confirm|trans({}, confirmation.translation_domain) }}
+                </{{ confirm_button_tag }}>
+            {% endblock %}
+        {% endblock %}
+    </dialog>
+{% endblock %}
+
+{% block action_confirmable_control %}
+    {% set confirm_attribute_keys = ['href', 'target', 'data-kreyu--data-table-bundle--batch-target'] %}
+    {% set confirm_button_attr = attr|filter((value, key) => key in confirm_attribute_keys)|merge(confirm_button_attr|default({})) %}
+
+    {% set attr = {
+        type: 'button',
+        'data-action': 'kreyu--data-table-bundle--dialog#open',
+    }|merge(attr|filter((value, key) => key not in confirm_attribute_keys and key != 'type')) %}
+
+    <div data-controller="kreyu--data-table-bundle--dialog">
+        <button{{ _self.attributes(attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        </button>
+        {{ block('action_confirmation_modal') }}
+    </div>
+{% endblock %}
+
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType #}
 {% block action_link_control %}
     {% set attr = { href, target }|filter(v => v != null)|merge(attr) %}
@@ -666,9 +782,13 @@
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    <{{ tag }}{{ _self.attributes(attr) }}>
-        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
-    </{{ tag }}>
+    {% if confirmation %}
+        {{ block('action_confirmable_control') }}
+    {% else %}
+        <{{ tag }}{{ _self.attributes(attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        </{{ tag }}>
+    {% endif %}
 {% endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
@@ -682,9 +802,13 @@
 
     {# Button action should work like a link action styled to look like a button #}
 
-    <{{ tag }}{{ _self.attributes(attr) }}>
-        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
-    </{{ tag }}>
+    {% if confirmation %}
+        {{ block('action_confirmable_control') }}
+    {% else %}
+        <{{ tag }}{{ _self.attributes(attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        </{{ tag }}>
+    {% endif %}
 {% endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
@@ -710,9 +834,19 @@
             <input type="hidden" name="_method" value="{{ method }}" />
         {%- endif -%}
 
-        <{{ button_tag }}{{ _self.attributes(button_attr) }}>
-            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
-        </{{ button_tag }}>
+        {% if csrf_token is not null -%}
+            <input type="hidden" name="_token" value="{{ csrf_token }}" />
+        {%- endif -%}
+
+        {% if confirmation %}
+            {% with { attr: button_attr, confirm_button_tag: 'button', confirm_button_attr: { type: 'submit' } } %}
+                {{ block('action_confirmable_control') }}
+            {% endwith %}
+        {% else %}
+            <{{ button_tag }}{{ _self.attributes(button_attr) }}>
+                {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+            </{{ button_tag }}>
+        {% endif %}
     </form>
 {% endblock %}
 
@@ -720,19 +854,27 @@
 {% block action_modal_control %}
     {# @var string href - URL that will respond with the modal contents #}
 
-    {% set attr = { href }|filter(v => v != null)|merge(attr) %}
+    {% set attr = {
+        href,
+        'data-turbo-prefetch': 'false',
+        'data-action': 'kreyu--data-table-bundle--dialog#open',
+    }|filter(v => v != null)|merge(attr) %}
 
     {% if batch %}
         {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
     {% endif %}
 
-    {% set tag = tag ?? 'button' %}
+    {% set tag = tag ?? 'a' %}
 
-    {# Themes that extend base theme should provide their own implementation of modal #}
-
-    <{{ tag }}{{ _self.attributes(attr) }}>
-        {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
-    </{{ tag }}>
+    <div data-controller="kreyu--data-table-bundle--dialog">
+        <{{ tag }}{{ _self.attributes(attr) }}>
+            {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
+        </{{ tag }}>
+        <dialog data-kreyu--data-table-bundle--dialog-target="dialog">
+            <div data-kreyu--data-table-bundle--dialog-target="content">{{ 'Loading'|trans({}, 'KreyuDataTable') }}</div>
+            <button type="button" data-action="kreyu--data-table-bundle--dialog#close">{{ 'Close'|trans({}, 'KreyuDataTable') }}</button>
+        </dialog>
+    </div>
 {% endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\Dropdown\DropdownActionType #}

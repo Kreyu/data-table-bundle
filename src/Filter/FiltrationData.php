@@ -138,8 +138,20 @@ class FiltrationData implements \ArrayAccess
 
     public function hasActiveFilters(): bool
     {
-        foreach ($this->filters as $filter) {
-            if ($filter->hasValue()) {
+        return $this->hasActiveFiltersExcept([]);
+    }
+
+    /**
+     * @param array<string> $filterNames
+     */
+    public function hasActiveFiltersExcept(array $filterNames): bool
+    {
+        $includedFilters = array_diff_key($this->filters, array_flip($filterNames));
+
+        foreach ($includedFilters as $filter) {
+            $hasValue = $filter->hasValue();
+
+            if ($hasValue) {
                 return true;
             }
         }

@@ -61,6 +61,52 @@ $builder
 ;
 ```
 
+### `csrf_token_id`
+
+- **type**: `null`, `string` or `\Closure` (if using as a row action)
+- **default**: `null`
+
+Adds a hidden `_token` field with a CSRF token for this id.
+
+Requires `symfony/security-csrf` and `framework.csrf_protection` enabled:
+
+```bash
+composer require symfony/security-csrf
+```
+
+```php
+use Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType;
+
+$builder
+    ->addRowAction('delete', FormActionType::class, [
+        'method' => 'POST',
+        'action' => fn (Post $post) => $this->urlGenerator->generate('post_delete', [
+            'id' => $post->getId(),
+        ]),
+        'csrf_token_id' => 'delete',
+    ])
+;
+```
+
+Check the token in the controller (`#[IsCsrfTokenValid]` needs Symfony 7.1+):
+
+```php
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+
+#[Route('/posts/{id}/delete', name: 'post_delete', methods: ['POST'])]
+#[IsCsrfTokenValid('delete')]
+public function delete(Post $post): Response
+{
+    // ...
+}
+```
+
+Symfony 6.x → in an `AbstractController`, call `$this->isCsrfTokenValid('delete', $request->request->get('_token'))`.
+
+As a row action, a closure gets the row data and returns the token id, e.g. `fn (Post $post) => 'delete'.$post->getId()`.
+
 ## Inherited options
 
 <ActionTypeOptions/>

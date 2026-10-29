@@ -17,6 +17,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterData;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationView;
@@ -112,6 +113,7 @@ final class DataTableType implements DataTableTypeInterface
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
+            'has_active_non_search_filters' => $this->hasActiveNonSearchFilters($dataTable),
             'filtration_data' => $dataTable->getFiltrationData(),
             'sorting_data' => $dataTable->getSortingData(),
             'sorting_clearable' => $dataTable->getConfig()->isSortingClearable(),
@@ -312,6 +314,27 @@ final class DataTableType implements DataTableTypeInterface
             static fn (ActionInterface $action) => $action->createView($view),
             $dataTable->getBatchActions(),
         );
+    }
+
+    private function hasActiveNonSearchFilters(DataTableInterface $dataTable): bool
+    {
+        $filtrationData = $dataTable->getFiltrationData();
+
+        if ($filtrationData === null) {
+            return false;
+        }
+
+        $searchFilterNames = [];
+
+        foreach ($dataTable->getFilters() as $name => $filter) {
+            $innerType = $filter->getConfig()->getType()->getInnerType();
+
+            if ($innerType instanceof SearchFilterTypeInterface) {
+                $searchFilterNames[] = $name;
+            }
+        }
+
+        return $filtrationData->hasActiveFiltersExcept($searchFilterNames);
     }
 
     /**

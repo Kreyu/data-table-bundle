@@ -79,6 +79,29 @@ class ProductController
 ```
 :::
 
+## Active filters
+
+**Every theme, `base` included, shows active filters as chips in the action bar.**
+Click a chip to clear that filter, or the clear-all button in front of them.
+
+Check for active filters in PHP:
+
+```php
+$filtrationData = $dataTable->getFiltrationData();
+
+$filtrationData?->hasActiveFilters();                 // any filter
+$filtrationData?->hasActiveFiltersExcept(['search']); // any filter but "search"
+```
+
+**Open the filter panel only for real filters** with `has_active_non_search_filters`.
+It ignores [search filters](../../reference/types/filter/search.md), so typing in the search box doesn't pop the panel open:
+
+```twig
+<details{{ products.vars.has_active_non_search_filters ? ' open' }}>
+    {{ data_table_filters_form(products.vars.filtration_form) }}
+</details>
+```
+
 ## Saving applied filters
 
 By default, the filtration feature [persistence](persistence.md) is **disabled** for every data table.

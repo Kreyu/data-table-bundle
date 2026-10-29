@@ -197,8 +197,6 @@
     </svg>
 {% endblock %}
 
-{% block filter_clear_button_icon '&times;' %}
-
 {% block filter_clear_all_button_icon %}
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
         <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
@@ -209,15 +207,11 @@
 {% block filter_clear_all_button %}
     {% set attr = {
         'class': 'btn btn-icon btn-outline-danger',
-        'href': data_table_filter_clear_url(data_table, filters),
         'data-toggle': 'tooltip',
         'data-placement': 'bottom',
-        'title': 'Clear all filters'|trans({}, 'KreyuDataTable'),
-        'data-turbo-action': 'advance',
-        'data-turbo-frame': '_self',
     }|merge(attr|default({})) %}
 
-    <a{{ _self.attributes(attr) }}>{{ data_table_theme_block(data_table, 'filter_clear_all_button_icon') }}</a>
+    {{ parent() }}
 {% endblock %}
 
 {% block filter_clear_button %}
@@ -240,39 +234,16 @@
             {% endif %}
         </span>
 
-        <span>
-            {% if filter.vars.value is iterable %}
-                {% for value in filter.vars.value %}
-                    {%- if filter.vars.translation_domain is not same as false -%}
-                        {{ value|trans({}, filter.vars.translation_domain) }}
-                    {%- else -%}
-                        {{ filter.vars.value }}
-                    {%- endif -%}
-                    {{- not loop.last ? ', ' }}
-                {% endfor %}
-            {% elseif filter.vars.translation_domain is not same as false %}
-                {{ filter.vars.value|trans({}, filter.vars.translation_domain) }}
-            {% else %}
-                {{ filter.vars.value }}
-            {% endif %}
-        </span>
+        <span>{{ data_table_theme_block(data_table, 'filter_clear_button_value') }}</span>
 
         <span class="mx-2" aria-hidden="true">{{ data_table_theme_block(data_table, 'filter_clear_button_icon') }}</span>
     </a>
 {% endblock %}
 
 {% block active_filters %}
-    <div class="d-flex flex-wrap gap-1">
-        {% if has_active_filters %}
-            {{ data_table_theme_block(data_table, 'filter_clear_all_button') }}
-        {% endif %}
-
-        {% for filter_name, filter_data in filtration_data.filters|default([])|filter(filter => filter.hasValue()) %}
-            {% with { filter: filters[filter_name] } %}
-                {{ data_table_theme_block(data_table, 'filter_clear_button') }}
-            {% endwith %}
-        {% endfor %}
-    </div>
+    {% with { active_filters_attr: { class: 'd-flex flex-wrap gap-1' }|merge(active_filters_attr|default({})) } %}
+        {{ parent() }}
+    {% endwith %}
 {% endblock %}
 
 {# Filtration #}
@@ -704,7 +675,7 @@
         {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
-    {{ parent() }}
+    {% with { confirmation: false } %}{{ parent() }}{% endwith %}
 {%- endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\ButtonActionType #}
@@ -754,7 +725,7 @@
         {% with { attr, confirm_button_attr } %}{{ block('action_confirmation_modal') }}{% endwith %}
     {% endif %}
 
-    {{ parent() }}
+    {% with { confirmation: false } %}{{ parent() }}{% endwith %}
 {%- endblock %}
 
 {# @see Kreyu\Bundle\DataTableBundle\Action\Type\FormActionType #}
@@ -794,7 +765,8 @@
                 'type': 'button',
                 'data-bs-toggle': 'modal',
                 'data-bs-target': '#' ~ confirmation.identifier,
-            }|merge(button_attr)
+            }|merge(button_attr),
+            confirmation: false,
         } %}
             {{ parent() }}
         {% endwith %}
@@ -803,7 +775,7 @@
             {{ block('action_confirmation_modal') }}
         {% endwith %}
     {% else %}
-        {{ parent() }}
+        {% with { confirmation: false } %}{{ parent() }}{% endwith %}
     {% endif %}
 {%- endblock %}
 
@@ -831,35 +803,32 @@
         'outline-dark': 'btn-outline-dark',
     }|merge(variants ?? {})|filter(e => e is not same as false) -%}
 
-    <div
-        class="d-inline-block"
-        data-controller="kreyu--data-table-bundle--bootstrap-modal"
-        data-kreyu--data-table-bundle--bootstrap-modal-url-value="{{ href }}"
+    {% set modalId = 'modalId-' ~ random() %}
 
-        {% if batch %}
-           data-kreyu--data-table-bundle--batch-target="identifierHolder"
-           data-kreyu--data-table-bundle--batch-identifier-holder-attribute-value="data-kreyu--data-table-bundle--bootstrap-modal-url-value"
-        {% endif %}
-    >
-        {% set modalId = 'modalId-' ~ random() %}
+    {% set base_classes = base_classes ?? 'btn d-inline-flex align-items-center gap-2' %}
+    {% set variant_classes = variant_classes ?? variants[variant ?? default_variant ?? 'primary'] %}
 
-        {% set base_classes = base_classes ?? 'btn d-inline-flex align-items-center gap-2' %}
-        {% set variant_classes = variant_classes ?? variants[variant ?? default_variant ?? 'primary'] %}
+    {% set attr = {
+        href,
+        class: (base_classes ~ ' ' ~ variant_classes ~ ' ' ~ button_attr.class|default(''))|trim,
+        role: 'button',
+        'data-turbo-prefetch': 'false',
+        'data-bs-toggle': 'modal',
+        'data-bs-target': '#' ~ modalId,
+        'data-action': 'kreyu--data-table-bundle--dialog#open',
+    }|merge(attr) %}
 
-        {% set attr = {
-            class: (base_classes ~ ' ' ~ variant_classes ~ ' ' ~ button_attr.class|default(''))|trim,
-            type: 'button',
-            'data-bs-toggle': 'modal',
-            'data-bs-target': '#' ~ modalId,
-            'data-action': 'kreyu--data-table-bundle--bootstrap-modal#open',
-        }|merge(attr) %}
+    {% if batch %}
+        {% set attr = { 'data-kreyu--data-table-bundle--batch-target': 'identifierHolder' }|merge(attr) %}
+    {% endif %}
 
-        <button{{ _self.attributes(attr) }}>
+    <div class="d-inline-block" data-controller="kreyu--data-table-bundle--dialog">
+        <a{{ _self.attributes(attr) }}>
             {% with { attr: {} } %}{{- block('action_control', theme, _context) -}}{% endwith %}
-        </button>
+        </a>
 
         <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}Label" aria-hidden="true"
-            data-kreyu--data-table-bundle--bootstrap-modal-target="modal">
+            data-kreyu--data-table-bundle--dialog-target="content">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">

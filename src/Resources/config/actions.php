@@ -63,6 +63,7 @@ return static function (ContainerConfigurator $configurator) {
     $services
         ->set('kreyu_data_table.action.type.form', FormActionType::class)
         ->tag('kreyu_data_table.action.type')
+        ->args([service('security.csrf.token_manager')->nullOnInvalid()])
     ;
 
     $services

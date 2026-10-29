@@ -20,6 +20,11 @@
                 "fetch": "eager",
                 "enabled": true
             },
+            "dialog": {
+                "main": "controllers/dialog.js",
+                "fetch": "eager",
+                "enabled": true
+            },
             "bootstrap-modal": {
                 "main": "controllers/bootstrap/modal.js",
                 "fetch": "eager",

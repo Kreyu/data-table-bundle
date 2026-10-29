@@ -125,6 +125,7 @@ The following variables are common to every data table type:
 | `personalization_parameter_name` | Name of the parameter that holds the personalization form data.                                                                        |
 | `export_parameter_name`          | Name of the parameter that holds the export form data.                                                                                 |
 | `has_active_filters`             | If at least one filter is active, this value will equal `true`.                                                                        |
+| `has_active_non_search_filters`  | `true` if a filter other than a search filter is active. Use it to open the filter panel when the page loads.                          |
 | `filtration_data`                | An instance of filtration data, that contains applied filters values.                                                                  |
 | `sorting_data`                   | An instance of sorting data, that contains applied sorting values.                                                                     |
 | `header_row`                     | An instance of headers row view.                                                                                                       |
@@ -175,6 +176,7 @@ The following variables are common to every column type value:
 | `block_prefixes`         | A list of block prefixes respecting the type inheritance.                                                                                        |
 | `export`                 | An array of export options, including `data`, `value`, `label` and `translation_domain` options. Equals `false` if the column is not exportable. |
 | `attr`                   | An array of attributes used in rendering the column value.                                                                                       |
+| `cell_attr`              | An array of attributes used in rendering the column value cell (`<td>`). Set by the `value_cell_attr` column option.                             |
 
 ### Filter variables
 
@@ -210,6 +212,25 @@ The following variables are common to every action type:
 | `attr`                   | An array of attributes used in rendering the action.                                                              |
 | `icon_attr`              | An array of attributes used in rendering the action icon.                                                         |
 | `confirmation`           | An array of action confirmation options. If `false`, action is not confirmable.                                   |
+| `csrf_token`             | Form action only. CSRF token rendered as a hidden `_token` input. Set by the `csrf_token_id` option; `null` = none. |
+
+### Theme variables
+
+No type sets these. Pass them to `data_table()`, or set them with `{% with %}` in your theme:
+
+| Variable              | Rendered on                                                          |
+|-----------------------|----------------------------------------------------------------------|
+| `root_attr`           | Root `<div>`. Its `data-controller` is appended to the bundle's own. |
+| `active_filters_attr` | Filter chips wrapper.                                                |
+
+```twig
+{{ data_table(products, {
+    root_attr: { class: 'products-table', 'data-controller': 'products' },
+    active_filters_attr: { class: 'chips' },
+}) }}
+```
+
+See [Theming](../docs/features/theming.md#adding-html-attributes) for more.
 
 ::: tip
 Behind the scenes, these variables are made available to the `DataTableView`, `ColumnView` and `FilterView` objects of your data table

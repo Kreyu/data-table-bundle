@@ -220,7 +220,8 @@ $builder
 - **type**: `array` or `callable`
 - **default**: `[]`
 
-If you want to add extra attributes to an HTML column value representation (`<td>`) you can use the attr option.
+If you want to add extra attributes to an HTML column value representation (the element inside `<td>`) you can use the attr option.
+To set attributes on the `<td>` itself, use [`value_cell_attr`](#value-cell-attr).
 It's an associative array with HTML attributes as keys.
 This can be useful when you need to set a custom class for a column:
 
@@ -247,6 +248,35 @@ $builder
     ])
 ;
 ``` 
+
+### `value_cell_attr`
+
+- **type**: `array` or `callable`
+- **default**: `[]`
+
+Extra HTML attributes for the value cell (`<td>`).
+
+```php
+$builder
+    ->addColumn('quantity', NumberColumnType::class, [
+        'value_cell_attr' => [
+            'class' => 'text-end',
+        ],
+    ])
+;
+```
+
+A `callable` gets the value and the row data:
+
+```php
+$builder
+    ->addColumn('quantity', NumberColumnType::class, [
+        'value_cell_attr' => fn (int $quantity, Product $product) => [
+            'class' => $quantity === 0 ? 'table-danger' : '',
+        ],
+    ])
+;
+```
 
 ### `priority`
 

@@ -59,11 +59,31 @@ Now, add `@kreyu/data-table-bundle` controllers to your `assets/controllers.json
             },
             "batch": {
                 "enabled": true
+            },
+            "dialog": {
+                "enabled": true
             }
         }
     }
 }
 ```
+
+`dialog` opens modal actions in every theme, and action confirmations in the base theme.
+
+::: warning
+**`bootstrap-modal` is deprecated.** Replace it with `dialog`:
+
+```diff
+ "@kreyu/data-table-bundle": {
+-    "bootstrap-modal": {
++    "dialog": {
+         "enabled": true
+     }
+ }
+```
+
+Copied the old `bootstrap_5` `action_modal_control` block into your theme? Keep `bootstrap-modal` enabled until you update that block.
+:::
 
 ## Rebuild assets
 

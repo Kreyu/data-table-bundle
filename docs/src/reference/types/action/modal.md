@@ -7,21 +7,33 @@
 The [`ModalActionType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Action/Type/ModalActionType.php) represents an action
 that opens a modal dialog with contents loaded from given URL.
 
+The trigger is a link (`<a href>`). Clicking it opens the modal and loads the URL into it via the `dialog` Stimulus controller.
+As a batch action, the link's `href` gets the selected identifiers appended (`?id[]=1&id[]=2`).
+
+What the URL should return depends on the theme:
+
+| Theme | Modal | Response |
+|-------|-------|----------|
+| Base | native `<dialog>` | dialog body content |
+| Bootstrap 5, Tabler | Bootstrap modal | full `.modal-dialog` markup |
+
 > [!WARNING]
-> This action type requires additional JavaScript to work properly. If using the built-in Bootstrap 5 or Tabler (based on Bootstrap) theme,
-> enable the `bootstrap-modal` script in your `controllers.json` file, because **it is disabled by default**.
-> 
+> Requires the `dialog` controller in your `controllers.json`. It's enabled by default; if your file predates it, add it:
+>
 > ```json
 > {
 >   "controllers": {
 >     "@kreyu/data-table-bundle": {
->       "bootstrap-modal": {
->         "enabled": true
+>       "dialog": {
+>         "enabled": true,
+>         "fetch": "eager"
 >       }
 >     }
 >   }
 > }
 > ```
+>
+> The `bootstrap-modal` controller is deprecated. Only themes that copied the old Bootstrap 5 `action_modal_control` block still use it.
 
 ## Options
 

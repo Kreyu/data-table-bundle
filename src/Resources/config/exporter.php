@@ -29,7 +29,7 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.exporter.resolved_type_factory', ResolvedExporterTypeFactory::class)
-        ->alias(ResolvedExporterTypeFactoryInterface::class, 'kreyu_data_table.exporting.resolved_type_factory')
+        ->alias(ResolvedExporterTypeFactoryInterface::class, 'kreyu_data_table.exporter.resolved_type_factory')
     ;
 
     $services

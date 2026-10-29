@@ -37,13 +37,4 @@ class MoneyColumnTypeTest extends ColumnTypeTestCase
 
         $this->assertSame('PLN', $valueView->vars['currency']);
     }
-
-    public function testIntlFormatterOptionsDefault(): void
-    {
-        $valueView = $this->createColumnValueView($this->createColumn([
-            'currency' => 'PLN',
-        ]));
-
-        $this->assertSame(['attrs' => [], 'style' => 'decimal'], $valueView->vars['intl_formatter_options']);
-    }
 }

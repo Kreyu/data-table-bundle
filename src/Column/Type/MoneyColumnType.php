@@ -7,7 +7,6 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\Formatter\IntlFormatter;
 
 /**
  * Represents a column with monetary value, appropriately formatted and rendered with currency.
@@ -29,8 +28,6 @@ final class MoneyColumnType extends AbstractColumnType
         $view->vars = array_merge($view->vars, [
             'currency' => $currency,
             'divisor' => $divisor,
-            'use_intl_formatter' => $options['use_intl_formatter'],
-            'intl_formatter_options' => $options['intl_formatter_options'],
         ]);
     }
 
@@ -49,32 +46,10 @@ final class MoneyColumnType extends AbstractColumnType
             ->allowedValues(static fn (?int $value) => 0 !== $value)
             ->info('A divisor used to divide the value before rendering.')
         ;
+    }
 
-        $resolver
-            ->define('use_intl_formatter')
-            ->default(class_exists(IntlFormatter::class))
-            ->allowedTypes('bool')
-        ;
-
-        $configureIntlFormatterOptions = static function (OptionsResolver $resolver): void {
-            $resolver
-                ->setDefaults([
-                    'attrs' => [],
-                    'style' => 'decimal',
-                ])
-                ->setAllowedTypes('attrs', 'array')
-                ->setAllowedTypes('style', 'string')
-            ;
-        };
-
-        $supportsNestedOptions = method_exists($resolver, 'setOptions');
-
-        if ($supportsNestedOptions) {
-            $resolver->setOptions('intl_formatter_options', $configureIntlFormatterOptions);
-
-            return;
-        }
-
-        $resolver->setDefault('intl_formatter_options', $configureIntlFormatterOptions);
+    public function getParent(): string
+    {
+        return NumberColumnType::class;
     }
 }

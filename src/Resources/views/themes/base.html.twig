@@ -407,7 +407,7 @@
     {% form_theme form with form_themes|default([_self]) %}
 
     {{ form_start(form, { attr: { 'data-turbo-action': 'advance', 'data-turbo-frame': '_self', 'hidden': 'hidden' } }) }}
-        {# This form should be empty - all its inputs should be on the outside, referenced using the "form" attribute #}
+        <button type="submit" hidden></button>
     {{ form_end(form, { render_rest: false }) }}
 
     {% if form.count > 0 %}
@@ -578,13 +578,33 @@
                     {{ block('sort_arrow_none', theme, _context) }}
                 {% endif %}
             </a>
+
+            {{ block('column_header_filter', theme, _context) }}
         </th>
     {% else %}
         <th {{ block('attributes') }}>
             <span {% with { attr: label_attr } %}{{- block('attributes') -}}{% endwith %}>
                 {{- block('column_header_label', theme, _context) -}}
             </span>
+
+            {{ block('column_header_filter', theme, _context) }}
         </th>
+    {% endif %}
+{% endblock %}
+
+{% block column_header_filter %}
+    {% if filter_form %}
+        {% form_theme filter_form with form_themes|default([_self]) %}
+
+        {% set filter_aria_label = translation_domain is same as false ? label : label|trans(translation_parameters, translation_domain) %}
+
+        <div{{ _self.attributes(filter_attr|default({})) }}>
+            {% if filter_form.operator is defined %}
+                {{ form_widget(filter_form.operator, { attr: filter_form.operator.vars.attr|merge({ 'aria-label': filter_aria_label }) }) }}
+            {% endif %}
+
+            {{ form_widget(filter_form.value, { attr: filter_form.value.vars.attr|merge({ 'aria-label': filter_aria_label }) }) }}
+        </div>
     {% endif %}
 {% endblock %}
 

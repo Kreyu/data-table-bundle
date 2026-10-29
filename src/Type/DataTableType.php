@@ -362,17 +362,25 @@ final class DataTableType implements DataTableTypeInterface
             return false;
         }
 
-        $searchFilterNames = [];
+        $nonPanelFilterNames = [];
 
         foreach ($dataTable->getFilters() as $name => $filter) {
             $innerType = $filter->getConfig()->getType()->getInnerType();
 
             if ($innerType instanceof SearchFilterTypeInterface) {
-                $searchFilterNames[] = $name;
+                $nonPanelFilterNames[] = $name;
             }
         }
 
-        return $filtrationData->hasActiveFiltersExcept($searchFilterNames);
+        foreach ($dataTable->getVisibleColumns() as $name => $column) {
+            $hasHeaderFilter = $column->getConfig()->getOption('filter') !== null;
+
+            if ($hasHeaderFilter) {
+                $nonPanelFilterNames[] = $name;
+            }
+        }
+
+        return $filtrationData->hasActiveFiltersExcept($nonPanelFilterNames);
     }
 
     /**
@@ -604,6 +612,9 @@ final class DataTableType implements DataTableTypeInterface
             /** @var array<string, FormView> $searchFields */
             $searchFields = $filtrationFormView->vars['search_fields'];
 
+            /** @var array<string, FormView> $headerFields */
+            $headerFields = $filtrationFormView->vars['header_fields'];
+
             foreach ($view->filters as $filterView) {
                 $value = null;
 
@@ -611,7 +622,8 @@ final class DataTableType implements DataTableTypeInterface
                 $formName = $filterView->vars['form_name'];
                 $panelFormView = $filtrationFormView[$formName] ?? null;
                 $searchFormView = $searchFields[$formName] ?? null;
-                $filterFormView = $panelFormView ?? $searchFormView;
+                $headerFormView = $headerFields[$formName] ?? null;
+                $filterFormView = $panelFormView ?? $searchFormView ?? $headerFormView;
                 $valueFormView = $filterFormView['value'] ?? null;
 
                 if ($valueFormView !== null) {

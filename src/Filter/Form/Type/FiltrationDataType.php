@@ -82,6 +82,11 @@ class FiltrationDataType extends AbstractType
         }
 
         $view->vars['search_fields'] = $searchFields;
+
+        $headerFields = $this->moveHeaderFields($view, $dataTable, $dataTableView);
+
+        $view->vars['header_fields'] = $headerFields;
+        $dataTableView->vars['has_header_filters'] = $headerFields !== [];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -97,6 +102,46 @@ class FiltrationDataType extends AbstractType
             ->setAllowedTypes('data_table', DataTableInterface::class)
             ->setAllowedTypes('data_table_view', ['null', DataTableView::class])
         ;
+    }
+
+    /**
+     * @return array<string, FormView>
+     */
+    private function moveHeaderFields(
+        FormView $view,
+        DataTableInterface $dataTable,
+        DataTableView $dataTableView,
+    ): array {
+        $headerFields = [];
+        $columnHeaderViews = $dataTableView->headerRow->children ?? [];
+
+        foreach ($dataTable->getVisibleColumns() as $name => $column) {
+            $hasHeaderFilter = $column->getConfig()->getOption('filter') !== null;
+
+            if (!$hasHeaderFilter) {
+                continue;
+            }
+
+            $hasFilter = $dataTable->hasFilter($name);
+
+            if (!$hasFilter) {
+                continue;
+            }
+
+            $formName = $dataTable->getFilter($name)->getFormName();
+            $filterFormView = $view->children[$formName] ?? null;
+
+            if ($filterFormView === null) {
+                continue;
+            }
+
+            $headerFields[$formName] = $filterFormView;
+            $columnHeaderViews[$name]->vars['filter_form'] = $filterFormView;
+
+            unset($view[$formName]);
+        }
+
+        return $headerFields;
     }
 
     private function applyFormAttributeRecursively(FormView $view, string $id): void

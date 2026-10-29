@@ -138,6 +138,31 @@ Sets the sort field used by the sortable behavior. Setting the option to:
 - `false` - disables column sorting;
 - string - defines sort property path;
 
+### `filter`
+
+- **type**: `null` or `string`
+- **default**: `null` - the column has no header filter
+
+Filter type FQCN rendered in the column header. Adds a filter named after the column to the filtration form.
+See [column header filters](../../../../docs/features/filtering.md#column-header-filters).
+
+```php
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+
+$builder
+    ->addColumn('name', TextColumnType::class, [
+        'filter' => StringFilterType::class,
+    ])
+;
+```
+
+### `filter_options`
+
+- **type**: `array`
+- **default**: `[]`
+
+Options passed to the [`filter`](#filter) type, e.g. `operator_selectable` or `default_operator`.
+
 ### `block_prefix`
 
 - **type**: `string`

@@ -128,7 +128,8 @@ The following variables are common to every data table type:
 | `column_visibility_groups`       | Column visibility groups, name → label. Rendered by the `column_visibility_group_selector` block when there are two or more.          |
 | `column_visibility_group`        | Name of the selected column visibility group; `null` if the table defines none.                                                        |
 | `has_active_filters`             | If at least one filter is active, this value will equal `true`.                                                                        |
-| `has_active_non_search_filters`  | `true` if a filter other than a search filter is active. Use it to open the filter panel when the page loads.                          |
+| `has_active_non_search_filters`  | `true` if a panel filter is active (not a search or header filter). Use it to open the filter panel when the page loads.               |
+| `has_header_filters`             | `true` if a visible column renders a filter in its header. Set only when filtration is enabled.                                        |
 | `filtration_data`                | An instance of filtration data, that contains applied filters values.                                                                  |
 | `sorting_data`                   | An instance of sorting data, that contains applied sorting values.                                                                     |
 | `header_row`                     | An instance of headers row view.                                                                                                       |
@@ -173,6 +174,20 @@ The following variables are common to every column type header:
 | `block_prefixes`         | A list of block prefixes respecting the type inheritance.                                                                              |
 | `export`                 | An array of export options, including `label` and `translation_domain` options. Equals `false` if the column is not exportable.        |
 | `attr`                   | An array of attributes used in rendering the column header.                                                                            |
+| `filter_form`            | Form view of the column's [header filter](../docs/features/filtering.md#column-header-filters), a child of the filtration form. `null` without one. |
+
+**Header filters render in the `column_header_filter` block**, inside the column's `<th>`.
+Set `filter_attr` there to change the wrapper's attributes:
+
+```twig
+{% block column_header_filter %}
+    {% with { filter_attr: { class: 'header-filter' } } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+```
+
+> In `bootstrap_5` and `tabler`, a `class` there replaces the default `d-flex gap-1 pb-1`.
 
 ### Column value variables
 

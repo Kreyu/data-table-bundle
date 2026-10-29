@@ -84,6 +84,42 @@ class ProductController
 Bookmarked URLs with the old key no longer apply that filter.
 :::
 
+## Column header filters
+
+**Set `filter` on a column to render a filter in its header.**
+The filter is named after the column and joins the regular filtration form, so it submits, persists and shows as a chip like any other filter:
+
+```php
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\EntityFilterType;
+use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter\Type\StringFilterType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
+
+$builder
+    ->addColumn('name', TextColumnType::class, [
+        'sort' => true,
+        'filter' => StringFilterType::class,
+        'filter_options' => [
+            'operator_selectable' => true,
+        ],
+    ])
+    ->addFilter('category', EntityFilterType::class) // stays in the filter panel
+;
+```
+
+- Press Enter in a header filter to apply it. The panel's **Filter** button applies header filters too.
+- Header filters don't show in the filter panel. If [personalization](personalization.md) hides the column, its filter moves back to the panel.
+- Sorting and pagination links keep header filter values.
+- The filter queries the column's `property_path` when it's a string: `category?.name` → `category.name`. Index paths (`tags[0]`) fall back to the column name. Set `query_path` in `filter_options` to query something else.
+
+::: warning
+A column filter and an `addFilter()` filter can't share a name: `getDataTable()` throws a `LogicException`. Remove one of them.
+Search filters can't go in a header either; they render in the search bar, so add them with `addFilter()`.
+:::
+
+::: tip Using the `base` theme?
+Render the filtration form on the page with `data_table_filters_form()`. Header filters submit through it.
+:::
+
 ## Active filters
 
 **Every theme, `base` included, shows active filters as chips in the action bar.**

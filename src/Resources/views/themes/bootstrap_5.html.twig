@@ -26,9 +26,22 @@
 {% endblock %}
 
 {% block column_header %}
+    {% if data_table.vars.has_header_filters|default(false) %}
+        {% set attr = attr|merge({ class: ('align-top ' ~ attr.class|default(''))|trim }) %}
+    {% endif %}
+
     {% with {
         active_attr: { class: 'border-bottom border-primary text-primary' },
         label_attr: { class: 'text-decoration-none text-reset d-block w-100 h-100 py-1' },
+    } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
+{% block column_header_filter %}
+    {% with {
+        filter_attr: { class: 'd-flex gap-1 pb-1' }|merge(filter_attr|default({})),
+        form_themes: [_self, 'bootstrap_5_layout.html.twig'],
     } %}
         {{ parent() }}
     {% endwith %}
@@ -93,20 +106,20 @@
                 </div>
             </div>
         </div>
+    {% endif %}
 
-        {% if filtration_enabled and filtration_form and filters|length > 0 %}
-            <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
-                <div class="card-body">
-                    {{ data_table_filters_form(filtration_form) }}
-                </div>
+    {% if filtration_enabled and filtration_form and filters|length > 0 %}
+        <div class="border-bottom collapse" id="{{ filtration_form.vars.id }}__collapse">
+            <div class="card-body">
+                {{ data_table_filters_form(filtration_form) }}
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
 
-        {% if has_active_filters %}
-            <div class="card-body border-bottom">
-                {{ data_table_theme_block(data_table, 'active_filters') }}
-            </div>
-        {% endif %}
+    {% if has_active_filters %}
+        <div class="card-body border-bottom">
+            {{ data_table_theme_block(data_table, 'active_filters') }}
+        </div>
     {% endif %}
 
     {% if has_batch_actions %}
@@ -987,6 +1000,10 @@
 
 {% block column_checkbox_header %}
     {% set attr = { class: 'text-center' }|merge(attr) %}
+
+    {% if data_table.vars.has_header_filters|default(false) %}
+        {% set attr = attr|merge({ class: ('align-top ' ~ attr.class)|trim }) %}
+    {% endif %}
 
     {% with { attr, input_attr: { class: 'form-check-input mt-0' } } %}
         {{ parent() }}

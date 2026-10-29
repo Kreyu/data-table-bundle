@@ -15,6 +15,7 @@ use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
@@ -22,10 +23,13 @@ use Kreyu\Bundle\DataTableBundle\Filter\FilterBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilderInterface
 {
@@ -765,6 +769,8 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             $dataTable->addFilter($filter->getFilter());
         }
 
+        $this->addColumnFilters($dataTable);
+
         $this->resolveActions();
 
         foreach ($this->actions as $action) {
@@ -822,6 +828,70 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         foreach (array_keys($this->unresolvedFilters) as $filter) {
             $this->resolveFilter($filter);
         }
+    }
+
+    private function addColumnFilters(DataTableInterface $dataTable): void
+    {
+        foreach ($this->columns as $column) {
+            /** @var class-string<FilterTypeInterface>|null $filterType */
+            $filterType = $column->getOption('filter');
+
+            if ($filterType === null) {
+                continue;
+            }
+
+            $name = $column->getName();
+            $isSearchFilter = is_a($filterType, SearchFilterTypeInterface::class, allow_string: true);
+
+            if ($isSearchFilter) {
+                throw new LogicException(sprintf(
+                    'The column "%s" uses the search filter "%s" as its header filter. Search filters render in the search bar; add it with "addFilter()" instead.',
+                    $name,
+                    $filterType,
+                ));
+            }
+
+            /** @var array<string, mixed> $filterOptions */
+            $filterOptions = $column->getOption('filter_options');
+
+            $queryPath = $this->getColumnFilterQueryPath($column);
+
+            if ($queryPath !== null) {
+                $filterOptions['query_path'] ??= $queryPath;
+            }
+
+            $hasSameNamedFilter = $this->hasFilter($name);
+
+            if ($hasSameNamedFilter) {
+                throw new LogicException(sprintf(
+                    'The column "%1$s" has a header filter, but a filter named "%1$s" already exists. Remove either the "filter" column option or the "%1$s" filter.',
+                    $name,
+                ));
+            }
+
+            $dataTable->addFilter($name, $filterType, $filterOptions);
+        }
+    }
+
+    private function getColumnFilterQueryPath(ColumnBuilderInterface $column): ?string
+    {
+        /** @var PropertyPathInterface|string|bool|null $propertyPath */
+        $propertyPath = $column->getOption('property_path');
+        $isStringPropertyPath = is_string($propertyPath);
+
+        if (!$isStringPropertyPath) {
+            return null;
+        }
+
+        $hasIndex = str_contains($propertyPath, '[');
+
+        if ($hasIndex) {
+            return null;
+        }
+
+        $elements = (new PropertyPath($propertyPath))->getElements();
+
+        return implode('.', $elements);
     }
 
     private function resolveAction(string $name): ActionBuilderInterface

@@ -73,6 +73,7 @@ final class ColumnType implements ColumnTypeInterface
             'sort_direction' => $sortColumnData?->getDirection(),
             'sortable' => $column->getConfig()->isSortable(),
             'export' => $column->getConfig()->isExportable(),
+            'filter_form' => null,
         ]);
     }
 
@@ -290,6 +291,20 @@ final class ColumnType implements ColumnTypeInterface
             ->default(false)
             ->allowedTypes('bool', 'string')
             ->info('Defines whether the column is sortable. Passing a string sets the sorting path.')
+        ;
+
+        $resolver
+            ->define('filter')
+            ->default(null)
+            ->allowedTypes('null', 'string')
+            ->info('Filter type rendered in the column header. Adds a filter named after the column.')
+        ;
+
+        $resolver
+            ->define('filter_options')
+            ->default([])
+            ->allowedTypes('array')
+            ->info('Options passed to the column header filter.')
         ;
 
         $resolver

@@ -14,11 +14,13 @@ class ResolvedActionTypeFactoryDataCollectorProxy implements ResolvedActionTypeF
     public function __construct(
         private ResolvedActionTypeFactoryInterface $proxiedFactory,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
-    public function createResolvedType(ActionTypeInterface $type, array $typeExtensions = [], ?ResolvedActionTypeInterface $parent = null): ResolvedActionTypeInterface
-    {
+    public function createResolvedType(
+        ActionTypeInterface $type,
+        array $typeExtensions = [],
+        ?ResolvedActionTypeInterface $parent = null,
+    ): ResolvedActionTypeInterface {
         return new ResolvedActionTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),
             $this->dataCollector,

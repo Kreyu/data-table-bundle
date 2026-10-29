@@ -27,8 +27,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
         /* readonly */ private string $name,
         private ResolvedColumnTypeInterface $type,
         /* readonly */ private array $options = [],
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -290,6 +289,8 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('ColumnConfigBuilder methods cannot be accessed anymore once the builder is turned into a ColumnConfigInterface instance.');
+        return new BadMethodCallException(
+            'ColumnConfigBuilder methods cannot be accessed anymore once the builder is turned into a ColumnConfigInterface instance.',
+        );
     }
 }

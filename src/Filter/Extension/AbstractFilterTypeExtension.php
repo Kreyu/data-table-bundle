@@ -13,19 +13,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractFilterTypeExtension implements FilterTypeExtensionInterface
 {
-    public function apply(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter, array $options): void
-    {
-    }
+    public function apply(
+        ProxyQueryInterface $query,
+        FilterData $data,
+        FilterInterface $filter,
+        array $options,
+    ): void {}
 
-    public function buildFilter(FilterBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void {}
 
-    public function buildView(FilterView $view, FilterInterface $filter, array $options): void
-    {
-    }
+    public function buildView(FilterView $view, FilterInterface $filter, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 }

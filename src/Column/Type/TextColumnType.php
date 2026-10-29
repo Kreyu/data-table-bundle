@@ -9,6 +9,4 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
  *
  * @see https://data-table-bundle.swroblewski.pl/reference/types/column/text
  */
-final class TextColumnType extends AbstractColumnType
-{
-}
+final class TextColumnType extends AbstractColumnType {}

@@ -33,7 +33,6 @@ class ExporterRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -73,7 +72,9 @@ class ExporterRegistryTest extends TestCase
     public function testTypeCannotHaveItselfAsParent()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType).',
+        );
 
         $registry = $this->createRegistry(types: [new ExporterTypeWithSameParentType()]);
         $registry->getType(ExporterTypeWithSameParentType::class);
@@ -82,7 +83,9 @@ class ExporterRegistryTest extends TestCase
     public function testRecursiveTypeReferences()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo).',
+        );
 
         $registry = $this->createRegistry(types: [
             new RecursiveExporterTypeFoo(),
@@ -100,7 +103,6 @@ class ExporterRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
@@ -119,7 +121,8 @@ class ExporterRegistryTest extends TestCase
     private function createRegistry(array $types = [], array $typeExtensions = []): ExporterRegistry
     {
         return new ExporterRegistry(
-            types: $types ?: [
+            types: $types
+            ?: [
                 new ExporterType(),
                 new SimpleExporterType(),
                 new SimpleSubExporterType(),

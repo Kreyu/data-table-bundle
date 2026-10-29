@@ -21,7 +21,8 @@ class PaginatorFactory implements PaginatorFactoryInterface
         $identifierFieldNames = $queryBuilder
             ->getEntityManager()
             ->getClassMetadata($rootEntity)
-            ->getIdentifierFieldNames();
+            ->getIdentifierFieldNames()
+        ;
 
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
         $hasJoins = \count($queryBuilder->getDQLPart('join')) > 0;
@@ -70,7 +71,8 @@ class PaginatorFactory implements PaginatorFactoryInterface
 
         $classMetadata = $queryBuilder
             ->getEntityManager()
-            ->getClassMetadata($fromPart->getFrom());
+            ->getClassMetadata($fromPart->getFrom())
+        ;
 
         $identifierFieldNames = $classMetadata->getIdentifierFieldNames();
 

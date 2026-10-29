@@ -22,7 +22,7 @@ final class MoneyColumnType extends AbstractColumnType
             $currency = $currency($view->parent->data);
         }
 
-        if (null !== $divisor = $options['divisor']) {
+        if (null !== ($divisor = $options['divisor'])) {
             $view->vars['value'] /= $divisor;
         }
 
@@ -36,25 +36,29 @@ final class MoneyColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('currency')
+        $resolver
+            ->define('currency')
             ->required()
             ->allowedTypes('string', 'callable')
         ;
 
-        $resolver->define('divisor')
+        $resolver
+            ->define('divisor')
             ->default(null)
             ->allowedTypes('null', 'int')
-            ->allowedValues(fn (?int $value) => 0 !== $value)
+            ->allowedValues(static fn (?int $value) => 0 !== $value)
             ->info('A divisor used to divide the value before rendering.')
         ;
 
-        $resolver->define('use_intl_formatter')
+        $resolver
+            ->define('use_intl_formatter')
             ->default(class_exists(IntlFormatter::class))
             ->allowedTypes('bool')
         ;
 
-        $resolver->define('intl_formatter_options')
-            ->default(function (OptionsResolver $resolver) {
+        $resolver
+            ->define('intl_formatter_options')
+            ->default(static function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefaults([
                         'attrs' => [],

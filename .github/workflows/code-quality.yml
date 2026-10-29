@@ -8,8 +8,16 @@ on:
       - '**.php'
 
 jobs:
-  php-cs-fixer:
+  mago:
+    name: mago ${{ matrix.command }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        command:
+          - fmt --check
+          - lint --fail-on-out-of-sync-baseline
+          - analyze --fail-on-out-of-sync-baseline
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,34 +25,11 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.5
           extensions: dom fileinfo filter libxml xmlreader zip gd
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
 
-      - name: Run php-cs-fixer
-        run: ./vendor/bin/php-cs-fixer fix --diff
-
-      - name: Commit php-cs-fixer changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Apply php-cs-fixer changes
-
-  phpstan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.1
-          extensions: dom fileinfo filter libxml xmlreader zip gd
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-
-      - name: Run PHPStan
-        run: ./vendor/bin/phpstan analyse
+      - name: Run Mago
+        run: ./vendor/bin/mago ${{ matrix.command }}

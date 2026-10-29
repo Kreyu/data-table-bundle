@@ -20,8 +20,7 @@ class ResolvedActionTypeDataCollectorProxy implements ResolvedActionTypeInterfac
     public function __construct(
         private ResolvedActionTypeInterface $proxiedType,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
     public function getBlockPrefix(): string
     {

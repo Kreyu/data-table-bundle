@@ -10,8 +10,7 @@ class User
 {
     public function __construct(
         public string|TranslatableInterface|null $firstName = null,
-    ) {
-    }
+    ) {}
 
     public function getFirstNameUppercased(): string
     {

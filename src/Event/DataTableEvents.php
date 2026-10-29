@@ -63,7 +63,5 @@ final class DataTableEvents
      */
     public const PRE_EXPORT = 'kreyu_data_table.pre_export';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 }

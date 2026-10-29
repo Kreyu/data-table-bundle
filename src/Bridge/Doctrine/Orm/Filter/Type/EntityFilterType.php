@@ -15,8 +15,7 @@ final class EntityFilterType extends AbstractDoctrineOrmFilterType
 {
     public function __construct(
         private readonly ?ManagerRegistry $managerRegistry = null,
-    ) {
-    }
+    ) {}
 
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -39,14 +38,15 @@ final class EntityFilterType extends AbstractDoctrineOrmFilterType
         // Therefore, the EntityType requires "choice_value" option with a name of the entity identifier field.
         if (null !== $this->managerRegistry) {
             $resolver->addNormalizer('form_options', function (Options $options, array $formOptions) {
-                if (EntityType::class !== $options['form_type'] || null === $class = $formOptions['class'] ?? null) {
+                if (EntityType::class !== $options['form_type'] || null === ($class = $formOptions['class'] ?? null)) {
                     return $formOptions;
                 }
 
                 $identifiers = $this->managerRegistry
                     ->getManagerForClass($class)
                     ?->getClassMetadata($class)
-                    ->getIdentifier() ?? [];
+                    ->getIdentifier() ?? []
+                ;
 
                 if (1 === count($identifiers)) {
                     $formOptions += ['choice_value' => reset($identifiers)];

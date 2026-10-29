@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures;
 
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,9 +13,7 @@ class SimpleUser implements UserInterface
         return ['foo', 'bar'];
     }
 
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     public function getUserIdentifier(): string
     {

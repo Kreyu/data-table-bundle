@@ -481,14 +481,18 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return $this->getActionFactory()
+        return $this
+            ->getActionFactory()
             ->createNamedBuilder($name, $type ?? ButtonActionType::class, $options)
             ->setContext(ActionContext::Batch)
         ;
     }
 
-    public function addBatchAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
-    {
+    public function addBatchAction(
+        string|ActionBuilderInterface $action,
+        ?string $type = null,
+        array $options = [],
+    ): static {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
@@ -581,14 +585,18 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             throw $this->createBuilderLockedException();
         }
 
-        return $this->getActionFactory()
+        return $this
+            ->getActionFactory()
             ->createNamedBuilder($name, $type ?? ButtonActionType::class, $options)
             ->setContext(ActionContext::Row)
         ;
     }
 
-    public function addRowAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
-    {
+    public function addRowAction(
+        string|ActionBuilderInterface $action,
+        ?string $type = null,
+        array $options = [],
+    ): static {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
@@ -675,8 +683,11 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->getExporterFactory()->createNamedBuilder($name, $type ?? ExporterType::class, $options);
     }
 
-    public function addExporter(string|ExporterBuilderInterface $exporter, ?string $type = null, array $options = []): static
-    {
+    public function addExporter(
+        string|ExporterBuilderInterface $exporter,
+        ?string $type = null,
+        array $options = [],
+    ): static {
         if ($this->locked) {
             throw $this->createBuilderLockedException();
         }
@@ -722,7 +733,10 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         }
 
         if (null === $this->query) {
-            throw new BadMethodCallException(sprintf('Unable to create data table without a query. Use the "%s::setQuery()" method to set a query.', $this::class));
+            throw new BadMethodCallException(sprintf(
+                'Unable to create data table without a query. Use the "%s::setQuery()" method to set a query.',
+                $this::class,
+            ));
         }
 
         $dataTable = new DataTable(clone $this->query, $this->getDataTableConfig());
@@ -885,23 +899,27 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     private function shouldPrependBatchCheckboxColumn(): bool
     {
-        return $this->isAutoAddingBatchCheckboxColumn()
+        return (
+            $this->isAutoAddingBatchCheckboxColumn()
             && !empty($this->batchActions)
-            && !$this->hasColumn(self::BATCH_CHECKBOX_COLUMN_NAME);
+            && !$this->hasColumn(self::BATCH_CHECKBOX_COLUMN_NAME)
+        );
     }
 
     private function shouldAppendActionsColumn(): bool
     {
-        return $this->isAutoAddingActionsColumn()
+        return (
+            $this->isAutoAddingActionsColumn()
             && !empty($this->rowActions)
-            && !$this->hasColumn(self::ACTIONS_COLUMN_NAME);
+            && !$this->hasColumn(self::ACTIONS_COLUMN_NAME)
+        );
     }
 
     private function shouldAddSearchFilter(): bool
     {
         return $this->isAutoAddingSearchFilter()
-            && null !== $this->getSearchHandler()
-            && !$this->hasFilter(self::SEARCH_FILTER_NAME);
+        && null !== $this->getSearchHandler()
+        && !$this->hasFilter(self::SEARCH_FILTER_NAME);
     }
 
     private function prependBatchCheckboxColumn(): void
@@ -927,6 +945,8 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('DataTableBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.');
+        return new BadMethodCallException(
+            'DataTableBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.',
+        );
     }
 }

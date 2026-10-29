@@ -35,6 +35,6 @@ class MoneyColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('PLN', $valueView->vars['currency']);
+        $this->assertSame('PLN', $valueView->vars['currency']);
     }
 }

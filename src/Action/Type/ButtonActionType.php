@@ -6,7 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Action\Type;
 
 final class ButtonActionType extends AbstractActionType
 {
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return LinkActionType::class;
     }

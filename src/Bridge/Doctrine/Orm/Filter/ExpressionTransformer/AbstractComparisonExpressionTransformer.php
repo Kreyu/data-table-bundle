@@ -13,8 +13,7 @@ abstract class AbstractComparisonExpressionTransformer implements ExpressionTran
     public function __construct(
         private readonly bool $transformLeftExpr = true,
         private readonly bool $transformRightExpr = true,
-    ) {
-    }
+    ) {}
 
     public function transform(mixed $expression): Comparison
     {

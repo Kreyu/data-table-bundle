@@ -22,16 +22,17 @@ final class BooleanFilterType extends AbstractDoctrineOrmFilterType
                     Operator::Equals,
                     Operator::NotEquals,
                 ],
-                'active_filter_formatter' => function (FilterData $data) {
+                'active_filter_formatter' => static function (FilterData $data) {
                     return new TranslatableMessage($data->getValue() ? 'Yes' : 'No', domain: 'KreyuDataTable');
                 },
             ])
-            ->addNormalizer('form_options', function (Options $options, array $value): array {
+            ->addNormalizer('form_options', static function (Options $options, array $value): array {
                 if (ChoiceType::class !== $options['form_type']) {
                     return $value;
                 }
 
-                return $value + [
+                return $value
+                + [
                     'choices' => ['Yes' => true, 'No' => false],
                     'choice_translation_domain' => 'KreyuDataTable',
                 ];

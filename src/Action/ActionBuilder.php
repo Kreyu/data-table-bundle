@@ -19,6 +19,8 @@ class ActionBuilder extends ActionConfigBuilder implements ActionBuilderInterfac
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('ActionBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.');
+        return new BadMethodCallException(
+            'ActionBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.',
+        );
     }
 }

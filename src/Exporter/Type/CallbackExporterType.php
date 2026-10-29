@@ -11,8 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class CallbackExporterType extends AbstractExporterType
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         return $options['callback']($view, $exporter, $filename, $options);
     }
 

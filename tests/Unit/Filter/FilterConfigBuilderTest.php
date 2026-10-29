@@ -26,7 +26,7 @@ class FilterConfigBuilderTest extends TestCase
 
     public function testAddEventListener()
     {
-        $listener = fn () => null;
+        $listener = static fn () => null;
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())->method('addListener')->with('foo', $listener, 100);
@@ -196,8 +196,11 @@ class FilterConfigBuilderTest extends TestCase
         $this->assertTrue($this->getPrivatePropertyValue($config, 'locked'));
     }
 
-    private function createBuilder(?ResolvedFilterTypeInterface $type = null, ?EventDispatcherInterface $dispatcher = null, array $options = []): FilterConfigBuilder
-    {
+    private function createBuilder(
+        ?ResolvedFilterTypeInterface $type = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        array $options = [],
+    ): FilterConfigBuilder {
         return new FilterConfigBuilder(
             name: 'foo',
             type: $type ?? $this->createStub(ResolvedFilterTypeInterface::class),

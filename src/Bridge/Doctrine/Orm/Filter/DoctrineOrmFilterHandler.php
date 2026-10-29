@@ -24,8 +24,7 @@ class DoctrineOrmFilterHandler implements FilterHandlerInterface
     public function __construct(
         private readonly ExpressionFactoryInterface $expressionFactory = new ExpressionFactory(),
         private readonly ParameterFactoryInterface $parameterFactory = new ParameterFactory(),
-    ) {
-    }
+    ) {}
 
     public function handle(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
     {

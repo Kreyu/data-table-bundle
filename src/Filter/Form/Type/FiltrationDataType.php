@@ -25,10 +25,18 @@ class FiltrationDataType extends AbstractType
         $dataTable = $options['data_table'];
 
         foreach ($dataTable->getFilters() as $filter) {
-            $builder->add($filter->getFormName(), FilterDataType::class, $filter->getFormOptions() + [
-                'getter' => fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
-                'setter' => fn (FiltrationData $filtrationData, FilterData $filterData) => $filtrationData->setFilterData($filter, $filterData),
-            ]);
+            $builder->add(
+                $filter->getFormName(),
+                FilterDataType::class,
+                $filter->getFormOptions()
+                + [
+                    'getter' => static fn (FiltrationData $filtrationData) => $filtrationData->getFilterData($filter),
+                    'setter' => static fn (
+                        FiltrationData $filtrationData,
+                        FilterData $filterData,
+                    ) => $filtrationData->setFilterData($filter, $filterData),
+                ],
+            );
         }
     }
 

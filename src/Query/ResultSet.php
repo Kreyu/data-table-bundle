@@ -10,8 +10,7 @@ class ResultSet implements ResultSetInterface
         protected readonly \Iterator $iterator,
         protected ?int $currentPageItemCount = null,
         protected ?int $totalItemCount = null,
-    ) {
-    }
+    ) {}
 
     public function getIterator(): \Traversable
     {

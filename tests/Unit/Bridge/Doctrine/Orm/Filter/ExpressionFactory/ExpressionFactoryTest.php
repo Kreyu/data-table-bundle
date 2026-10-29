@@ -35,8 +35,12 @@ class ExpressionFactoryTest extends TestCase
     }
 
     #[DataProvider('expectedExpressionProvider')]
-    public function testItCreatesExpression(string $queryPath, FilterData $data, array $parameters, mixed $expected): void
-    {
+    public function testItCreatesExpression(
+        string $queryPath,
+        FilterData $data,
+        array $parameters,
+        mixed $expected,
+    ): void {
         $this->aliasResolver->method('resolve')->willReturn($queryPath);
 
         $this->assertEquals($expected, $this->createExpression($data, $parameters));
@@ -165,14 +169,18 @@ class ExpressionFactoryTest extends TestCase
 
     public function testItRequiresParameters()
     {
-        $this->expectExceptionObject(new InvalidArgumentException('The expression factory requires at least one parameter.'));
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The expression factory requires at least one parameter.'),
+        );
 
         $this->createExpression();
     }
 
     public function testBetweenOperatorRequiresFromAndToParameters()
     {
-        $this->expectExceptionObject(new InvalidArgumentException('Operator "between" requires "from" and "to" parameters.'));
+        $this->expectExceptionObject(
+            new InvalidArgumentException('Operator "between" requires "from" and "to" parameters.'),
+        );
 
         $this->createExpression(new FilterData(operator: Operator::Between), [
             new Parameter('foo', null),

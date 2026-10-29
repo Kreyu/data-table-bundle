@@ -35,7 +35,8 @@ class PaginatorFactoryTest extends TestCase
     {
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
-            ->from(Product::class, 'product');
+            ->from(Product::class, 'product')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -46,11 +47,12 @@ class PaginatorFactoryTest extends TestCase
     {
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
-            ->from(Product::class, 'product');
+            ->from(Product::class, 'product')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder, ['foo' => 'bar']);
 
-        $this->assertEquals('bar', $paginator->getQuery()->getHint('foo'));
+        $this->assertSame('bar', $paginator->getQuery()->getHint('foo'));
     }
 
     public function testCreateWithSingleIdentifierAndJoins()
@@ -58,7 +60,8 @@ class PaginatorFactoryTest extends TestCase
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
             ->from(Product::class, 'product')
-            ->leftJoin('product.category', 'category');
+            ->leftJoin('product.category', 'category')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -70,7 +73,8 @@ class PaginatorFactoryTest extends TestCase
     {
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
-            ->from(Car::class, 'car');
+            ->from(Car::class, 'car')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -83,7 +87,8 @@ class PaginatorFactoryTest extends TestCase
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
             ->from(Car::class, 'car')
-            ->leftJoin(Product::class, 'product');
+            ->leftJoin(Product::class, 'product')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -96,7 +101,8 @@ class PaginatorFactoryTest extends TestCase
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
             ->from(Product::class, 'product')
-            ->having('product.name <> "test"');
+            ->having('product.name <> "test"')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -108,7 +114,8 @@ class PaginatorFactoryTest extends TestCase
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
             ->from(Product::class, 'product')
-            ->from(Category::class, 'category');
+            ->from(Category::class, 'category')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -119,7 +126,8 @@ class PaginatorFactoryTest extends TestCase
     {
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
-            ->from(ProductAttribute::class, 'productAttribute');
+            ->from(ProductAttribute::class, 'productAttribute')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -132,7 +140,8 @@ class PaginatorFactoryTest extends TestCase
             ->createQueryBuilder()
             ->from(Product::class, 'product')
             ->leftJoin('product.category', 'category')
-            ->orderBy('product.id', 'ASC');
+            ->orderBy('product.id', 'ASC')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 
@@ -145,7 +154,8 @@ class PaginatorFactoryTest extends TestCase
             ->createQueryBuilder()
             ->from(Product::class, 'product')
             ->leftJoin('product.category', 'category')
-            ->orderBy('category.id', 'ASC');
+            ->orderBy('category.id', 'ASC')
+        ;
 
         $paginator = $this->paginatorFactory->create($queryBuilder);
 

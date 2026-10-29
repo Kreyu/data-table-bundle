@@ -13,15 +13,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class PhpSpreadsheetExporterType extends AbstractExporterType
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         throw new \LogicException('Base exporter type cannot be called directly');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         if (!class_exists(Spreadsheet::class)) {
-            throw new \LogicException('Trying to use exporter that requires PhpSpreadsheet which is not installed. Try running "composer require phpoffice/phpspreadsheet".');
+            throw new \LogicException(
+                'Trying to use exporter that requires PhpSpreadsheet which is not installed. Try running "composer require phpoffice/phpspreadsheet".',
+            );
         }
 
         $resolver

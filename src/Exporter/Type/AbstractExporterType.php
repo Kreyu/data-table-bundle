@@ -11,13 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractExporterType implements ExporterTypeInterface
 {
-    public function buildExporter(ExporterBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildExporter(ExporterBuilderInterface $builder, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 
     public function getName(): string
     {

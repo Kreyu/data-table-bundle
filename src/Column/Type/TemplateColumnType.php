@@ -33,13 +33,15 @@ final class TemplateColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('template_path')
+        $resolver
+            ->define('template_path')
             ->required()
             ->allowedTypes('string', 'callable')
             ->info('A path to the template that should be rendered.')
         ;
 
-        $resolver->define('template_vars')
+        $resolver
+            ->define('template_vars')
             ->default([])
             ->allowedTypes('array', 'callable')
             ->info('An array of variables passed to the template.')

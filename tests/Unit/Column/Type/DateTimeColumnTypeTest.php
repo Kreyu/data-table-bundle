@@ -33,7 +33,7 @@ class DateTimeColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('d.m.Y H:i:s', $valueView->vars['format']);
+        $this->assertSame('d.m.Y H:i:s', $valueView->vars['format']);
     }
 
     public function testPassingFormatOptionWhenExportable(): void
@@ -49,7 +49,7 @@ class DateTimeColumnTypeTest extends ColumnTypeTestCase
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $data);
 
         $this->assertEquals($data->dateTime, $exportColumnValueView->vars['data']);
-        $this->assertEquals('01.01.2021 00:00:00', $exportColumnValueView->vars['value']);
+        $this->assertSame('01.01.2021 00:00:00', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingFormatOptionWhenExportableAndInvalidDate(): void
@@ -64,8 +64,8 @@ class DateTimeColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $data);
 
-        $this->assertEquals('invalid', $exportColumnValueView->vars['data']);
-        $this->assertEquals('', $exportColumnValueView->vars['value']);
+        $this->assertSame('invalid', $exportColumnValueView->vars['data']);
+        $this->assertSame('', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingTimezoneOption(): void
@@ -76,6 +76,6 @@ class DateTimeColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('Europe/Warsaw', $valueView->vars['timezone']);
+        $this->assertSame('Europe/Warsaw', $valueView->vars['timezone']);
     }
 }

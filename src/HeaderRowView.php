@@ -19,8 +19,7 @@ class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function __construct(
         public DataTableView $parent,
-    ) {
-    }
+    ) {}
 
     public function getIterator(): \Traversable
     {

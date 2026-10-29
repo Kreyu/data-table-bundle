@@ -28,35 +28,36 @@ class PersonalizationData
 
     public static function fromArray(array $data): self
     {
-        $resolver = self::$optionsResolver ??= (new OptionsResolver())
-            ->setDefaults([
-                'columns' => function (OptionsResolver $resolver) {
-                    $resolver
-                        ->setPrototype(true)
-                        ->setDefaults([
-                            'name' => null,
-                            'priority' => 0,
-                            'visible' => true,
-                        ])
-                        ->setAllowedTypes('name', ['null', 'string'])
-                        ->setAllowedTypes('priority', 'int')
-                        ->setAllowedTypes('visible', 'bool')
-                    ;
-                },
-            ])
-            ->addNormalizer('columns', function (Options $options, array $value) {
-                foreach ($value as $name => $column) {
-                    $value[$name]['name'] ??= $name;
-                }
+        $resolver =
+            self::$optionsResolver ??= (new OptionsResolver())
+                ->setDefaults([
+                    'columns' => static function (OptionsResolver $resolver) {
+                        $resolver
+                            ->setPrototype(true)
+                            ->setDefaults([
+                                'name' => null,
+                                'priority' => 0,
+                                'visible' => true,
+                            ])
+                            ->setAllowedTypes('name', ['null', 'string'])
+                            ->setAllowedTypes('priority', 'int')
+                            ->setAllowedTypes('visible', 'bool')
+                        ;
+                    },
+                ])
+                ->addNormalizer('columns', static function (Options $options, array $value) {
+                    foreach ($value as $name => $column) {
+                        $value[$name]['name'] ??= $name;
+                    }
 
-                return $value;
-            })
+                    return $value;
+                })
         ;
 
         $data = $resolver->resolve($data);
 
         return new self(array_map(
-            static fn (array $data) => PersonalizationColumnData::fromArray($data),
+            PersonalizationColumnData::fromArray(...),
             $data['columns'],
         ));
     }
@@ -140,9 +141,11 @@ class PersonalizationData
         }
 
         foreach ($columns as $column) {
-            if ($column instanceof ColumnInterface && !$column->getConfig()->isPersonalizable()) {
-                $this->removeColumn($column);
+            if (!($column instanceof ColumnInterface && !$column->getConfig()->isPersonalizable())) {
+                continue;
             }
+
+            $this->removeColumn($column);
         }
     }
 }

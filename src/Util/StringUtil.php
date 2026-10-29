@@ -22,8 +22,12 @@ class StringUtil
     {
         $suffixesExpression = implode('|', $suffixes);
 
-        if (preg_match("~([^\\\\]+?)($suffixesExpression)?$~i", $fqcn, $matches)) {
-            return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $matches[1]));
+        if (preg_match("~([^\\\\]+?)({$suffixesExpression})?$~i", $fqcn, $matches)) {
+            return strtolower(preg_replace(
+                ['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'],
+                ['\\1_\\2', '\\1_\\2'],
+                $matches[1],
+            ));
         }
 
         return null;
@@ -37,7 +41,7 @@ class StringUtil
     {
         return ucfirst(strtolower(preg_replace_callback(
             pattern: '/([A-Z]|\d+)/',
-            callback: fn (array $matches) => ' '.$matches[0],
+            callback: static fn (array $matches) => ' '.$matches[0],
             subject: $string,
         )));
     }

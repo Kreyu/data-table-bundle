@@ -19,8 +19,7 @@ class Column implements ColumnInterface
 
     public function __construct(
         private readonly ColumnConfigInterface $config,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -50,11 +49,11 @@ class Column implements ColumnInterface
 
     public function getPropertyPath(): ?PropertyPathInterface
     {
-        if ($this->propertyPath || $this->propertyPath = $this->config->getPropertyPath()) {
+        if ($this->propertyPath || ($this->propertyPath = $this->config->getPropertyPath())) {
             return $this->propertyPath;
         }
 
-        if ('' === $name = $this->getName()) {
+        if ('' === ($name = $this->getName())) {
             return null;
         }
 
@@ -63,7 +62,7 @@ class Column implements ColumnInterface
 
     public function getSortPropertyPath(): ?PropertyPathInterface
     {
-        if ($this->sortPropertyPath || $this->sortPropertyPath = $this->config->getSortPropertyPath()) {
+        if ($this->sortPropertyPath || ($this->sortPropertyPath = $this->config->getSortPropertyPath())) {
             return $this->sortPropertyPath;
         }
 

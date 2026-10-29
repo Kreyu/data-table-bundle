@@ -38,10 +38,14 @@ class PaginationUrlGeneratorTest extends TestCase
     {
         $this->request->attributes->set('_route_params', ['id' => 1]);
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
-            'id' => 1,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 1,
+                'id' => 1,
+            ])
+        ;
 
         $this->generate();
     }
@@ -50,20 +54,28 @@ class PaginationUrlGeneratorTest extends TestCase
     {
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
-            'action' => 'list',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 1,
+                'action' => 'list',
+            ])
+        ;
 
         $this->generate();
     }
 
     public function testItPreservesDataTableUrlQueryParameters()
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
-            'foo' => 'bar',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 1,
+                'foo' => 'bar',
+            ])
+        ;
 
         $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
     }
@@ -72,9 +84,13 @@ class PaginationUrlGeneratorTest extends TestCase
     {
         $this->request->query->set(self::PAGE_PARAMETER_NAME, 3);
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 5,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 5,
+            ])
+        ;
 
         $this->generate($this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]), page: 5);
     }
@@ -84,12 +100,16 @@ class PaginationUrlGeneratorTest extends TestCase
         $this->request->attributes->set('_route_params', ['id' => 1]);
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 5,
-            'id' => 1,
-            'action' => 'list',
-            'foo' => 'bar',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 5,
+                'id' => 1,
+                'action' => 'list',
+                'foo' => 'bar',
+            ])
+        ;
 
         $this->generate($this->createDataTableViewMock(['foo' => 'bar']), page: 5);
     }

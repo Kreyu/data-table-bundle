@@ -65,7 +65,12 @@ class ApplyExpressionTransformersTest extends TestCase
         ];
 
         yield 'Using "trim", "lower" and "upper" options with "expression_transformers" option' => [
-            ['trim' => true, 'lower' => true, 'upper' => true, 'expression_transformers' => [new CustomExpressionTransformer()]],
+            [
+                'trim' => true,
+                'lower' => true,
+                'upper' => true,
+                'expression_transformers' => [new CustomExpressionTransformer()],
+            ],
             'CUSTOM(UPPER(LOWER(TRIM(foo)))) = CUSTOM(UPPER(LOWER(TRIM(bar))))',
         ];
     }
@@ -80,9 +85,12 @@ class ApplyExpressionTransformersTest extends TestCase
         ];
 
         $filterConfig = $this->createMock(FilterConfigInterface::class);
-        $filterConfig->method('getOption')->willReturnCallback(function (string $option) use ($options) {
-            return $options[$option] ?? null;
-        });
+        $filterConfig
+            ->method('getOption')
+            ->willReturnCallback(static function (string $option) use ($options) {
+                return $options[$option] ?? null;
+            })
+        ;
 
         $filter = $this->createMock(FilterInterface::class);
         $filter->method('getConfig')->willReturn($filterConfig);

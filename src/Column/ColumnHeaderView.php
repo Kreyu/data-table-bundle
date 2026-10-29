@@ -15,8 +15,7 @@ class ColumnHeaderView
 
     public function __construct(
         public HeaderRowView $parent,
-    ) {
-    }
+    ) {}
 
     public function getDataTable(): DataTableView
     {

@@ -26,13 +26,15 @@ final class NumberColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('use_intl_formatter')
+        $resolver
+            ->define('use_intl_formatter')
             ->default(class_exists(IntlFormatter::class))
             ->allowedTypes('bool')
         ;
 
-        $resolver->define('intl_formatter_options')
-            ->default(function (OptionsResolver $resolver) {
+        $resolver
+            ->define('intl_formatter_options')
+            ->default(static function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefaults([
                         'attrs' => [],

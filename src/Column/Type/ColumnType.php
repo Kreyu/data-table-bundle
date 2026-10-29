@@ -25,8 +25,7 @@ final class ColumnType implements ColumnTypeInterface
 {
     public function __construct(
         private ?TranslatorInterface $translator = null,
-    ) {
-    }
+    ) {}
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
@@ -64,7 +63,8 @@ final class ColumnType implements ColumnTypeInterface
             'data_table' => $dataTableView,
             'block_prefixes' => $this->getColumnBlockPrefixes($column, $options),
             'label' => $options['label'] ?? StringUtil::camelToSentence($column->getName()),
-            'translation_domain' => $options['header_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
+            'translation_domain' =>
+                $options['header_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null,
             'translation_parameters' => $options['header_translation_parameters'],
             'sort_parameter_name' => $dataTable->getConfig()->getSortParameterName(),
             'attr' => $options['header_attr'],
@@ -134,7 +134,8 @@ final class ColumnType implements ColumnTypeInterface
         }
 
         $options['export']['label'] ??= $options['label'] ?? StringUtil::camelToSentence($column->getName());
-        $options['export']['header_translation_domain'] ??= $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['header_translation_domain'] ??=
+            $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
         $options['export']['header_translation_parameters'] ??= $options['header_translation_parameters'] ?? [];
 
         $label = $options['export']['label'];
@@ -176,7 +177,8 @@ final class ColumnType implements ColumnTypeInterface
         $options['export']['property_accessor'] ??= $options['property_accessor'];
         $options['export']['formatter'] ??= $options['formatter'];
         $options['export']['value_translation_key'] ??= $options['value_translation_key'];
-        $options['export']['value_translation_domain'] ??= $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
+        $options['export']['value_translation_domain'] ??=
+            $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
         $options['export']['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
 
         $rowData = $view->parent->data;
@@ -184,7 +186,10 @@ final class ColumnType implements ColumnTypeInterface
         $data = $this->getColumnDataFromRowData($rowData, $column, $options['export']);
         $value = $this->getColumnValueFromColumnData($data, $rowData, $column, $options['export']);
 
-        if ($this->translator && (false !== $options['export']['value_translation_domain'] || $value instanceof TranslatableInterface)) {
+        if (
+            $this->translator
+            && (false !== $options['export']['value_translation_domain'] || $value instanceof TranslatableInterface)
+        ) {
             $locale = null;
 
             if (method_exists(TranslatableInterface::class, 'getLocale')) {
@@ -223,109 +228,137 @@ final class ColumnType implements ColumnTypeInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('label')
+        $resolver
+            ->define('label')
             ->default(null)
             ->allowedTypes('null', 'string', TranslatableInterface::class)
             ->info('Label displayed in column header - null to default to sentence cased column name.')
         ;
 
-        $resolver->define('header_translation_domain')
+        $resolver
+            ->define('header_translation_domain')
             ->default(null)
             ->allowedTypes('null', 'bool', 'string')
             ->info('Translation domain used to translate the column header - set to false to disable translation.')
         ;
 
-        $resolver->define('header_translation_parameters')
+        $resolver
+            ->define('header_translation_parameters')
             ->default([])
             ->allowedTypes('null', 'array')
             ->info('Translation parameters used to translate the column header.')
         ;
 
-        $resolver->define('value_translation_key')
+        $resolver
+            ->define('value_translation_key')
             ->default(null)
             ->allowedTypes('null', 'string')
             ->info('Translation key used to translate the column value - used instead of column value if given.')
         ;
 
-        $resolver->define('value_translation_domain')
+        $resolver
+            ->define('value_translation_domain')
             ->default(false)
             ->allowedTypes('null', 'bool', 'string')
             ->info('Translation parameters used to translate the column value - set to false to disable translation.')
         ;
 
-        $resolver->define('value_translation_parameters')
+        $resolver
+            ->define('value_translation_parameters')
             ->default([])
             ->allowedTypes('array', 'callable')
             ->info('Translation parameters used to translate the column value.')
         ;
 
-        $resolver->define('block_prefix')
+        $resolver
+            ->define('block_prefix')
             ->default(null)
             ->allowedTypes('null', 'string')
             ->info('Defines custom block prefix to use when rendering the column.')
         ;
 
-        $resolver->define('sort')
+        $resolver
+            ->define('sort')
             ->default(false)
             ->allowedTypes('bool', 'string')
             ->info('Defines whether the column is sortable. Passing a string sets the sorting path.')
         ;
 
-        $resolver->define('export')
+        $resolver
+            ->define('export')
             ->default(false)
             ->allowedTypes('bool', 'array')
-            ->info('Defines whether the column is exportable. You can pass an array of options to differentiate them during an export.')
+            ->info(
+                'Defines whether the column is exportable. You can pass an array of options to differentiate them during an export.',
+            )
         ;
 
-        $resolver->define('formatter')
+        $resolver
+            ->define('formatter')
             ->default(null)
             ->allowedTypes('null', 'callable')
-            ->info('Formatter to use on non-empty value to customize it even further before rendering. Column value and row data are passed as arguments.')
+            ->info(
+                'Formatter to use on non-empty value to customize it even further before rendering. Column value and row data are passed as arguments.',
+            )
         ;
 
-        $resolver->define('property_path')
+        $resolver
+            ->define('property_path')
             ->default(null)
             ->allowedTypes('null', 'bool', 'string', PropertyPathInterface::class)
-            ->info('Path to use by property accessor component to retrieve the column value from row data. Defaults to column name.')
+            ->info(
+                'Path to use by property accessor component to retrieve the column value from row data. Defaults to column name.',
+            )
         ;
 
-        $resolver->define('property_accessor')
+        $resolver
+            ->define('property_accessor')
             ->default(PropertyAccess::createPropertyAccessor())
             ->allowedTypes(PropertyAccessorInterface::class)
             ->info('An instance of property accessor to use to retrieve the value.')
         ;
 
-        $resolver->define('getter')
+        $resolver
+            ->define('getter')
             ->default(null)
             ->allowedTypes('null', 'callable')
-            ->info('Callable used to retrieve column value from row data. If set, it is used instead of property accessor.')
+            ->info(
+                'Callable used to retrieve column value from row data. If set, it is used instead of property accessor.',
+            )
         ;
 
-        $resolver->define('header_attr')
+        $resolver
+            ->define('header_attr')
             ->default([])
             ->allowedTypes('array')
             ->info('Extra HTML attributes to render on the column header.')
         ;
 
-        $resolver->define('value_attr')
+        $resolver
+            ->define('value_attr')
             ->default([])
             ->allowedTypes('array', 'callable')
             ->info('Extra HTML attributes to render on the column value.')
         ;
 
-        $resolver->define('priority')
+        $resolver
+            ->define('priority')
             ->default(0)
             ->allowedTypes('int')
-            ->info('Defines the priority of the column - the higher the priority, the earlier the column will be rendered.')
+            ->info(
+                'Defines the priority of the column - the higher the priority, the earlier the column will be rendered.',
+            )
         ;
 
-        $resolver->define('visible')
+        $resolver
+            ->define('visible')
             ->default(true)
             ->allowedTypes('bool')
             ->info('Defines the visibility of the column.')
         ;
 
-        $resolver->define('personalizable')
+        $resolver
+            ->define('personalizable')
             ->default(true)
             ->allowedTypes('bool')
             ->info('Defines whether the column can be personalized by the user in personalization feature.')
@@ -354,15 +387,22 @@ final class ColumnType implements ColumnTypeInterface
 
         $propertyPath = $options['property_path'] ?? $column->getName();
 
-        if ((is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface) && (is_array($rowData) || is_object($rowData))) {
+        if (
+            (is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface)
+            && (is_array($rowData) || is_object($rowData))
+        ) {
             return $options['property_accessor']->getValue($rowData, $propertyPath);
         }
 
         return $rowData;
     }
 
-    private function getColumnValueFromColumnData(mixed $data, mixed $rowData, ColumnInterface $column, array $options): mixed
-    {
+    private function getColumnValueFromColumnData(
+        mixed $data,
+        mixed $rowData,
+        ColumnInterface $column,
+        array $options,
+    ): mixed {
         if (null === $data) {
             return null;
         }

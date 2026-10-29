@@ -74,7 +74,8 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         if ($container->getParameter('kernel.debug')) {
             $container
                 ->getDefinition('kreyu_data_table.debug.data_collector')
-                ->setArgument('$maxDepth', $config['profiler']['max_depth']);
+                ->setArgument('$maxDepth', $config['profiler']['max_depth'])
+            ;
         }
     }
 
@@ -120,7 +121,7 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'pagination_factory',
         ];
 
-        array_walk_recursive($config, function (&$item, $key) use ($serviceReferenceNodes) {
+        array_walk_recursive($config, static function (&$item, $key) use ($serviceReferenceNodes) {
             if (in_array($key, $serviceReferenceNodes) && is_string($item)) {
                 $item = new Reference($item);
             }

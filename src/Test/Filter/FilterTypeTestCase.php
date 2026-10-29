@@ -28,8 +28,11 @@ abstract class FilterTypeTestCase extends FilterIntegrationTestCase
         return $this->factory->createNamed($name, $this->getTestedType(), $options);
     }
 
-    protected function createFilterView(FilterInterface $filter, ?FilterData $data = null, ?DataTableView $parent = null): FilterView
-    {
+    protected function createFilterView(
+        FilterInterface $filter,
+        ?FilterData $data = null,
+        ?DataTableView $parent = null,
+    ): FilterView {
         return $filter->createView(
             data: $data ?? $this->createFilterDataMock(),
             parent: $parent ?? $this->createDataTableViewMock(),

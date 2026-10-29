@@ -13,7 +13,8 @@ class DataTableTest extends DataTableIntegrationTestCase
 {
     public function testGetColumns()
     {
-        $dataTable = $this->createDataTableBuilder()
+        $dataTable = $this
+            ->createDataTableBuilder()
             ->addColumn('first', options: ['priority' => 1])
             ->addColumn('second', options: ['priority' => 2])
             ->addColumn('third', options: ['priority' => 3])
@@ -29,13 +30,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetColumnsRespectsPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => true])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => true])
             ->addColumn('first', options: ['priority' => 1])
             ->addColumn('second', options: ['priority' => 2])
             ->addColumn('third', options: ['priority' => 3])
             ->addColumn('fourth', options: ['priority' => 4])
             ->addColumn('fifth', options: ['priority' => 100, 'personalizable' => false])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -55,13 +58,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetColumnsIgnoresDisabledPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => false])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => false])
             ->addColumn('first', options: ['priority' => 1])
             ->addColumn('second', options: ['priority' => 2])
             ->addColumn('third', options: ['priority' => 3])
             ->addColumn('fourth', options: ['priority' => 4])
             ->addColumn('fifth', options: ['priority' => 5])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -80,13 +85,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetVisibleColumns()
     {
-        $dataTable = $this->createDataTableBuilder()
+        $dataTable = $this
+            ->createDataTableBuilder()
             ->addColumn('first', options: ['priority' => 1, 'visible' => true])
             ->addColumn('second', options: ['priority' => 2, 'visible' => false])
             ->addColumn('third', options: ['priority' => 3, 'visible' => true])
             ->addColumn('fourth', options: ['priority' => 4, 'visible' => false])
             ->addColumn('fifth', options: ['priority' => 5, 'visible' => true])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $columns = array_keys($dataTable->getVisibleColumns());
 
@@ -95,13 +102,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetVisibleColumnsRespectsPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => true])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => true])
             ->addColumn('first', options: ['priority' => 1, 'visible' => true])
             ->addColumn('second', options: ['priority' => 2, 'visible' => false])
             ->addColumn('third', options: ['priority' => 3, 'visible' => true])
             ->addColumn('fourth', options: ['priority' => 4, 'visible' => false])
             ->addColumn('fifth', options: ['priority' => 100, 'visible' => true, 'personalizable' => false])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -121,13 +130,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetVisibleColumnsIgnoresDisabledPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => false])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => false])
             ->addColumn('first', options: ['priority' => 1, 'visible' => true])
             ->addColumn('second', options: ['priority' => 2, 'visible' => false])
             ->addColumn('third', options: ['priority' => 3, 'visible' => true])
             ->addColumn('fourth', options: ['priority' => 4, 'visible' => false])
             ->addColumn('fifth', options: ['priority' => 5, 'visible' => true])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -146,13 +157,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetHiddenColumns()
     {
-        $dataTable = $this->createDataTableBuilder()
+        $dataTable = $this
+            ->createDataTableBuilder()
             ->addColumn('first', options: ['visible' => true])
             ->addColumn('second', options: ['visible' => false])
             ->addColumn('third', options: ['visible' => true])
             ->addColumn('fourth', options: ['visible' => false])
             ->addColumn('fifth', options: ['visible' => true])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $columns = array_keys($dataTable->getHiddenColumns());
 
@@ -161,13 +174,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetHiddenColumnsRespectsPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => true])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => true])
             ->addColumn('first', options: ['priority' => 1, 'visible' => true])
             ->addColumn('second', options: ['priority' => 2, 'visible' => false])
             ->addColumn('third', options: ['priority' => 3, 'visible' => true])
             ->addColumn('fourth', options: ['priority' => 100, 'visible' => false, 'personalizable' => false])
             ->addColumn('fifth', options: ['priority' => 5, 'visible' => true])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -187,13 +202,15 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetHiddenColumnsIgnoresDisabledPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => false])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => false])
             ->addColumn('first', options: ['priority' => 1, 'visible' => true])
             ->addColumn('second', options: ['priority' => 2, 'visible' => false])
             ->addColumn('third', options: ['priority' => 3, 'visible' => true])
             ->addColumn('fourth', options: ['priority' => 4, 'visible' => false])
             ->addColumn('fifth', options: ['priority' => 5, 'visible' => true])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -212,7 +229,8 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetExportableColumns()
     {
-        $dataTable = $this->createDataTableBuilder()
+        $dataTable = $this
+            ->createDataTableBuilder()
             ->addColumn('first', options: [
                 'priority' => 1,
                 'visible' => true,
@@ -244,7 +262,8 @@ class DataTableTest extends DataTableIntegrationTestCase
                 'visible' => true,
                 'export' => false,
             ])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $columns = array_keys($dataTable->getExportableColumns());
 
@@ -253,7 +272,8 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetExportableColumnsRespectsPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => true])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => true])
             ->addColumn('first', options: [
                 'priority' => 1,
                 'visible' => true,
@@ -286,7 +306,8 @@ class DataTableTest extends DataTableIntegrationTestCase
                 'visible' => true,
                 'export' => false,
             ])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [
@@ -305,7 +326,8 @@ class DataTableTest extends DataTableIntegrationTestCase
 
     public function testGetExportableColumnsIgnoresDisabledPersonalization()
     {
-        $dataTable = $this->createDataTableBuilder(['personalization_enabled' => false])
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => false])
             ->addColumn('first', options: [
                 'priority' => 1,
                 'visible' => true,
@@ -337,7 +359,8 @@ class DataTableTest extends DataTableIntegrationTestCase
                 'visible' => true,
                 'export' => false,
             ])
-            ->getDataTable();
+            ->getDataTable()
+        ;
 
         $dataTable->setPersonalizationData(PersonalizationData::fromArray([
             'columns' => [

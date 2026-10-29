@@ -17,8 +17,7 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
     public function __construct(
         private CacheInterface $cache,
         private string $prefix,
-    ) {
-    }
+    ) {}
 
     public static function getTagName(PersistenceSubjectInterface $subject): string
     {
@@ -40,8 +39,11 @@ class CachePersistenceAdapter implements PersistenceAdapterInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function read(DataTableInterface $dataTable, PersistenceSubjectInterface $subject, mixed $default = null): mixed
-    {
+    public function read(
+        DataTableInterface $dataTable,
+        PersistenceSubjectInterface $subject,
+        mixed $default = null,
+    ): mixed {
         $cacheKey = $this->getCacheKey($dataTable, $subject);
 
         return $this->getCacheValue($cacheKey, $this->getTagName($subject), $default);

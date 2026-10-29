@@ -14,8 +14,7 @@ class Car
         private readonly string $name,
         #[ORM\Id, ORM\Column]
         private readonly int $year,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

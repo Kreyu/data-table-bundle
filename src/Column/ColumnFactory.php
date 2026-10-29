@@ -10,8 +10,7 @@ class ColumnFactory implements ColumnFactoryInterface
 {
     public function __construct(
         private readonly ColumnRegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     public function create(string $type = ColumnType::class, array $options = []): ColumnInterface
     {
@@ -28,8 +27,11 @@ class ColumnFactory implements ColumnFactoryInterface
         return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $type, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = ColumnType::class, array $options = []): ColumnBuilderInterface
-    {
+    public function createNamedBuilder(
+        string $name,
+        string $type = ColumnType::class,
+        array $options = [],
+    ): ColumnBuilderInterface {
         $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);

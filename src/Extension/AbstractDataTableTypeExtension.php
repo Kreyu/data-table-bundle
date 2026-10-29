@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kreyu\Bundle\DataTableBundle\Extension;
 
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
@@ -9,15 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractDataTableTypeExtension implements DataTableTypeExtensionInterface
 {
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void {}
 
-    public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
-    {
-    }
+    public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 }

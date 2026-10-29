@@ -13,7 +13,7 @@ class RewindableGeneratorIteratorTest extends TestCase
     {
         $calls = 0;
 
-        $callable = function () use (&$calls) {
+        $callable = static function () use (&$calls) {
             ++$calls;
             yield from [1, 2, 3];
         };
@@ -23,7 +23,7 @@ class RewindableGeneratorIteratorTest extends TestCase
         $iterator->next(); // 3
         $iterator->rewind(); // 1
 
-        $this->assertEquals(1, $iterator->current());
+        $this->assertSame(1, $iterator->current());
         $this->assertSame(2, $calls);
     }
 }

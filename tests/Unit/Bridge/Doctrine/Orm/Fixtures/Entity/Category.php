@@ -14,8 +14,7 @@ class Category
         private readonly int $id,
         #[ORM\Column]
         private readonly string $name,
-    ) {
-    }
+    ) {}
 
     public function getId(): int
     {

@@ -16,8 +16,7 @@ class DataCollectorListener implements EventSubscriberInterface
 {
     public function __construct(
         private readonly DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
     public static function getSubscribedEvents(): array
     {

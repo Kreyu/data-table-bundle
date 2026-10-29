@@ -11,34 +11,49 @@ class DataTableFactory implements DataTableFactoryInterface
 {
     public function __construct(
         private readonly DataTableRegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
-    public function create(string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableInterface
-    {
+    public function create(
+        string $type = DataTableType::class,
+        mixed $data = null,
+        array $options = [],
+    ): DataTableInterface {
         return $this->createBuilder($type, $data, $options)->getDataTable();
     }
 
-    public function createNamed(string $name, string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableInterface
-    {
+    public function createNamed(
+        string $name,
+        string $type = DataTableType::class,
+        mixed $data = null,
+        array $options = [],
+    ): DataTableInterface {
         return $this->createNamedBuilder($name, $type, $data, $options)->getDataTable();
     }
 
-    public function createBuilder(string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableBuilderInterface
-    {
+    public function createBuilder(
+        string $type = DataTableType::class,
+        mixed $data = null,
+        array $options = [],
+    ): DataTableBuilderInterface {
         return $this->createNamedBuilder($this->registry->getType($type)->getName(), $type, $data, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = DataTableType::class, mixed $data = null, array $options = []): DataTableBuilderInterface
-    {
+    public function createNamedBuilder(
+        string $name,
+        string $type = DataTableType::class,
+        mixed $data = null,
+        array $options = [],
+    ): DataTableBuilderInterface {
         $query = $data;
 
         if (null !== $data && !$data instanceof ProxyQueryInterface) {
             foreach ($this->registry->getProxyQueryFactories() as $proxyQueryFactory) {
-                if ($proxyQueryFactory->supports($data)) {
-                    $query = $proxyQueryFactory->create($data);
-                    break;
+                if (!$proxyQueryFactory->supports($data)) {
+                    continue;
                 }
+
+                $query = $proxyQueryFactory->create($data);
+                break;
             }
         }
 

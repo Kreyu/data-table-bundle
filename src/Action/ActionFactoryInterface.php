@@ -36,5 +36,9 @@ interface ActionFactoryInterface
      *
      * @throws InvalidOptionsException if any of given option is not applicable to the given type
      */
-    public function createNamedBuilder(string $name, string $type = ActionType::class, array $options = []): ActionBuilderInterface;
+    public function createNamedBuilder(
+        string $name,
+        string $type = ActionType::class,
+        array $options = [],
+    ): ActionBuilderInterface;
 }

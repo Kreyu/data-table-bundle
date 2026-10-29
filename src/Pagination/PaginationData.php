@@ -12,8 +12,7 @@ class PaginationData
     public function __construct(
         private int $page = PaginationInterface::DEFAULT_PAGE,
         private ?int $perPage = PaginationInterface::DEFAULT_PER_PAGE,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array{page: int, perPage: int} $data
@@ -23,16 +22,16 @@ class PaginationData
         ($resolver = new OptionsResolver())
             ->setDefault('page', null)
             ->setDefault('perPage', null)
-            ->addNormalizer('page', function (Options $options, mixed $value) {
+            ->addNormalizer('page', static function (Options $options, mixed $value) {
                 return null !== $value ? (int) $value : null;
             })
-            ->addNormalizer('perPage', function (Options $options, mixed $value) {
+            ->addNormalizer('perPage', static function (Options $options, mixed $value) {
                 return null !== $value ? (int) $value : null;
             })
-            ->setAllowedValues('page', function (int $value): bool {
+            ->setAllowedValues('page', static function (int $value): bool {
                 return $value > 0;
             })
-            ->setAllowedValues('perPage', function (?int $value): bool {
+            ->setAllowedValues('perPage', static function (?int $value): bool {
                 return null === $value || $value > 0;
             })
         ;

@@ -23,13 +23,14 @@ class ExportDataType extends AbstractType
             ->add('filename', TextType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(function (?string $value, ExecutionContextInterface $context) {
+                    new Constraints\Callback(static function (?string $value, ExecutionContextInterface $context) {
                         if (null === $value) {
                             return;
                         }
 
                         if (str_contains($value, '/') || str_contains($value, '\\')) {
-                            $context->buildViolation('The filename cannot contain following characters: "\/"')
+                            $context
+                                ->buildViolation('The filename cannot contain following characters: "\/"')
                                 ->addViolation()
                             ;
                         }
@@ -38,7 +39,9 @@ class ExportDataType extends AbstractType
             ])
             ->add('exporter', ChoiceType::class, [
                 'choices' => array_flip(array_map(
-                    fn (ExporterInterface $exporter) => $exporter->getConfig()->getOption('label') ?? $exporter->getName(),
+                    static fn (ExporterInterface $exporter) => (
+                        $exporter->getConfig()->getOption('label') ?? $exporter->getName()
+                    ),
                     $options['exporters'],
                 )),
             ])
@@ -61,6 +64,11 @@ class ExportDataType extends AbstractType
 
         // TODO: Remove deprecated default filename option
         $resolver->setDefault('default_filename', null);
-        $resolver->setDeprecated('default_filename', 'kreyu/data-table-bundle', '0.14', 'The "%name%" option is deprecated.');
+        $resolver->setDeprecated(
+            'default_filename',
+            'kreyu/data-table-bundle',
+            '0.14',
+            'The "%name%" option is deprecated.',
+        );
     }
 }

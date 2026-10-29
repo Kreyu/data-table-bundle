@@ -30,8 +30,7 @@ class DataTableExtension extends AbstractExtension
         private readonly ColumnSortUrlGeneratorInterface $columnSortUrlGenerator,
         private readonly FilterClearUrlGeneratorInterface $filterClearUrlGenerator,
         private readonly PaginationUrlGeneratorInterface $paginationUrlGenerator,
-    ) {
-    }
+    ) {}
 
     public function getFunctions(): array
     {
@@ -117,11 +116,19 @@ class DataTableExtension extends AbstractExtension
      *
      * @deprecated The "data_table_form_aware" function is deprecated. Instead of wrapping the data table with form, reference it by using the "form" HTML attribute.
      */
-    public function renderDataTableFormAware(Environment $environment, DataTableView $view, FormView $formView, array $dataTableVariables = [], array $formVariables = []): string
-    {
+    public function renderDataTableFormAware(
+        Environment $environment,
+        DataTableView $view,
+        FormView $formView,
+        array $dataTableVariables = [],
+        array $formVariables = [],
+    ): string {
         return $this->renderThemeBlock(
             environment: $environment,
-            context: array_merge($view->vars, $dataTableVariables, ['form' => $formView, 'form_variables' => $formVariables]),
+            context: array_merge($view->vars, $dataTableVariables, [
+                'form' => $formView,
+                'form_variables' => $formVariables,
+            ]),
             dataTable: $this->getDecoratedDataTable($view, $dataTableVariables),
             blockName: 'kreyu_data_table_form_aware',
         );
@@ -147,8 +154,11 @@ class DataTableExtension extends AbstractExtension
      *
      * @throws TwigException|\Throwable
      */
-    public function renderDataTableActionBar(Environment $environment, DataTableView $view, array $variables = []): string
-    {
+    public function renderDataTableActionBar(
+        Environment $environment,
+        DataTableView $view,
+        array $variables = [],
+    ): string {
         return $this->renderThemeBlock(
             environment: $environment,
             context: array_merge($view->vars, $variables),
@@ -252,8 +262,11 @@ class DataTableExtension extends AbstractExtension
      *
      * @throws TwigException|\Throwable
      */
-    public function renderPagination(Environment $environment, DataTableView|PaginationView $view, array $variables = []): string
-    {
+    public function renderPagination(
+        Environment $environment,
+        DataTableView|PaginationView $view,
+        array $variables = [],
+    ): string {
         if ($view instanceof DataTableView) {
             $view = $view->vars['pagination'];
         }
@@ -269,8 +282,11 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderFiltersForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
-    {
+    public function renderFiltersForm(
+        Environment $environment,
+        FormInterface|FormView $form,
+        array $variables = [],
+    ): string {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
@@ -286,8 +302,11 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderPersonalizationForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
-    {
+    public function renderPersonalizationForm(
+        Environment $environment,
+        FormInterface|FormView $form,
+        array $variables = [],
+    ): string {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
@@ -303,8 +322,11 @@ class DataTableExtension extends AbstractExtension
     /**
      * @throws TwigException|\Throwable
      */
-    public function renderExportForm(Environment $environment, FormInterface|FormView $form, array $variables = []): string
-    {
+    public function renderExportForm(
+        Environment $environment,
+        FormInterface|FormView $form,
+        array $variables = [],
+    ): string {
         if ($form instanceof FormInterface) {
             $form = $form->createView();
         }
@@ -326,8 +348,10 @@ class DataTableExtension extends AbstractExtension
         return $this->filterClearUrlGenerator->generate($dataTableView, ...$filterViews);
     }
 
-    public function generateColumnSortUrl(DataTableView $dataTableView, ColumnHeaderView|array $columnHeaderViews): string
-    {
+    public function generateColumnSortUrl(
+        DataTableView $dataTableView,
+        ColumnHeaderView|array $columnHeaderViews,
+    ): string {
         if ($columnHeaderViews instanceof ColumnHeaderView) {
             $columnHeaderViews = [$columnHeaderViews];
         }
@@ -386,8 +410,13 @@ class DataTableExtension extends AbstractExtension
      *
      * @throws RuntimeError if the block is not found in any of the given data table themes
      */
-    public function renderThemeBlock(Environment $environment, array $context, DataTableView $dataTable, string $blockName, bool $resetAttr = false): string
-    {
+    public function renderThemeBlock(
+        Environment $environment,
+        array $context,
+        DataTableView $dataTable,
+        string $blockName,
+        bool $resetAttr = false,
+    ): string {
         $themes = $dataTable->vars['themes'];
 
         if (!empty($context['attr']) && $resetAttr) {
@@ -404,7 +433,11 @@ class DataTableExtension extends AbstractExtension
             }
         }
 
-        throw new RuntimeError(sprintf('Block "%s" does not exist on any of the configured data table themes: %s', $blockName, implode(', ', array_map(fn (string $theme) => "\"$theme\"", $themes))));
+        throw new RuntimeError(sprintf(
+            'Block "%s" does not exist on any of the configured data table themes: %s',
+            $blockName,
+            implode(', ', array_map(static fn (string $theme) => "\"{$theme}\"", $themes)),
+        ));
     }
 
     /**
@@ -414,8 +447,13 @@ class DataTableExtension extends AbstractExtension
      *
      * @throws TwigException|\Throwable
      */
-    private function getDecoratedViewContext(Environment $environment, ColumnHeaderView|ColumnValueView|ActionView $view, array $variables, string $prefix, string $suffix): array
-    {
+    private function getDecoratedViewContext(
+        Environment $environment,
+        ColumnHeaderView|ColumnValueView|ActionView $view,
+        array $variables,
+        string $prefix,
+        string $suffix,
+    ): array {
         $dataTable = $view->getDataTable();
 
         $context = array_merge($view->vars, $variables);

@@ -16,8 +16,7 @@ class Product
         private readonly string $name,
         #[ORM\ManyToOne]
         private readonly Category $category,
-    ) {
-    }
+    ) {}
 
     public function getId(): int
     {

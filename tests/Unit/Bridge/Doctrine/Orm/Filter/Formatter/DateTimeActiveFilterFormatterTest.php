@@ -14,17 +14,17 @@ class DateTimeActiveFilterFormatterTest extends TestCase
 {
     public function testItCastsValueToStringIfNotDateTime()
     {
-        $this->assertEquals('123', $this->format(123));
+        $this->assertSame('123', $this->format(123));
     }
 
     public function testItFormatsDateTimeToDefaultFormatIfInputFormatFormOptionIsNotGiven()
     {
-        $this->assertEquals('2023-01-01 11:22:33', $this->format(new \DateTime('2023-01-01 11:22:33')));
+        $this->assertSame('2023-01-01 11:22:33', $this->format(new \DateTime('2023-01-01 11:22:33')));
     }
 
     public function testItFormatsDateTimeUsingInputFormatFormOption()
     {
-        $this->assertEquals('2023/01/01 11/22/33', $this->format(new \DateTime('2023-01-01 11:22:33'), [
+        $this->assertSame('2023/01/01 11/22/33', $this->format(new \DateTime('2023-01-01 11:22:33'), [
             'form_options' => [
                 'input_format' => 'Y/m/d H/i/s',
             ],
@@ -33,7 +33,7 @@ class DateTimeActiveFilterFormatterTest extends TestCase
 
     public function testItFormatsDateTimeWithMinutesAndSecondsFormOptionsSetToFalse()
     {
-        $this->assertEquals('2023-01-01 11', $this->format(new \DateTime('2023-01-01 11:22:33'), [
+        $this->assertSame('2023-01-01 11', $this->format(new \DateTime('2023-01-01 11:22:33'), [
             'form_options' => [
                 'with_minutes' => false,
                 'with_seconds' => false,
@@ -49,12 +49,15 @@ class DateTimeActiveFilterFormatterTest extends TestCase
         $filter = $this->createMock(FilterInterface::class);
         $filterConfig = $this->createMock(FilterConfigInterface::class);
 
-        $filterConfig->method('getOption')->willReturnCallback(function (string $name) use ($filterOptions) {
-            return $filterOptions[$name] ?? null;
-        });
+        $filterConfig
+            ->method('getOption')
+            ->willReturnCallback(static function (string $name) use ($filterOptions) {
+                return $filterOptions[$name] ?? null;
+            })
+        ;
 
         $filter->method('getConfig')->willReturn($filterConfig);
 
-        return ($formatter)($data, $filter);
+        return $formatter($data, $filter);
     }
 }

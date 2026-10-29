@@ -23,8 +23,7 @@ class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
         public DataTableView $parent,
         public int $index,
         public mixed $data,
-    ) {
-    }
+    ) {}
 
     public function getIterator(): \Traversable
     {

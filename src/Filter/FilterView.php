@@ -17,6 +17,5 @@ class FilterView
     public function __construct(
         public DataTableView $parent,
         public ?FilterData $data = null,
-    ) {
-    }
+    ) {}
 }

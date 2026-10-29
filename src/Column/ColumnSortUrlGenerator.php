@@ -15,8 +15,7 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     public function generate(DataTableView $dataTableView, ColumnHeaderView ...$columnHeaderViews): string
     {
@@ -73,7 +72,7 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
 
     private function getRequest(): Request
     {
-        if (null === $request = $this->requestStack->getCurrentRequest()) {
+        if (null === ($request = $this->requestStack->getCurrentRequest())) {
             throw new LogicException('Unable to retrieve current request.');
         }
 

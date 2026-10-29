@@ -27,8 +27,7 @@ final class ActionsColumnType extends AbstractColumnType
 {
     public function __construct(
         private readonly ActionFactoryInterface $actionFactory,
-    ) {
-    }
+    ) {}
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
@@ -51,11 +50,12 @@ final class ActionsColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('actions')
+        $resolver
+            ->define('actions')
             ->default([])
             ->allowedTypes('actions', 'array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]')
             ->info('An array of actions to render in the column.')
-            ->normalize(function (Options $options, mixed $value) {
+            ->normalize(static function (Options $options, mixed $value) {
                 ($resolver = new OptionsResolver())
                     ->setRequired([
                         'type',
@@ -73,9 +73,11 @@ final class ActionsColumnType extends AbstractColumnType
                 ;
 
                 foreach ($value as $name => $action) {
-                    if (is_array($action)) {
-                        $value[$name] = $resolver->resolve($action);
+                    if (!is_array($action)) {
+                        continue;
                     }
+
+                    $value[$name] = $resolver->resolve($action);
                 }
 
                 return $value;

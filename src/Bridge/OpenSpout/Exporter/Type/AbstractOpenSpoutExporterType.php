@@ -25,8 +25,12 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
      * @throws IOException
      * @throws WriterNotOpenedException
      */
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         touch($path = $this->getTempnam($options));
 
         $writer = $this->getWriter($options);
@@ -35,15 +39,15 @@ abstract class AbstractOpenSpoutExporterType extends AbstractExporterType
         if ($options['use_headers']) {
             $writer->addRow(new Row(
                 cells: $this->getHeaderRowCells($view->headerRow, $options),
-                style: $this->getStyle($view->headerRow, 'header_row_style', $options)),
-            );
+                style: $this->getStyle($view->headerRow, 'header_row_style', $options),
+            ));
         }
 
         foreach ($view->valueRows as $valueRow) {
             $writer->addRow(new Row(
                 cells: $this->getValueRowCells($valueRow, $options),
-                style: $this->getStyle($view->headerRow, 'value_row_style', $options)),
-            );
+                style: $this->getStyle($view->headerRow, 'value_row_style', $options),
+            ));
         }
 
         $writer->close();

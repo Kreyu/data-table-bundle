@@ -34,7 +34,7 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('https://example.com', $columnValueView->vars['href']);
+        $this->assertSame('https://example.com', $columnValueView->vars['href']);
     }
 
     public function testPassingHrefOptionAsCallable(): void
@@ -44,7 +44,10 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
         };
 
         $column = $this->createColumn([
-            'href' => function (string $columnData, mixed $passedRowData, ColumnInterface $passedColumn) use (&$column, $rowData) {
+            'href' => function (string $columnData, mixed $passedRowData, ColumnInterface $passedColumn) use (
+                &$column,
+                $rowData,
+            ) {
                 $this->assertEquals('foo', $columnData);
                 $this->assertEquals($rowData, $passedRowData);
                 $this->assertEquals($column, $passedColumn);
@@ -55,7 +58,7 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, data: 'foo', rowData: $rowData);
 
-        $this->assertEquals('https://example.com', $columnValueView->vars['href']);
+        $this->assertSame('https://example.com', $columnValueView->vars['href']);
     }
 
     public function testPassingTargetOptionAsString(): void
@@ -66,7 +69,7 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('_blank', $columnValueView->vars['target']);
+        $this->assertSame('_blank', $columnValueView->vars['target']);
     }
 
     public function testPassingTargetOptionAsCallable(): void
@@ -76,7 +79,10 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
         };
 
         $column = $this->createColumn([
-            'target' => function (string $columnData, mixed $passedRowData, ColumnInterface $passedColumn) use (&$column, $rowData) {
+            'target' => function (string $columnData, mixed $passedRowData, ColumnInterface $passedColumn) use (
+                &$column,
+                $rowData,
+            ) {
                 $this->assertEquals('foo', $columnData);
                 $this->assertEquals($rowData, $passedRowData);
                 $this->assertEquals($column, $passedColumn);
@@ -87,6 +93,6 @@ class LinkColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, data: 'foo', rowData: $rowData);
 
-        $this->assertEquals('_blank', $columnValueView->vars['target']);
+        $this->assertSame('_blank', $columnValueView->vars['target']);
     }
 }

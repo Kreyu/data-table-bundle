@@ -11,8 +11,10 @@ use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Test\ExpressionTransformerT
 
 class UpperExpressionTransformerTest extends ExpressionTransformerTestCase
 {
-    public static function createTransformer(bool $transformLeftExpr = true, bool $transformRightExpr = true): ExpressionTransformerInterface
-    {
+    public static function createTransformer(
+        bool $transformLeftExpr = true,
+        bool $transformRightExpr = true,
+    ): ExpressionTransformerInterface {
         return new UpperExpressionTransformer($transformLeftExpr, $transformRightExpr);
     }
 

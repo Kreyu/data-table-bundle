@@ -18,14 +18,16 @@ results locally that CI produces — independent of whatever PHP version is on y
 ```bash
 make install        # build the image and resolve/install dependencies
 make test           # run PHPUnit
-make phpstan        # run PHPStan
-make cs-check       # check code style (dry-run)
-make cs-fix         # apply code style fixes
-make ci             # install + test + phpstan + cs-check (the full CI run)
+make quality        # Mago: fmt --check + lint + analyze
+make fmt            # apply Mago formatting
+make ci             # install + test + quality (the full CI run)
 make shell          # interactive shell in the container
 ```
 
 Run `make` (or `make help`) to list all targets.
+
+> Mago baselines match the PHP 8.5 dependency set CI uses. Run
+> `make install quality PHP_VERSION=8.5`; other versions' dependencies report different findings.
 
 ## Choosing a PHP version
 

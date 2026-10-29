@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures;
 
 use Kreyu\Bundle\DataTableBundle\Persistence\PersistenceSubjectInterface;
@@ -12,9 +14,7 @@ class PersistenceSubjectUser implements UserInterface, PersistenceSubjectInterfa
         return ['foo', 'bar'];
     }
 
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     public function getUserIdentifier(): string
     {

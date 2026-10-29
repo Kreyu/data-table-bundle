@@ -13,17 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractFilterType implements FilterTypeInterface
 {
-    public function buildFilter(FilterBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildFilter(FilterBuilderInterface $builder, array $options): void {}
 
-    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
-    {
-    }
+    public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 
     public function getBlockPrefix(): string
     {

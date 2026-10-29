@@ -15,15 +15,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class OpenSpoutExporterType extends AbstractExporterType
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         throw new LogicException('Base OpenSpout exporter type cannot be called directly');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         if (!interface_exists(WriterInterface::class)) {
-            throw new LogicException('Trying to use exporter that requires OpenSpout which is not installed. Try running "composer require openspout/openspout".');
+            throw new LogicException(
+                'Trying to use exporter that requires OpenSpout which is not installed. Try running "composer require openspout/openspout".',
+            );
         }
 
         $resolver

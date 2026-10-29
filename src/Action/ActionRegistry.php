@@ -20,12 +20,12 @@ class ActionRegistry implements ActionRegistryInterface
     private array $types;
 
     /**
-     * @var array<ActionTypeExtensionInterface>
+     * @var array<class-string<ActionTypeInterface>, list<ActionTypeExtensionInterface>>
      */
     private array $typeExtensions;
 
     /**
-     * @var array<ResolvedActionTypeFactoryInterface>
+     * @var array<ResolvedActionTypeInterface>
      */
     private array $resolvedTypes;
 
@@ -59,7 +59,10 @@ class ActionRegistry implements ActionRegistryInterface
 
     private function resolveType(string $name): ResolvedActionTypeInterface
     {
-        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The action type %s does not exist', $name));
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf(
+            'The action type %s does not exist',
+            $name,
+        ));
 
         if (isset($this->checkedTypes[$fqcn = $type::class])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));

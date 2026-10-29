@@ -21,8 +21,7 @@ final class CollectionColumnType extends AbstractColumnType
 {
     public function __construct(
         private ?TranslatorInterface $translator = null,
-    ) {
-    }
+    ) {}
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
@@ -64,45 +63,53 @@ final class CollectionColumnType extends AbstractColumnType
             $separator = $separator->trans($this->translator, $locale);
         }
 
-        $view->value = $view->vars['value'] = implode($separator, array_map(
-            static fn (ColumnValueView $view) => $view->vars['value'],
-            $this->createChildrenColumnValueViews($view, $column, $options['export']),
-        ));
+        $view->value =
+            $view->vars['value'] = implode($separator, array_map(
+                static fn (ColumnValueView $view) => $view->vars['value'],
+                $this->createChildrenColumnValueViews($view, $column, $options['export']),
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry-type */
-        $resolver->define('entry_type')
+        $resolver
+            ->define('entry_type')
             ->default(TextColumnType::class)
             ->info('Column type to render for each item in the collection.')
             ->allowedTypes('string')
         ;
 
         /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#entry-options */
-        $resolver->define('entry_options')
+        $resolver
+            ->define('entry_options')
             ->default([])
             ->info('Options to pass to the column type for each item in the collection.')
             ->allowedTypes('array')
         ;
 
         /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#separator */
-        $resolver->define('separator')
+        $resolver
+            ->define('separator')
             ->default(', ')
             ->info('Separator to render between each item in the collection.')
             ->allowedTypes('null', 'string', TranslatableInterface::class)
         ;
 
         /* @see https://data-table-bundle.swroblewski.pl/reference/types/column/collection#separator-html */
-        $resolver->define('separator_html')
+        $resolver
+            ->define('separator_html')
             ->default(false)
             ->info('Determines whether the separator should be rendered as HTML instead of text.')
             ->allowedTypes('bool')
         ;
     }
 
-    private function createChildrenColumnValueViews(ColumnValueView $view, ColumnInterface $column, array $options): array
-    {
+    private function createChildrenColumnValueViews(
+        ColumnValueView $view,
+        ColumnInterface $column,
+        array $options,
+    ): array {
         /** @var ColumnFactoryInterface $prototypeFactory */
         $prototypeFactory = $column->getConfig()->getAttribute('prototype_factory');
 
@@ -117,10 +124,14 @@ final class CollectionColumnType extends AbstractColumnType
 
             // If there's no property path, default to getter that simply returns the value
             if (false === ($options['entry_options']['property_path'] ?? false)) {
-                $options['entry_options'] += ['getter' => fn ($value) => $value];
+                $options['entry_options'] += ['getter' => static fn ($value) => $value];
             }
 
-            $prototype = $prototypeFactory->createNamed((string) $index, $options['entry_type'], $options['entry_options']);
+            $prototype = $prototypeFactory->createNamed(
+                (string) $index,
+                $options['entry_type'],
+                $options['entry_options'],
+            );
             $prototype->setDataTable($column->getDataTable());
 
             $children[] = $prototype->createValueView($valueRowView);

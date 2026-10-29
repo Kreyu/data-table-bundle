@@ -6,6 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\AbstractColumnType;
 
-class SimpleColumnType extends AbstractColumnType
-{
-}
+class SimpleColumnType extends AbstractColumnType {}

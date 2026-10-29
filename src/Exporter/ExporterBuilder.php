@@ -19,6 +19,8 @@ class ExporterBuilder extends ExporterConfigBuilder implements ExporterBuilderIn
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('FilterBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.');
+        return new BadMethodCallException(
+            'FilterBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.',
+        );
     }
 }

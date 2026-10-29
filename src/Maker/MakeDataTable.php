@@ -33,7 +33,14 @@ class MakeDataTable extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->addArgument('data-table-class', InputArgument::OPTIONAL, sprintf('Choose a name for your data table class (e.g. <fg=yellow>%sDataTableType</>)', Str::asClassName(Str::getRandomTerm())))
+            ->addArgument(
+                'data-table-class',
+                InputArgument::OPTIONAL,
+                sprintf(
+                    'Choose a name for your data table class (e.g. <fg=yellow>%sDataTableType</>)',
+                    Str::asClassName(Str::getRandomTerm()),
+                ),
+            )
             ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeDataTable.txt'))
         ;
     }
@@ -67,7 +74,5 @@ class MakeDataTable extends AbstractMaker
         $io->text('Next: Open your new data table class and add some columns and filters!');
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-    }
+    public function configureDependencies(DependencyBuilder $dependencies): void {}
 }

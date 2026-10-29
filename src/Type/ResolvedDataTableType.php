@@ -26,8 +26,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
         private readonly DataTableTypeInterface $innerType,
         private readonly array $typeExtensions = [],
         private readonly ?ResolvedDataTableTypeInterface $parent = null,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -52,12 +51,24 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
-    {
+    public function createBuilder(
+        DataTableFactoryInterface $factory,
+        string $name,
+        ?ProxyQueryInterface $query = null,
+        array $options = [],
+    ): DataTableBuilderInterface {
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
-            throw new $exception(sprintf('An error has occurred resolving the options of the data table "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
+            throw new $exception(
+                sprintf(
+                    'An error has occurred resolving the options of the data table "%s": %s',
+                    get_debug_type($this->getInnerType()),
+                    $exception->getMessage(),
+                ),
+                $exception->getCode(),
+                $exception,
+            );
         }
 
         return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);

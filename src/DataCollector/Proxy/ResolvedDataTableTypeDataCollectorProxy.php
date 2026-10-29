@@ -19,8 +19,7 @@ class ResolvedDataTableTypeDataCollectorProxy implements ResolvedDataTableTypeIn
     public function __construct(
         private ResolvedDataTableTypeInterface $proxiedType,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -42,8 +41,12 @@ class ResolvedDataTableTypeDataCollectorProxy implements ResolvedDataTableTypeIn
         return $this->proxiedType->getTypeExtensions();
     }
 
-    public function createBuilder(DataTableFactoryInterface $factory, string $name, ?ProxyQueryInterface $query = null, array $options = []): DataTableBuilderInterface
-    {
+    public function createBuilder(
+        DataTableFactoryInterface $factory,
+        string $name,
+        ?ProxyQueryInterface $query = null,
+        array $options = [],
+    ): DataTableBuilderInterface {
         $builder = $this->proxiedType->createBuilder($factory, $name, $query, $options);
         $builder->setAttribute('data_collector/passed_options', $options);
         $builder->setType($this);

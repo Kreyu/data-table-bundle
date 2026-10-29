@@ -15,8 +15,7 @@ class ActionView
 
     public function __construct(
         public DataTableView|ColumnValueView $parent,
-    ) {
-    }
+    ) {}
 
     public function getDataTable(): DataTableView
     {

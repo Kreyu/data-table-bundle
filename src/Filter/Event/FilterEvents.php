@@ -10,7 +10,5 @@ final class FilterEvents
 
     public const POST_HANDLE = 'kreyu_data_table.filter.post_handle';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 }

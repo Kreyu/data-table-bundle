@@ -22,7 +22,11 @@ interface ExporterFactoryInterface
      *
      * @throws InvalidOptionsException if any of given option is not applicable to the given type
      */
-    public function createNamed(string $name, string $type = ExporterType::class, array $options = []): ExporterInterface;
+    public function createNamed(
+        string $name,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): ExporterInterface;
 
     /**
      * @param class-string<ExporterTypeInterface> $type
@@ -36,5 +40,9 @@ interface ExporterFactoryInterface
      *
      * @throws InvalidOptionsException if any of given option is not applicable to the given type
      */
-    public function createNamedBuilder(string $name, string $type = ExporterType::class, array $options = []): ExporterBuilderInterface;
+    public function createNamedBuilder(
+        string $name,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): ExporterBuilderInterface;
 }

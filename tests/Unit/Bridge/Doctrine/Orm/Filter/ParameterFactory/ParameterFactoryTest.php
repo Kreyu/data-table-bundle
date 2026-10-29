@@ -146,7 +146,7 @@ class ParameterFactoryTest extends TestCase
 
         $parameters = $this->createParameters();
 
-        $this->assertEquals('foo_10', $parameters[0]->getName());
+        $this->assertSame('foo_10', $parameters[0]->getName());
     }
 
     #[DataProvider('expectedParametersProvider')]

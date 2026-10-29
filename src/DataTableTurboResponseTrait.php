@@ -22,9 +22,11 @@ trait DataTableTurboResponseTrait
         DataTableInterface $dataTable,
     ): Response {
         return new Response(
-            $this->twig->createTemplate('{{ data_table(dataTableContent) }}')->render([
-                'dataTableContent' => $dataTable->createView(),
-            ]),
+            $this->twig
+                ->createTemplate('{{ data_table(dataTableContent) }}')
+                ->render([
+                    'dataTableContent' => $dataTable->createView(),
+                ]),
         );
     }
 }

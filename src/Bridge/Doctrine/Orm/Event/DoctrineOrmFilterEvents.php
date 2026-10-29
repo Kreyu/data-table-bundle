@@ -13,7 +13,5 @@ final class DoctrineOrmFilterEvents
     /**
      * @codeCoverageIgnore
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 }

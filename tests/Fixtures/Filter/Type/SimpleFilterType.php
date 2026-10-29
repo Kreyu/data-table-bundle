@@ -6,6 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type;
 
 use Kreyu\Bundle\DataTableBundle\Filter\Type\AbstractFilterType;
 
-class SimpleFilterType extends AbstractFilterType
-{
-}
+class SimpleFilterType extends AbstractFilterType {}

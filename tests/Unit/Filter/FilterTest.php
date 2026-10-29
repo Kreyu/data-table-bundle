@@ -38,14 +38,14 @@ class FilterTest extends TestCase
     {
         $this->filterConfig->method('getName')->willReturn('foo.bar');
 
-        $this->assertEquals('foo__bar', $this->createFilter()->getFormName());
+        $this->assertSame('foo__bar', $this->createFilter()->getFormName());
     }
 
     public function testQueryPathDefaultsToFilterName()
     {
         $this->filterConfig->method('getName')->willReturn('foo');
 
-        $this->assertEquals('foo', $this->createFilter()->getQueryPath());
+        $this->assertSame('foo', $this->createFilter()->getQueryPath());
     }
 
     public function testHandleDispatchesEvents(): void
@@ -58,25 +58,35 @@ class FilterTest extends TestCase
         $this->eventDispatcher
             ->expects($matcher = $this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function (FilterEvent $event, string $eventName) use ($matcher, $filter, $query, $data) {
-                // @phpstan-ignore-next-line
-                $this->assertInstanceOf(match ($matcher->numberOfInvocations()) {
-                    1 => PreHandleEvent::class,
-                    2 => PostHandleEvent::class,
-                }, $event);
+            ->willReturnCallback(function (FilterEvent $event, string $eventName) use (
+                $matcher,
+                $filter,
+                $query,
+                $data,
+            ) {
+                $this->assertInstanceOf(
+                    match ($matcher->numberOfInvocations()) {
+                        1 => PreHandleEvent::class,
+                        2 => PostHandleEvent::class,
+                    },
+                    $event,
+                );
 
-                // @phpstan-ignore-next-line
-                $this->assertEquals(match ($matcher->numberOfInvocations()) {
-                    1 => FilterEvents::PRE_HANDLE,
-                    2 => FilterEvents::POST_HANDLE,
-                }, $eventName);
+                $this->assertEquals(
+                    match ($matcher->numberOfInvocations()) {
+                        1 => FilterEvents::PRE_HANDLE,
+                        2 => FilterEvents::POST_HANDLE,
+                    },
+                    $eventName,
+                );
 
                 $this->assertEquals($query, $event->getQuery());
                 $this->assertEquals($data, $event->getData());
                 $this->assertEquals($filter, $event->getFilter());
 
                 return $event;
-            });
+            })
+        ;
 
         $filter->handle($query, $data);
     }
@@ -96,23 +106,35 @@ class FilterTest extends TestCase
         $resolvedFilterType
             ->expects($this->once())
             ->method('createView')
-            ->willReturnCallback(function ($passedFilter, $passedData, $passedParent) use ($filter, $data, $parent, $view) {
+            ->willReturnCallback(function ($passedFilter, $passedData, $passedParent) use (
+                $filter,
+                $data,
+                $parent,
+                $view,
+            ) {
                 $this->assertEquals($filter, $passedFilter);
                 $this->assertEquals($data, $passedData);
                 $this->assertEquals($parent, $passedParent);
 
                 return $view;
-            });
+            })
+        ;
 
         $resolvedFilterType
             ->expects($this->once())
             ->method('buildView')
-            ->willReturnCallback(function ($passedView, $passedFilter, $passedData, $passedOptions) use ($view, $filter, $data, $options) {
+            ->willReturnCallback(function ($passedView, $passedFilter, $passedData, $passedOptions) use (
+                $view,
+                $filter,
+                $data,
+                $options,
+            ) {
                 $this->assertEquals($view, $passedView);
                 $this->assertEquals($filter, $passedFilter);
                 $this->assertEquals($data, $passedData);
                 $this->assertEquals($options, $passedOptions);
-            });
+            })
+        ;
 
         $this->assertEquals($view, $filter->createView($data, $parent));
     }

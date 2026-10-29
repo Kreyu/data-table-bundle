@@ -23,7 +23,7 @@ class BooleanColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('True', $valueView->vars['label_true']);
+        $this->assertSame('True', $valueView->vars['label_true']);
     }
 
     public function testLabelFalseOption(): void
@@ -34,6 +34,6 @@ class BooleanColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('False', $valueView->vars['label_false']);
+        $this->assertSame('False', $valueView->vars['label_false']);
     }
 }

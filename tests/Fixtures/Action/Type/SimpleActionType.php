@@ -6,6 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type;
 
 use Kreyu\Bundle\DataTableBundle\Action\Type\AbstractActionType;
 
-class SimpleActionType extends AbstractActionType
-{
-}
+class SimpleActionType extends AbstractActionType {}

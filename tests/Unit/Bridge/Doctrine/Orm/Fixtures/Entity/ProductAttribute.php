@@ -14,8 +14,7 @@ class ProductAttribute
         private Product $product,
         #[ORM\Column]
         private readonly string $name,
-    ) {
-    }
+    ) {}
 
     public function getProduct(): Product
     {

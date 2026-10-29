@@ -20,8 +20,7 @@ final class EnumColumnType extends AbstractColumnType
 {
     public function __construct(
         private ?TranslatorInterface $translator = null,
-    ) {
-    }
+    ) {}
 
     public function configureOptions(OptionsResolver $resolver): void
     {

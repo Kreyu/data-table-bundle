@@ -17,8 +17,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
         private string $name,
         private ResolvedExporterTypeInterface $type,
         private array $options = [],
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -140,6 +139,8 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('ExporterConfigBuilder methods cannot be accessed anymore once the builder is turned into a ExporterConfigInterface instance.');
+        return new BadMethodCallException(
+            'ExporterConfigBuilder methods cannot be accessed anymore once the builder is turned into a ExporterConfigInterface instance.',
+        );
     }
 }

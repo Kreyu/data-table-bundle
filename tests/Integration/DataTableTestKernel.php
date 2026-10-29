@@ -49,7 +49,6 @@ final class DataTableTestKernel extends Kernel
         return self::tempDir().'/log';
     }
 
-    // Process-scoped so concurrent kernels (e.g. parallel matrix cells on one host) never collide.
     public static function tempDir(): string
     {
         return sys_get_temp_dir().'/kreyu_dtb_integration_'.getmypid();
@@ -67,7 +66,6 @@ final class DataTableTestKernel extends Kernel
             'default_path' => $this->getProjectDir().'/templates',
         ]);
 
-        // Required: the bundle's ORM entity filter type depends on the "doctrine" service.
         $container->loadFromExtension('doctrine', [
             'dbal' => ['url' => 'sqlite:///:memory:'],
             'orm' => [],
@@ -76,7 +74,6 @@ final class DataTableTestKernel extends Kernel
 
     protected function build(ContainerBuilder $container): void
     {
-        // Public so the test can fetch them and so they survive private-service pruning.
         $container->addCompilerPass(new class implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {

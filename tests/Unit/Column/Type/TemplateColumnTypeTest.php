@@ -30,7 +30,7 @@ class TemplateColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('template.html.twig', $valueView->vars['template_path']);
+        $this->assertSame('template.html.twig', $valueView->vars['template_path']);
     }
 
     public function testTemplatePathOptionAsCallable()
@@ -46,7 +46,7 @@ class TemplateColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: 'foo');
 
-        $this->assertEquals('template.html.twig', $columnValueView->vars['template_path']);
+        $this->assertSame('template.html.twig', $columnValueView->vars['template_path']);
     }
 
     public function testTemplateVarsOptionAsArray()

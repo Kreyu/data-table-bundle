@@ -33,7 +33,10 @@ return static function (ContainerConfigurator $configurator) {
 
     $services
         ->set('kreyu_data_table.type.data_table', DataTableType::class)
-        ->arg('$defaults', abstract_arg('Default options, provided by KreyuDataTableExtension and DefaultConfigurationPass'))
+        ->arg(
+            '$defaults',
+            abstract_arg('Default options, provided by KreyuDataTableExtension and DefaultConfigurationPass'),
+        )
         ->tag('kreyu_data_table.type')
     ;
 
@@ -57,7 +60,10 @@ return static function (ContainerConfigurator $configurator) {
     ;
 
     $services
-        ->set('kreyu_data_table.persistence.subject_provider.token_storage', TokenStoragePersistenceSubjectProvider::class)
+        ->set(
+            'kreyu_data_table.persistence.subject_provider.token_storage',
+            TokenStoragePersistenceSubjectProvider::class,
+        )
         ->args([service('security.token_storage')])
     ;
 

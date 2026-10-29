@@ -12,21 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractDataTableType implements DataTableTypeInterface
 {
-    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildDataTable(DataTableBuilderInterface $builder, array $options): void {}
 
-    public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void
-    {
-    }
+    public function buildView(DataTableView $view, DataTableInterface $dataTable, array $options): void {}
 
-    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void
-    {
-    }
+    public function buildExportView(DataTableView $view, DataTableInterface $dataTable, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 
     public function getName(): string
     {

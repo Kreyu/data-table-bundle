@@ -24,7 +24,7 @@ class CheckboxColumnTypeTest extends ColumnTypeTestCase
         $columnHeaderView = $this->createColumnHeaderView($column);
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('uuid', $columnHeaderView->vars['identifier_name']);
-        $this->assertEquals('uuid', $columnValueView->vars['identifier_name']);
+        $this->assertSame('uuid', $columnHeaderView->vars['identifier_name']);
+        $this->assertSame('uuid', $columnValueView->vars['identifier_name']);
     }
 }

@@ -30,7 +30,8 @@ final class DatePeriodColumnType extends AbstractDateTimeColumnType
 
         $resolver->setDefault('format', 'd.m.Y');
 
-        $resolver->define('separator')
+        $resolver
+            ->define('separator')
             ->default(' - ')
             ->allowedTypes('null', 'string')
             ->info('A string used to visually separate start and end dates.')

@@ -14,8 +14,7 @@ class ResolvedExporterTypeDataCollectorProxy implements ResolvedExporterTypeInte
 {
     public function __construct(
         private ResolvedExporterTypeInterface $proxiedType,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -37,8 +36,11 @@ class ResolvedExporterTypeDataCollectorProxy implements ResolvedExporterTypeInte
         return $this->proxiedType->getTypeExtensions();
     }
 
-    public function createBuilder(ExporterFactoryInterface $factory, string $name, array $options): ExporterBuilderInterface
-    {
+    public function createBuilder(
+        ExporterFactoryInterface $factory,
+        string $name,
+        array $options,
+    ): ExporterBuilderInterface {
         $builder = $this->proxiedType->createBuilder($factory, $name, $options);
         $builder->setAttribute('data_collector/passed_options', $options);
         $builder->setType($this);

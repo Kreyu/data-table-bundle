@@ -22,8 +22,12 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
     /**
      * @throws Exception
      */
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         $spreadsheet = $this->createSpreadsheet($view, $options);
 
         $writer = $this->getWriter($spreadsheet, $options);
@@ -33,7 +37,7 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
 
         $extension = mb_strtolower((new \ReflectionClass($writer))->getShortName());
 
-        return new ExportFile($tempnam, "$filename.$extension");
+        return new ExportFile($tempnam, "{$filename}.{$extension}");
     }
 
     /**

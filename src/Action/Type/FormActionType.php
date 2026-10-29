@@ -18,9 +18,11 @@ final class FormActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['method', 'action', 'button_attr'] as $optionName) {
-                if ($options[$optionName] instanceof \Closure) {
-                    $options[$optionName] = $options[$optionName]($value);
+                if (!$options[$optionName] instanceof \Closure) {
+                    continue;
                 }
+
+                $options[$optionName] = $options[$optionName]($value);
             }
         }
 

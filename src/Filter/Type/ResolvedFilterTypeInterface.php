@@ -26,7 +26,11 @@ interface ResolvedFilterTypeInterface
      */
     public function getTypeExtensions(): array;
 
-    public function createBuilder(FilterFactoryInterface $factory, string $name, array $options): FilterBuilderInterface;
+    public function createBuilder(
+        FilterFactoryInterface $factory,
+        string $name,
+        array $options,
+    ): FilterBuilderInterface;
 
     public function createView(FilterInterface $filter, FilterData $data, DataTableView $parent): FilterView;
 

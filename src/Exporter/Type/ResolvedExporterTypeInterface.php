@@ -22,7 +22,11 @@ interface ResolvedExporterTypeInterface
      */
     public function getTypeExtensions(): array;
 
-    public function createBuilder(ExporterFactoryInterface $factory, string $name, array $options): ExporterBuilderInterface;
+    public function createBuilder(
+        ExporterFactoryInterface $factory,
+        string $name,
+        array $options,
+    ): ExporterBuilderInterface;
 
     public function buildExporter(ExporterBuilderInterface $builder, array $options): void;
 

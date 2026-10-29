@@ -17,7 +17,10 @@ class CachePersistenceAdapterTest extends TestCase
         $persistenceSubject = $this->createMock(PersistenceSubjectInterface::class);
         $persistenceSubject->method('getDataTablePersistenceIdentifier')->willReturn('foo');
 
-        $this->assertEquals('kreyu_data_table_persistence_foo', CachePersistenceAdapter::getTagName($persistenceSubject));
+        $this->assertSame(
+            'kreyu_data_table_persistence_foo',
+            CachePersistenceAdapter::getTagName($persistenceSubject),
+        );
     }
 
     public function testItUrlEncodesCacheKeyToPreventReservedCharactersError()
@@ -27,15 +30,19 @@ class CachePersistenceAdapterTest extends TestCase
         $reservedCharacters = '{}()/\\@%';
 
         $cache = $this->createMock(CacheInterface::class);
-        $cache->expects($this->exactly(2))->method('get')->with('products_%7B%7D%28%29%2F%5C%40%25_foo_%7B%7D%28%29%2F%5C%40%25_id_%7B%7D%28%29%2F%5C%40%25');
+        $cache
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with('products_%7B%7D%28%29%2F%5C%40%25_foo_%7B%7D%28%29%2F%5C%40%25_id_%7B%7D%28%29%2F%5C%40%25')
+        ;
 
         $dataTable = $this->createMock(DataTableInterface::class);
-        $dataTable->method('getName')->willReturn("products_$reservedCharacters");
+        $dataTable->method('getName')->willReturn("products_{$reservedCharacters}");
 
         $persistenceSubject = $this->createMock(PersistenceSubjectInterface::class);
-        $persistenceSubject->method('getDataTablePersistenceIdentifier')->willReturn("id_$reservedCharacters");
+        $persistenceSubject->method('getDataTablePersistenceIdentifier')->willReturn("id_{$reservedCharacters}");
 
-        $adapter = new CachePersistenceAdapter($cache, "foo_$reservedCharacters");
+        $adapter = new CachePersistenceAdapter($cache, "foo_{$reservedCharacters}");
         $adapter->write($dataTable, $persistenceSubject, null);
         $adapter->read($dataTable, $persistenceSubject);
     }

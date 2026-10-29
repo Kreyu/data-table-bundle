@@ -118,9 +118,11 @@ class FiltrationData implements \ArrayAccess
     public function appendMissingFilters(array $filters): void
     {
         foreach ($filters as $filter) {
-            if (null === $this->getFilterData($filter)) {
-                $this->setFilterData($filter, new FilterData(operator: $filter->getConfig()->getDefaultOperator()));
+            if (null !== $this->getFilterData($filter)) {
+                continue;
             }
+
+            $this->setFilterData($filter, new FilterData(operator: $filter->getConfig()->getDefaultOperator()));
         }
     }
 

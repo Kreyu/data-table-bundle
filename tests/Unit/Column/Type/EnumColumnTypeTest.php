@@ -40,7 +40,7 @@ class EnumColumnTypeTest extends ColumnTypeTestCase
         });
 
         $this->assertEquals(UnitEnum::Foo, $columnValueView->vars['data']);
-        $this->assertEquals('Foo', $columnValueView->vars['value']);
+        $this->assertSame('Foo', $columnValueView->vars['value']);
     }
 
     public function testDefaultFormatterWithTranslatableEnum(): void
@@ -52,7 +52,7 @@ class EnumColumnTypeTest extends ColumnTypeTestCase
         });
 
         $this->assertEquals(TranslatableEnum::Foo, $columnValueView->vars['data']);
-        $this->assertEquals('Translated foo', $columnValueView->vars['value']);
+        $this->assertSame('Translated foo', $columnValueView->vars['value']);
     }
 
     protected function createColumnWithTranslator(array $options = []): ColumnInterface

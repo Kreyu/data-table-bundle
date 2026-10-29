@@ -19,8 +19,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
         private string $name,
         private ResolvedActionTypeInterface $type,
         private array $options = [],
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -174,6 +173,8 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('ActionConfigBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.');
+        return new BadMethodCallException(
+            'ActionConfigBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.',
+        );
     }
 }

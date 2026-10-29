@@ -15,8 +15,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     public function generate(DataTableView $dataTableView, FilterView ...$filterViews): string
     {
@@ -48,7 +47,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
     {
         $value = isset($filterView->data) ? $filterView->data->getValue() : null;
         if (is_array($value)) {
-            $parameters = ['value' => array_map(fn () => '', $value)];
+            $parameters = ['value' => array_map(static fn () => '', $value)];
         } else {
             $parameters = ['value' => ''];
         }
@@ -68,7 +67,7 @@ class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
 
     private function getRequest(): Request
     {
-        if (null === $request = $this->requestStack->getCurrentRequest()) {
+        if (null === ($request = $this->requestStack->getCurrentRequest())) {
             throw new LogicException('Unable to retrieve current request.');
         }
 

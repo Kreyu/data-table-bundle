@@ -137,7 +137,7 @@ class ColumnConfigBuilderTest extends TestCase
         $builder = $this->createBuilder();
         $builder->setPriority(100);
 
-        $this->assertEquals(100, $builder->getPriority());
+        $this->assertSame(100, $builder->getPriority());
     }
 
     public function testGetColumnFactoryWithoutFactorySet()

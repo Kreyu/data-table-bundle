@@ -31,8 +31,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         private QueryBuilder $queryBuilder,
         private array $hints = [],
         private string|int $hydrationMode = AbstractQuery::HYDRATE_OBJECT,
-    ) {
-    }
+    ) {}
 
     public function __call(string $name, array $args): mixed
     {

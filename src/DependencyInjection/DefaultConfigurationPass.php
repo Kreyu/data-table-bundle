@@ -27,7 +27,8 @@ class DefaultConfigurationPass implements CompilerPassInterface
             }
 
             $defaults[$context]['persistence_adapter'] ??= $this->getDefaultPersistenceAdapter($container, $context);
-            $defaults[$context]['persistence_subject_provider'] ??= $this->getDefaultPersistenceSubjectProvider($container);
+            $defaults[$context]['persistence_subject_provider'] ??=
+                $this->getDefaultPersistenceSubjectProvider($container);
         }
 
         $extension->setArgument('$defaults', $defaults);
@@ -36,7 +37,7 @@ class DefaultConfigurationPass implements CompilerPassInterface
     private function getDefaultPersistenceAdapter(ContainerBuilder $container, string $context): ?Reference
     {
         if ($container->has(CacheInterface::class)) {
-            return new Reference("kreyu_data_table.$context.persistence.adapter.cache");
+            return new Reference("kreyu_data_table.{$context}.persistence.adapter.cache");
         }
 
         return null;

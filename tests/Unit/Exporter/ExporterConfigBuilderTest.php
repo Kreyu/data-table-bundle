@@ -57,8 +57,10 @@ class ExporterConfigBuilderTest extends TestCase
         $this->assertTrue($this->getPrivatePropertyValue($config, 'locked'));
     }
 
-    private function createBuilder(?ResolvedExporterTypeInterface $type = null, array $options = []): ExporterConfigBuilder
-    {
+    private function createBuilder(
+        ?ResolvedExporterTypeInterface $type = null,
+        array $options = [],
+    ): ExporterConfigBuilder {
         return new ExporterConfigBuilder(
             name: 'foo',
             type: $type ?? $this->createStub(ResolvedExporterTypeInterface::class),

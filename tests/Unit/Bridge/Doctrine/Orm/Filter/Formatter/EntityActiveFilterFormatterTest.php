@@ -14,17 +14,17 @@ class EntityActiveFilterFormatterTest extends TestCase
 {
     public function testItCastsFilterDataValueToString()
     {
-        $this->assertEquals('123', $this->format(123));
+        $this->assertSame('123', $this->format(123));
     }
 
     public function testItUsesChoiceLabelOptionAsPropertyPath()
     {
-        $this->assertEquals('bar', $this->format(['foo' => 'bar'], ['choice_label' => '[foo]']));
+        $this->assertSame('bar', $this->format(['foo' => 'bar'], ['choice_label' => '[foo]']));
     }
 
     public function testItUsesChoiceLabelOptionCallable()
     {
-        $this->assertEquals('bar', $this->format('foo', ['choice_label' => fn () => 'bar']));
+        $this->assertSame('bar', $this->format('foo', ['choice_label' => static fn () => 'bar']));
     }
 
     private function format(mixed $value, array $filterOptions = []): string
@@ -35,12 +35,15 @@ class EntityActiveFilterFormatterTest extends TestCase
         $filter = $this->createMock(FilterInterface::class);
         $filterConfig = $this->createMock(FilterConfigInterface::class);
 
-        $filterConfig->method('getOption')->willReturnCallback(function (string $name) use ($filterOptions) {
-            return $filterOptions[$name] ?? null;
-        });
+        $filterConfig
+            ->method('getOption')
+            ->willReturnCallback(static function (string $name) use ($filterOptions) {
+                return $filterOptions[$name] ?? null;
+            })
+        ;
 
         $filter->method('getConfig')->willReturn($filterConfig);
 
-        return ($formatter)($data, $filter);
+        return $formatter($data, $filter);
     }
 }

@@ -1,0 +1,1141 @@
+variant = "loose"
+
+[[issues]]
+file = "src/Action/ActionConfigBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Action/ActionConfigBuilderInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Action/ActionRegistry.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Action/Type/AbstractActionType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/ActionType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/FormActionType.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/FormActionType.php"
+code = "strict-behavior"
+message = "Call to `in_array` must enforce strict comparison."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/ModalActionType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/ModalActionType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Action/Type/ResolvedActionType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/ResolvedActionType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/EventListener/TransformDateRangeFilterData.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Filter/ExpressionFactory/ExpressionFactory.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Filter/Formatter/DateRangeActiveFilterFormatter.php"
+code = "identity-comparison"
+message = "Use identity comparison `===` instead of equality comparison `==`."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Filter/Type/BooleanFilterType.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Paginator/PaginatorFactory.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Paginator/PaginatorFactory.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Paginator/PaginatorFactory.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Query/AliasResolver.php"
+code = "strict-behavior"
+message = "Call to `in_array` must enforce strict comparison."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQuery.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQueryInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Bridge/Doctrine/Orm/Query/DoctrineOrmResultSetFactory.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 2
+
+[[issues]]
+file = "src/Bridge/OpenSpout/Exporter/Type/AbstractOpenSpoutExporterType.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Bridge/PhpSpreadsheet/Exporter/Type/HtmlExporterType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnConfigBuilder.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnConfigBuilder.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnConfigBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnConfigBuilderInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 4
+
+[[issues]]
+file = "src/Column/ColumnConfigBuilderInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnConfigInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Column/ColumnRegistry.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Column/Type/AbstractColumnType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/CollectionColumnType.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 2
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ColumnType.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ResolvedColumnType.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ResolvedColumnType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ResolvedColumnType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ResolvedColumnType.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Column/Type/ResolvedColumnTypeInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataCollector/DataTableDataCollector.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/DataCollector/DataTableDataCollector.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataCollector/Proxy/ResolvedActionTypeDataCollectorProxy.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataCollector/Proxy/ResolvedColumnTypeDataCollectorProxy.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataCollector/Proxy/ResolvedDataTableTypeDataCollectorProxy.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 4
+
+[[issues]]
+file = "src/DataTable.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 6
+
+[[issues]]
+file = "src/DataTable.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 3
+
+[[issues]]
+file = "src/DataTable.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTable.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 24
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableBuilder.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/DataTableBuilderInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/DataTableBuilderInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigBuilder.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigBuilder.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigBuilder.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 5
+
+[[issues]]
+file = "src/DataTableConfigBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigBuilder.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigBuilderInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 10
+
+[[issues]]
+file = "src/DataTableConfigBuilderInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableConfigInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/DataTableRegistry.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/DependencyInjection/Configuration.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/DependencyInjection/Configuration.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/DependencyInjection/KreyuDataTableExtension.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/DependencyInjection/KreyuDataTableExtension.php"
+code = "strict-behavior"
+message = "Call to `in_array` must enforce strict comparison."
+count = 1
+
+[[issues]]
+file = "src/Exporter/ExportData.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Exporter/ExportStrategy.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 2
+
+[[issues]]
+file = "src/Exporter/ExporterConfigBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Exporter/ExporterRegistry.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Exporter/Form/Type/ExportDataType.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Exporter/Form/Type/ExportStrategyType.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Exporter/Type/AbstractExporterType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Exporter/Type/ResolvedExporterType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Exporter/Type/ResolvedExporterType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/Filter.php"
+code = "literal-named-argument"
+message = "Literal argument `'__'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "src/Filter/Filter.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterClearUrlGenerator.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterClearUrlGenerator.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilder.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilder.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilder.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilder.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilderInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigBuilderInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterConfigInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterData.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Filter/FilterRegistry.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Filter/FiltrationData.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Filter/FiltrationData.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/FiltrationData.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Filter/Form/Type/FilterDataType.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/AbstractFilterType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/FilterType.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/FilterType.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/ResolvedFilterType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/ResolvedFilterType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Filter/Type/SearchFilterType.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Pagination/PaginationData.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 4
+
+[[issues]]
+file = "src/Pagination/PaginationInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationColumnData.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationColumnData.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationColumnData.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationData.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationData.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Personalization/PersonalizationData.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Query/ArrayProxyQuery.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Request/HttpFoundationRequestHandler.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Request/HttpFoundationRequestHandler.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 3
+
+[[issues]]
+file = "src/Request/HttpFoundationRequestHandler.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Sorting/SortingColumnData.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "src/Sorting/SortingData.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Sorting/SortingData.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Test/Column/Type/ColumnTypeTestCase.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Test/DataTableIntegrationTestCase.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Test/Exporter/ExporterTypeTestCase.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Twig/DataTableExtension.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableThemeNode.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Twig/DataTableThemeTokenParser.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Type/AbstractDataTableType.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Type/ResolvedDataTableType.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Type/ResolvedDataTableType.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Type/ResolvedDataTableTypeInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Util/FormUtil.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Util/FormUtil.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Integration/DataTableTestKernel.php"
+code = "literal-named-argument"
+message = "Literal argument `2` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/Integration/DataTableTestKernel.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "tests/Integration/DataTableTestKernel.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Action/ActionConfigBuilderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Action/ActionRegistryTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Action/ActionRegistryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/DoctrineOrmFilterHandlerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/EventListener/ApplyExpressionTransformersTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/ExpressionTransformer/CallbackExpressionTransformerTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/Formatter/DateActiveFilterFormatterTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/Formatter/DateTimeActiveFilterFormatterTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Filter/Formatter/EntityActiveFilterFormatterTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Paginator/PaginatorFactoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Query/DoctrineOrmProxyQueryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Query/DoctrineOrmResultSetFactoryTest.php"
+code = "literal-named-argument"
+message = "Literal argument `'item'` should be passed as a named argument for clarity."
+count = 3
+
+[[issues]]
+file = "tests/Unit/Bridge/Doctrine/Orm/Query/DoctrineOrmResultSetFactoryTest.php"
+code = "literal-named-argument"
+message = "Literal argument `25` should be passed as a named argument for clarity."
+count = 3
+
+[[issues]]
+file = "tests/Unit/Column/ColumnConfigBuilderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Column/ColumnRegistryTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Column/ColumnRegistryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Column/ColumnSortUrlGeneratorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Column/Type/ColumnTypeTest.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Column/Type/ColumnTypeTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataCollector/DataTableDataCollectorTest.php"
+code = "strict-behavior"
+message = "Call to `in_array` must enforce strict comparison."
+count = 2
+
+[[issues]]
+file = "tests/Unit/DataCollector/DataTableDataCollectorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataTableBuilderTest.php"
+code = "prefer-arrow-function"
+message = "This closure can be simplified to a more concise arrow function."
+count = 4
+
+[[issues]]
+file = "tests/Unit/DataTableBuilderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataTableConfigBuilderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataTableRegistryTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataTableRegistryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/DataTableTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Exporter/ExporterRegistryTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Exporter/ExporterRegistryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Filter/FilterConfigBuilderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Filter/FilterRegistryTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Filter/FilterRegistryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Pagination/PaginationTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1

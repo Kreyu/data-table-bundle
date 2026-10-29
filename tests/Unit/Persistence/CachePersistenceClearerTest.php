@@ -26,7 +26,10 @@ class CachePersistenceClearerTest extends TestCase
         $cache = $this->createMock(CacheInterface::class);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('Cache instance must be an instance of %s', TagAwareCacheInterface::class));
+        $this->expectExceptionMessage(sprintf(
+            'Cache instance must be an instance of %s',
+            TagAwareCacheInterface::class,
+        ));
 
         $clearer = new CachePersistenceClearer($cache);
         $clearer->clear(new PersistenceSubjectAggregate('foo', new \stdClass()));

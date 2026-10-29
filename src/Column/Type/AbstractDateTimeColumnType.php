@@ -21,19 +21,21 @@ abstract class AbstractDateTimeColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('format')
+        $resolver
+            ->define('format')
             ->allowedTypes('string')
             ->info('A date time string format, supported by the PHP date() function - null to use default.')
         ;
 
-        $resolver->define('timezone')
+        $resolver
+            ->define('timezone')
             ->default(null)
             ->allowedTypes('null', 'bool', 'string', \DateTimeZone::class)
             ->info('Target timezone - null to use the default, false to leave unchanged.')
         ;
 
         // When exporting, we ensure the export "formatter" option is present, so the value gets pre-formatted.
-        $resolver->addNormalizer('export', function (Options $options, mixed $export) {
+        $resolver->addNormalizer('export', static function (Options $options, mixed $export) {
             if (false === $export) {
                 return false;
             }
@@ -42,7 +44,7 @@ abstract class AbstractDateTimeColumnType extends AbstractColumnType
                 $export = [];
             }
 
-            $export['formatter'] ??= $options['formatter'] ?? function (mixed $value) use ($options) {
+            $export['formatter'] ??= $options['formatter'] ?? static function (mixed $value) use ($options) {
                 if (!$value instanceof \DateTimeInterface) {
                     return '';
                 }

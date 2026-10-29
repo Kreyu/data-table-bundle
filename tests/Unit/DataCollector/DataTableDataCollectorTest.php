@@ -84,9 +84,12 @@ class DataTableDataCollectorTest extends TestCase
         $this->dataExtractor->method('extractDataTableConfiguration')->willReturn(['type_class' => 'App\\DataTable']);
         $this->dataExtractor->method('extractColumnConfiguration')->willReturn(['column_config' => true]);
         $this->dataExtractor->method('extractFilterConfiguration')->willReturn(['filter_config' => true]);
-        $this->dataExtractor->method('extractActionConfiguration')->willReturnCallback(
-            fn (ActionInterface $a) => ['action_name' => $a->getName()],
-        );
+        $this->dataExtractor
+            ->method('extractActionConfiguration')
+            ->willReturnCallback(
+                static fn (ActionInterface $a) => ['action_name' => $a->getName()],
+            )
+        ;
         $this->dataExtractor->method('extractExporterConfiguration')->willReturn(['exporter_config' => true]);
 
         $this->collector->collectDataTable($dataTable);
@@ -212,7 +215,10 @@ class DataTableDataCollectorTest extends TestCase
         $this->initializeCollectorWithDataTable('users', columns: ['name', 'email']);
 
         $dataTable = $this->createDataTableMock('users');
-        $dataTable->method('hasColumn')->willReturnCallback(fn (string $name) => in_array($name, ['name', 'email']));
+        $dataTable
+            ->method('hasColumn')
+            ->willReturnCallback(static fn (string $name) => in_array($name, ['name', 'email']))
+        ;
 
         $nameColumn = $this->createColumnMock('name');
         $nameDataTable = $this->createDataTableMock('users');
@@ -222,10 +228,13 @@ class DataTableDataCollectorTest extends TestCase
         $emailDataTable = $this->createDataTableMock('users');
         $emailColumn->method('getDataTable')->willReturn($emailDataTable);
 
-        $dataTable->method('getColumn')->willReturnMap([
-            ['name', $nameColumn],
-            ['email', $emailColumn],
-        ]);
+        $dataTable
+            ->method('getColumn')
+            ->willReturnMap([
+                ['name', $nameColumn],
+                ['email', $emailColumn],
+            ])
+        ;
 
         $sortingData = new SortingData([
             new SortingColumnData('name', 'asc'),
@@ -301,7 +310,10 @@ class DataTableDataCollectorTest extends TestCase
         $this->initializeCollectorWithDataTable('users', filters: ['status', 'role']);
 
         $dataTable = $this->createDataTableMock('users');
-        $dataTable->method('hasFilter')->willReturnCallback(fn (string $name) => in_array($name, ['status', 'role']));
+        $dataTable
+            ->method('hasFilter')
+            ->willReturnCallback(static fn (string $name) => in_array($name, ['status', 'role']))
+        ;
 
         $statusFilter = $this->createFilterMock('status');
         $statusDataTable = $this->createDataTableMock('users');
@@ -311,10 +323,13 @@ class DataTableDataCollectorTest extends TestCase
         $roleDataTable = $this->createDataTableMock('users');
         $roleFilter->method('getDataTable')->willReturn($roleDataTable);
 
-        $dataTable->method('getFilter')->willReturnMap([
-            ['status', $statusFilter],
-            ['role', $roleFilter],
-        ]);
+        $dataTable
+            ->method('getFilter')
+            ->willReturnMap([
+                ['status', $statusFilter],
+                ['role', $roleFilter],
+            ])
+        ;
 
         $statusFilterData = new FilterData('active', Operator::Equals);
         $roleFilterData = new FilterData('admin');

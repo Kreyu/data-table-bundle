@@ -7,6 +7,4 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 /**
  * @deprecated since 0.14.0, use {@see AbstractPhpSpreadsheetExporterType}
  */
-abstract class AbstractExporterType extends AbstractPhpSpreadsheetExporterType
-{
-}
+abstract class AbstractExporterType extends AbstractPhpSpreadsheetExporterType {}

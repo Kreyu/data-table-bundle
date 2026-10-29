@@ -22,7 +22,11 @@ class DataTableThemeTokenParserTest extends TestCase
     #[DataProvider('provideCompileCases')]
     public function testCompile($source, DataTableThemeNode $expected)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->createMock(LoaderInterface::class), [
+            'cache' => false,
+            'autoescape' => false,
+            'optimizations' => 0,
+        ]);
         $env->addTokenParser(new DataTableThemeTokenParser());
 
         $source = new Source($source, '');
@@ -43,7 +47,9 @@ class DataTableThemeTokenParserTest extends TestCase
         yield 'single theme' => [
             '{% data_table_theme data_table "foo" %}',
             new DataTableThemeNode(
-                class_exists(ContextVariable::class) ? new ContextVariable('data_table', 1) : new NameExpression('data_table', 1),
+                class_exists(ContextVariable::class)
+                    ? new ContextVariable('data_table', 1)
+                    : new NameExpression('data_table', 1),
                 new ArrayExpression([
                     new ConstantExpression(0, 1),
                     new ConstantExpression('foo', 1),
@@ -57,7 +63,9 @@ class DataTableThemeTokenParserTest extends TestCase
         yield 'multiple themes without only' => [
             '{% data_table_theme data_table with ["foo", "bar"] %}',
             new DataTableThemeNode(
-                class_exists(ContextVariable::class) ? new ContextVariable('data_table', 1) : new NameExpression('data_table', 1),
+                class_exists(ContextVariable::class)
+                    ? new ContextVariable('data_table', 1)
+                    : new NameExpression('data_table', 1),
                 new ArrayExpression([
                     new ConstantExpression(0, 1),
                     new ConstantExpression('foo', 1),
@@ -73,7 +81,9 @@ class DataTableThemeTokenParserTest extends TestCase
         yield 'multiple themes with only' => [
             '{% data_table_theme data_table with ["foo", "bar"] only %}',
             new DataTableThemeNode(
-                class_exists(ContextVariable::class) ? new ContextVariable('data_table', 1) : new NameExpression('data_table', 1),
+                class_exists(ContextVariable::class)
+                    ? new ContextVariable('data_table', 1)
+                    : new NameExpression('data_table', 1),
                 new ArrayExpression([
                     new ConstantExpression(0, 1),
                     new ConstantExpression('foo', 1),

@@ -32,7 +32,7 @@ class DataTableConfigBuilderTest extends TestCase
 
     public function testAddEventListener()
     {
-        $listener = fn () => null;
+        $listener = static fn () => null;
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())->method('addListener')->with('foo', $listener, 100);
@@ -483,8 +483,11 @@ class DataTableConfigBuilderTest extends TestCase
         $this->assertTrue($this->getPrivatePropertyValue($config, 'locked'));
     }
 
-    private function createBuilder(?ResolvedDataTableTypeInterface $type = null, ?EventDispatcherInterface $dispatcher = null, array $options = []): DataTableConfigBuilder
-    {
+    private function createBuilder(
+        ?ResolvedDataTableTypeInterface $type = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        array $options = [],
+    ): DataTableConfigBuilder {
         return new DataTableConfigBuilder(
             name: 'foo',
             type: $type ?? $this->createStub(ResolvedDataTableTypeInterface::class),

@@ -44,7 +44,8 @@ class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterfac
 
             $query
                 ->setMaxResults($maxResults)
-                ->setFirstResult($firstResult);
+                ->setFirstResult($firstResult)
+            ;
 
             $itemCount = 0;
 

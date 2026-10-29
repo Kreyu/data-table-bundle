@@ -1,5 +1,5 @@
 # Dockerised test environment — mirrors the GitHub Actions CI.
-# Usage: `make install` once, then `make test` / `make phpstan` / `make cs-check`.
+# Usage: `make install` once, then `make test` / `make quality`.
 # Override the PHP version: `make test PHP_VERSION=8.5`.
 
 PHP_VERSION ?= 8.1
@@ -9,10 +9,11 @@ export PHP_VERSION HOST_UID HOST_GID
 
 DC := docker compose
 RUN := $(DC) run --rm php
+MAGO := $(RUN) vendor/bin/mago
 
 .DEFAULT_GOAL := help
 
-.PHONY: help build install test phpstan cs-check cs-fix quality ci shell matrix
+.PHONY: help build install test fmt fmt-check lint analyze quality ci shell matrix
 
 help: ## List available targets
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -26,18 +27,21 @@ install: build ## Resolve & install dependencies for the container PHP (composer
 test: ## Run PHPUnit
 	$(RUN) vendor/bin/phpunit
 
-phpstan: ## Run PHPStan (CI uses PHP 8.1)
-	$(RUN) vendor/bin/phpstan analyse -c docker/phpstan.neon --memory-limit=1G
+fmt: ## Format code with Mago
+	$(MAGO) fmt
 
-cs-check: ## Check code style (dry-run)
-	$(RUN) vendor/bin/php-cs-fixer fix --dry-run --diff
+fmt-check: ## Check formatting (dry-run)
+	$(MAGO) fmt --check
 
-cs-fix: ## Apply code style fixes
-	$(RUN) vendor/bin/php-cs-fixer fix --diff
+lint: ## Run Mago linter
+	$(MAGO) lint --fail-on-out-of-sync-baseline
 
-quality: cs-check phpstan ## Run all code-quality checks
+analyze: ## Run Mago static analysis (CI uses PHP 8.5 dependencies)
+	$(MAGO) analyze --fail-on-out-of-sync-baseline
 
-ci: install test phpstan cs-check ## Reproduce the full CI run on PHP $(PHP_VERSION)
+quality: fmt-check lint analyze ## Run all code-quality checks
+
+ci: install test quality ## Reproduce the full CI run on PHP $(PHP_VERSION)
 
 shell: ## Open a shell in the container
 	$(RUN) bash

@@ -6,6 +6,4 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type;
 
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 
-class SimpleDataTableType extends AbstractDataTableType
-{
-}
+class SimpleDataTableType extends AbstractDataTableType {}

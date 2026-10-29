@@ -8,8 +8,7 @@ class StaticPersistenceSubjectProvider implements PersistenceSubjectProviderInte
 {
     public function __construct(
         private string $identifier = 'static',
-    ) {
-    }
+    ) {}
 
     public function provide(): PersistenceSubjectInterface
     {

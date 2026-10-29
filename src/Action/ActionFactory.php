@@ -10,8 +10,7 @@ class ActionFactory implements ActionFactoryInterface
 {
     public function __construct(
         private readonly ActionRegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     public function create(string $type = ActionType::class, array $options = []): ActionInterface
     {
@@ -28,8 +27,11 @@ class ActionFactory implements ActionFactoryInterface
         return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $type, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = ActionType::class, array $options = []): ActionBuilderInterface
-    {
+    public function createNamedBuilder(
+        string $name,
+        string $type = ActionType::class,
+        array $options = [],
+    ): ActionBuilderInterface {
         $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);

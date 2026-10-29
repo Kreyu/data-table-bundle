@@ -25,7 +25,10 @@ trait DataTableFactoryAwareTrait
     protected function createDataTable(string $type, mixed $query = null, array $options = []): DataTableInterface
     {
         if (null === $this->dataTableFactory) {
-            throw new LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+            throw new LogicException(sprintf(
+                'You cannot use the "%s" method on controller without data table factory.',
+                __METHOD__,
+            ));
         }
 
         return $this->dataTableFactory->create($type, $query, $options);
@@ -34,10 +37,17 @@ trait DataTableFactoryAwareTrait
     /**
      * @param class-string<DataTableTypeInterface> $type
      */
-    protected function createNamedDataTable(string $name, string $type, mixed $query = null, array $options = []): DataTableInterface
-    {
+    protected function createNamedDataTable(
+        string $name,
+        string $type,
+        mixed $query = null,
+        array $options = [],
+    ): DataTableInterface {
         if (null === $this->dataTableFactory) {
-            throw new LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+            throw new LogicException(sprintf(
+                'You cannot use the "%s" method on controller without data table factory.',
+                __METHOD__,
+            ));
         }
 
         return $this->dataTableFactory->createNamed($name, $type, $query, $options);
@@ -46,16 +56,25 @@ trait DataTableFactoryAwareTrait
     protected function createDataTableBuilder(mixed $query = null, array $options = []): DataTableBuilderInterface
     {
         if (null === $this->dataTableFactory) {
-            throw new LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+            throw new LogicException(sprintf(
+                'You cannot use the "%s" method on controller without data table factory.',
+                __METHOD__,
+            ));
         }
 
         return $this->dataTableFactory->createBuilder(DataTableType::class, $query, $options);
     }
 
-    protected function createNamedDataTableBuilder(string $name, mixed $query = null, array $options = []): DataTableBuilderInterface
-    {
+    protected function createNamedDataTableBuilder(
+        string $name,
+        mixed $query = null,
+        array $options = [],
+    ): DataTableBuilderInterface {
         if (null === $this->dataTableFactory) {
-            throw new LogicException(sprintf('You cannot use the "%s" method on controller without data table factory.', __METHOD__));
+            throw new LogicException(sprintf(
+                'You cannot use the "%s" method on controller without data table factory.',
+                __METHOD__,
+            ));
         }
 
         return $this->dataTableFactory->createNamedBuilder($name, DataTableType::class, $query, $options);

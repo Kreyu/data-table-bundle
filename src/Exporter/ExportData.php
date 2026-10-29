@@ -28,10 +28,10 @@ class ExportData
             ->setAllowedTypes('filename', ['null', 'string'])
             ->setAllowedTypes('strategy', ['string', ExportStrategy::class])
             ->setAllowedTypes('include_personalization', 'bool')
-            ->addNormalizer('strategy', function (Options $options, $value): ExportStrategy {
+            ->addNormalizer('strategy', static function (Options $options, $value): ExportStrategy {
                 return $value instanceof ExportStrategy ? $value : ExportStrategy::from($value);
             })
-            ->addNormalizer('exporter', function (Options $options, $value): ?string {
+            ->addNormalizer('exporter', static function (Options $options, $value): ?string {
                 if ($value instanceof ExporterInterface) {
                     return $value->getName();
                 }

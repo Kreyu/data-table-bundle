@@ -21,8 +21,7 @@ class ResolvedColumnTypeDataCollectorProxy implements ResolvedColumnTypeInterfac
     public function __construct(
         private ResolvedColumnTypeInterface $proxiedType,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
     public function getBlockPrefix(): string
     {

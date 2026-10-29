@@ -15,8 +15,7 @@ class Action implements ActionInterface
 
     public function __construct(
         private readonly ActionConfigInterface $config,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

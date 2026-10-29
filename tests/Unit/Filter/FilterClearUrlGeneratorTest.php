@@ -40,9 +40,13 @@ class FilterClearUrlGeneratorTest extends TestCase
     {
         $this->request->attributes->set('_route_params', ['id' => 1]);
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'id' => 1,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'id' => 1,
+            ])
+        ;
 
         $this->generate();
     }
@@ -51,35 +55,47 @@ class FilterClearUrlGeneratorTest extends TestCase
     {
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'action' => 'list',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'action' => 'list',
+            ])
+        ;
 
         $this->generate();
     }
 
     public function testItPreservesDataTableUrlQueryParameters()
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'foo' => 'bar',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'foo' => 'bar',
+            ])
+        ;
 
         $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
     }
 
     public function testItIncludesEmptyFilterParameters()
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::FILTRATION_PARAMETER_NAME => [
-                'firstName' => [
-                    'value' => '',
-                    'operator' => null,
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::FILTRATION_PARAMETER_NAME => [
+                    'firstName' => [
+                        'value' => '',
+                        'operator' => null,
+                    ],
+                    'lastName' => [
+                        'value' => '',
+                    ],
                 ],
-                'lastName' => [
-                    'value' => '',
-                ],
-            ],
-        ]);
+            ])
+        ;
 
         $this->generate(
             $this->createDataTableViewMock(),
@@ -95,9 +111,13 @@ class FilterClearUrlGeneratorTest extends TestCase
         $dataTableView = $this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]);
         $dataTableView->vars['pagination_enabled'] = true;
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 1,
+            ])
+        ;
 
         $this->generate($dataTableView);
     }
@@ -107,21 +127,25 @@ class FilterClearUrlGeneratorTest extends TestCase
         $this->request->attributes->set('_route_params', ['id' => 1]);
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'id' => 1,
-            'action' => 'list',
-            'foo' => 'bar',
-            self::PAGE_PARAMETER_NAME => 1,
-            self::FILTRATION_PARAMETER_NAME => [
-                'firstName' => [
-                    'value' => '',
-                    'operator' => null,
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'id' => 1,
+                'action' => 'list',
+                'foo' => 'bar',
+                self::PAGE_PARAMETER_NAME => 1,
+                self::FILTRATION_PARAMETER_NAME => [
+                    'firstName' => [
+                        'value' => '',
+                        'operator' => null,
+                    ],
+                    'lastName' => [
+                        'value' => '',
+                    ],
                 ],
-                'lastName' => [
-                    'value' => '',
-                ],
-            ],
-        ]);
+            ])
+        ;
 
         $dataTableView = $this->createDataTableViewMock(['foo' => 'bar']);
         $dataTableView->vars['pagination_enabled'] = true;

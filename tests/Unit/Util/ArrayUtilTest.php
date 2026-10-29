@@ -26,14 +26,17 @@ class ArrayUtilTest extends TestCase
         ];
 
         $output = ArrayUtil::mapWithKeys(
-            callback: fn (array $array) => [$array['id'] => $array['name']],
+            callback: static fn (array $array) => [$array['id'] => $array['name']],
             array: $input,
         );
 
         $this->assertSame([1 => 'John', 2 => 'Jane'], $output);
-        $this->assertSame([
-            ['id' => 1, 'name' => 'John'],
-            ['id' => 2, 'name' => 'Jane'],
-        ], $input);
+        $this->assertSame(
+            [
+                ['id' => 1, 'name' => 'John'],
+                ['id' => 2, 'name' => 'Jane'],
+            ],
+            $input,
+        );
     }
 }

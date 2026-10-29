@@ -36,5 +36,9 @@ interface ColumnFactoryInterface
      *
      * @throws InvalidOptionsException if any of given option is not applicable to the given type
      */
-    public function createNamedBuilder(string $name, string $type = ColumnType::class, array $options = []): ColumnBuilderInterface;
+    public function createNamedBuilder(
+        string $name,
+        string $type = ColumnType::class,
+        array $options = [],
+    ): ColumnBuilderInterface;
 }

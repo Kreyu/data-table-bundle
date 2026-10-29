@@ -33,7 +33,6 @@ class FilterRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -73,7 +72,9 @@ class FilterRegistryTest extends TestCase
     public function testTypeCannotHaveItselfAsParent()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType).',
+        );
 
         $registry = $this->createRegistry(types: [new FilterTypeWithSameParentType()]);
         $registry->getType(FilterTypeWithSameParentType::class);
@@ -82,7 +83,9 @@ class FilterRegistryTest extends TestCase
     public function testRecursiveTypeReferences()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo).',
+        );
 
         $registry = $this->createRegistry(types: [
             new RecursiveFilterTypeFoo(),
@@ -100,7 +103,6 @@ class FilterRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
@@ -119,7 +121,8 @@ class FilterRegistryTest extends TestCase
     private function createRegistry(array $types = [], array $typeExtensions = []): FilterRegistry
     {
         return new FilterRegistry(
-            types: $types ?: [
+            types: $types
+            ?: [
                 new FilterType(),
                 new SimpleFilterType(),
                 new SimpleSubFilterType(),

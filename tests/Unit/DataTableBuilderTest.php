@@ -245,7 +245,7 @@ class DataTableBuilderTest extends TestCase
 
     public function testGetSearchHandler()
     {
-        $handler = fn () => null;
+        $handler = static fn () => null;
 
         $builder = $this->createBuilder();
         $builder->setSearchHandler($handler);
@@ -257,13 +257,16 @@ class DataTableBuilderTest extends TestCase
     {
         $builder = $this->createBuilder();
         $builder->setFilterFactory($this->createFilterFactory());
-        $builder->setSearchHandler(fn () => null);
+        $builder->setSearchHandler(static fn () => null);
 
         $dataTable = $builder->getDataTable();
 
         $this->assertCount(1, $dataTable->getFilters());
         $this->assertTrue($dataTable->hasFilter('__search'));
-        $this->assertInstanceOf(SearchFilterType::class, $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            SearchFilterType::class,
+            $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testSearchHandlerWithAutoAddingSearchFilterDisabled()
@@ -271,7 +274,7 @@ class DataTableBuilderTest extends TestCase
         $builder = $this->createBuilder();
         $builder->setFilterFactory($this->createFilterFactory());
         $builder->setAutoAddingSearchFilter(false);
-        $builder->setSearchHandler(fn () => null);
+        $builder->setSearchHandler(static fn () => null);
 
         $dataTable = $builder->getDataTable();
 
@@ -282,12 +285,15 @@ class DataTableBuilderTest extends TestCase
     {
         $builder = $this->createBuilder();
         $builder->setFilterFactory($this->createFilterFactory());
-        $builder->setSearchHandler(fn () => null);
+        $builder->setSearchHandler(static fn () => null);
         $builder->addFilter('__search', SimpleFilterType::class);
 
         $dataTable = $builder->getDataTable();
 
-        $this->assertInstanceOf(SimpleFilterType::class, $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            SimpleFilterType::class,
+            $dataTable->getFilter('__search')->getConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testGetActions()
@@ -451,7 +457,10 @@ class DataTableBuilderTest extends TestCase
 
         $this->assertCount(1, $dataTable->getColumns());
         $this->assertTrue($dataTable->hasColumn('__batch'));
-        $this->assertInstanceOf(CheckboxColumnType::class, $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            CheckboxColumnType::class,
+            $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testBatchActionWithAutoAddingBatchCheckboxColumnDisabled()
@@ -476,7 +485,10 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $this->assertInstanceOf(TextColumnType::class, $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            TextColumnType::class,
+            $dataTable->getColumn('__batch')->getConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testGetRowAction()
@@ -551,8 +563,14 @@ class DataTableBuilderTest extends TestCase
 
         $this->assertCount(1, $dataTable->getColumns());
         $this->assertTrue($dataTable->hasColumn('__actions'));
-        $this->assertInstanceOf(ActionsColumnType::class, $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType());
-        $this->assertSame($builder->getRowActions(), $dataTable->getColumn('__actions')->getConfig()->getOption('actions'));
+        $this->assertInstanceOf(
+            ActionsColumnType::class,
+            $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType(),
+        );
+        $this->assertSame(
+            $builder->getRowActions(),
+            $dataTable->getColumn('__actions')->getConfig()->getOption('actions'),
+        );
     }
 
     public function testRowActionWithAutoAddingActionsColumnDisabled()
@@ -578,7 +596,10 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $this->assertInstanceOf(TextColumnType::class, $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            TextColumnType::class,
+            $dataTable->getColumn('__actions')->getConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testGetExporters()
@@ -598,7 +619,10 @@ class DataTableBuilderTest extends TestCase
         $this->assertSame('bar', $exporters['bar']->getName());
 
         $this->assertInstanceOf(ExporterType::class, $exporters['foo']->getExporterConfig()->getType()->getInnerType());
-        $this->assertInstanceOf(SimpleExporterType::class, $exporters['bar']->getExporterConfig()->getType()->getInnerType());
+        $this->assertInstanceOf(
+            SimpleExporterType::class,
+            $exporters['bar']->getExporterConfig()->getType()->getInnerType(),
+        );
     }
 
     public function testGetExporterNonExistent()
@@ -678,7 +702,7 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedColumns = array_map(function (ColumnBuilderInterface $columnBuilder) use ($dataTable) {
+        $expectedColumns = array_map(static function (ColumnBuilderInterface $columnBuilder) use ($dataTable) {
             return $columnBuilder->getColumn()->setDataTable($dataTable);
         }, $builder->getColumns());
 
@@ -694,7 +718,7 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedFilters = array_map(function (FilterBuilderInterface $columnBuilder) use ($dataTable) {
+        $expectedFilters = array_map(static function (FilterBuilderInterface $columnBuilder) use ($dataTable) {
             return $columnBuilder->getFilter()->setDataTable($dataTable);
         }, $builder->getFilters());
 
@@ -710,7 +734,7 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedActions = array_map(function (ActionBuilderInterface $columnBuilder) use ($dataTable) {
+        $expectedActions = array_map(static function (ActionBuilderInterface $columnBuilder) use ($dataTable) {
             return $columnBuilder->getAction()->setDataTable($dataTable);
         }, $builder->getActions());
 
@@ -726,7 +750,7 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedExporters = array_map(function (ExporterBuilderInterface $columnBuilder) use ($dataTable) {
+        $expectedExporters = array_map(static function (ExporterBuilderInterface $columnBuilder) use ($dataTable) {
             return $columnBuilder->getExporter()->setDataTable($dataTable);
         }, $builder->getExporters());
 

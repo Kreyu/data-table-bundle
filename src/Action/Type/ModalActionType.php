@@ -15,8 +15,7 @@ final class ModalActionType extends AbstractActionType
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
@@ -28,14 +27,19 @@ final class ModalActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['href', 'route', 'route_params'] as $optionName) {
-                if (isset($options[$optionName]) && $options[$optionName] instanceof \Closure) {
-                    $options[$optionName] = $options[$optionName]($value);
+                if (!(isset($options[$optionName]) && $options[$optionName] instanceof \Closure)) {
+                    continue;
                 }
+
+                $options[$optionName] = $options[$optionName]($value);
             }
         } else {
             foreach (['href', 'route', 'route_params'] as $optionName) {
                 if (isset($options[$optionName]) && $options[$optionName] instanceof \Closure) {
-                    throw new LogicException(sprintf('Closure used for option "%s", but it\'s only available for row actions.', $optionName));
+                    throw new LogicException(sprintf(
+                        'Closure used for option "%s", but it\'s only available for row actions.',
+                        $optionName,
+                    ));
                 }
             }
         }

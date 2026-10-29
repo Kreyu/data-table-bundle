@@ -22,7 +22,7 @@ class DataTableRegistry implements DataTableRegistryInterface
     private array $types;
 
     /**
-     * @var array<DataTableTypeExtensionInterface>
+     * @var array<class-string<DataTableTypeInterface>, list<DataTableTypeExtensionInterface>>
      */
     private array $typeExtensions;
 
@@ -74,11 +74,18 @@ class DataTableRegistry implements DataTableRegistryInterface
 
     private function resolveType(string $name): ResolvedDataTableTypeInterface
     {
-        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The data table type %s does not exist', $name));
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf(
+            'The data table type %s does not exist',
+            $name,
+        ));
 
         if (isset($this->checkedTypes[$fqcn = $type::class])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for data table type "%s" (%s).', $fqcn, $types));
+            throw new LogicException(sprintf(
+                'Circular reference detected for data table type "%s" (%s).',
+                $fqcn,
+                $types,
+            ));
         }
 
         $this->checkedTypes[$fqcn] = true;

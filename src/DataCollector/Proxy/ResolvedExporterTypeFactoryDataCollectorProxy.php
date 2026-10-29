@@ -12,11 +12,13 @@ class ResolvedExporterTypeFactoryDataCollectorProxy implements ResolvedExporterT
 {
     public function __construct(
         private ResolvedExporterTypeFactoryInterface $proxiedFactory,
-    ) {
-    }
+    ) {}
 
-    public function createResolvedType(ExporterTypeInterface $type, array $typeExtensions = [], ?ResolvedExporterTypeInterface $parent = null): ResolvedExporterTypeInterface
-    {
+    public function createResolvedType(
+        ExporterTypeInterface $type,
+        array $typeExtensions = [],
+        ?ResolvedExporterTypeInterface $parent = null,
+    ): ResolvedExporterTypeInterface {
         return new ResolvedExporterTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),
         );

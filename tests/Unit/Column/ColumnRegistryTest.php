@@ -33,7 +33,6 @@ class ColumnRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -73,7 +72,9 @@ class ColumnRegistryTest extends TestCase
     public function testTypeCannotHaveItselfAsParent()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType).',
+        );
 
         $registry = $this->createRegistry(types: [new ColumnTypeWithSameParentType()]);
         $registry->getType(ColumnTypeWithSameParentType::class);
@@ -82,7 +83,9 @@ class ColumnRegistryTest extends TestCase
     public function testRecursiveTypeReferences()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo).',
+        );
 
         $registry = $this->createRegistry(types: [
             new RecursiveColumnTypeFoo(),
@@ -100,7 +103,6 @@ class ColumnRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
@@ -119,7 +121,8 @@ class ColumnRegistryTest extends TestCase
     private function createRegistry(array $types = [], array $typeExtensions = []): ColumnRegistry
     {
         return new ColumnRegistry(
-            types: $types ?: [
+            types: $types
+            ?: [
                 new ColumnType(),
                 new SimpleColumnType(),
                 new SimpleSubColumnType(),

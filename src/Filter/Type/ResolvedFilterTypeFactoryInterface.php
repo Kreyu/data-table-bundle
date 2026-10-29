@@ -11,5 +11,9 @@ interface ResolvedFilterTypeFactoryInterface
     /**
      * @param array<FilterTypeExtensionInterface> $typeExtensions
      */
-    public function createResolvedType(FilterTypeInterface $type, array $typeExtensions = [], ?ResolvedFilterTypeInterface $parent = null): ResolvedFilterTypeInterface;
+    public function createResolvedType(
+        FilterTypeInterface $type,
+        array $typeExtensions = [],
+        ?ResolvedFilterTypeInterface $parent = null,
+    ): ResolvedFilterTypeInterface;
 }

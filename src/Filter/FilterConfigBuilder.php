@@ -32,8 +32,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         private ResolvedFilterTypeInterface $type,
         private EventDispatcherInterface $dispatcher,
         private readonly array $options = [],
-    ) {
-    }
+    ) {}
 
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
     {
@@ -293,6 +292,8 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('FilterConfigBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.');
+        return new BadMethodCallException(
+            'FilterConfigBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.',
+        );
     }
 }

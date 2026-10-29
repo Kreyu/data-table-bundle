@@ -33,7 +33,8 @@ final class CheckboxColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('identifier_name')
+        $resolver
+            ->define('identifier_name')
             ->default('id')
             ->allowedTypes('string')
             ->info('The name of the identifier property.')

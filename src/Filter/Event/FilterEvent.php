@@ -15,8 +15,7 @@ class FilterEvent extends Event
         private readonly ProxyQueryInterface $query,
         private FilterData $data,
         private readonly FilterInterface $filter,
-    ) {
-    }
+    ) {}
 
     public function getQuery(): ProxyQueryInterface
     {

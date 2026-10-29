@@ -76,7 +76,7 @@ class Pagination implements PaginationInterface
 
     public function getCurrentPageFirstItemIndex(): int
     {
-        return $this->itemNumberPerPage * ($this->currentPageNumber - 1) + 1;
+        return ($this->itemNumberPerPage * ($this->currentPageNumber - 1)) + 1;
     }
 
     public function getCurrentPageLastItemIndex(): int
@@ -86,7 +86,6 @@ class Pagination implements PaginationInterface
 
     private function isCurrentPageNumberOutOfRange(): bool
     {
-        return $this->currentPageNumber < 1
-            || $this->currentPageNumber > $this->getPageCount();
+        return $this->currentPageNumber < 1 || $this->currentPageNumber > $this->getPageCount();
     }
 }

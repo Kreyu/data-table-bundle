@@ -19,6 +19,8 @@ class ColumnBuilder extends ColumnConfigBuilder implements ColumnBuilderInterfac
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('ColumnBuilder methods cannot be accessed anymore once the builder is turned into a ColumnConfigInterface instance.');
+        return new BadMethodCallException(
+            'ColumnBuilder methods cannot be accessed anymore once the builder is turned into a ColumnConfigInterface instance.',
+        );
     }
 }

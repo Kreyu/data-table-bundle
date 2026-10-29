@@ -12,8 +12,7 @@ class CachePersistenceClearer implements PersistenceClearerInterface
 {
     public function __construct(
         private CacheInterface $cache,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws InvalidArgumentException
@@ -21,7 +20,10 @@ class CachePersistenceClearer implements PersistenceClearerInterface
     public function clear(PersistenceSubjectInterface $subject): void
     {
         if (!$this->cache instanceof TagAwareCacheInterface) {
-            throw new \LogicException(sprintf('Cache instance must be an instance of %s', TagAwareCacheInterface::class));
+            throw new \LogicException(sprintf(
+                'Cache instance must be an instance of %s',
+                TagAwareCacheInterface::class,
+            ));
         }
 
         $this->cache->invalidateTags([CachePersistenceAdapter::getTagName($subject)]);

@@ -51,7 +51,7 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('|', $valueView->vars['separator']);
+        $this->assertSame('|', $valueView->vars['separator']);
 
         $rowData = new class {
             public array $collection = [1, 2, 3];
@@ -59,16 +59,18 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
 
         $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
 
-        $this->assertEquals('1|2|3', $exportValueView->vars['value']);
+        $this->assertSame('1|2|3', $exportValueView->vars['value']);
     }
 
     public function testPassingSeparatorOptionAsTranslatable(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->once())
+        $this->translator
+            ->expects($this->once())
             ->method('trans')
             ->with('separator', [], 'data-table')
-            ->willReturn('translated');
+            ->willReturn('translated')
+        ;
 
         $column = $this->createColumn([
             'separator' => $separator = t('separator', domain: 'data-table'),
@@ -86,7 +88,7 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
 
         $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
 
-        $this->assertEquals('1translated2translated3', $exportValueView->vars['value']);
+        $this->assertSame('1translated2translated3', $exportValueView->vars['value']);
     }
 
     public function testPassingSeparatorOptionAsNull(): void
@@ -106,7 +108,7 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
 
         $exportValueView = $this->createExportColumnValueView($column, rowData: $rowData);
 
-        $this->assertEquals('123', $exportValueView->vars['value']);
+        $this->assertSame('123', $exportValueView->vars['value']);
     }
 
     public function testDefaultSeparatorHtmlOption(): void
@@ -172,8 +174,7 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
         $data = new class($collection) {
             public function __construct(
                 public array $collection,
-            ) {
-            }
+            ) {}
         };
 
         $valueRowView = $this->createValueRowView(data: $data);

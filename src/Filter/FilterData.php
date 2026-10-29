@@ -12,8 +12,7 @@ class FilterData
     public function __construct(
         private mixed $value = null,
         private ?Operator $operator = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data = []): self
     {
@@ -23,7 +22,7 @@ class FilterData
                 'operator' => null,
             ])
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
-            ->setNormalizer('operator', function (Options $options, mixed $value): ?Operator {
+            ->setNormalizer('operator', static function (Options $options, mixed $value): ?Operator {
                 return is_string($value) ? Operator::from($value) : $value;
             })
             ->setIgnoreUndefined()

@@ -96,7 +96,7 @@ final class FilterType implements FilterTypeInterface
             ->setAllowedTypes('supported_operators', Operator::class.'[]')
             ->setAllowedTypes('operator_selectable', 'bool')
             ->setAllowedTypes('active_filter_formatter', ['null', 'callable'])
-            ->setAllowedValues('translation_domain', function (mixed $value): bool {
+            ->setAllowedValues('translation_domain', static function (mixed $value): bool {
                 return is_null($value) || false === $value || is_string($value);
             })
         ;

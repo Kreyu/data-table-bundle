@@ -17,9 +17,11 @@ final class LinkActionType extends AbstractActionType
             $value = $view->parent->value;
 
             foreach (['href', 'target'] as $optionName) {
-                if ($options[$optionName] instanceof \Closure) {
-                    $options[$optionName] = $options[$optionName]($value);
+                if (!$options[$optionName] instanceof \Closure) {
+                    continue;
                 }
+
+                $options[$optionName] = $options[$optionName]($value);
             }
         }
 

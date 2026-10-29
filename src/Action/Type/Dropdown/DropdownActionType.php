@@ -43,13 +43,15 @@ class DropdownActionType extends AbstractActionType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('actions')
+        $resolver
+            ->define('actions')
             ->allowedTypes(ActionBuilderInterface::class.'[]', \Closure::class)
             ->required()
             ->info('The actions to display in the dropdown.')
         ;
 
-        $resolver->define('with_caret')
+        $resolver
+            ->define('with_caret')
             ->default(true)
             ->allowedTypes('bool')
             ->info('Whether to display a caret next to the dropdown label.')

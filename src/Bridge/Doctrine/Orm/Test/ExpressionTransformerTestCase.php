@@ -15,8 +15,11 @@ abstract class ExpressionTransformerTestCase extends TestCase
     abstract public static function expressionTransformationProvider(): iterable;
 
     #[DataProvider('expressionTransformationProvider')]
-    public function testExpressionTransformation(ExpressionTransformerInterface $expressionTransformer, mixed $inputExpression, mixed $outputExpression): void
-    {
+    public function testExpressionTransformation(
+        ExpressionTransformerInterface $expressionTransformer,
+        mixed $inputExpression,
+        mixed $outputExpression,
+    ): void {
         $this->assertEquals($outputExpression, $expressionTransformer->transform($inputExpression));
     }
 }

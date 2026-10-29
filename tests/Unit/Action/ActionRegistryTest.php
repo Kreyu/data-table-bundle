@@ -33,7 +33,6 @@ class ActionRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -73,7 +72,9 @@ class ActionRegistryTest extends TestCase
     public function testTypeCannotHaveItselfAsParent()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType).',
+        );
 
         $registry = $this->createRegistry(types: [new ActionTypeWithSameParentType()]);
         $registry->getType(ActionTypeWithSameParentType::class);
@@ -82,7 +83,9 @@ class ActionRegistryTest extends TestCase
     public function testRecursiveTypeReferences()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo).',
+        );
 
         $registry = $this->createRegistry(types: [
             new RecursiveActionTypeFoo(),
@@ -100,7 +103,6 @@ class ActionRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
@@ -119,7 +121,8 @@ class ActionRegistryTest extends TestCase
     private function createRegistry(array $types = [], array $typeExtensions = []): ActionRegistry
     {
         return new ActionRegistry(
-            types: $types ?: [
+            types: $types
+            ?: [
                 new ActionType(),
                 new SimpleActionType(),
                 new SimpleSubActionType(),

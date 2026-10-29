@@ -11,15 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractActionTypeExtension implements ActionTypeExtensionInterface
 {
-    public function buildAction(ActionBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildAction(ActionBuilderInterface $builder, array $options): void {}
 
-    public function buildView(ActionView $view, ActionInterface $action, array $options): void
-    {
-    }
+    public function buildView(ActionView $view, ActionInterface $action, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 }

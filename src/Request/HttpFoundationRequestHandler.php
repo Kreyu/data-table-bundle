@@ -65,7 +65,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
         $parameterName = $dataTable->getConfig()->getSortParameterName();
 
-        $sortingData = $this->extractQueryParameter($request, "[$parameterName]");
+        $sortingData = $this->extractQueryParameter($request, "[{$parameterName}]");
 
         if (empty($sortingData)) {
             return;
@@ -85,8 +85,8 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
-        $page = $this->extractQueryParameter($request, "[$pageParameterName]");
-        $perPage = $this->extractQueryParameter($request, "[$perPageParameterName]");
+        $page = $this->extractQueryParameter($request, "[{$pageParameterName}]");
+        $perPage = $this->extractQueryParameter($request, "[{$perPageParameterName}]");
 
         $perPage ??= $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
 

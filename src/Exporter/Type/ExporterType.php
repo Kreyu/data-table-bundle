@@ -13,14 +13,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ExporterType implements ExporterTypeInterface
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         throw new LogicException('Base exporter type cannot be called directly');
     }
 
-    public function buildExporter(ExporterBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildExporter(ExporterBuilderInterface $builder, array $options): void {}
 
     public function configureOptions(OptionsResolver $resolver): void
     {

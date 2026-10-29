@@ -64,7 +64,8 @@ class DoctrineOrmFilterHandlerTest extends TestCase
                 $this->assertEquals('expression', $expression);
 
                 return $queryBuilder;
-            });
+            })
+        ;
 
         $this->query->method('getQueryBuilder')->willReturn($queryBuilder);
 
@@ -82,11 +83,16 @@ class DoctrineOrmFilterHandlerTest extends TestCase
                 $this->assertNull($type);
 
                 return $queryBuilder;
-            });
+            })
+        ;
 
         $this->query->method('getQueryBuilder')->willReturn($queryBuilder);
 
-        $this->createHandler(parameters: [new Parameter('foo', 'bar')])->handle($this->query, $this->data, $this->filter);
+        $this->createHandler(parameters: [new Parameter('foo', 'bar')])->handle(
+            $this->query,
+            $this->data,
+            $this->filter,
+        );
     }
 
     public function testItSetsParameterWithTypeSpecified(): void
@@ -100,11 +106,16 @@ class DoctrineOrmFilterHandlerTest extends TestCase
                 $this->assertEquals('date_immutable', $type);
 
                 return $queryBuilder;
-            });
+            })
+        ;
 
         $this->query->method('getQueryBuilder')->willReturn($queryBuilder);
 
-        $this->createHandler(parameters: [new Parameter('foo', 'bar', 'date_immutable')])->handle($this->query, $this->data, $this->filter);
+        $this->createHandler(parameters: [new Parameter('foo', 'bar', 'date_immutable')])->handle(
+            $this->query,
+            $this->data,
+            $this->filter,
+        );
     }
 
     public function testItDispatchesEvents(): void
@@ -113,24 +124,29 @@ class DoctrineOrmFilterHandlerTest extends TestCase
             ->expects($matcher = $this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (DoctrineOrmFilterEvent $event, string $eventName) use ($matcher) {
-                // @phpstan-ignore-next-line
-                $this->assertInstanceOf(match ($matcher->numberOfInvocations()) {
-                    1 => PreSetParametersEvent::class,
-                    2 => PreApplyExpressionEvent::class,
-                }, $event);
+                $this->assertInstanceOf(
+                    match ($matcher->numberOfInvocations()) {
+                        1 => PreSetParametersEvent::class,
+                        2 => PreApplyExpressionEvent::class,
+                    },
+                    $event,
+                );
 
-                // @phpstan-ignore-next-line
-                $this->assertEquals(match ($matcher->numberOfInvocations()) {
-                    1 => DoctrineOrmFilterEvents::PRE_SET_PARAMETERS,
-                    2 => DoctrineOrmFilterEvents::PRE_APPLY_EXPRESSION,
-                }, $eventName);
+                $this->assertEquals(
+                    match ($matcher->numberOfInvocations()) {
+                        1 => DoctrineOrmFilterEvents::PRE_SET_PARAMETERS,
+                        2 => DoctrineOrmFilterEvents::PRE_APPLY_EXPRESSION,
+                    },
+                    $eventName,
+                );
 
                 $this->assertEquals($this->query, $event->getQuery());
                 $this->assertEquals($this->data, $event->getData());
                 $this->assertEquals($this->filter, $event->getFilter());
 
                 return $event;
-            });
+            })
+        ;
 
         $this->createHandler()->handle($this->query, $this->data, $this->filter);
     }

@@ -18,8 +18,7 @@ class ColumnValueView
 
     public function __construct(
         public ValueRowView $parent,
-    ) {
-    }
+    ) {}
 
     public function getDataTable(): DataTableView
     {

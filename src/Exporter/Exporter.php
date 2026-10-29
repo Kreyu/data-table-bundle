@@ -14,8 +14,7 @@ class Exporter implements ExporterInterface
 
     public function __construct(
         private readonly ExporterConfigInterface $config,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

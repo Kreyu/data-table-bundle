@@ -12,7 +12,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface ExporterTypeInterface
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile;
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile;
 
     public function buildExporter(ExporterBuilderInterface $builder, array $options): void;
 

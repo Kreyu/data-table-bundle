@@ -25,9 +25,9 @@ class ArrayProxyQueryTest extends TestCase
             iterator_to_array($result->getIterator()),
         );
 
-        $this->assertEquals(2, $result->count());
-        $this->assertEquals(2, $result->getTotalItemCount());
-        $this->assertEquals(2, $result->getCurrentPageItemCount());
+        $this->assertSame(2, $result->count());
+        $this->assertSame(2, $result->getTotalItemCount());
+        $this->assertSame(2, $result->getCurrentPageItemCount());
     }
 
     public function testGetResultWithTotalItemCountSet()
@@ -44,9 +44,9 @@ class ArrayProxyQueryTest extends TestCase
             iterator_to_array($result->getIterator()),
         );
 
-        $this->assertEquals(2, $result->count());
-        $this->assertEquals(25, $result->getTotalItemCount());
-        $this->assertEquals(2, $result->getCurrentPageItemCount());
+        $this->assertSame(2, $result->count());
+        $this->assertSame(25, $result->getTotalItemCount());
+        $this->assertSame(2, $result->getCurrentPageItemCount());
     }
 
     public function testSort()
@@ -78,8 +78,8 @@ class ArrayProxyQueryTest extends TestCase
         $result = $query->getResult();
 
         $this->assertEquals([['id' => 2]], iterator_to_array($result->getIterator()));
-        $this->assertEquals(1, $result->getCurrentPageItemCount());
-        $this->assertEquals(3, $result->getTotalItemCount());
+        $this->assertSame(1, $result->getCurrentPageItemCount());
+        $this->assertSame(3, $result->getTotalItemCount());
     }
 
     public function testSortAndPaginate()
@@ -97,7 +97,7 @@ class ArrayProxyQueryTest extends TestCase
         $result = $query->getResult();
 
         $this->assertEquals([['id' => 1]], iterator_to_array($result->getIterator()));
-        $this->assertEquals(1, $result->getCurrentPageItemCount());
-        $this->assertEquals(3, $result->getTotalItemCount());
+        $this->assertSame(1, $result->getCurrentPageItemCount());
+        $this->assertSame(3, $result->getTotalItemCount());
     }
 }

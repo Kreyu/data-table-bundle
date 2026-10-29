@@ -17,7 +17,7 @@ class FormUtilTest extends TestCase
 
         $result = FormUtil::getFormViewValueRecursive($formView);
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
     }
 
     public function testGetFormViewValueRecursiveWithChildren()

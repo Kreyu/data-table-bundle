@@ -31,9 +31,9 @@ class DoctrineOrmResultSetFactoryTest extends TestCase
         $resultSet = $factory->create($paginator);
 
         $this->assertInstanceOf(RewindableGeneratorIterator::class, $resultSet->getIterator());
-        $this->assertEquals(25, iterator_count($resultSet->getIterator()));
-        $this->assertEquals(25, $resultSet->getCurrentPageItemCount());
-        $this->assertEquals(25, $resultSet->getTotalItemCount());
+        $this->assertSame(25, iterator_count($resultSet->getIterator()));
+        $this->assertSame(25, $resultSet->getCurrentPageItemCount());
+        $this->assertSame(25, $resultSet->getTotalItemCount());
     }
 
     public function testCreateWithLimit()
@@ -54,9 +54,9 @@ class DoctrineOrmResultSetFactoryTest extends TestCase
         $resultSet = $factory->create($paginator);
 
         $this->assertInstanceOf(\ArrayIterator::class, $resultSet->getIterator());
-        $this->assertEquals(25, iterator_count($resultSet->getIterator()));
-        $this->assertEquals(25, $resultSet->getCurrentPageItemCount());
-        $this->assertEquals(1000, $resultSet->getTotalItemCount());
+        $this->assertSame(25, iterator_count($resultSet->getIterator()));
+        $this->assertSame(25, $resultSet->getCurrentPageItemCount());
+        $this->assertSame(1000, $resultSet->getTotalItemCount());
     }
 
     public function testCreateWithLimitGreaterThanBatchSize()
@@ -79,8 +79,8 @@ class DoctrineOrmResultSetFactoryTest extends TestCase
         $resultSet = $factory->create($paginator, 25);
 
         $this->assertInstanceOf(\ArrayIterator::class, $resultSet->getIterator());
-        $this->assertEquals(100, iterator_count($resultSet->getIterator()));
-        $this->assertEquals(100, $resultSet->getCurrentPageItemCount());
-        $this->assertEquals(1000, $resultSet->getTotalItemCount());
+        $this->assertSame(100, iterator_count($resultSet->getIterator()));
+        $this->assertSame(100, $resultSet->getCurrentPageItemCount());
+        $this->assertSame(1000, $resultSet->getTotalItemCount());
     }
 }

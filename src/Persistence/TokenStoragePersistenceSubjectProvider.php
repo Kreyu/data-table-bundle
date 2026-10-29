@@ -11,8 +11,7 @@ class TokenStoragePersistenceSubjectProvider implements PersistenceSubjectProvid
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,
-    ) {
-    }
+    ) {}
 
     public function provide(): PersistenceSubjectInterface
     {

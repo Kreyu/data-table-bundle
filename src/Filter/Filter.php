@@ -19,8 +19,7 @@ class Filter implements FilterInterface
 
     public function __construct(
         private readonly FilterConfigInterface $config,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

@@ -22,7 +22,7 @@ class CallbackExpressionTransformerTest extends ExpressionTransformerTestCase
 
         yield [self::createTransformer(trim(...)), ' foo ', 'foo'];
 
-        yield [self::createTransformer(static fn ($expression) => "$expression bar"), 'foo', 'foo bar'];
+        yield [self::createTransformer(static fn ($expression) => "{$expression} bar"), 'foo', 'foo bar'];
 
         yield [
             self::createTransformer(static function (Expr\Comparison $comparison) use ($expr) {
@@ -35,10 +35,10 @@ class CallbackExpressionTransformerTest extends ExpressionTransformerTestCase
 
     public function testConstructorConvertsCallableToClosure(): void
     {
-        $transformer = self::createTransformer(fn () => null);
+        $transformer = self::createTransformer(static fn () => null);
 
         $reflectionProperty = new \ReflectionProperty($transformer, 'callback');
 
-        $this->assertEquals('Closure', $reflectionProperty->getType());
+        $this->assertSame('Closure', (string) $reflectionProperty->getType());
     }
 }

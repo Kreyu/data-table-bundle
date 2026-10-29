@@ -10,8 +10,7 @@ class FilterFactory implements FilterFactoryInterface
 {
     public function __construct(
         private readonly FilterRegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     public function create(string $type = FilterType::class, array $options = []): FilterInterface
     {
@@ -28,8 +27,11 @@ class FilterFactory implements FilterFactoryInterface
         return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $type, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = FilterType::class, array $options = []): FilterBuilderInterface
-    {
+    public function createNamedBuilder(
+        string $name,
+        string $type = FilterType::class,
+        array $options = [],
+    ): FilterBuilderInterface {
         $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);

@@ -24,8 +24,8 @@ class PersonalizationColumnDataType extends AbstractType
 
         // Add transformer that converts boolean to integer to help the HiddenType visibility field.
         $builder->get('visible')->addModelTransformer(new CallbackTransformer(
-            fn (?bool $visible) => (int) $visible,
-            fn (int $visible) => (bool) $visible,
+            static fn (?bool $visible) => (int) $visible,
+            static fn (int $visible) => (bool) $visible,
         ));
     }
 
@@ -33,7 +33,7 @@ class PersonalizationColumnDataType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => PersonalizationColumnData::class,
-            'empty_data' => fn (FormInterface $form) => new PersonalizationColumnData($form->getName()),
+            'empty_data' => static fn (FormInterface $form) => new PersonalizationColumnData($form->getName()),
         ]);
     }
 

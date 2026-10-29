@@ -30,7 +30,7 @@ class ArrayProxyQuery implements ProxyQueryInterface
 
         $this->data = $this->originalData;
 
-        usort($this->data, function ($a, $b) use ($sortingData, $propertyAccessor) {
+        usort($this->data, static function ($a, $b) use ($sortingData, $propertyAccessor) {
             foreach ($sortingData->getColumns() as $sortingColumnData) {
                 $propertyPath = $sortingColumnData->getPropertyPath();
                 $direction = $sortingColumnData->getDirection();

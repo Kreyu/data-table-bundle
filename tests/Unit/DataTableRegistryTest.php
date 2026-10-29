@@ -35,7 +35,6 @@ class DataTableRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        // @phpstan-ignore-next-line
         $this->createRegistry()->getType('stdClass');
     }
 
@@ -75,7 +74,9 @@ class DataTableRegistryTest extends TestCase
     public function testTypeCannotHaveItselfAsParent()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType).',
+        );
 
         $registry = $this->createRegistry(types: [new DataTableTypeWithSameParentType()]);
         $registry->getType(DataTableTypeWithSameParentType::class);
@@ -84,7 +85,9 @@ class DataTableRegistryTest extends TestCase
     public function testRecursiveTypeReferences()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo).');
+        $this->expectExceptionMessage(
+            'Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo).',
+        );
 
         $registry = $this->createRegistry(types: [
             new RecursiveDataTableTypeFoo(),
@@ -102,7 +105,6 @@ class DataTableRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        // @phpstan-ignore-next-line
         $this->assertFalse($this->createRegistry()->hasType('stdClass'));
     }
 
@@ -136,10 +138,14 @@ class DataTableRegistryTest extends TestCase
         $this->createRegistry(proxyQueryFactories: [new \stdClass()]);
     }
 
-    private function createRegistry(array $types = [], array $typeExtensions = [], array $proxyQueryFactories = []): DataTableRegistry
-    {
+    private function createRegistry(
+        array $types = [],
+        array $typeExtensions = [],
+        array $proxyQueryFactories = [],
+    ): DataTableRegistry {
         return new DataTableRegistry(
-            types: $types ?: [
+            types: $types
+            ?: [
                 new DataTableType(),
                 new SimpleDataTableType(),
                 new SimpleSubDataTableType(),

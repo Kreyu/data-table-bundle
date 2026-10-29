@@ -12,8 +12,12 @@ use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType;
 
 class SimpleSubExporterType extends AbstractExporterType
 {
-    public function export(DataTableView $view, ExporterInterface $exporter, string $filename, array $options = []): ExportFile
-    {
+    public function export(
+        DataTableView $view,
+        ExporterInterface $exporter,
+        string $filename,
+        array $options = [],
+    ): ExportFile {
         throw new LogicException('Not implemented');
     }
 

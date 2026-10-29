@@ -14,11 +14,13 @@ class ResolvedDataTableTypeFactoryDataCollectorProxy implements ResolvedDataTabl
     public function __construct(
         private ResolvedDataTableTypeFactoryInterface $proxiedFactory,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
-    public function createResolvedType(DataTableTypeInterface $type, array $typeExtensions, ?ResolvedDataTableTypeInterface $parent = null): ResolvedDataTableTypeInterface
-    {
+    public function createResolvedType(
+        DataTableTypeInterface $type,
+        array $typeExtensions,
+        ?ResolvedDataTableTypeInterface $parent = null,
+    ): ResolvedDataTableTypeInterface {
         return new ResolvedDataTableTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),
             $this->dataCollector,

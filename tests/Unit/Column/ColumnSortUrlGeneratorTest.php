@@ -42,9 +42,13 @@ class ColumnSortUrlGeneratorTest extends TestCase
     {
         $this->request->attributes->set('_route_params', ['id' => 1]);
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'id' => 1,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'id' => 1,
+            ])
+        ;
 
         $this->generate();
     }
@@ -53,48 +57,66 @@ class ColumnSortUrlGeneratorTest extends TestCase
     {
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'action' => 'list',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'action' => 'list',
+            ])
+        ;
 
         $this->generate();
     }
 
     public function testItPreservesDataTableUrlQueryParameters()
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'foo' => 'bar',
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'foo' => 'bar',
+            ])
+        ;
 
         $this->generate($this->createDataTableView(['foo' => 'bar']));
     }
 
     public function testItRemovesOtherSortParameters()
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-            ],
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::SORT_PARAMETER_NAME => [
+                    'firstName' => 'asc',
+                ],
+            ])
+        ;
 
         $this->generate(
-            $this->createDataTableView([self::SORT_PARAMETER_NAME => [
-                'middleName' => 'asc',
-                'lastName' => 'desc',
-            ]]),
+            $this->createDataTableView([
+                self::SORT_PARAMETER_NAME => [
+                    'middleName' => 'asc',
+                    'lastName' => 'desc',
+                ],
+            ]),
             $this->createColumnHeaderView($this->createDataTableView(), 'firstName', null),
         );
     }
 
     public function testItGeneratesWithOppositeDirectionsWhenSortingNotClearable(): void
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-                'middleName' => 'desc',
-                'lastName' => 'asc',
-            ],
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::SORT_PARAMETER_NAME => [
+                    'firstName' => 'asc',
+                    'middleName' => 'desc',
+                    'lastName' => 'asc',
+                ],
+            ])
+        ;
 
         $dataTableView = $this->createDataTableView();
         $dataTableView->vars['sorting_clearable'] = false;
@@ -111,13 +133,17 @@ class ColumnSortUrlGeneratorTest extends TestCase
     #[TestWith([null])] // Tests behavior when sorting_clearable is somehow null or not set (should default to true)
     public function testItCyclesBetweenAscDescNoneWhenSortingClearable(?bool $sortingClearable): void
     {
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-                'middleName' => 'desc',
-                'lastName' => 'none',
-            ],
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::SORT_PARAMETER_NAME => [
+                    'firstName' => 'asc',
+                    'middleName' => 'desc',
+                    'lastName' => 'none',
+                ],
+            ])
+        ;
 
         $dataTableView = $this->createDataTableView();
         $dataTableView->vars['sorting_clearable'] = $sortingClearable;
@@ -137,9 +163,13 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $dataTableView = $this->createDataTableView([self::PAGE_PARAMETER_NAME => 2]);
         $dataTableView->vars['pagination_enabled'] = true;
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            self::PAGE_PARAMETER_NAME => 1,
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                self::PAGE_PARAMETER_NAME => 1,
+            ])
+        ;
 
         $this->generate($dataTableView);
     }
@@ -149,17 +179,21 @@ class ColumnSortUrlGeneratorTest extends TestCase
         $this->request->attributes->set('_route_params', ['id' => 1]);
         $this->request->query->set('action', 'list');
 
-        $this->urlGenerator->expects($this->once())->method('generate')->with(self::ROUTE_NAME, [
-            'id' => 1,
-            'action' => 'list',
-            'foo' => 'bar',
-            self::PAGE_PARAMETER_NAME => 1,
-            self::SORT_PARAMETER_NAME => [
-                'firstName' => 'asc',
-                'middleName' => 'desc',
-                'lastName' => 'none',
-            ],
-        ]);
+        $this->urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with(self::ROUTE_NAME, [
+                'id' => 1,
+                'action' => 'list',
+                'foo' => 'bar',
+                self::PAGE_PARAMETER_NAME => 1,
+                self::SORT_PARAMETER_NAME => [
+                    'firstName' => 'asc',
+                    'middleName' => 'desc',
+                    'lastName' => 'none',
+                ],
+            ])
+        ;
 
         $dataTableView = $this->createDataTableView(['foo' => 'bar']);
         $dataTableView->vars['sorting_clearable'] = true;
@@ -191,8 +225,11 @@ class ColumnSortUrlGeneratorTest extends TestCase
         return $dataTableView;
     }
 
-    private function createColumnHeaderView(DataTableView $dataTableView, string $name, ?string $direction): ColumnHeaderView
-    {
+    private function createColumnHeaderView(
+        DataTableView $dataTableView,
+        string $name,
+        ?string $direction,
+    ): ColumnHeaderView {
         $columnHeaderView = new ColumnHeaderView(new HeaderRowView($dataTableView));
         $columnHeaderView->vars['name'] = $name;
         $columnHeaderView->vars['sort_direction'] = $direction;

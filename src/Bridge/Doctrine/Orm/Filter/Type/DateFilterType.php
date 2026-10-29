@@ -27,7 +27,7 @@ final class DateFilterType extends AbstractDoctrineOrmFilterType
                 ],
                 'active_filter_formatter' => new DateActiveFilterFormatter(),
             ])
-            ->addNormalizer('form_options', function (Options $options, array $value) {
+            ->addNormalizer('form_options', static function (Options $options, array $value) {
                 if (DateType::class !== $options['form_type']) {
                     return $value;
                 }

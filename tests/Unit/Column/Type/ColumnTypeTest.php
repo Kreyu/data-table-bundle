@@ -38,7 +38,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column);
 
-        $this->assertEquals('First name', $columnHeaderView->vars['label']);
+        $this->assertSame('First name', $columnHeaderView->vars['label']);
     }
 
     public function testDefaultExportLabelInheritsFromLabel(): void
@@ -50,7 +50,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnHeaderView = $this->createExportColumnHeaderView($column);
 
-        $this->assertEquals('Name', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('Name', $exportColumnHeaderView->vars['label']);
     }
 
     public function testDefaultExportLabelInheritsFromName(): void
@@ -61,7 +61,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnHeaderView = $this->createExportColumnHeaderView($column);
 
-        $this->assertEquals('First name', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('First name', $exportColumnHeaderView->vars['label']);
     }
 
     public function testPassingLabelOption(): void
@@ -72,7 +72,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column);
 
-        $this->assertEquals('Name', $columnHeaderView->vars['label']);
+        $this->assertSame('Name', $columnHeaderView->vars['label']);
     }
 
     public function testPassingExportLabelOption(): void
@@ -85,7 +85,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnHeaderView = $this->createExportColumnHeaderView($column);
 
-        $this->assertEquals('Name', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('Name', $exportColumnHeaderView->vars['label']);
     }
 
     public function testPassingExportLabelOptionAsTranslatable(): void
@@ -100,7 +100,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnHeaderView = $this->createExportColumnHeaderView($column);
 
-        $this->assertEquals('First name', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('First name', $exportColumnHeaderView->vars['label']);
     }
 
     public function testPassingExportLabelOptionAsTranslatableWithoutTranslator(): void
@@ -127,7 +127,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnHeaderView = $this->createExportColumnHeaderView($column);
 
-        $this->assertEquals('John', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('John', $exportColumnHeaderView->vars['label']);
     }
 
     public static function provideExportLabelTranslationOptions(): iterable
@@ -199,7 +199,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column, $this->createHeaderRowView($dataTableView));
 
-        $this->assertEquals('user', $columnHeaderView->vars['translation_domain']);
+        $this->assertSame('user', $columnHeaderView->vars['translation_domain']);
     }
 
     public function testPassingHeaderTranslationDomainOption(): void
@@ -210,7 +210,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column);
 
-        $this->assertEquals('user', $columnHeaderView->vars['translation_domain']);
+        $this->assertSame('user', $columnHeaderView->vars['translation_domain']);
     }
 
     public function testPassingHeaderTranslationParametersOption(): void
@@ -232,7 +232,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('first_name', $columnValueView->vars['translation_key']);
+        $this->assertSame('first_name', $columnValueView->vars['translation_key']);
     }
 
     public function testDefaultValueTranslationKeyWhenColumnIsNotTranslatableAndValueIsString(): void
@@ -256,7 +256,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('John', $columnValueView->vars['translation_key']);
+        $this->assertSame('John', $columnValueView->vars['translation_key']);
     }
 
     public function testDefaultValueTranslationKeyWhenColumnIsTranslatableAndValueIsTranslatable(): void
@@ -283,7 +283,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, $this->createValueRowView($dataTableView));
 
-        $this->assertEquals('product', $columnValueView->vars['translation_domain']);
+        $this->assertSame('product', $columnValueView->vars['translation_domain']);
     }
 
     public function testPassingValueTranslationDomainOption(): void
@@ -294,7 +294,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('product', $columnValueView->vars['translation_domain']);
+        $this->assertSame('product', $columnValueView->vars['translation_domain']);
     }
 
     public function testPassingValueTranslationParametersOption(): void
@@ -346,7 +346,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('John', $exportColumnValueView->vars['value']);
+        $this->assertSame('John', $exportColumnValueView->vars['value']);
     }
 
     public function testValueTranslationVarsWhenValueIsString()
@@ -402,7 +402,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
         $this->assertSame($firstName, $exportColumnValueView->vars['data']);
-        $this->assertEquals('John', $exportColumnValueView->vars['value']);
+        $this->assertSame('John', $exportColumnValueView->vars['value']);
     }
 
     public function testNonStringExportValueNotTranslated()
@@ -434,8 +434,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('%first_name%', $exportColumnValueView->vars['data']);
-        $this->assertEquals('John', $exportColumnValueView->vars['value']);
+        $this->assertSame('%first_name%', $exportColumnValueView->vars['data']);
+        $this->assertSame('John', $exportColumnValueView->vars['value']);
     }
 
     public static function provideExportValueTranslationOptions(): iterable
@@ -514,7 +514,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $this->assertTrue($column->getConfig()->isSortable());
         $this->assertTrue($columnHeaderView->vars['sortable']);
-        $this->assertEquals('firstName', (string) $column->getConfig()->getSortPropertyPath());
+        $this->assertSame('firstName', (string) $column->getConfig()->getSortPropertyPath());
     }
 
     public function testPassingSortOptionAsString(): void
@@ -525,8 +525,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column);
 
-        $this->assertEquals('user.firstName', (string) $column->getConfig()->getSortPropertyPath());
-        $this->assertEquals('user.firstName', $columnHeaderView->vars['sort_field']);
+        $this->assertSame('user.firstName', (string) $column->getConfig()->getSortPropertyPath());
+        $this->assertSame('user.firstName', (string) $columnHeaderView->vars['sort_field']);
     }
 
     public function testPassingExportOptionAsBoolean(): void
@@ -552,7 +552,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $this->assertTrue($column->getConfig()->isExportable());
         $this->assertTrue($columnHeaderView->vars['export']);
-        $this->assertEquals('Name', $exportColumnHeaderView->vars['label']);
+        $this->assertSame('Name', $exportColumnHeaderView->vars['label']);
     }
 
     public function testPassingFormatterOption(): void
@@ -571,8 +571,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('john', $columnValueView->vars['data']);
-        $this->assertEquals('JOHN', $columnValueView->vars['value']);
+        $this->assertSame('john', $columnValueView->vars['data']);
+        $this->assertSame('JOHN', $columnValueView->vars['value']);
     }
 
     public function testPassingExportFormatterOption(): void
@@ -581,7 +581,9 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $column = $this->createNamedColumn('firstName', [
             'export' => [
-                'formatter' => function (string $value, User $data, ColumnInterface $column, array $options) use ($user) {
+                'formatter' => function (string $value, User $data, ColumnInterface $column, array $options) use (
+                    $user,
+                ) {
                     $this->assertEquals($user, $data);
                     $this->assertEquals('firstName', $column->getName());
                     $this->assertIsCallable($options['formatter']);
@@ -593,14 +595,14 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('john', $exportColumnValueView->vars['data']);
-        $this->assertEquals('JOHN', $exportColumnValueView->vars['value']);
+        $this->assertSame('john', $exportColumnValueView->vars['data']);
+        $this->assertSame('JOHN', $exportColumnValueView->vars['value']);
     }
 
     public function testFormatterNotAppliedWithNullData(): void
     {
         $column = $this->createNamedColumn('firstName', [
-            'formatter' => fn (mixed $value) => throw new \LogicException('This should not be called!'),
+            'formatter' => static fn (mixed $value) => throw new \LogicException('This should not be called!'),
         ]);
 
         $columnValueView = $this->createColumnValueView($column, data: new User(firstName: null));
@@ -612,7 +614,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $column = $this->createNamedColumn('firstName', [
             'export' => [
-                'formatter' => fn (mixed $value) => throw new \LogicException('This should not be called!'),
+                'formatter' => static fn (mixed $value) => throw new \LogicException('This should not be called!'),
             ],
         ]);
 
@@ -627,8 +629,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('John', $columnValueView->vars['value']);
-        $this->assertEquals('firstName', (string) $column->getConfig()->getPropertyPath());
+        $this->assertSame('John', $columnValueView->vars['value']);
+        $this->assertSame('firstName', (string) $column->getConfig()->getPropertyPath());
     }
 
     public function testExportPropertyPathInheritsFromName(): void
@@ -639,7 +641,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('John', $exportColumnValueView->vars['value']);
+        $this->assertSame('John', $exportColumnValueView->vars['value']);
     }
 
     public function testExportPropertyPathInheritsFromPropertyPathOption(): void
@@ -651,7 +653,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('JOHN', $exportColumnValueView->vars['value']);
+        $this->assertSame('JOHN', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingPropertyPathOptionAsString(): void
@@ -662,8 +664,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('JOHN', $columnValueView->vars['value']);
-        $this->assertEquals('firstNameUppercased', (string) $column->getConfig()->getPropertyPath());
+        $this->assertSame('JOHN', $columnValueView->vars['value']);
+        $this->assertSame('firstNameUppercased', (string) $column->getConfig()->getPropertyPath());
     }
 
     public function testPassingExportPropertyPathOptionAsString(): void
@@ -676,7 +678,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('JOHN', $exportColumnValueView->vars['value']);
+        $this->assertSame('JOHN', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingPropertyPathOptionAsObject(): void
@@ -687,8 +689,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('JOHN', $columnValueView->vars['value']);
-        $this->assertEquals('firstNameUppercased', (string) $column->getConfig()->getPropertyPath());
+        $this->assertSame('JOHN', $columnValueView->vars['value']);
+        $this->assertSame('firstNameUppercased', (string) $column->getConfig()->getPropertyPath());
     }
 
     public function testPassingExportPropertyPathOptionAsObject(): void
@@ -701,7 +703,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: new User(firstName: 'John'));
 
-        $this->assertEquals('JOHN', $exportColumnValueView->vars['value']);
+        $this->assertSame('JOHN', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingPropertyAccessorOption(): void
@@ -709,7 +711,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $user = new User(firstName: 'John');
 
         $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
-        $propertyAccessor->expects($this->once())
+        $propertyAccessor
+            ->expects($this->once())
             ->method('getValue')
             ->with($user, 'firstName')
         ;
@@ -726,7 +729,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $user = new User(firstName: 'John');
 
         $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
-        $propertyAccessor->expects($this->once())
+        $propertyAccessor
+            ->expects($this->once())
             ->method('getValue')
             ->with($user, 'firstName')
         ;
@@ -757,7 +761,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('Definitely not John', $columnValueView->vars['value']);
+        $this->assertSame('Definitely not John', $columnValueView->vars['value']);
     }
 
     public function testExportGetterHasHigherPriorityThanPropertyPath(): void
@@ -779,7 +783,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('Definitely not John', $exportColumnValueView->vars['value']);
+        $this->assertSame('Definitely not John', $exportColumnValueView->vars['value']);
     }
 
     public function testExportGetterOptionInheritance(): void
@@ -799,7 +803,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('Definitely not John', $exportColumnValueView->vars['value']);
+        $this->assertSame('Definitely not John', $exportColumnValueView->vars['value']);
     }
 
     public function testPassingExportGetterOption(): void
@@ -820,7 +824,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $exportColumnValueView = $this->createExportColumnValueView($column, rowData: $user);
 
-        $this->assertEquals('Definitely not John', $exportColumnValueView->vars['value']);
+        $this->assertSame('Definitely not John', $exportColumnValueView->vars['value']);
     }
 
     public function testWithNeitherPropertyPathNorGetterOption(): void
@@ -899,7 +903,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
             'priority' => 10,
         ]);
 
-        $this->assertEquals(10, $column->getConfig()->getPriority());
+        $this->assertSame(10, $column->getConfig()->getPriority());
     }
 
     public function testPassingVisibleOption(): void
@@ -926,7 +930,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnHeaderView = $this->createColumnHeaderView($column);
 
-        $this->assertEquals('firstName', $columnHeaderView->vars['name']);
+        $this->assertSame('firstName', $columnHeaderView->vars['name']);
     }
 
     public function testValueViewVarsContainsName(): void
@@ -935,7 +939,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
 
         $columnValueView = $this->createColumnValueView($column);
 
-        $this->assertEquals('firstName', $columnValueView->vars['name']);
+        $this->assertSame('firstName', $columnValueView->vars['name']);
     }
 
     public function testHeaderViewVarsContainsItself()
@@ -987,7 +991,10 @@ class ColumnTypeTest extends ColumnTypeTestCase
     {
         $column = $this->createColumn();
 
-        $columnValueView = $this->createColumnValueView($column, $this->createValueRowView($dataTableView = new DataTableView()));
+        $columnValueView = $this->createColumnValueView(
+            $column,
+            $this->createValueRowView($dataTableView = new DataTableView()),
+        );
 
         $this->assertSame($dataTableView, $columnValueView->vars['data_table']);
     }
@@ -1013,7 +1020,7 @@ class ColumnTypeTest extends ColumnTypeTestCase
         $columnHeaderView = $this->createColumnHeaderView($column);
 
         $this->assertTrue($columnHeaderView->vars['sorted']);
-        $this->assertEquals('desc', $columnHeaderView->vars['sort_direction']);
+        $this->assertSame('desc', $columnHeaderView->vars['sort_direction']);
     }
 
     public function testBuildExportHeaderViewWithNonExportableColumn()
@@ -1066,10 +1073,12 @@ class ColumnTypeTest extends ColumnTypeTestCase
         ?string $locale = null,
     ): void {
         $this->translator = $this->createTranslator();
-        $this->translator->expects($this->once())
+        $this->translator
+            ->expects($this->once())
             ->method('trans')
             ->with($id, $parameters, $domain, $locale)
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
     }
 
     protected function expectNoTranslation(): void
@@ -1089,8 +1098,10 @@ class ColumnTypeTest extends ColumnTypeTestCase
         return $translator;
     }
 
-    protected function createTranslatable(string $value, bool $expectTranslated = true): MockObject&TranslatableInterface
-    {
+    protected function createTranslatable(
+        string $value,
+        bool $expectTranslated = true,
+    ): MockObject&TranslatableInterface {
         $translatable = $this->createMock(TranslatableInterface::class);
 
         if ($expectTranslated) {
@@ -1102,7 +1113,8 @@ class ColumnTypeTest extends ColumnTypeTestCase
                 $locale = 'en';
             }
 
-            $translatable->expects($this->once())
+            $translatable
+                ->expects($this->once())
                 ->method('trans')
                 ->with($this->translator, $locale)
                 ->willReturn($value)

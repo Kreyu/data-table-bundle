@@ -151,31 +151,46 @@ abstract class ColumnTypeTestCase extends TestCase
         return new HeaderRowView($dataTableView ?? new DataTableView());
     }
 
-    protected function createValueRowView(?DataTableView $dataTableView = null, int $index = 0, mixed $data = null): ValueRowView
-    {
+    protected function createValueRowView(
+        ?DataTableView $dataTableView = null,
+        int $index = 0,
+        mixed $data = null,
+    ): ValueRowView {
         return new ValueRowView($dataTableView ?? new DataTableView(), $index, $data);
     }
 
-    protected function createColumnHeaderView(ColumnInterface $column, ?HeaderRowView $headerRowView = null): ColumnHeaderView
-    {
+    protected function createColumnHeaderView(
+        ColumnInterface $column,
+        ?HeaderRowView $headerRowView = null,
+    ): ColumnHeaderView {
         return $column->createHeaderView($headerRowView ?? $this->createHeaderRowView());
     }
 
-    protected function createExportColumnHeaderView(ColumnInterface $column, ?HeaderRowView $headerRowView = null): ColumnHeaderView
-    {
+    protected function createExportColumnHeaderView(
+        ColumnInterface $column,
+        ?HeaderRowView $headerRowView = null,
+    ): ColumnHeaderView {
         return $column->createExportHeaderView($headerRowView ?? $this->createHeaderRowView());
     }
 
-    protected function createColumnValueView(ColumnInterface $column, ?ValueRowView $valueRowView = null, mixed $data = null, mixed $rowData = null): ColumnValueView
-    {
+    protected function createColumnValueView(
+        ColumnInterface $column,
+        ?ValueRowView $valueRowView = null,
+        mixed $data = null,
+        mixed $rowData = null,
+    ): ColumnValueView {
         $columnValueView = $column->createValueView($valueRowView ?? $this->createValueRowView(data: $rowData));
         $columnValueView->data = $data;
 
         return $columnValueView;
     }
 
-    protected function createExportColumnValueView(ColumnInterface $column, ?ValueRowView $valueRowView = null, mixed $data = null, mixed $rowData = null): ColumnValueView
-    {
+    protected function createExportColumnValueView(
+        ColumnInterface $column,
+        ?ValueRowView $valueRowView = null,
+        mixed $data = null,
+        mixed $rowData = null,
+    ): ColumnValueView {
         $columnValueView = $column->createExportValueView($valueRowView ?? $this->createValueRowView(data: $rowData));
         $columnValueView->data = $data;
 

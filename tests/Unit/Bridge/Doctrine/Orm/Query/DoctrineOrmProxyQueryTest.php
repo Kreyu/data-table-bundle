@@ -49,7 +49,8 @@ class DoctrineOrmProxyQueryTest extends TestCase
             ->createQueryBuilder()
             ->from(Product::class, 'product')
             ->leftJoin('product.category', 'category')
-            ->orderBy('product.id', 'ASC');
+            ->orderBy('product.id', 'ASC')
+        ;
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->sort(new SortingData([
@@ -68,13 +69,14 @@ class DoctrineOrmProxyQueryTest extends TestCase
     {
         $queryBuilder = TestEntityManagerFactory::create()
             ->createQueryBuilder()
-            ->from(Product::class, 'product');
+            ->from(Product::class, 'product')
+        ;
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->paginate(new PaginationData(1, 25));
 
-        $this->assertEquals(0, $queryBuilder->getFirstResult());
-        $this->assertEquals(25, $queryBuilder->getMaxResults());
+        $this->assertSame(0, $queryBuilder->getFirstResult());
+        $this->assertSame(25, $queryBuilder->getMaxResults());
     }
 
     public function testGetResult()
@@ -85,15 +87,19 @@ class DoctrineOrmProxyQueryTest extends TestCase
         $paginator->method('getQuery')->willReturn($this->createMock(Query::class));
 
         $paginationFactory = $this->createMock(PaginatorFactoryInterface::class);
-        $paginationFactory->expects($this->once())
+        $paginationFactory
+            ->expects($this->once())
             ->method('create')
             ->with($queryBuilder, ['foo' => 'bar'])
-            ->willReturn($paginator);
+            ->willReturn($paginator)
+        ;
 
         $resultSetFactory = $this->createMock(DoctrineOrmResultSetFactoryInterface::class);
-        $resultSetFactory->expects($this->once())
+        $resultSetFactory
+            ->expects($this->once())
             ->method('create')
-            ->with($paginator, 5000);
+            ->with($paginator, 5000)
+        ;
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder, ['foo' => 'bar']);
         $proxyQuery->setResultSetFactory($resultSetFactory);
@@ -116,9 +122,9 @@ class DoctrineOrmProxyQueryTest extends TestCase
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
 
-        $this->assertEquals(0, $proxyQuery->getUniqueParameterId());
-        $this->assertEquals(1, $proxyQuery->getUniqueParameterId());
-        $this->assertEquals(2, $proxyQuery->getUniqueParameterId());
+        $this->assertSame(0, $proxyQuery->getUniqueParameterId());
+        $this->assertSame(1, $proxyQuery->getUniqueParameterId());
+        $this->assertSame(2, $proxyQuery->getUniqueParameterId());
     }
 
     public function testGetHints()
@@ -189,7 +195,7 @@ class DoctrineOrmProxyQueryTest extends TestCase
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
 
-        $this->assertEquals(5000, $proxyQuery->getBatchSize());
+        $this->assertSame(5000, $proxyQuery->getBatchSize());
     }
 
     public function testSetBatchSizeZero()
@@ -221,7 +227,7 @@ class DoctrineOrmProxyQueryTest extends TestCase
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->setBatchSize(25);
 
-        $this->assertEquals(25, $proxyQuery->getBatchSize());
+        $this->assertSame(25, $proxyQuery->getBatchSize());
     }
 
     public function testGetDefaultPaginatorFactory()

@@ -12,8 +12,7 @@ class PersistenceSubjectAggregate implements PersistenceSubjectInterface
     public function __construct(
         private string $identifier,
         private mixed $subject,
-    ) {
-    }
+    ) {}
 
     public function getDataTablePersistenceIdentifier(): string
     {

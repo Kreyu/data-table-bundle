@@ -27,8 +27,7 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
         private readonly FilterTypeInterface $innerType,
         private readonly array $typeExtensions = [],
         private readonly ?ResolvedFilterTypeInterface $parent = null,
-    ) {
-    }
+    ) {}
 
     public function getBlockPrefix(): string
     {
@@ -58,7 +57,15 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
-            throw new $exception(sprintf('An error has occurred resolving the options of the filter "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
+            throw new $exception(
+                sprintf(
+                    'An error has occurred resolving the options of the filter "%s": %s',
+                    get_debug_type($this->getInnerType()),
+                    $exception->getMessage(),
+                ),
+                $exception->getCode(),
+                $exception,
+            );
         }
 
         return new FilterBuilder($name, $this, new EventDispatcher(), $options);

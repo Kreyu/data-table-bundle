@@ -20,12 +20,12 @@ class ExporterRegistry implements ExporterRegistryInterface
     private array $types;
 
     /**
-     * @var array<ExporterTypeExtensionInterface>
+     * @var array<class-string<ExporterTypeInterface>, list<ExporterTypeExtensionInterface>>
      */
     private array $typeExtensions;
 
     /**
-     * @var array<ResolvedExporterTypeFactoryInterface>
+     * @var array<ResolvedExporterTypeInterface>
      */
     private array $resolvedTypes;
 
@@ -59,11 +59,18 @@ class ExporterRegistry implements ExporterRegistryInterface
 
     private function resolveType(string $name): ResolvedExporterTypeInterface
     {
-        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The exporter type %s does not exist', $name));
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf(
+            'The exporter type %s does not exist',
+            $name,
+        ));
 
         if (isset($this->checkedTypes[$fqcn = $type::class])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for exporter type "%s" (%s).', $fqcn, $types));
+            throw new LogicException(sprintf(
+                'Circular reference detected for exporter type "%s" (%s).',
+                $fqcn,
+                $types,
+            ));
         }
 
         $this->checkedTypes[$fqcn] = true;

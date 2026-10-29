@@ -20,8 +20,7 @@ class ResolvedFilterTypeDataCollectorProxy implements ResolvedFilterTypeInterfac
     public function __construct(
         private ResolvedFilterTypeInterface $proxiedType,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
     public function getBlockPrefix(): string
     {

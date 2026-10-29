@@ -27,8 +27,7 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         private ColumnTypeInterface $innerType,
         private array $typeExtensions = [],
         private ?ResolvedColumnTypeInterface $parent = null,
-    ) {
-    }
+    ) {}
 
     public function getBlockPrefix(): string
     {
@@ -58,7 +57,15 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
-            throw new $exception(sprintf('An error has occurred resolving the options of the column "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
+            throw new $exception(
+                sprintf(
+                    'An error has occurred resolving the options of the column "%s": %s',
+                    get_debug_type($this->getInnerType()),
+                    $exception->getMessage(),
+                ),
+                $exception->getCode(),
+                $exception,
+            );
         }
 
         $builder = new ColumnBuilder($name, $this, $options);

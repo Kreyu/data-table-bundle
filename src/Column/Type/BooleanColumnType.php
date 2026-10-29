@@ -27,13 +27,15 @@ final class BooleanColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('label_true')
+        $resolver
+            ->define('label_true')
             ->default('Yes')
             ->allowedTypes('string', TranslatableInterface::class)
             ->info('Label displayed when the value is truthy.')
         ;
 
-        $resolver->define('label_false')
+        $resolver
+            ->define('label_false')
             ->default('No')
             ->allowedTypes('string', TranslatableInterface::class)
             ->info('Label displayed when the value is falsy.')

@@ -1,7 +1,6 @@
 /vendor
 /venv
 /composer.lock
-/.php-cs-fixer.cache
 /.phpunit.cache
 /.phpunit.result.cache
 /.idea

@@ -21,7 +21,7 @@ class TestEntityManagerFactory
 
         $config = ORMSetup::createAttributeMetadataConfiguration([], true);
 
-        if (PHP_VERSION_ID >= 80400 && method_exists($config, 'enableNativeLazyObjects')) {
+        if (PHP_VERSION_ID >= 80_400 && method_exists($config, 'enableNativeLazyObjects')) {
             $config->enableNativeLazyObjects(true);
         }
 

@@ -22,8 +22,7 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
         private readonly ExporterTypeInterface $innerType,
         private readonly array $typeExtensions = [],
         private readonly ?ResolvedExporterTypeInterface $parent = null,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {
@@ -48,12 +47,23 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
     /**
      * @throws ExceptionInterface
      */
-    public function createBuilder(ExporterFactoryInterface $factory, string $name, array $options): ExporterBuilderInterface
-    {
+    public function createBuilder(
+        ExporterFactoryInterface $factory,
+        string $name,
+        array $options,
+    ): ExporterBuilderInterface {
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
-            throw new $exception(sprintf('An error has occurred resolving the options of the exporter "%s": ', get_debug_type($this->getInnerType())).$exception->getMessage(), $exception->getCode(), $exception);
+            throw new $exception(
+                sprintf(
+                    'An error has occurred resolving the options of the exporter "%s": %s',
+                    get_debug_type($this->getInnerType()),
+                    $exception->getMessage(),
+                ),
+                $exception->getCode(),
+                $exception,
+            );
         }
 
         return new ExporterBuilder($name, $this, $options);

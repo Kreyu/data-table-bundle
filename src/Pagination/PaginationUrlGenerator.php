@@ -15,8 +15,7 @@ class PaginationUrlGenerator implements PaginationUrlGeneratorInterface
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     public function generate(DataTableView $dataTableView, int $page): string
     {
@@ -39,7 +38,7 @@ class PaginationUrlGenerator implements PaginationUrlGeneratorInterface
 
     private function getRequest(): Request
     {
-        if (null === $request = $this->requestStack->getCurrentRequest()) {
+        if (null === ($request = $this->requestStack->getCurrentRequest())) {
             throw new LogicException('Unable to retrieve current request.');
         }
 

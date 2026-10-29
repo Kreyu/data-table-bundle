@@ -15,8 +15,7 @@ class DoctrineOrmFilterEvent extends Event
         private readonly ProxyQueryInterface $query,
         private readonly FilterData $data,
         private readonly FilterInterface $filter,
-    ) {
-    }
+    ) {}
 
     public function getQuery(): ProxyQueryInterface
     {

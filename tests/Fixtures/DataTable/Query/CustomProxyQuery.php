@@ -12,13 +12,9 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 
 class CustomProxyQuery implements ProxyQueryInterface
 {
-    public function sort(SortingData $sortingData): void
-    {
-    }
+    public function sort(SortingData $sortingData): void {}
 
-    public function paginate(PaginationData $paginationData): void
-    {
-    }
+    public function paginate(PaginationData $paginationData): void {}
 
     public function getResult(): ResultSetInterface
     {

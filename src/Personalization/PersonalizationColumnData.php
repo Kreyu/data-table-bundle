@@ -15,23 +15,23 @@ class PersonalizationColumnData
         public string $name,
         public int $priority = 0,
         public bool $visible = true,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array{name: string, order: int, visible: bool} $data
      */
     public static function fromArray(array $data): self
     {
-        $resolver = self::$optionsResolver ??= (new OptionsResolver())
-            ->setRequired('name')
-            ->setDefaults([
-                'priority' => 0,
-                'visible' => true,
-            ])
-            ->setAllowedTypes('name', 'string')
-            ->setAllowedTypes('priority', 'int')
-            ->setAllowedTypes('visible', 'bool')
+        $resolver =
+            self::$optionsResolver ??= (new OptionsResolver())
+                ->setRequired('name')
+                ->setDefaults([
+                    'priority' => 0,
+                    'visible' => true,
+                ])
+                ->setAllowedTypes('name', 'string')
+                ->setAllowedTypes('priority', 'int')
+                ->setAllowedTypes('visible', 'bool')
         ;
 
         $data = $resolver->resolve($data);

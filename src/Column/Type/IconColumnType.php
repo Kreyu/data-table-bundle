@@ -16,9 +16,11 @@ final class IconColumnType extends AbstractColumnType
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
         foreach (['icon', 'icon_attr'] as $optionName) {
-            if (is_callable($options[$optionName])) {
-                $options[$optionName] = $options[$optionName]($view->value);
+            if (!is_callable($options[$optionName])) {
+                continue;
             }
+
+            $options[$optionName] = $options[$optionName]($view->value);
         }
 
         $view->vars = array_replace($view->vars, [
@@ -29,13 +31,15 @@ final class IconColumnType extends AbstractColumnType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define('icon')
+        $resolver
+            ->define('icon')
             ->required()
             ->allowedTypes('string', 'callable')
             ->info('Defines the icon to render.')
         ;
 
-        $resolver->define('icon_attr')
+        $resolver
+            ->define('icon_attr')
             ->default([])
             ->allowedTypes('array', 'callable')
             ->info('Defines the HTML attributes for the icon to render.')

@@ -14,11 +14,13 @@ class ResolvedFilterTypeFactoryDataCollectorProxy implements ResolvedFilterTypeF
     public function __construct(
         private ResolvedFilterTypeFactoryInterface $proxiedFactory,
         private DataTableDataCollectorInterface $dataCollector,
-    ) {
-    }
+    ) {}
 
-    public function createResolvedType(FilterTypeInterface $type, array $typeExtensions = [], ?ResolvedFilterTypeInterface $parent = null): ResolvedFilterTypeInterface
-    {
+    public function createResolvedType(
+        FilterTypeInterface $type,
+        array $typeExtensions = [],
+        ?ResolvedFilterTypeInterface $parent = null,
+    ): ResolvedFilterTypeInterface {
         return new ResolvedFilterTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),
             $this->dataCollector,

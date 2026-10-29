@@ -13,29 +13,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractColumnType implements ColumnTypeInterface
 {
-    public function buildColumn(ColumnBuilderInterface $builder, array $options): void
-    {
-    }
+    public function buildColumn(ColumnBuilderInterface $builder, array $options): void {}
 
-    public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
-    {
-    }
+    public function buildHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void {}
 
-    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
-    {
-    }
+    public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void {}
 
-    public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
-    {
-    }
+    public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void {}
 
-    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
-    {
-    }
+    public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void {}
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 
     public function getBlockPrefix(): string
     {

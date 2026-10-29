@@ -10,16 +10,18 @@ class ExporterFactory implements ExporterFactoryInterface
 {
     public function __construct(
         private ExporterRegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     public function create(string $type = ExporterType::class, array $options = []): ExporterInterface
     {
         return $this->createBuilder($type, $options)->getExporter();
     }
 
-    public function createNamed(string $name, string $type = ExporterType::class, array $options = []): ExporterInterface
-    {
+    public function createNamed(
+        string $name,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): ExporterInterface {
         return $this->createNamedBuilder($name, $type, $options)->getExporter();
     }
 
@@ -28,8 +30,11 @@ class ExporterFactory implements ExporterFactoryInterface
         return $this->createNamedBuilder($this->registry->getType($type)->getName(), $type, $options);
     }
 
-    public function createNamedBuilder(string $name, string $type = ExporterType::class, array $options = []): ExporterBuilderInterface
-    {
+    public function createNamedBuilder(
+        string $name,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): ExporterBuilderInterface {
         $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);

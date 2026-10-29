@@ -11,8 +11,7 @@ class DataTableEvent extends Event
 {
     public function __construct(
         private readonly DataTableInterface $dataTable,
-    ) {
-    }
+    ) {}
 
     public function getDataTable(): DataTableInterface
     {

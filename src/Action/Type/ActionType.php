@@ -41,9 +41,11 @@ final class ActionType implements ActionTypeInterface
             ];
 
             foreach ($callableOptions as $optionName) {
-                if ($options[$optionName] instanceof \Closure) {
-                    $options[$optionName] = $options[$optionName]($value);
+                if (!$options[$optionName] instanceof \Closure) {
+                    continue;
                 }
+
+                $options[$optionName] = $options[$optionName]($value);
             }
         }
 
@@ -70,7 +72,7 @@ final class ActionType implements ActionTypeInterface
 
         $blockPrefixes = $action->getConfig()->getType()->getBlockPrefixHierarchy();
 
-        if (null !== $blockPrefix = $options['block_prefix']) {
+        if (null !== ($blockPrefix = $options['block_prefix'])) {
             array_unshift($blockPrefixes, $blockPrefix);
         }
 

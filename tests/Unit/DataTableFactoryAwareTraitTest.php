@@ -49,7 +49,11 @@ class DataTableFactoryAwareTraitTest extends TestCase
         $arguments = ['foo', new CustomProxyQuery(), ['bar' => 'baz']];
 
         $factory = $this->createMock(DataTableFactoryInterface::class);
-        $factory->expects($this->once())->method('createNamedBuilder')->with($arguments[0], DataTableType::class, $arguments[1], $arguments[2]);
+        $factory
+            ->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with($arguments[0], DataTableType::class, $arguments[1], $arguments[2])
+        ;
 
         $this->createClassUsingTrait($factory)->execute('createNamedDataTableBuilder', $arguments);
     }

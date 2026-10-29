@@ -22,11 +22,11 @@ class ParameterFactory implements ParameterFactoryInterface
         $operator = $data->getOperator();
 
         if (Operator::Between === $operator) {
-            if (null !== $from = $value['from'] ?? null) {
+            if (null !== ($from = $value['from'] ?? null)) {
                 $parameters['from'] = new Parameter($name.'_from', $from);
             }
 
-            if (null !== $to = $value['to'] ?? null) {
+            if (null !== ($to = $value['to'] ?? null)) {
                 $parameters['to'] = new Parameter($name.'_to', $to);
             }
 
@@ -34,9 +34,9 @@ class ParameterFactory implements ParameterFactoryInterface
         }
 
         $parameters[] = new Parameter($name, match ($operator) {
-            Operator::Contains, Operator::NotContains => "%$value%",
-            Operator::StartsWith => "$value%",
-            Operator::EndsWith => "%$value",
+            Operator::Contains, Operator::NotContains => "%{$value}%",
+            Operator::StartsWith => "{$value}%",
+            Operator::EndsWith => "%{$value}",
             default => $value,
         });
 

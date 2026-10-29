@@ -21,21 +21,26 @@ class FilterDataType extends AbstractType
     {
         $builder->add('value', $options['form_type'], $options['form_options']);
 
-        $builder->get('value')->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->get('value')->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
             if ('' === $event->getData()) {
                 $event->setData(null);
             }
         });
 
         if ($options['operator_selectable']) {
-            $builder->add('operator', $options['operator_form_type'], $options['operator_form_options'] + [
-                'empty_data' => $options['default_operator'],
-                'choices' => $options['supported_operators'],
-            ]);
+            $builder->add(
+                'operator',
+                $options['operator_form_type'],
+                $options['operator_form_options']
+                + [
+                    'empty_data' => $options['default_operator'],
+                    'choices' => $options['supported_operators'],
+                ],
+            );
 
             $builder->get('operator')->addViewTransformer(new CallbackTransformer(
-                fn (mixed $value) => $value,
-                fn (mixed $value) => $value instanceof Operator ? $value->value : $value,
+                static fn (mixed $value) => $value,
+                static fn (mixed $value) => $value instanceof Operator ? $value->value : $value,
             ));
         }
     }
@@ -53,7 +58,7 @@ class FilterDataType extends AbstractType
                 'supported_operators' => [],
                 'operator_selectable' => false,
                 'default_operator' => Operator::Equals,
-                'empty_data' => function (Options $options) {
+                'empty_data' => static function (Options $options) {
                     return new FilterData(operator: $options['default_operator']);
                 },
             ])

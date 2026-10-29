@@ -20,21 +20,16 @@ class CountingProxyQuery implements ProxyQueryInterface
 
     public function __construct(
         private array $data = [],
-    ) {
-    }
+    ) {}
 
     public static function reset(): void
     {
         self::$getResultCalls = 0;
     }
 
-    public function sort(SortingData $sortingData): void
-    {
-    }
+    public function sort(SortingData $sortingData): void {}
 
-    public function paginate(PaginationData $paginationData): void
-    {
-    }
+    public function paginate(PaginationData $paginationData): void {}
 
     public function getResult(): ResultSetInterface
     {

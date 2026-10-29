@@ -20,12 +20,12 @@ class FilterRegistry implements FilterRegistryInterface
     private array $types;
 
     /**
-     * @var array<FilterTypeExtensionInterface>
+     * @var array<class-string<FilterTypeInterface>, list<FilterTypeExtensionInterface>>
      */
     private array $typeExtensions;
 
     /**
-     * @var array<ResolvedFilterTypeFactoryInterface>
+     * @var array<ResolvedFilterTypeInterface>
      */
     private array $resolvedTypes;
 
@@ -59,7 +59,10 @@ class FilterRegistry implements FilterRegistryInterface
 
     private function resolveType(string $name): ResolvedFilterTypeInterface
     {
-        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The filter type %s does not exist', $name));
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf(
+            'The filter type %s does not exist',
+            $name,
+        ));
 
         if (isset($this->checkedTypes[$fqcn = $type::class])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));

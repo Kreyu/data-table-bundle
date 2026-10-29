@@ -20,12 +20,12 @@ class ColumnRegistry implements ColumnRegistryInterface
     private array $types;
 
     /**
-     * @var array<ColumnTypeExtensionInterface>
+     * @var array<class-string<ColumnTypeInterface>, list<ColumnTypeExtensionInterface>>
      */
     private array $typeExtensions;
 
     /**
-     * @var array<ResolvedColumnTypeFactoryInterface>
+     * @var array<ResolvedColumnTypeInterface>
      */
     private array $resolvedTypes;
 
@@ -59,7 +59,10 @@ class ColumnRegistry implements ColumnRegistryInterface
 
     private function resolveType(string $name): ResolvedColumnTypeInterface
     {
-        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf('The column type %s does not exist', $name));
+        $type = $this->types[$name] ?? throw new InvalidArgumentException(sprintf(
+            'The column type %s does not exist',
+            $name,
+        ));
 
         if (isset($this->checkedTypes[$fqcn = $type::class])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));

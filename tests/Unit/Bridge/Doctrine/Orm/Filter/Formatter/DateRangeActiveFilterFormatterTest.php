@@ -49,7 +49,7 @@ class DateRangeActiveFilterFormatterTest extends TestCase
 
         $result = ($this->formatter)($filterData);
 
-        $this->assertEquals('2023-01-20', $result);
+        $this->assertSame('2023-01-20', $result);
     }
 
     public function testDateRangeWithBothDates()
@@ -60,6 +60,6 @@ class DateRangeActiveFilterFormatterTest extends TestCase
 
         $result = ($this->formatter)($filterData);
 
-        $this->assertEquals('2023-01-01 - 2023-01-15', $result);
+        $this->assertSame('2023-01-01 - 2023-01-15', $result);
     }
 }

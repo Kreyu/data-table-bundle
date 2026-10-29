@@ -19,6 +19,8 @@ class FilterBuilder extends FilterConfigBuilder implements FilterBuilderInterfac
 
     private function createBuilderLockedException(): BadMethodCallException
     {
-        return new BadMethodCallException('FilterBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.');
+        return new BadMethodCallException(
+            'FilterBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.',
+        );
     }
 }

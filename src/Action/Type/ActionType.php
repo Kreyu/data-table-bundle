@@ -125,7 +125,7 @@ final class ActionType implements ActionTypeInterface
     private function getIdentifier(ActionView $view, ActionInterface $action): string
     {
         $identifierParts = [
-            $action->getDataTable()->getName(),
+            $view->getDataTable()->vars['name'],
             $action->getConfig()->getContext()->value.'-action',
             $action->getName(),
         ];

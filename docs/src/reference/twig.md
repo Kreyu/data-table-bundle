@@ -204,7 +204,7 @@ The following variables are common to every action type:
 | Variable                 | Usage                                                                                                             |
 |--------------------------|-------------------------------------------------------------------------------------------------------------------|
 | `name`                   | Name of the action.                                                                                               |
-| `identifier`             | Unique per action and row, e.g. `products--row-action--delete--3`. Use it for element ids.                        |
+| `identifier`             | `[table]--[context]-action--[name]`, plus `--[row]` for row actions, e.g. `products--row-action--delete--3`. Use it for element ids. Same-named actions in one row (e.g. in two dropdowns) share it. |
 | `label`                  | Name of the action.                                                                                               |
 | `data_table`             | An instance of data table view.                                                                                   |
 | `block_prefixes`         | A list of block prefixes respecting the type inheritance.                                                         |
@@ -235,7 +235,9 @@ See [Theming](../docs/features/theming.md#adding-html-attributes) for more.
 
 ### Dialog and pagination variables
 
-Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes, except `confirm_button_attr`:
+Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes, except `confirm_button_attr`.
+
+> The dialog variables and sub-blocks apply to themes built on `base` (base, daisyUI). Bootstrap 5 and Tabler render their own Bootstrap modal.
 
 | Variable                  | Block                                               | Rendered on                                                                         |
 |---------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------|

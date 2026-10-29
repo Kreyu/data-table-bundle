@@ -8,6 +8,12 @@ count = 2
 
 [[issues]]
 file = "src/Action/Type/ActionType.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #2 of `implode`: expected `array<array-key, Stringable|null|scalar>|null`, but provided type `list{3: int}|list{mixed, string('batch-action')|string('global-action')|string('row-action'), string}` is less specific."
+count = 1
+
+[[issues]]
+file = "src/Action/Type/ActionType.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Kreyu\Bundle\DataTableBundle\Action\Type\ActionType::resolveConfirmationOption`: expected `array<array-key, mixed>|bool`, but found `mixed`.'
 count = 1

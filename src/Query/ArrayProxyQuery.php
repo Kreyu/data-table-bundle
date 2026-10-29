@@ -12,6 +12,7 @@ class ArrayProxyQuery implements ProxyQueryInterface
 {
     private ?array $originalData = null;
     private ?array $sortedData = null;
+    private ?PaginationData $paginationData = null;
 
     public function __construct(
         private array $data,
@@ -49,10 +50,16 @@ class ArrayProxyQuery implements ProxyQueryInterface
         });
 
         $this->sortedData = $this->data;
+
+        if ($this->paginationData !== null) {
+            $this->paginate($this->paginationData);
+        }
     }
 
     public function paginate(PaginationData $paginationData): void
     {
+        $this->paginationData = $paginationData;
+
         $this->data = array_slice(
             $this->sortedData ?? $this->originalData,
             $paginationData->getOffset(),

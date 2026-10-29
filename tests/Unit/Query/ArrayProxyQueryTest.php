@@ -100,4 +100,23 @@ class ArrayProxyQueryTest extends TestCase
         $this->assertSame(1, $result->getCurrentPageItemCount());
         $this->assertSame(3, $result->getTotalItemCount());
     }
+
+    public function testPaginateAndSort()
+    {
+        $query = new ArrayProxyQuery(
+            data: [['id' => 1], ['id' => 2], ['id' => 3]],
+        );
+
+        $query->paginate(new PaginationData(page: 1, perPage: 2));
+
+        $query->sort(new SortingData([
+            new SortingColumnData('id', 'desc', '[id]'),
+        ]));
+
+        $result = $query->getResult();
+
+        $this->assertEquals([['id' => 3], ['id' => 2]], iterator_to_array($result->getIterator()));
+        $this->assertSame(2, $result->getCurrentPageItemCount());
+        $this->assertSame(3, $result->getTotalItemCount());
+    }
 }

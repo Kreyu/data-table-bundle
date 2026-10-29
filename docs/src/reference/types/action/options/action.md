@@ -216,6 +216,6 @@ The modal can be configured by passing an array with the following options:
 > 
 > - **type**: `null` or `string`
 > - **default**: `danger`
-> - **allowed values**: `danger`, `warning`, `info`
+> - **allowed values**: `null`, `danger`, `warning`, `info`
 > 
 > Represents a type of the action confirmation, which determines the color of the displayed modal.

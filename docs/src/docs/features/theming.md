@@ -265,8 +265,9 @@ Remember that in the second case, you cannot call the `parent()` function in the
 {% block action_confirmation_modal %}
     {% with {
         modal_attr: { class: 'modal' },
-        modal_content_attr: { class: 'modal-box' },
+        modal_box_attr: { class: 'modal-box' },
         cancel_button_attr: { class: 'btn' },
+        confirm_button_attr: confirm_button_attr|merge({ class: 'btn btn-error' }),
     } %}
         {{ parent() }}
     {% endwith %}

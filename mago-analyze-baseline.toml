@@ -8,12 +8,6 @@ count = 2
 
 [[issues]]
 file = "src/Action/Type/ActionType.php"
-code = "less-specific-nested-argument-type"
-message = "Argument type mismatch for argument #2 of `vsprintf`: expected `array<array-key, Stringable|null|scalar>`, but provided type `list{mixed, string('batch')|string('global')|string('row'), string}` is less specific."
-count = 1
-
-[[issues]]
-file = "src/Action/Type/ActionType.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Kreyu\Bundle\DataTableBundle\Action\Type\ActionType::resolveConfirmationOption`: expected `array<array-key, mixed>|bool`, but found `mixed`.'
 count = 1
@@ -28,12 +22,6 @@ count = 2
 file = "src/Action/Type/ActionType.php"
 code = "possibly-false-array-access"
 message = "Cannot perform array access on possibly `false` value."
-count = 3
-
-[[issues]]
-file = "src/Action/Type/ActionType.php"
-code = "possibly-null-operand"
-message = "Possibly null left operand used in string concatenation (type `null|string`)."
 count = 1
 
 [[issues]]

@@ -204,6 +204,7 @@ The following variables are common to every action type:
 | Variable                 | Usage                                                                                                             |
 |--------------------------|-------------------------------------------------------------------------------------------------------------------|
 | `name`                   | Name of the action.                                                                                               |
+| `identifier`             | Unique per action and row, e.g. `products--row-action--delete--3`. Use it for element ids.                        |
 | `label`                  | Name of the action.                                                                                               |
 | `data_table`             | An instance of data table view.                                                                                   |
 | `block_prefixes`         | A list of block prefixes respecting the type inheritance.                                                         |
@@ -234,19 +235,31 @@ See [Theming](../docs/features/theming.md#adding-html-attributes) for more.
 
 ### Dialog and pagination variables
 
-Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes:
+Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes, except `confirm_button_attr`:
 
-| Variable                  | Block                                               | Rendered on                                                             |
-|---------------------------|-----------------------------------------------------|-------------------------------------------------------------------------|
-| `modal_attr`              | `action_modal_control`, `action_confirmation_modal` | `<dialog>`                                                              |
-| `modal_content_attr`      | `action_modal_control`                              | `<div>` the loaded content goes into                                    |
-|                           | `action_confirmation_modal`                         | `<div>` around the dialog content. Not rendered unless set.             |
-| `modal_close_button_attr` | `action_modal_control`                              | Close button                                                            |
-| `modal_title_attr`        | `action_confirmation_modal`                         | Title `<h2>`                                                            |
-| `modal_description_attr`  | `action_confirmation_modal`                         | Description `<p>`                                                       |
-| `cancel_button_attr`      | `action_confirmation_modal`                         | Cancel button                                                           |
-| `confirm_button_attr`     | `action_confirmation_modal`                         | Confirm button                                                          |
-| `disabled_attr`           | `pagination_controls`                               | Disabled first, previous, next and last links. Merged over their `attr`. |
+| Variable                  | Block                                               | Rendered on                                                                         |
+|---------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------|
+| `modal_attr`              | `action_modal_control`, `action_confirmation_modal` | `<dialog>`                                                                          |
+| `modal_box_attr`          | `action_modal_control`, `action_confirmation_modal` | `<div>` around everything inside the `<dialog>`. Not rendered unless set.           |
+| `modal_content_attr`      | `action_modal_control`                              | `<div>` the loaded content goes into                                                |
+| `modal_close_button_attr` | `action_modal_control`                              | Close button                                                                        |
+| `modal_title_attr`        | `action_confirmation_modal`                         | Title `<h2>`                                                                        |
+| `modal_description_attr`  | `action_confirmation_modal`                         | Description `<p>`                                                                   |
+| `cancel_button_attr`      | `action_confirmation_modal`                         | Cancel button                                                                       |
+| `confirm_button_attr`     | `action_confirmation_modal`                         | Confirm button. Arrives with `href` (links) or `type: submit` (forms).              |
+| `disabled_attr`           | `pagination_controls`                               | Disabled first, previous, next and last links. Merged over their `attr`.            |
+
+**`confirm_button_attr` arrives filled.** Setting it outright drops `href` or `type` and the confirm button does nothing. Merge onto it:
+
+```twig
+{% block action_confirmation_modal %}
+    {% with { confirm_button_attr: confirm_button_attr|merge({ class: 'btn btn-danger' }) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+```
+
+Restyle the parts of `action_modal_control` that aren't attributes by overriding its sub-blocks: `action_modal_loading` (shown until the content loads) and `action_modal_close_button`.
 
 ::: tip
 Behind the scenes, these variables are made available to the `DataTableView`, `ColumnView` and `FilterView` objects of your data table

@@ -584,7 +584,7 @@
         'info': 'primary',
         'warning': 'warning',
         'danger': 'danger',
-    }[confirmation.type] %}
+    }[confirmation.type ?? 'info'] %}
 
 <div class="modal modal-blur fade" id="{{ confirmation.identifier }}" tabindex="-1" style="display: none;" aria-hidden="true">
     {% block action_confirmation_modal_dialog %}

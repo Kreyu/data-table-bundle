@@ -738,10 +738,10 @@
         'data-kreyu--data-table-bundle--dialog-target': 'dialog',
     }|merge(modal_attr|default({})) %}
 
-    {% set modal_content_attr = modal_content_attr|default({}) %}
+    {% set modal_box_attr = modal_box_attr|default({}) %}
 
     <dialog{{ _self.attributes(modal_attr) }}>
-        {% if modal_content_attr is not empty %}<div{{ _self.attributes(modal_content_attr) }}>{% endif %}
+        {% if modal_box_attr is not empty %}<div{{ _self.attributes(modal_box_attr) }}>{% endif %}
         {% block action_confirmation_modal_header %}
             <h2{{ _self.attributes({ id: confirmation.identifier ~ '--title' }|merge(modal_title_attr|default({}))) }}>
                 {{ confirmation.label_title|trans({}, confirmation.translation_domain) }}
@@ -766,7 +766,7 @@
                 </{{ confirm_button_tag }}>
             {% endblock %}
         {% endblock %}
-        {% if modal_content_attr is not empty %}</div>{% endif %}
+        {% if modal_box_attr is not empty %}</div>{% endif %}
     </dialog>
 {% endblock %}
 
@@ -879,14 +879,21 @@
     {% endif %}
 
     {% set tag = tag ?? 'a' %}
+    {% set modal_box_attr = modal_box_attr|default({}) %}
 
     <div data-controller="kreyu--data-table-bundle--dialog">
         <{{ tag }}{{ _self.attributes(attr) }}>
             {{- data_table_theme_block(data_table, 'action_control', resetAttr = true) -}}
         </{{ tag }}>
         <dialog{{ _self.attributes({ 'data-kreyu--data-table-bundle--dialog-target': 'dialog' }|merge(modal_attr|default({}))) }}>
-            <div{{ _self.attributes({ 'data-kreyu--data-table-bundle--dialog-target': 'content' }|merge(modal_content_attr|default({}))) }}>{{ 'Loading'|trans({}, 'KreyuDataTable') }}</div>
-            <button{{ _self.attributes({ type: 'button', 'data-action': 'kreyu--data-table-bundle--dialog#close' }|merge(modal_close_button_attr|default({}))) }}>{{ 'Close'|trans({}, 'KreyuDataTable') }}</button>
+            {% if modal_box_attr is not empty %}<div{{ _self.attributes(modal_box_attr) }}>{% endif %}
+            <div{{ _self.attributes({ 'data-kreyu--data-table-bundle--dialog-target': 'content' }|merge(modal_content_attr|default({}))) }}>
+                {%- block action_modal_loading %}{{ 'Loading'|trans({}, 'KreyuDataTable') }}{% endblock -%}
+            </div>
+            {% block action_modal_close_button %}
+                <button{{ _self.attributes({ type: 'button', 'data-action': 'kreyu--data-table-bundle--dialog#close' }|merge(modal_close_button_attr|default({}))) }}>{{ 'Close'|trans({}, 'KreyuDataTable') }}</button>
+            {% endblock %}
+            {% if modal_box_attr is not empty %}</div>{% endif %}
         </dialog>
     </div>
 {% endblock %}

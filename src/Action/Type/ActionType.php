@@ -53,21 +53,10 @@ final class ActionType implements ActionTypeInterface
             $options['confirmation'] = $this->resolveConfirmationOption($options['confirmation']);
         }
 
-        if ($action->getConfig()->isConfirmable()) {
-            $options['confirmation']['identifier'] = vsprintf(
-                // [data table name]--[context]-action--[action name]--confirmation
-                format: '%s--%s-action--%s',
-                values: [
-                    $dataTable->vars['name'],
-                    $action->getConfig()->getContext()->value,
-                    $action->getName(),
-                ],
-            );
+        $identifier = $this->getIdentifier($view, $action);
 
-            if ($view->parent instanceof ColumnValueView) {
-                // [data table name]--[context]-action--[action name]--confirmation--[row index]
-                $options['confirmation']['identifier'] .= '--'.$view->parent->parent->index;
-            }
+        if ($action->getConfig()->isConfirmable()) {
+            $options['confirmation']['identifier'] = $identifier;
         }
 
         $blockPrefixes = $action->getConfig()->getType()->getBlockPrefixHierarchy();
@@ -79,6 +68,7 @@ final class ActionType implements ActionTypeInterface
         $view->vars = array_replace($view->vars, [
             'data_table' => $dataTable,
             'name' => $action->getName(),
+            'identifier' => $identifier,
             'block_prefixes' => $blockPrefixes,
             'label' => $options['label'] ?? StringUtil::camelToSentence($action->getName()),
             'translation_domain' => $options['translation_domain'] ?? $dataTable->vars['translation_domain'],
@@ -132,6 +122,21 @@ final class ActionType implements ActionTypeInterface
         return null;
     }
 
+    private function getIdentifier(ActionView $view, ActionInterface $action): string
+    {
+        $identifierParts = [
+            $action->getDataTable()->getName(),
+            $action->getConfig()->getContext()->value.'-action',
+            $action->getName(),
+        ];
+
+        if ($view->parent instanceof ColumnValueView) {
+            $identifierParts[] = $view->parent->parent->index;
+        }
+
+        return implode('--', $identifierParts);
+    }
+
     private function resolveConfirmationOption(bool|array $confirmation): array
     {
         if (true === $confirmation) {
@@ -153,7 +158,7 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedTypes('label_confirm', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('label_cancel', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('type', ['null', 'string'])
-            ->setAllowedValues('type', ['danger', 'warning', 'info'])
+            ->setAllowedValues('type', [null, 'danger', 'warning', 'info'])
         ;
 
         return $optionsResolver->resolve($confirmation ?: []);

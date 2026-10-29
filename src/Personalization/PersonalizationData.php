@@ -28,31 +28,7 @@ class PersonalizationData
 
     public static function fromArray(array $data): self
     {
-        $resolver =
-            self::$optionsResolver ??= (new OptionsResolver())
-                ->setDefaults([
-                    'columns' => static function (OptionsResolver $resolver) {
-                        $resolver
-                            ->setPrototype(true)
-                            ->setDefaults([
-                                'name' => null,
-                                'priority' => 0,
-                                'visible' => true,
-                            ])
-                            ->setAllowedTypes('name', ['null', 'string'])
-                            ->setAllowedTypes('priority', 'int')
-                            ->setAllowedTypes('visible', 'bool')
-                        ;
-                    },
-                ])
-                ->addNormalizer('columns', static function (Options $options, array $value) {
-                    foreach ($value as $name => $column) {
-                        $value[$name]['name'] ??= $name;
-                    }
-
-                    return $value;
-                })
-        ;
+        $resolver = self::$optionsResolver ??= self::createOptionsResolver();
 
         $data = $resolver->resolve($data);
 
@@ -147,5 +123,41 @@ class PersonalizationData
 
             $this->removeColumn($column);
         }
+    }
+
+    private static function createOptionsResolver(): OptionsResolver
+    {
+        $configureColumns = static function (OptionsResolver $resolver): void {
+            $resolver
+                ->setPrototype(true)
+                ->setDefaults([
+                    'name' => null,
+                    'priority' => 0,
+                    'visible' => true,
+                ])
+                ->setAllowedTypes('name', ['null', 'string'])
+                ->setAllowedTypes('priority', 'int')
+                ->setAllowedTypes('visible', 'bool')
+            ;
+        };
+
+        $resolver = (new OptionsResolver())
+            ->setDefined('columns')
+            ->addNormalizer('columns', static function (Options $options, array $value) {
+                foreach ($value as $name => $column) {
+                    $value[$name]['name'] ??= $name;
+                }
+
+                return $value;
+            })
+        ;
+
+        $supportsNestedOptions = method_exists($resolver, 'setOptions');
+
+        if ($supportsNestedOptions) {
+            return $resolver->setOptions('columns', $configureColumns);
+        }
+
+        return $resolver->setDefault('columns', $configureColumns);
     }
 }

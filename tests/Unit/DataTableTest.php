@@ -56,6 +56,22 @@ class DataTableTest extends DataTableIntegrationTestCase
         $this->assertEquals(['fifth', 'first', 'second', 'third', 'fourth'], $columns);
     }
 
+    public function testGetColumnsWithEmptyPersonalizationData()
+    {
+        $dataTable = $this
+            ->createDataTableBuilder(['personalization_enabled' => true])
+            ->addColumn('first', options: ['priority' => 1])
+            ->addColumn('second', options: ['priority' => 2])
+            ->getDataTable()
+        ;
+
+        $dataTable->setPersonalizationData(PersonalizationData::fromArray([]));
+
+        $columns = array_keys($dataTable->getColumns());
+
+        $this->assertEquals(['second', 'first'], $columns);
+    }
+
     public function testGetColumnsIgnoresDisabledPersonalization()
     {
         $dataTable = $this

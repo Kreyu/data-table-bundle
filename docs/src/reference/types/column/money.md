@@ -6,6 +6,10 @@
 
 The [`MoneyColumnType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/Column/Type/MoneyColumnType.php) represents a column with monetary value, appropriately formatted and rendered with currency sign.
 
+::: tip
+**Its parent is [`NumberColumnType`](number.md).** Type extensions for `NumberColumnType` apply to money columns too, and theme blocks fall back from `column_money_*` to `column_number_*`.
+:::
+
 ## Options
 
 ### `currency`

@@ -56,18 +56,25 @@ final class MoneyColumnType extends AbstractColumnType
             ->allowedTypes('bool')
         ;
 
-        $resolver
-            ->define('intl_formatter_options')
-            ->default(static function (OptionsResolver $resolver) {
-                $resolver
-                    ->setDefaults([
-                        'attrs' => [],
-                        'style' => 'decimal',
-                    ])
-                    ->setAllowedTypes('attrs', 'array')
-                    ->setAllowedTypes('style', 'string')
-                ;
-            })
-        ;
+        $configureIntlFormatterOptions = static function (OptionsResolver $resolver): void {
+            $resolver
+                ->setDefaults([
+                    'attrs' => [],
+                    'style' => 'decimal',
+                ])
+                ->setAllowedTypes('attrs', 'array')
+                ->setAllowedTypes('style', 'string')
+            ;
+        };
+
+        $supportsNestedOptions = method_exists($resolver, 'setOptions');
+
+        if ($supportsNestedOptions) {
+            $resolver->setOptions('intl_formatter_options', $configureIntlFormatterOptions);
+
+            return;
+        }
+
+        $resolver->setDefault('intl_formatter_options', $configureIntlFormatterOptions);
     }
 }

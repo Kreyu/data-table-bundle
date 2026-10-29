@@ -36,6 +36,13 @@ class NumberColumnTypeTest extends ColumnTypeTestCase
         $this->assertTrue($valueView->vars['use_intl_formatter']);
     }
 
+    public function testIntlFormatterOptionsDefault(): void
+    {
+        $valueView = $this->createColumnValueView($this->createColumn());
+
+        $this->assertSame(['attrs' => [], 'style' => 'decimal'], $valueView->vars['intl_formatter_options']);
+    }
+
     public function testIntlFormatterOptionsOption(): void
     {
         $column = $this->createColumn([

@@ -35,6 +35,11 @@ interface ResolvedDataTableTypeInterface
         array $options = [],
     ): DataTableBuilderInterface;
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function createDefaultQuery(array $options): mixed;
+
     public function createView(DataTableInterface $dataTable): DataTableView;
 
     public function createExportView(DataTableInterface $dataTable): DataTableView;

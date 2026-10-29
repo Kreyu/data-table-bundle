@@ -59,6 +59,37 @@ This method accepts _three_ arguments:
 In above example, we're passing an instance of Doctrine ORM query builder as data, not results.
 This allows the bundle to paginate the results, apply filtration, and more.
 
+## Default query
+
+**A type can provide its own query**, so the controller doesn't have to pass data.
+Return it from `createDefaultQuery()`; it gets the resolved options:
+
+```php
+use App\Repository\ProductRepository;
+use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
+
+class ProductDataTableType extends AbstractDataTableType
+{
+    public function __construct(
+        private ProductRepository $productRepository,
+    ) {
+    }
+
+    public function createDefaultQuery(array $options): mixed
+    {
+        return $this->productRepository->createQueryBuilder('product');
+    }
+}
+```
+
+```php
+$dataTable = $this->createDataTable(ProductDataTableType::class);
+```
+
+- Return anything you could pass as data: a query builder, an array or a proxy query.
+- Data passed to `createDataTable()` wins over the default query.
+- Returning `null` falls back to the parent type's default query.
+
 ## Handling the request
 
 In order to be able to paginate, sort, filter, personalize or export the data table, call the `handleRequest()` method of the data table:

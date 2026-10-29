@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 
@@ -44,25 +45,37 @@ class DataTableFactory implements DataTableFactoryInterface
         mixed $data = null,
         array $options = [],
     ): DataTableBuilderInterface {
-        $query = $data;
-
-        if (null !== $data && !$data instanceof ProxyQueryInterface) {
-            foreach ($this->registry->getProxyQueryFactories() as $proxyQueryFactory) {
-                if (!$proxyQueryFactory->supports($data)) {
-                    continue;
-                }
-
-                $query = $proxyQueryFactory->create($data);
-                break;
-            }
-        }
-
         $type = $this->registry->getType($type);
 
-        $builder = $type->createBuilder($this, $name, $query, $options);
+        $builder = $type->createBuilder($this, $name, null, $options);
+
+        $data ??= $type->createDefaultQuery($builder->getOptions());
+
+        $builder->setQuery($this->createProxyQuery($data));
 
         $type->buildDataTable($builder, $builder->getOptions());
 
         return $builder;
+    }
+
+    private function createProxyQuery(mixed $data): ?ProxyQueryInterface
+    {
+        if ($data === null) {
+            return null;
+        }
+
+        if ($data instanceof ProxyQueryInterface) {
+            return $data;
+        }
+
+        foreach ($this->registry->getProxyQueryFactories() as $proxyQueryFactory) {
+            $isSupported = $proxyQueryFactory->supports($data);
+
+            if ($isSupported) {
+                return $proxyQueryFactory->create($data);
+            }
+        }
+
+        throw new UnexpectedTypeException($data, ProxyQueryInterface::class);
     }
 }

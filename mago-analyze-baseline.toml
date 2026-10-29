@@ -1293,6 +1293,12 @@ count = 1
 [[issues]]
 file = "src/DataTableFactory.php"
 code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createDefaultQuery`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "src/DataTableFactory.php"
+code = "less-specific-argument"
 message = 'Argument type mismatch for argument #2 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::buildDataTable`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
 count = 1
 
@@ -1300,12 +1306,6 @@ count = 1
 file = "src/DataTableFactory.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #4 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createBuilder`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "src/DataTableFactory.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #3 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createBuilder`: expected `Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface|null`, but found `mixed`.'
 count = 1
 
 [[issues]]

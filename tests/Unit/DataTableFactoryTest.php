@@ -10,6 +10,8 @@ use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\CustomQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\ConfigurableDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DefaultQueryDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DefaultQuerySubDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
@@ -45,6 +47,20 @@ class DataTableFactoryTest extends TestCase
         $builder = $this->createFactory()->createNamedBuilder('name', data: $data);
 
         $this->assertSame($data, $builder->getQuery());
+    }
+
+    public function testCreateNamedBuilderUsesTypeDefaultQuery()
+    {
+        $factory = $this->createFactory(proxyQueryFactories: [new CustomProxyQueryFactory()]);
+        $data = new CustomProxyQuery();
+
+        $explicitBuilder = $factory->createNamedBuilder('name', DefaultQueryDataTableType::class, $data);
+        $defaultBuilder = $factory->createNamedBuilder('name', DefaultQueryDataTableType::class);
+        $inheritedBuilder = $factory->createNamedBuilder('name', DefaultQuerySubDataTableType::class);
+
+        $this->assertSame($data, $explicitBuilder->getQuery());
+        $this->assertInstanceOf(CustomProxyQuery::class, $defaultBuilder->getQuery());
+        $this->assertInstanceOf(CustomProxyQuery::class, $inheritedBuilder->getQuery());
     }
 
     public function testCreateBuilderUsesDataTableName()
@@ -96,6 +112,8 @@ class DataTableFactoryTest extends TestCase
                 new DataTableType(),
                 new SimpleDataTableType(),
                 new ConfigurableDataTableType(),
+                new DefaultQueryDataTableType(),
+                new DefaultQuerySubDataTableType(),
             ],
             typeExtensions: [],
             proxyQueryFactories: $proxyQueryFactories,

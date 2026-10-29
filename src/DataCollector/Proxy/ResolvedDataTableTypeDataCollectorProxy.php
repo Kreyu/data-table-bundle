@@ -54,6 +54,11 @@ class ResolvedDataTableTypeDataCollectorProxy implements ResolvedDataTableTypeIn
         return $builder;
     }
 
+    public function createDefaultQuery(array $options): mixed
+    {
+        return $this->proxiedType->createDefaultQuery($options);
+    }
+
     public function createView(DataTableInterface $dataTable): DataTableView
     {
         return $this->proxiedType->createView($dataTable);

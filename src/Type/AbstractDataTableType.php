@@ -20,6 +20,11 @@ abstract class AbstractDataTableType implements DataTableTypeInterface
 
     public function configureOptions(OptionsResolver $resolver): void {}
 
+    public function createDefaultQuery(array $options): mixed
+    {
+        return null;
+    }
+
     public function getName(): string
     {
         return StringUtil::fqcnToShortName(static::class, ['DataTableType', 'Type']) ?: '';

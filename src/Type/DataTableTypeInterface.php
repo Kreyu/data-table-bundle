@@ -28,6 +28,11 @@ interface DataTableTypeInterface
 
     public function configureOptions(OptionsResolver $resolver): void;
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function createDefaultQuery(array $options): mixed;
+
     public function getName(): string;
 
     /**

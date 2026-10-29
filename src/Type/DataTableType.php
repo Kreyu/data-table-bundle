@@ -275,6 +275,11 @@ final class DataTableType implements DataTableTypeInterface
         ;
     }
 
+    public function createDefaultQuery(array $options): mixed
+    {
+        return null;
+    }
+
     public function getName(): string
     {
         return 'data_table';

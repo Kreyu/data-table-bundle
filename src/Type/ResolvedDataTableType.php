@@ -74,6 +74,11 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
         return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
     }
 
+    public function createDefaultQuery(array $options): mixed
+    {
+        return $this->innerType->createDefaultQuery($options) ?? $this->parent?->createDefaultQuery($options);
+    }
+
     public function createView(DataTableInterface $dataTable): DataTableView
     {
         return new DataTableView();

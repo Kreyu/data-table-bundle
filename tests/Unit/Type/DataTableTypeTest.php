@@ -112,7 +112,7 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
 
         $expectedFiltrationParameters = [
-            'author__name' => ['value' => 'bar'],
+            'author:name' => ['value' => 'bar'],
             DataTableBuilderInterface::SEARCH_FILTER_NAME => ['value' => 'foo'],
         ];
 
@@ -135,14 +135,14 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         /** @var FormView $personalizationForm */
         $personalizationForm = $dataTable->createView()->vars['personalization_form'];
 
-        $this->assertSame(['id', 'author__name'], array_keys($personalizationForm['columns']->children));
-        $this->assertSame('Author.name', $personalizationForm['columns']['author__name']->vars['label']);
+        $this->assertSame(['id', 'author:name'], array_keys($personalizationForm['columns']->children));
+        $this->assertSame('Author.name', $personalizationForm['columns']['author:name']->vars['label']);
 
         $form = $dataTable->createPersonalizationFormBuilder()->getForm();
         $form->submit([
             'columns' => [
                 'id' => ['name' => 'id', 'priority' => '1', 'visible' => '0'],
-                'author__name' => ['name' => 'author.name', 'priority' => '2', 'visible' => '1'],
+                'author:name' => ['name' => 'author.name', 'priority' => '2', 'visible' => '1'],
             ],
         ]);
 

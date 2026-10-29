@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Personalization\Form\Type;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationColumnData;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
+use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -72,7 +73,7 @@ class PersonalizationDataType extends AbstractType
         $columnsByFormName = [];
 
         foreach ($columns as $column) {
-            $formName = str_replace(search: '.', replace: '__', subject: $column->getName());
+            $formName = FormUtil::getFormName($column->getName());
             $columnsByFormName[$formName] = $column;
         }
 

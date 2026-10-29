@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Event\FilterEvents;
 use Kreyu\Bundle\DataTableBundle\Filter\Event\PostHandleEvent;
 use Kreyu\Bundle\DataTableBundle\Filter\Event\PreHandleEvent;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
+use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 
 class Filter implements FilterInterface
 {
@@ -49,7 +50,7 @@ class Filter implements FilterInterface
 
     public function getFormName(): string
     {
-        return str_replace('.', '__', $this->getName());
+        return FormUtil::getFormName($this->getName());
     }
 
     public function getFormOptions(): array

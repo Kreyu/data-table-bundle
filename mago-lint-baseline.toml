@@ -548,12 +548,6 @@ count = 1
 
 [[issues]]
 file = "src/Filter/Filter.php"
-code = "literal-named-argument"
-message = "Literal argument `'__'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "src/Filter/Filter.php"
 code = "no-isset"
 message = "Use of the `isset` construct."
 count = 1

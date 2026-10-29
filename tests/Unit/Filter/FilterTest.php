@@ -38,7 +38,7 @@ class FilterTest extends TestCase
     {
         $this->filterConfig->method('getName')->willReturn('foo.bar');
 
-        $this->assertSame('foo__bar', $this->createFilter()->getFormName());
+        $this->assertSame('foo:bar', $this->createFilter()->getFormName());
     }
 
     public function testQueryPathDefaultsToFilterName()

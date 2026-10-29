@@ -8,6 +8,11 @@ use Symfony\Component\Form\FormView;
 
 class FormUtil
 {
+    public static function getFormName(string $name): string
+    {
+        return str_replace(search: '.', replace: ':', subject: $name);
+    }
+
     public static function getFormViewValueRecursive(FormView $view): mixed
     {
         $value = $view->vars['value'];

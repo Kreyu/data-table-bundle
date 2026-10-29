@@ -185,7 +185,7 @@ The following variables are common to every filter type:
 | Variable                       | Usage                                                                                                             |
 |--------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | `name`                         | Name of the filter.                                                                                               |
-| `form_name`                    | Form field name of the filter (dots replaced with `__`).                                                          |
+| `form_name`                    | Form field name of the filter (dots replaced with `:`).                                                           |
 | `label`                        | Label that will be used when rendering the column header.                                                         |
 | `label_translation_parameters` | Parameters used when translating the `label` option.                                                              |
 | `translation_domain`           | Translation domain used when translating the column translatable values. If `false`, the translation is disabled. |

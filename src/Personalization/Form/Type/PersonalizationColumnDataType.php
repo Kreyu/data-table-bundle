@@ -9,7 +9,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationColumnDataType extends AbstractType
@@ -33,7 +32,7 @@ class PersonalizationColumnDataType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => PersonalizationColumnData::class,
-            'empty_data' => static fn (FormInterface $form) => new PersonalizationColumnData($form->getName()),
+            'empty_data' => static fn () => new PersonalizationColumnData(''),
         ]);
     }
 

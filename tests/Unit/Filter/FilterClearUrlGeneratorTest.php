@@ -82,7 +82,7 @@ class FilterClearUrlGeneratorTest extends TestCase
     public function testItIncludesEmptyFilterParameters()
     {
         $this->request->query->set(self::FILTRATION_PARAMETER_NAME, [
-            'author__name' => ['value' => 'John'],
+            'author:name' => ['value' => 'John'],
         ]);
 
         $this->urlGenerator
@@ -90,7 +90,7 @@ class FilterClearUrlGeneratorTest extends TestCase
             ->method('generate')
             ->with(self::ROUTE_NAME, [
                 self::FILTRATION_PARAMETER_NAME => [
-                    'author__name' => [
+                    'author:name' => [
                         'value' => '',
                     ],
                     'firstName' => [
@@ -108,7 +108,7 @@ class FilterClearUrlGeneratorTest extends TestCase
             $this->createDataTableViewMock(),
             $this->createFilterViewMock('firstName', operatorSelectable: true),
             $this->createFilterViewMock('lastName', operatorSelectable: false),
-            $this->createFilterViewMock('author.name', operatorSelectable: false, formName: 'author__name'),
+            $this->createFilterViewMock('author.name', operatorSelectable: false, formName: 'author:name'),
         );
     }
 

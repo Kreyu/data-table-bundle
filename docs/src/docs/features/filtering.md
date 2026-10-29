@@ -79,6 +79,11 @@ class ProductController
 ```
 :::
 
+::: warning Upgrading: dotted filter names in URLs
+**A dot in a filter name now becomes `:` in the URL, not `__`:** `filter_products[author:name]`, previously `filter_products[author__name]`.
+Bookmarked URLs with the old key no longer apply that filter.
+:::
+
 ## Active filters
 
 **Every theme, `base` included, shows active filters as chips in the action bar.**

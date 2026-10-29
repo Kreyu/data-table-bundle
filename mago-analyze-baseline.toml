@@ -1088,12 +1088,6 @@ count = 1
 
 [[issues]]
 file = "src/DataTable.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #2 of `array_filter`: expected `(callable(Kreyu\Bundle\DataTableBundle\Column\ColumnInterface): bool)|(callable(Kreyu\Bundle\DataTableBundle\Column\ColumnInterface, string): bool)|(callable(string): bool)|null`, but provided type `(closure(Kreyu\Bundle\DataTableBundle\Column\ColumnInterface): nonnull)` is less specific.'
-count = 1
-
-[[issues]]
-file = "src/DataTable.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #5 of `Kreyu\Bundle\DataTableBundle\Pagination\PaginationContext::__construct`: expected `int`, but found `mixed`.'
 count = 2
@@ -1102,13 +1096,13 @@ count = 2
 file = "src/DataTable.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 6
+count = 7
 
 [[issues]]
 file = "src/DataTable.php"
 code = "mixed-assignment"
 message = "Assigning `nonnull` type to a variable may lead to unexpected behavior."
-count = 11
+count = 7
 
 [[issues]]
 file = "src/DataTable.php"
@@ -1126,12 +1120,6 @@ count = 1
 file = "src/DataTable.php"
 code = "mixed-operand"
 message = "Left operand in spaceship comparison (`<=>`) has `mixed` type."
-count = 1
-
-[[issues]]
-file = "src/DataTable.php"
-code = "mixed-operand"
-message = "Right operand in `&&` operation has `mixed` type."
 count = 1
 
 [[issues]]
@@ -1293,6 +1281,12 @@ count = 1
 [[issues]]
 file = "src/DataTableFactory.php"
 code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createDefaultQuery`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "src/DataTableFactory.php"
+code = "less-specific-argument"
 message = 'Argument type mismatch for argument #2 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::buildDataTable`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
 count = 1
 
@@ -1300,12 +1294,6 @@ count = 1
 file = "src/DataTableFactory.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #4 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createBuilder`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "src/DataTableFactory.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #3 of `Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface::createBuilder`: expected `Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -2092,7 +2080,7 @@ count = 3
 file = "src/Request/HttpFoundationRequestHandler.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 6
+count = 7
 
 [[issues]]
 file = "src/Request/HttpFoundationRequestHandler.php"
@@ -2385,6 +2373,12 @@ count = 1
 [[issues]]
 file = "src/Type/DataTableType.php"
 code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Kreyu\Bundle\DataTableBundle\DataTableConfigBuilderInterface::setColumnVisibilityGroups`: expected `array<string, Symfony\Contracts\Translation\TranslatableInterface|string>`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
+code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Kreyu\Bundle\DataTableBundle\DataTableConfigBuilderInterface::setExportFormFactory`: expected `Symfony\Component\Form\FormFactoryInterface|null`, but found `nonnull`.'
 count = 1
 
@@ -2560,7 +2554,7 @@ count = 2
 file = "src/Type/DataTableType.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 12
+count = 13
 
 [[issues]]
 file = "src/Type/DataTableType.php"

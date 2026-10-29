@@ -74,7 +74,7 @@ class FiltrationDataType extends AbstractType
             }
 
             if ($filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
-                $searchFields[] = $view[$child->getName()];
+                $searchFields[$child->getName()] = $view[$child->getName()];
 
                 unset($view[$child->getName()]);
             }

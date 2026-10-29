@@ -492,11 +492,24 @@ final class DataTableType implements DataTableTypeInterface
         $parameters = [];
 
         if ($dataTable->getConfig()->isFiltrationEnabled()) {
+            /** @var FormView $filtrationFormView */
+            $filtrationFormView = $view->vars['filtration_form'];
+
+            /** @var array<string, FormView> $searchFields */
+            $searchFields = $filtrationFormView->vars['search_fields'];
+
             foreach ($view->filters as $filterView) {
                 $value = null;
 
-                if ($formView = $view->vars['filtration_form'][$filterView->vars['name']]['value'] ?? null) {
-                    $value = FormUtil::getFormViewValueRecursive($formView);
+                /** @var string $filterName */
+                $filterName = $filterView->vars['name'];
+                $panelFormView = $filtrationFormView[$filterName] ?? null;
+                $searchFormView = $searchFields[$filterName] ?? null;
+                $filterFormView = $panelFormView ?? $searchFormView;
+                $valueFormView = $filterFormView['value'] ?? null;
+
+                if ($valueFormView !== null) {
+                    $value = FormUtil::getFormViewValueRecursive($valueFormView);
                 }
 
                 if (null === $value || '' === $value || [] === $value) {

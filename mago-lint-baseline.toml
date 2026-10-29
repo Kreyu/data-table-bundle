@@ -866,12 +866,6 @@ count = 1
 
 [[issues]]
 file = "src/Type/DataTableType.php"
-code = "no-assign-in-condition"
-message = "Avoid assignments in conditions."
-count = 1
-
-[[issues]]
-file = "src/Type/DataTableType.php"
 code = "no-else-clause"
 message = "Avoid `else` clauses."
 count = 1

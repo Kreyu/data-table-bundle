@@ -237,7 +237,7 @@ See [Theming](../docs/features/theming.md#adding-html-attributes) for more.
 
 Set these with `{% with %}` in the block named below. Each is merged over the bundle's own attributes, except `confirm_button_attr`.
 
-> The dialog variables and sub-blocks apply to themes built on `base` (base, daisyUI). Bootstrap 5 and Tabler render their own Bootstrap modal.
+> The dialog variables and sub-blocks apply to `base` and themes extending it. Bootstrap 5 and Tabler render their own Bootstrap modal.
 
 | Variable                  | Block                                               | Rendered on                                                                         |
 |---------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------|

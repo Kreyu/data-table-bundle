@@ -67,7 +67,11 @@ interface DataTableInterface
     /**
      * @param class-string<ColumnTypeInterface> $type
      */
-    public function addColumn(ColumnInterface|string $column, string $type = ColumnType::class, array $options = []): static;
+    public function addColumn(
+        ColumnInterface|string $column,
+        string $type = ColumnType::class,
+        array $options = [],
+    ): static;
 
     public function removeColumn(string $name): static;
 
@@ -86,7 +90,11 @@ interface DataTableInterface
     /**
      * @param class-string<FilterTypeInterface> $type
      */
-    public function addFilter(FilterInterface|string $filter, string $type = FilterType::class, array $options = []): static;
+    public function addFilter(
+        FilterInterface|string $filter,
+        string $type = FilterType::class,
+        array $options = [],
+    ): static;
 
     public function removeFilter(string $name): static;
 
@@ -105,7 +113,11 @@ interface DataTableInterface
     /**
      * @param class-string<ActionTypeInterface> $type
      */
-    public function addAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static;
 
     public function removeAction(string $name): static;
 
@@ -124,7 +136,11 @@ interface DataTableInterface
     /**
      * @param class-string<ActionTypeInterface> $type
      */
-    public function addBatchAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addBatchAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static;
 
     public function removeBatchAction(string $name): static;
 
@@ -143,7 +159,11 @@ interface DataTableInterface
     /**
      * @param class-string<ActionTypeInterface> $type
      */
-    public function addRowAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static;
+    public function addRowAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static;
 
     public function removeRowAction(string $name): static;
 
@@ -162,7 +182,11 @@ interface DataTableInterface
     /**
      * @param class-string<ExporterTypeInterface> $type
      */
-    public function addExporter(ExporterInterface|string $exporter, string $type = ExporterType::class, array $options = []): static;
+    public function addExporter(
+        ExporterInterface|string $exporter,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): static;
 
     public function removeExporter(string $name): static;
 
@@ -219,4 +243,6 @@ interface DataTableInterface
     public function setTurboFrameId(string $turboFrameId): static;
 
     public function isRequestFromTurboFrame(): bool;
+
+    public function isDeferred(): bool;
 }

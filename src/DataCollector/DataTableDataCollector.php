@@ -32,7 +32,10 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
         private int $maxDepth = 3,
     ) {
         if (!class_exists(ClassStub::class)) {
-            throw new \LogicException(sprintf('The VarDumper component is needed for using the "%s" class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
+            throw new \LogicException(sprintf(
+                'The VarDumper component is needed for using the "%s" class. Install symfony/var-dumper version 3.4 or above.',
+                __CLASS__,
+            ));
         }
     }
 
@@ -56,9 +59,7 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
         return '@KreyuDataTable/data_collector/template.html.twig';
     }
 
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
-    {
-    }
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void {}
 
     public function collectDataTable(DataTableInterface $dataTable): void
     {
@@ -67,34 +68,46 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             $this->dataExtractor->extractDataTableConfiguration($dataTable),
             [
                 'columns' => ArrayUtil::mapWithKeys(
-                    fn (ColumnInterface $column) => [$column->getName() => $this->dataExtractor->extractColumnConfiguration($column)],
+                    fn (ColumnInterface $column) => [
+                        $column->getName() => $this->dataExtractor->extractColumnConfiguration($column),
+                    ],
                     $dataTable->getColumns(),
                 ),
                 'filters' => ArrayUtil::mapWithKeys(
-                    fn (FilterInterface $filter) => [$filter->getName() => $this->dataExtractor->extractFilterConfiguration($filter)],
+                    fn (FilterInterface $filter) => [
+                        $filter->getName() => $this->dataExtractor->extractFilterConfiguration($filter),
+                    ],
                     $dataTable->getFilters(),
                 ),
                 'actions' => ArrayUtil::mapWithKeys(
-                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    fn (ActionInterface $action) => [
+                        $action->getName() => $this->dataExtractor->extractActionConfiguration($action),
+                    ],
                     $dataTable->getActions(),
                 ),
                 'row_actions' => ArrayUtil::mapWithKeys(
-                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    fn (ActionInterface $action) => [
+                        $action->getName() => $this->dataExtractor->extractActionConfiguration($action),
+                    ],
                     $dataTable->getRowActions(),
                 ),
                 'batch_actions' => ArrayUtil::mapWithKeys(
-                    fn (ActionInterface $action) => [$action->getName() => $this->dataExtractor->extractActionConfiguration($action)],
+                    fn (ActionInterface $action) => [
+                        $action->getName() => $this->dataExtractor->extractActionConfiguration($action),
+                    ],
                     $dataTable->getBatchActions(),
                 ),
                 'exporters' => ArrayUtil::mapWithKeys(
-                    fn (ExporterInterface $exporter) => [$exporter->getName() => $this->dataExtractor->extractExporterConfiguration($exporter)],
+                    fn (ExporterInterface $exporter) => [
+                        $exporter->getName() => $this->dataExtractor->extractExporterConfiguration($exporter),
+                    ],
                     $dataTable->getExporters(),
                 ),
             ],
         );
 
         if (!$dataTable->getConfig()->isPaginationEnabled()) {
-            $this->data[$dataTable->getName()]['total_count'] = $this->isDeferred($dataTable)
+            $this->data[$dataTable->getName()]['total_count'] = $dataTable->isDeferred()
                 ? null
                 : iterator_count($dataTable->getItems());
         }
@@ -110,7 +123,9 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
 
     public function collectColumnHeaderView(ColumnInterface $column, ColumnHeaderView $view): void
     {
-        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['header_view_vars'] = ArrayUtil::ksort($view->vars);
+        $this->data[$column
+            ->getDataTable()
+            ->getName()]['columns'][$column->getName()]['header_view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectColumnValueView(ColumnInterface $column, ColumnValueView $view): void
@@ -120,7 +135,9 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             return;
         }
 
-        $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()]['value_view_vars'] = ArrayUtil::ksort($view->vars);
+        $this->data[$column
+            ->getDataTable()
+            ->getName()]['columns'][$column->getName()]['value_view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectSortingData(DataTableInterface $dataTable, SortingData $data): void
@@ -144,19 +161,16 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
         $this->data[$dataTable->getName()]['page'] = $data->getPage();
         $this->data[$dataTable->getName()]['per_page'] = $data->getPerPage();
 
-        $this->data[$dataTable->getName()]['total_count'] = $this->isDeferred($dataTable)
+        $this->data[$dataTable->getName()]['total_count'] = $dataTable->isDeferred()
             ? null
             : $dataTable->getPagination()->getTotalItemCount();
     }
 
-    private function isDeferred(DataTableInterface $dataTable): bool
-    {
-        return $dataTable->getConfig()->getOption('async', false) && !$dataTable->isRequestFromTurboFrame();
-    }
-
     public function collectFilterView(FilterInterface $filter, FilterView $view): void
     {
-        $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+        $this->data[$filter
+            ->getDataTable()
+            ->getName()]['filters'][$filter->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function collectFiltrationData(DataTableInterface $dataTable, FiltrationData $data): void
@@ -184,7 +198,9 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             ActionContext::Batch => 'batch_actions',
         };
 
-        $this->data[$action->getDataTable()->getName()][$actionsKey][$action->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+        $this->data[$action
+            ->getDataTable()
+            ->getName()][$actionsKey][$action->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
     }
 
     public function getData(): array|Data

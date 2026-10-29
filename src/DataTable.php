@@ -136,19 +136,19 @@ class DataTable implements DataTableInterface
 
         $this->dispatch(DataTableEvents::PRE_INITIALIZE, new DataTableEvent($this));
 
-        if (null === $this->paginationData && $paginationData = $this->getInitialPaginationData()) {
+        if (null === $this->paginationData && ($paginationData = $this->getInitialPaginationData())) {
             $this->paginate($paginationData, false);
         }
 
-        if (null === $this->sortingData && $sortingData = $this->getInitialSortingData()) {
+        if (null === $this->sortingData && ($sortingData = $this->getInitialSortingData())) {
             $this->sort($sortingData, false);
         }
 
-        if (null === $this->filtrationData && $filtrationData = $this->getInitialFiltrationData()) {
+        if (null === $this->filtrationData && ($filtrationData = $this->getInitialFiltrationData())) {
             $this->filter($filtrationData, false);
         }
 
-        if (null === $this->personalizationData && $personalizationData = $this->getInitialPersonalizationData()) {
+        if (null === $this->personalizationData && ($personalizationData = $this->getInitialPersonalizationData())) {
             $this->personalize($personalizationData, false);
         }
 
@@ -276,10 +276,14 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->columns);
     }
 
-    public function addColumn(ColumnInterface|string $column, string $type = ColumnType::class, array $options = []): static
-    {
+    public function addColumn(
+        ColumnInterface|string $column,
+        string $type = ColumnType::class,
+        array $options = [],
+    ): static {
         if (is_string($column)) {
-            $column = $this->config->getColumnFactory()
+            $column = $this->config
+                ->getColumnFactory()
                 ->createNamedBuilder($column, $type, $options)
                 ->getColumn()
             ;
@@ -318,10 +322,14 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->filters);
     }
 
-    public function addFilter(FilterInterface|string $filter, string $type = FilterType::class, array $options = []): static
-    {
+    public function addFilter(
+        FilterInterface|string $filter,
+        string $type = FilterType::class,
+        array $options = [],
+    ): static {
         if (is_string($filter)) {
-            $filter = $this->config->getFilterFactory()
+            $filter = $this->config
+                ->getFilterFactory()
                 ->createNamedBuilder($filter, $type, $options)
                 ->getFilter()
             ;
@@ -360,8 +368,11 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->actions);
     }
 
-    public function addAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
-    {
+    public function addAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static {
         if (is_string($action)) {
             $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Global);
@@ -402,8 +413,11 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->batchActions);
     }
 
-    public function addBatchAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
-    {
+    public function addBatchAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static {
         if (is_string($action)) {
             $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Batch);
@@ -444,8 +458,11 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->rowActions);
     }
 
-    public function addRowAction(ActionInterface|string $action, string $type = ActionType::class, array $options = []): static
-    {
+    public function addRowAction(
+        ActionInterface|string $action,
+        string $type = ActionType::class,
+        array $options = [],
+    ): static {
         if (is_string($action)) {
             $builder = $this->config->getActionFactory()->createNamedBuilder($action, $type, $options);
             $builder->setContext(ActionContext::Row);
@@ -486,10 +503,14 @@ class DataTable implements DataTableInterface
         return array_key_exists($name, $this->exporters);
     }
 
-    public function addExporter(ExporterInterface|string $exporter, string $type = ExporterType::class, array $options = []): static
-    {
+    public function addExporter(
+        ExporterInterface|string $exporter,
+        string $type = ExporterType::class,
+        array $options = [],
+    ): static {
         if (is_string($exporter)) {
-            $exporter = $this->config->getExporterFactory()
+            $exporter = $this->config
+                ->getExporterFactory()
                 ->createNamedBuilder($exporter, $type, $options)
                 ->getExporter()
             ;
@@ -782,7 +803,7 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has personalization feature disabled.');
         }
 
-        if (null === $formFactory = $this->config->getPersonalizationFormFactory()) {
+        if (null === ($formFactory = $this->config->getPersonalizationFormFactory())) {
             throw new RuntimeException('The data table has no configured personalization form factory.');
         }
 
@@ -801,7 +822,7 @@ class DataTable implements DataTableInterface
             throw new RuntimeException('The data table has export feature disabled.');
         }
 
-        if (null === $formFactory = $this->config->getExportFormFactory()) {
+        if (null === ($formFactory = $this->config->getExportFormFactory())) {
             throw new RuntimeException('The data table has no configured export form factory.');
         }
 
@@ -830,8 +851,10 @@ class DataTable implements DataTableInterface
 
     public function handleRequest(mixed $request): void
     {
-        if (null === $requestHandler = $this->config->getRequestHandler()) {
-            throw new RuntimeException('The "handleRequest" method cannot be used on data tables without configured request handler.');
+        if (null === ($requestHandler = $this->config->getRequestHandler())) {
+            throw new RuntimeException(
+                'The "handleRequest" method cannot be used on data tables without configured request handler.',
+            );
         }
 
         $requestHandler->handle($this, $request);
@@ -879,6 +902,14 @@ class DataTable implements DataTableInterface
     public function isRequestFromTurboFrame(): bool
     {
         return null !== $this->turboFrameId && 'kreyu_data_table_'.$this->getName() === $this->turboFrameId;
+    }
+
+    public function isDeferred(): bool
+    {
+        $async = $this->config->getOption('async', false);
+        $requestFromTurboFrame = $this->isRequestFromTurboFrame();
+
+        return $async && !$requestFromTurboFrame;
     }
 
     private function dispatch(string $eventName, DataTableEvent $event): void
@@ -1005,7 +1036,10 @@ class DataTable implements DataTableInterface
         };
 
         if (null === $adapter) {
-            throw new RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have an adapter.', $context->value));
+            throw new RuntimeException(sprintf(
+                'The data table is configured to use %s persistence, but does not have an adapter.',
+                $context->value,
+            ));
         }
 
         return $adapter;
@@ -1024,7 +1058,10 @@ class DataTable implements DataTableInterface
         };
 
         if (null === $provider) {
-            throw new RuntimeException(sprintf('The data table is configured to use %s persistence, but does not have a subject provider.', $context->value));
+            throw new RuntimeException(sprintf(
+                'The data table is configured to use %s persistence, but does not have a subject provider.',
+                $context->value,
+            ));
         }
 
         return $provider->provide();

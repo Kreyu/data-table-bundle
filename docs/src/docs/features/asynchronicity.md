@@ -151,6 +151,15 @@ loading placeholder. Turbo then fetches that URL, and the bundle renders the rea
 On a page with multiple async tables, each frame loads independently, and only the table being fetched
 runs its query.
 
+**`$dataTable->isDeferred()` is `true` while only the placeholder renders.** Use it to skip your own
+expensive work for that render:
+
+```php
+if (!$dataTable->isDeferred()) {
+    $summary = $this->statistics->summarize($query);
+}
+```
+
 ### Controlling when the data is fetched
 
 The `async_loading` option controls **when** Turbo fetches the deferred data:

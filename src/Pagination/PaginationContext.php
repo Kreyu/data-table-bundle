@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Pagination;
 
-class PaginationContext
+final class PaginationContext
 {
     public function __construct(
         public readonly int $currentPageNumber,
@@ -12,6 +12,5 @@ class PaginationContext
         public readonly int $totalItemCount,
         public readonly ?int $itemNumberPerPage,
         public readonly int $visiblePagesRange,
-    ) {
-    }
+    ) {}
 }

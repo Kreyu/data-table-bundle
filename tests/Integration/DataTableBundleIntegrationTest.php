@@ -21,7 +21,6 @@ class DataTableBundleIntegrationTest extends KernelTestCase
     {
         parent::tearDown();
 
-        // Booting the kernel leaves one exception handler registered; drop it for PHPUnit's strict check.
         restore_exception_handler();
     }
 
@@ -35,7 +34,10 @@ class DataTableBundleIntegrationTest extends KernelTestCase
         self::bootKernel(['debug' => false]);
 
         $this->assertTrue(self::getContainer()->has(DataTableFactoryInterface::class));
-        $this->assertInstanceOf(DataTableFactoryInterface::class, self::getContainer()->get(DataTableFactoryInterface::class));
+        $this->assertInstanceOf(
+            DataTableFactoryInterface::class,
+            self::getContainer()->get(DataTableFactoryInterface::class),
+        );
     }
 
     public function testFactoryCreatesADataTable(): void

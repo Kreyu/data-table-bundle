@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Type;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
+use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CountingProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DataTableTypeTest extends DataTableIntegrationTestCase
 {
     public function testAsyncDeferredRenderSkipsQuery(): void
     {
-        $dataTable = $this->createCountingDataTable(['async' => true]);
+        $dataTable = $this->createCountingDataTable([
+            'async' => true,
+            'filtration_enabled' => true,
+            'personalization_enabled' => true,
+            'exporting_enabled' => true,
+        ]);
 
         $view = $dataTable->createView();
 
@@ -25,6 +31,9 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $this->assertNull($view->pagination);
         $this->assertSame([], $view->valueRows);
         $this->assertSame([], $view->vars['url_query_parameters']);
+        $this->assertArrayNotHasKey('filtration_form', $view->vars);
+        $this->assertArrayNotHasKey('personalization_form', $view->vars);
+        $this->assertArrayNotHasKey('export_form', $view->vars);
     }
 
     public function testAsyncFrameRequestRendersData(): void
@@ -52,27 +61,20 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $this->assertInstanceOf(RowIterator::class, $view->valueRows);
     }
 
-    public function testAsyncLoadingOptionPropagatesToView(): void
+    public function testCustomPaginationFactoryIsUsed(): void
     {
-        $eager = $this->createCountingDataTable(['async' => true, 'async_loading' => 'eager'])->createView();
-        $this->assertSame('eager', $eager->vars['async_loading']);
+        $customPagination = new Pagination(
+            currentPageNumber: 1,
+            currentPageItemCount: 1,
+            totalItemCount: 1,
+        );
 
-        $default = $this->createCountingDataTable(['async' => true])->createView();
-        $this->assertSame('lazy', $default->vars['async_loading']);
-    }
+        $paginationFactory = $this->createStub(PaginationFactoryInterface::class);
+        $paginationFactory->method('create')->willReturn($customPagination);
 
-    public function testInvalidAsyncOptionIsRejected(): void
-    {
-        $this->expectException(InvalidOptionsException::class);
+        $dataTable = $this->createCountingDataTable(['pagination_factory' => $paginationFactory], [['id' => 1]]);
 
-        $this->dataTableFactory->createBuilder(DataTableType::class, [], ['async' => 'yes']);
-    }
-
-    public function testInvalidAsyncLoadingOptionIsRejected(): void
-    {
-        $this->expectException(InvalidOptionsException::class);
-
-        $this->dataTableFactory->createBuilder(DataTableType::class, [], ['async_loading' => 'always']);
+        $this->assertSame($customPagination, $dataTable->getPagination());
     }
 
     private function createCountingDataTable(array $options, array $data = []): DataTableInterface

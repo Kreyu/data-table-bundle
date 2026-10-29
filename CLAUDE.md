@@ -1,57 +1,48 @@
 # CLAUDE.md
 
-Guidance for working in this repository.
-
-## What this is
-
-`kreyu/data-table-bundle` — a Symfony bundle for building data tables. Its architecture is a
-deliberate port of the Symfony Form component to the table domain: type classes resolved through a
-registry, mutable **builder** → immutable **config** → runtime **instance** → **view**, decorated by
-type extensions. Built-in type classes are `final`; share behavior through `getParent()` composition,
-never PHP inheritance.
+`kreyu/data-table-bundle`: a Symfony bundle for data tables, modelled on the Symfony Form component.
+Types resolve through a registry. Each table goes builder → config → `DataTable` → `DataTableView`, and type extensions decorate each step.
 
 ## Layout
 
 | Path | What |
 |------|------|
-| `src/` | Bundle source (PSR-4 `Kreyu\Bundle\DataTableBundle\`) |
-| `tests/` | PHPUnit tests (`tests/Unit/…`) and `tests/Fixtures/…` |
-| `docs/specs/` | Reverse-engineered **architecture** specs (how it works internally, with file+line citations) |
-| `docs/src/` | User-facing **VitePress** docs (how to *use* the bundle) — `docs/src/docs/features/*`, `docs/src/reference/*` |
+| `src/` | Bundle source, `Kreyu\Bundle\DataTableBundle\` |
+| `src/{Column,Filter,Action,Exporter}/Type/` | Built-in types |
+| `src/Bridge/` | Doctrine ORM, OpenSpout, PhpSpreadsheet integrations |
+| `src/Resources/config/*.php` | Service definitions |
+| `src/Resources/views/themes/` | Twig themes: `base` → `bootstrap_5` → `tabler`; `*icons*` themes define only the `icon` block |
+| `src/Resources/translations/` | `KreyuDataTable.<locale>.yaml` |
+| `tests/Unit/`, `tests/Integration/` | PHPUnit; shared fixtures in `tests/Fixtures/` |
+| `docs/src/` | User docs (VitePress) |
+| `docs/specs/` | Internal architecture notes |
 
-## Required workflow for every change
+## Checks
 
-1. **Run the tests** — they must stay green before you consider a change done:
-   ```bash
-   vendor/bin/phpunit
-   ```
-   Also run the quality gates the CI runs:
-   ```bash
-   vendor/bin/php-cs-fixer fix --dry-run --diff      # code style (must be clean)
-   vendor/bin/phpstan analyse --memory-limit=1G       # static analysis
-   ```
-   Or use the Dockerised CI mirror: `make test`, `make quality`, or `make ci` (see `Makefile`).
-   When you add or change behavior, add or update tests for it.
+Default PHP is 8.1, the supported minimum; set `PHP_VERSION=8.5` to test the newest.
 
-2. **Update the user docs** — whenever you add or change anything user-facing (a new option, config
-   node, Twig theme block, controller helper, or behavior), update the VitePress docs under
-   `docs/src/` in the **same** change:
-   - the relevant feature page under `docs/src/docs/features/`;
-   - the config reference `docs/src/reference/configuration.md` (both the YAML **and** PHP example
-     blocks) when you touch the config tree or add an option;
-   - the Twig reference `docs/src/reference/twig.md` when you touch theme blocks/functions.
-   Match the existing page style: `::: code-group` tabs (Globally YAML / Globally PHP / For data table
-   type / For specific data table) and `::: tip` / `::: warning` callouts. The architecture specs in
-   `docs/specs/` are separate — update them only when asked; they are not a substitute for user docs.
+```bash
+make install    # build image + composer update (rerun after editing composer.json)
+make test       # PHPUnit
+make quality    # Mago: fmt --check + lint + analyze
+make fmt        # apply Mago formatting
+make matrix     # PHPUnit on PHP 8.1–8.5 × lowest/highest deps
+```
 
-## Conventions
+Mago baselines (`mago-*-baseline.toml`) match PHP 8.5 dependencies, so run `make quality` after `make install PHP_VERSION=8.5`.
 
-- **Comments (Symfony style): default to none.** Allowed: one-sentence class-level PHPDoc, `@internal`,
-  `@param`/`@return`/`@throws` only when the type hint is insufficient, `@deprecated` with a migration
-  path, and inline `//` only for a non-obvious *why*. No WHAT-comments, no TODO/FIXME, no multi-line
-  blocks.
-- Don't break the public contract without cause: adding methods to `*ConfigInterface` /
-  `*ConfigBuilderInterface` breaks external implementers — prefer a plain resolved option read via
-  `getOption()` when the runtime only needs a value (see `page_visible_range`, `async`).
-- New types are auto-registered via DI tags — implement the interface, never `new` or manually register
-  them.
+A change is done when `make test` and `make quality` pass.
+
+## Rules
+
+- **Share behavior through `getParent()`**, never PHP inheritance. Built-in types are `final`.
+- **Other classes: interface or `final`.** Anything replaceable (factories, generators, adapters) gets an interface and stays open; classes without one (value objects, events) are `final`.
+- **New types and extensions register themselves.** Implement the interface; DI autoconfiguration adds the tag.
+- **Expose features through interfaces.** New config and behavior get methods on the matching interface (e.g. `DataTableConfigInterface::getPaginationFactory()`). That breaks third-party implementers, so name the added methods in the commit message.
+- **Shared markup goes in `base.html.twig`.** `bootstrap_5` and `tabler` override single blocks only.
+- **Keep the user docs current in the same change.** Anything users touch counts: options, config keys, public methods, theme blocks, behavior. Update:
+  - feature page in `docs/src/docs/features/`
+  - `docs/src/reference/configuration.md` (YAML and PHP examples) for config
+  - `docs/src/reference/twig.md` for theme blocks or Twig functions
+  - match the existing `::: code-group` tabs and `::: tip` / `::: warning` callouts
+- **Leave `docs/specs/` alone** unless asked.

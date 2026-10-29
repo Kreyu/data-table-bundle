@@ -21,7 +21,8 @@
         "symfony/twig-bundle": "^6.0|^7.0|^8.0",
         "twig/extra-bundle": "^3.6|^4.0",
         "twig/intl-extra": "^3.6|^4.0",
-        "symfony/validator": "^6.0|^7.0|^8.0"
+        "symfony/validator": "^6.0|^7.0|^8.0",
+        "symfony/options-resolver": "^6.3|^7.0|^8.0"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.48",

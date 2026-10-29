@@ -2552,12 +2552,6 @@ count = 2
 
 [[issues]]
 file = "src/Type/DataTableType.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used in array assignment on `non-empty-array<mixed, array{'operator'?: null|string('between')|string('contains')|string('ends-with')|string('equals')|string('greater-than')|string('greater-than-equals')|string('in')|string('less-than')|string('less-than-equals')|string('not-contains')|string('not-equals')|string('not-in')|string('starts-with'), 'value': nonnull}>`."
-count = 1
-
-[[issues]]
-file = "src/Type/DataTableType.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 10

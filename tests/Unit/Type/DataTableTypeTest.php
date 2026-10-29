@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Type;
 
+use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
+use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\CallbackFilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CountingProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+use Symfony\Component\Form\Forms;
 
 class DataTableTypeTest extends DataTableIntegrationTestCase
 {
@@ -77,6 +86,37 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $this->assertSame($customPagination, $dataTable->getPagination());
     }
 
+    public function testUrlQueryParametersKeepFilters(): void
+    {
+        $options = [
+            'filtration_enabled' => true,
+            'filter_factory' => $this->createFilterFactory(),
+            'filtration_form_factory' => Forms::createFormFactory(),
+        ];
+
+        $builder = $this->dataTableFactory->createBuilder(DataTableType::class, [['id' => 1]], $options);
+        $builder->addColumn('id');
+        $builder->addFilter('author.name', CallbackFilterType::class, ['callback' => static fn () => null]);
+        $builder->setSearchHandler(static fn () => null);
+
+        $dataTable = $builder->getDataTable();
+        $dataTable->filter(FiltrationData::fromArray([
+            DataTableBuilderInterface::SEARCH_FILTER_NAME => 'foo',
+            'author.name' => 'bar',
+        ]));
+
+        /** @var array<string, array<string, array{value: mixed}>> $urlQueryParameters */
+        $urlQueryParameters = $dataTable->createView()->vars['url_query_parameters'];
+        $filtrationParameterName = $dataTable->getConfig()->getFiltrationParameterName();
+
+        $expectedFiltrationParameters = [
+            'author__name' => ['value' => 'bar'],
+            DataTableBuilderInterface::SEARCH_FILTER_NAME => ['value' => 'foo'],
+        ];
+
+        $this->assertSame($expectedFiltrationParameters, $urlQueryParameters[$filtrationParameterName]);
+    }
+
     private function createCountingDataTable(array $options, array $data = []): DataTableInterface
     {
         CountingProxyQuery::reset();
@@ -86,5 +126,20 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $builder->addColumn('id');
 
         return $builder->getDataTable();
+    }
+
+    private function createFilterFactory(): FilterFactory
+    {
+        $registry = new FilterRegistry(
+            types: [
+                new FilterType(),
+                new CallbackFilterType(),
+                new SearchFilterType(),
+            ],
+            typeExtensions: [],
+            resolvedTypeFactory: new ResolvedFilterTypeFactory(),
+        );
+
+        return new FilterFactory($registry);
     }
 }

@@ -503,8 +503,9 @@ final class DataTableType implements DataTableTypeInterface
 
                 /** @var string $filterName */
                 $filterName = $filterView->vars['name'];
-                $panelFormView = $filtrationFormView[$filterName] ?? null;
-                $searchFormView = $searchFields[$filterName] ?? null;
+                $formName = $dataTable->getFilter($filterName)->getFormName();
+                $panelFormView = $filtrationFormView[$formName] ?? null;
+                $searchFormView = $searchFields[$formName] ?? null;
                 $filterFormView = $panelFormView ?? $searchFormView;
                 $valueFormView = $filterFormView['value'] ?? null;
 
@@ -522,8 +523,7 @@ final class DataTableType implements DataTableTypeInterface
                     $filterParameter['operator'] = $filterView->data->getOperator()?->value;
                 }
 
-                $parameters[$dataTable->getConfig()->getFiltrationParameterName()][$filterView->vars['name']] =
-                    $filterParameter;
+                $parameters[$dataTable->getConfig()->getFiltrationParameterName()][$formName] = $filterParameter;
             }
         }
 

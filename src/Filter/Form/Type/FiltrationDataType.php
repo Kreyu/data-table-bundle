@@ -57,26 +57,22 @@ class FiltrationDataType extends AbstractType
 
         $view->vars['attr']['id'] = $id;
 
-        foreach ($view as $name => $filterFormView) {
-            $filterView = $dataTableView->filters[$name];
+        $searchFields = [];
+
+        foreach ($dataTable->getFilters() as $filterName => $filter) {
+            $formName = $filter->getFormName();
+            $filterFormView = $view[$formName];
+            $filterView = $dataTableView->filters[$filterName];
 
             $filterFormView->vars['label'] = $filterView->vars['label'];
             $filterFormView->vars['translation_domain'] = $filterView->vars['translation_domain'];
-        }
 
-        $searchFields = [];
+            $filterInnerType = $filter->getConfig()->getType()->getInnerType();
 
-        foreach ($form as $child) {
-            try {
-                $filter = $dataTable->getFilter($child->getName());
-            } catch (\InvalidArgumentException) {
-                continue;
-            }
+            if ($filterInnerType instanceof SearchFilterTypeInterface) {
+                $searchFields[$formName] = $filterFormView;
 
-            if ($filter->getConfig()->getType()->getInnerType() instanceof SearchFilterTypeInterface) {
-                $searchFields[$child->getName()] = $view[$child->getName()];
-
-                unset($view[$child->getName()]);
+                unset($view[$formName]);
             }
         }
 

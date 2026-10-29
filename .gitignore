@@ -5,3 +5,5 @@
 /.phpunit.result.cache
 /.idea
 /.vscode
+mago-analyze-baseline.toml
+mago-lint-baseline.toml

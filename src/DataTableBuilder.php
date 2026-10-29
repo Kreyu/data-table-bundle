@@ -36,28 +36,28 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     /**
      * The column builders defined for the data table.
      *
-     * @var array<ColumnBuilderInterface>
+     * @var array<string, ColumnBuilderInterface|null>
      */
     private array $columns = [];
 
     /**
      * The data of columns that haven't been converted to column builders yet.
      *
-     * @var array<array{0: class-string<ColumnTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<ColumnTypeInterface>, 1: array}>
      */
     private array $unresolvedColumns = [];
 
     /**
      * The column builders defined for the data table.
      *
-     * @var array<FilterBuilderInterface>
+     * @var array<string, FilterBuilderInterface|null>
      */
     private array $filters = [];
 
     /**
      * The data of filters that haven't been converted to filter builders yet.
      *
-     * @var array<array{0: class-string<FilterTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<FilterTypeInterface>, 1: array}>
      */
     private array $unresolvedFilters = [];
 
@@ -75,28 +75,28 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     /**
      * The action builders defined for the data table.
      *
-     * @var array<ActionBuilderInterface>
+     * @var array<string, ActionBuilderInterface|null>
      */
     private array $actions = [];
 
     /**
      * The data of actions that haven't been converted to action builders yet.
      *
-     * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<ActionTypeInterface>, 1: array}>
      */
     private array $unresolvedActions = [];
 
     /**
      * The batch action builders defined for the data table.
      *
-     * @var array<ActionBuilderInterface>
+     * @var array<string, ActionBuilderInterface|null>
      */
     private array $batchActions = [];
 
     /**
      * The data of batch actions that haven't been converted to action builders yet.
      *
-     * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<ActionTypeInterface>, 1: array}>
      */
     private array $unresolvedBatchActions = [];
 
@@ -109,14 +109,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     /**
      * The row action builders defined for the data table.
      *
-     * @var array<ActionBuilderInterface>
+     * @var array<string, ActionBuilderInterface|null>
      */
     private array $rowActions = [];
 
     /**
      * The data of row actions that haven't been converted to action builders yet.
      *
-     * @var array<array{0: class-string<ActionTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<ActionTypeInterface>, 1: array}>
      */
     private array $unresolvedRowActions = [];
 
@@ -129,17 +129,20 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     /**
      * The exporter builders defined for the data table.
      *
-     * @var array<ExporterBuilderInterface>
+     * @var array<string, ExporterBuilderInterface|null>
      */
     private array $exporters = [];
 
     /**
      * The data of exporters that haven't been converted to exporter builders yet.
      *
-     * @var array<array{0: class-string<ExporterTypeInterface>, 1: array}>
+     * @var array<string, array{0: class-string<ExporterTypeInterface>, 1: array}>
      */
     private array $unresolvedExporters = [];
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         string $name,
         ResolvedDataTableTypeInterface $type,
@@ -152,6 +155,10 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function __clone(): void
     {
+        if ($this->query === null) {
+            return;
+        }
+
         $this->query = clone $this->query;
     }
 
@@ -162,9 +169,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function setQuery(?ProxyQueryInterface $query): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->query = $query;
 
@@ -173,46 +178,32 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getColumns(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveColumns();
-
-        return $this->columns;
+        return $this->resolveColumns();
     }
 
     public function getColumn(string $name): ColumnBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->columns)) {
+            throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedColumns[$name])) {
-            return $this->resolveColumn($name);
-        }
-
-        if (isset($this->columns[$name])) {
-            return $this->columns[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The column with the name "%s" does not exist.', $name));
+        return $this->columns[$name] ?? $this->resolveColumn($name);
     }
 
     public function createColumn(string $name, ?string $type = null, array $options = []): ColumnBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->getColumnFactory()->createNamedBuilder($name, $type ?? TextColumnType::class, $options);
     }
 
     public function addColumn(ColumnBuilderInterface|string $column, ?string $type = null, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($column instanceof ColumnBuilderInterface) {
             $this->columns[$column->getName()] = $column;
@@ -230,18 +221,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function hasColumn(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->columns[$name]) || isset($this->unresolvedColumns[$name]);
+        return array_key_exists($name, $this->columns);
     }
 
     public function removeColumn(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedColumns[$name], $this->columns[$name]);
 
@@ -250,46 +237,32 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getFilters(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveFilters();
-
-        return $this->filters;
+        return $this->resolveFilters();
     }
 
     public function getFilter(string $name): FilterBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->filters)) {
+            throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedFilters[$name])) {
-            return $this->resolveFilter($name);
-        }
-
-        if (isset($this->filters[$name])) {
-            return $this->filters[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The filter with the name "%s" does not exist.', $name));
+        return $this->filters[$name] ?? $this->resolveFilter($name);
     }
 
     public function createFilter(string $name, ?string $type = null, array $options = []): FilterBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->getFilterFactory()->createNamedBuilder($name, $type ?? FilterType::class, $options);
     }
 
     public function addFilter(string|FilterBuilderInterface $filter, ?string $type = null, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($filter instanceof FilterBuilderInterface) {
             $this->filters[$filter->getName()] = $filter;
@@ -307,18 +280,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function hasFilter(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->filters[$name]) || isset($this->unresolvedFilters[$name]);
+        return array_key_exists($name, $this->filters);
     }
 
     public function removeFilter(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedFilters[$name], $this->filters[$name]);
 
@@ -327,38 +296,30 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getSearchHandler(): ?callable
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->searchHandler;
     }
 
     public function setSearchHandler(?callable $searchHandler): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->searchHandler = $searchHandler;
+        $this->searchHandler = $searchHandler === null ? null : $searchHandler(...);
 
         return $this;
     }
 
     public function isAutoAddingSearchFilter(): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->autoAddingSearchFilter;
     }
 
     public function setAutoAddingSearchFilter(bool $autoAddingSearchFilter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->autoAddingSearchFilter = $autoAddingSearchFilter;
 
@@ -367,46 +328,32 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getActions(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveActions();
-
-        return $this->actions;
+        return $this->resolveActions();
     }
 
     public function getAction(string $name): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->actions)) {
+            throw new InvalidArgumentException(sprintf('The action with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedActions[$name])) {
-            return $this->resolveAction($name);
-        }
-
-        if (isset($this->actions[$name])) {
-            return $this->actions[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The action with the name "%s" does not exist.', $name));
+        return $this->actions[$name] ?? $this->resolveAction($name);
     }
 
     public function createAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->getActionFactory()->createNamedBuilder($name, $type ?? ButtonActionType::class, $options);
     }
 
     public function addAction(string|ActionBuilderInterface $action, ?string $type = null, array $options = []): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($action instanceof ActionBuilderInterface) {
             $this->actions[$action->getName()] = $action;
@@ -424,18 +371,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function hasAction(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->actions[$name]) || isset($this->unresolvedActions[$name]);
+        return array_key_exists($name, $this->actions);
     }
 
     public function removeAction(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedActions[$name], $this->actions[$name]);
 
@@ -444,46 +387,32 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getBatchActions(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveBatchActions();
-
-        return $this->batchActions;
+        return $this->resolveBatchActions();
     }
 
     public function getBatchAction(string $name): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->batchActions)) {
+            throw new InvalidArgumentException(sprintf('The batch action with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedBatchActions[$name])) {
-            return $this->resolveBatchAction($name);
-        }
-
-        if (isset($this->batchActions[$name])) {
-            return $this->batchActions[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The batch action with the name "%s" does not exist.', $name));
+        return $this->batchActions[$name] ?? $this->resolveBatchAction($name);
     }
 
     public function hasBatchAction(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->batchActions[$name]) || isset($this->unresolvedBatchActions[$name]);
+        return array_key_exists($name, $this->batchActions);
     }
 
     public function createBatchAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this
             ->getActionFactory()
@@ -497,9 +426,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         ?string $type = null,
         array $options = [],
     ): static {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($action instanceof ActionBuilderInterface) {
             $this->batchActions[$action->getName()] = $action;
@@ -517,9 +444,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function removeBatchAction(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedBatchActions[$name], $this->batchActions[$name]);
 
@@ -528,18 +453,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function isAutoAddingBatchCheckboxColumn(): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->autoAddingBatchCheckboxColumn;
     }
 
     public function setAutoAddingBatchCheckboxColumn(bool $autoAddingBatchCheckboxColumn): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->autoAddingBatchCheckboxColumn = $autoAddingBatchCheckboxColumn;
 
@@ -548,46 +469,32 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getRowActions(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveRowActions();
-
-        return $this->rowActions;
+        return $this->resolveRowActions();
     }
 
     public function getRowAction(string $name): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->rowActions)) {
+            throw new InvalidArgumentException(sprintf('The row action with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedRowActions[$name])) {
-            return $this->resolveRowAction($name);
-        }
-
-        if (isset($this->rowActions[$name])) {
-            return $this->rowActions[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The row action with the name "%s" does not exist.', $name));
+        return $this->rowActions[$name] ?? $this->resolveRowAction($name);
     }
 
     public function hasRowAction(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->rowActions[$name]) || isset($this->unresolvedRowActions[$name]);
+        return array_key_exists($name, $this->rowActions);
     }
 
     public function createRowAction(string $name, ?string $type = null, array $options = []): ActionBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this
             ->getActionFactory()
@@ -601,9 +508,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         ?string $type = null,
         array $options = [],
     ): static {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($action instanceof ActionBuilderInterface) {
             $this->rowActions[$action->getName()] = $action;
@@ -621,9 +526,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function removeRowAction(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedRowActions[$name], $this->rowActions[$name]);
 
@@ -632,18 +535,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function isAutoAddingActionsColumn(): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->autoAddingActionsColumn;
     }
 
     public function setAutoAddingActionsColumn(bool $autoAddingActionsColumn): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->autoAddingActionsColumn = $autoAddingActionsColumn;
 
@@ -652,37 +551,25 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getExporters(): array
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        $this->resolveExporters();
-
-        return $this->exporters;
+        return $this->resolveExporters();
     }
 
     public function getExporter(string $name): ExporterBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
+        $this->ensureNotLocked();
+
+        if (!array_key_exists($name, $this->exporters)) {
+            throw new InvalidArgumentException(sprintf('The exporter with the name "%s" does not exist.', $name));
         }
 
-        if (isset($this->unresolvedExporters[$name])) {
-            return $this->resolveExporter($name);
-        }
-
-        if (isset($this->exporters[$name])) {
-            return $this->exporters[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('The exporter with the name "%s" does not exist.', $name));
+        return $this->exporters[$name] ?? $this->resolveExporter($name);
     }
 
     public function createExporter(string $name, ?string $type = null, array $options = []): ExporterBuilderInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         return $this->getExporterFactory()->createNamedBuilder($name, $type ?? ExporterType::class, $options);
     }
@@ -692,9 +579,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         ?string $type = null,
         array $options = [],
     ): static {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if ($exporter instanceof ExporterBuilderInterface) {
             $this->exporters[$exporter->getName()] = $exporter;
@@ -712,18 +597,14 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function hasExporter(string $name): bool
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
-        return isset($this->exporters[$name]) || isset($this->unresolvedExporters[$name]);
+        return array_key_exists($name, $this->exporters);
     }
 
     public function removeExporter(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         unset($this->unresolvedExporters[$name], $this->exporters[$name]);
 
@@ -732,9 +613,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
 
     public function getDataTable(): DataTableInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if (null === $this->query) {
             throw new BadMethodCallException(sprintf(
@@ -757,45 +636,54 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
             $this->addSearchFilter();
         }
 
-        $this->resolveColumns();
+        $columns = $this->resolveColumns();
 
-        foreach ($this->columns as $column) {
+        foreach ($columns as $column) {
             $dataTable->addColumn($column->getColumn());
         }
 
-        $this->resolveFilters();
-
-        foreach ($this->filters as $filter) {
+        foreach ($this->resolveFilters() as $filter) {
             $dataTable->addFilter($filter->getFilter());
         }
 
-        $this->addColumnFilters($dataTable);
+        $this->addColumnFilters($dataTable, $columns);
 
-        $this->resolveActions();
-
-        foreach ($this->actions as $action) {
+        foreach ($this->resolveActions() as $action) {
             $dataTable->addAction($action->getAction());
         }
 
-        $this->resolveBatchActions();
-
-        foreach ($this->batchActions as $batchAction) {
+        foreach ($this->resolveBatchActions() as $batchAction) {
             $dataTable->addBatchAction($batchAction->getAction());
         }
 
-        $this->resolveRowActions();
-
-        foreach ($this->rowActions as $rowAction) {
+        foreach ($this->resolveRowActions() as $rowAction) {
             $dataTable->addRowAction($rowAction->getAction());
         }
 
-        $this->resolveExporters();
-
-        foreach ($this->exporters as $exporter) {
+        foreach ($this->resolveExporters() as $exporter) {
             $dataTable->addExporter($exporter->getExporter());
         }
 
         return $dataTable;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param array<string, T|null>  $builders
+     * @param \Closure(string): T    $resolveBuilder
+     *
+     * @return array<string, T>
+     */
+    private function resolveBuilders(array $builders, \Closure $resolveBuilder): array
+    {
+        $resolvedBuilders = [];
+
+        foreach ($builders as $name => $builder) {
+            $resolvedBuilders[$name] = $builder ?? $resolveBuilder($name);
+        }
+
+        return $resolvedBuilders;
     }
 
     private function resolveColumn(string $name): ColumnBuilderInterface
@@ -807,11 +695,12 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->columns[$name] = $this->getColumnFactory()->createNamedBuilder($name, $type, $options);
     }
 
-    private function resolveColumns(): void
+    /**
+     * @return array<string, ColumnBuilderInterface>
+     */
+    private function resolveColumns(): array
     {
-        foreach (array_keys($this->unresolvedColumns) as $column) {
-            $this->resolveColumn($column);
-        }
+        return $this->resolveBuilders($this->columns, $this->resolveColumn(...));
     }
 
     private function resolveFilter(string $name): FilterBuilderInterface
@@ -823,16 +712,20 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->filters[$name] = $this->getFilterFactory()->createNamedBuilder($name, $type, $options);
     }
 
-    private function resolveFilters(): void
+    /**
+     * @return array<string, FilterBuilderInterface>
+     */
+    private function resolveFilters(): array
     {
-        foreach (array_keys($this->unresolvedFilters) as $filter) {
-            $this->resolveFilter($filter);
-        }
+        return $this->resolveBuilders($this->filters, $this->resolveFilter(...));
     }
 
-    private function addColumnFilters(DataTableInterface $dataTable): void
+    /**
+     * @param array<string, ColumnBuilderInterface> $columns
+     */
+    private function addColumnFilters(DataTableInterface $dataTable, array $columns): void
     {
-        foreach ($this->columns as $column) {
+        foreach ($columns as $column) {
             /** @var class-string<FilterTypeInterface>|null $filterType */
             $filterType = $column->getOption('filter');
 
@@ -906,11 +799,12 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->actions[$name] = $action;
     }
 
-    private function resolveActions(): void
+    /**
+     * @return array<string, ActionBuilderInterface>
+     */
+    private function resolveActions(): array
     {
-        foreach (array_keys($this->unresolvedActions) as $action) {
-            $this->resolveAction($action);
-        }
+        return $this->resolveBuilders($this->actions, $this->resolveAction(...));
     }
 
     private function resolveBatchAction(string $name): ActionBuilderInterface
@@ -925,11 +819,12 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->batchActions[$name] = $batchAction;
     }
 
-    private function resolveBatchActions(): void
+    /**
+     * @return array<string, ActionBuilderInterface>
+     */
+    private function resolveBatchActions(): array
     {
-        foreach (array_keys($this->unresolvedBatchActions) as $batchAction) {
-            $this->resolveBatchAction($batchAction);
-        }
+        return $this->resolveBuilders($this->batchActions, $this->resolveBatchAction(...));
     }
 
     private function resolveRowAction(string $name): ActionBuilderInterface
@@ -944,11 +839,12 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->rowActions[$name] = $rowAction;
     }
 
-    private function resolveRowActions(): void
+    /**
+     * @return array<string, ActionBuilderInterface>
+     */
+    private function resolveRowActions(): array
     {
-        foreach (array_keys($this->unresolvedRowActions) as $rowAction) {
-            $this->resolveRowAction($rowAction);
-        }
+        return $this->resolveBuilders($this->rowActions, $this->resolveRowAction(...));
     }
 
     private function resolveExporter(string $name): ExporterBuilderInterface
@@ -960,18 +856,19 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         return $this->exporters[$name] = $this->getExporterFactory()->createNamedBuilder($name, $type, $options);
     }
 
-    private function resolveExporters(): void
+    /**
+     * @return array<string, ExporterBuilderInterface>
+     */
+    private function resolveExporters(): array
     {
-        foreach (array_keys($this->unresolvedExporters) as $exporter) {
-            $this->resolveExporter($exporter);
-        }
+        return $this->resolveBuilders($this->exporters, $this->resolveExporter(...));
     }
 
     private function shouldPrependBatchCheckboxColumn(): bool
     {
         return (
             $this->isAutoAddingBatchCheckboxColumn()
-            && !empty($this->batchActions)
+            && $this->batchActions !== []
             && !$this->hasColumn(self::BATCH_CHECKBOX_COLUMN_NAME)
         );
     }
@@ -980,7 +877,7 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
     {
         return (
             $this->isAutoAddingActionsColumn()
-            && !empty($this->rowActions)
+            && $this->rowActions !== []
             && !$this->hasColumn(self::ACTIONS_COLUMN_NAME)
         );
     }
@@ -1011,12 +908,5 @@ class DataTableBuilder extends DataTableConfigBuilder implements DataTableBuilde
         $this->addFilter(self::SEARCH_FILTER_NAME, SearchFilterType::class, [
             'handler' => $this->getSearchHandler(),
         ]);
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'DataTableBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.',
-        );
     }
 }

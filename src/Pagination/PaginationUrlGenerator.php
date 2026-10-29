@@ -5,43 +5,19 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Pagination;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Kreyu\Bundle\DataTableBundle\Request\AbstractUrlGenerator;
 
-class PaginationUrlGenerator implements PaginationUrlGeneratorInterface
+class PaginationUrlGenerator extends AbstractUrlGenerator implements PaginationUrlGeneratorInterface
 {
-    public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly UrlGeneratorInterface $urlGenerator,
-    ) {}
-
     public function generate(DataTableView $dataTableView, int $page): string
     {
-        $request = $this->getRequest();
+        $parameters = $this->getUrlParameters($dataTableView);
 
-        $route = $request->attributes->get('_route');
-        $routeParams = $request->attributes->get('_route_params', []);
-        $queryParams = $request->query->all();
+        /** @var string $pageParameterName */
+        $pageParameterName = $dataTableView->vars['page_parameter_name'];
 
-        $parameters = [...$routeParams, ...$queryParams];
+        $parameters[$pageParameterName] = $page;
 
-        // Recursively replace/merge with the URL query parameters defined in the data table view.
-        // This allows the user to define custom query parameters that should be preserved when changing pages.
-        $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
-
-        $parameters[$dataTableView->vars['page_parameter_name']] = $page;
-
-        return $this->urlGenerator->generate($route, $parameters);
-    }
-
-    private function getRequest(): Request
-    {
-        if (null === ($request = $this->requestStack->getCurrentRequest())) {
-            throw new LogicException('Unable to retrieve current request.');
-        }
-
-        return $request;
+        return $this->generateUrl($parameters);
     }
 }

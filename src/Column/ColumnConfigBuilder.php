@@ -6,12 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
+use Kreyu\Bundle\DataTableBundle\LockableBuilderTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 {
-    protected bool $locked = false;
+    use LockableBuilderTrait;
 
     private array $attributes = [];
     private ?PropertyPathInterface $propertyPath = null;
@@ -21,7 +22,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
     private bool $personalizable = true;
     private int $priority = 0;
     private bool $visible = true;
-    private ColumnFactoryInterface $columnFactory;
+    private ?ColumnFactoryInterface $columnFactory = null;
 
     public function __construct(
         /* readonly */ private string $name,
@@ -36,9 +37,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setName(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->name = $name;
 
@@ -52,9 +51,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setType(ResolvedColumnTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->type = $type;
 
@@ -78,9 +75,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setOptions(array $options): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options = $options;
 
@@ -89,9 +84,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setOption(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options[$name] = $value;
 
@@ -115,9 +108,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setAttributes(array $attributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes = $attributes;
 
@@ -126,9 +117,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes[$name] = $value;
 
@@ -142,9 +131,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if (is_string($propertyPath)) {
             $propertyPath = new PropertyPath($propertyPath);
@@ -162,9 +149,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setSortPropertyPath(string|PropertyPathInterface|null $sortPropertyPath): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         if (is_string($sortPropertyPath)) {
             $sortPropertyPath = new PropertyPath($sortPropertyPath);
@@ -182,9 +167,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setSortable(bool $sortable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortable = $sortable;
 
@@ -198,9 +181,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setExportable(bool $exportable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->exportable = $exportable;
 
@@ -214,9 +195,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setPersonalizable(bool $personalizable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizable = $personalizable;
 
@@ -230,9 +209,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setPriority(int $priority): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->priority = $priority;
 
@@ -246,9 +223,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setVisible(bool $visible): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->visible = $visible;
 
@@ -257,7 +232,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getColumnFactory(): ColumnFactoryInterface
     {
-        if (!isset($this->columnFactory)) {
+        if ($this->columnFactory === null) {
             throw new BadMethodCallException('The column factory must be set before retrieving it.');
         }
 
@@ -266,9 +241,7 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->columnFactory = $columnFactory;
 
@@ -277,20 +250,11 @@ class ColumnConfigBuilder implements ColumnConfigBuilderInterface
 
     public function getColumnConfig(): ColumnConfigInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $config = clone $this;
         $config->locked = true;
 
         return $config;
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'ColumnConfigBuilder methods cannot be accessed anymore once the builder is turned into a ColumnConfigInterface instance.',
-        );
     }
 }

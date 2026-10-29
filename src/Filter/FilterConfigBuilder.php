@@ -7,21 +7,43 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\LockableBuilderTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormTypeInterface;
 
 class FilterConfigBuilder implements FilterConfigBuilderInterface
 {
-    protected bool $locked = false;
+    use LockableBuilderTrait;
 
     private array $attributes = [];
-    private FilterHandlerInterface $handler;
+    private ?FilterHandlerInterface $handler = null;
+
+    /**
+     * @var class-string<FormTypeInterface>
+     */
     private string $formType = TextType::class;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $formOptions = [];
+
+    /**
+     * @var class-string<FormTypeInterface>
+     */
     private string $operatorFormType = OperatorType::class;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $operatorFormOptions = [];
+
+    /**
+     * @var array<Operator>
+     */
     private array $supportedOperators = [];
     private Operator $defaultOperator = Operator::Equals;
     private bool $operatorSelectable = false;
@@ -69,9 +91,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setType(ResolvedFilterTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->type = $type;
 
@@ -110,9 +130,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes[$name] = $value;
 
@@ -121,9 +139,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setAttributes(array $attributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes = $attributes;
 
@@ -132,7 +148,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function getHandler(): FilterHandlerInterface
     {
-        if (!isset($this->handler)) {
+        if ($this->handler === null) {
             throw new BadMethodCallException('Filter has no handler set');
         }
 
@@ -141,9 +157,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setHandler(FilterHandlerInterface $handler): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->handler = $handler;
 
@@ -157,9 +171,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setFormType(string $formType): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->formType = $formType;
 
@@ -171,11 +183,12 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         return $this->formOptions;
     }
 
+    /**
+     * @param array<string, mixed> $formOptions
+     */
     public function setFormOptions(array $formOptions): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->formOptions = $formOptions;
 
@@ -189,9 +202,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setOperatorFormType(string $operatorFormType): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->operatorFormType = $operatorFormType;
 
@@ -203,11 +214,12 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
         return $this->operatorFormOptions;
     }
 
+    /**
+     * @param array<string, mixed> $operatorFormOptions
+     */
     public function setOperatorFormOptions(array $operatorFormOptions): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->operatorFormOptions = $operatorFormOptions;
 
@@ -221,9 +233,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setSupportedOperators(array $supportedOperators): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->supportedOperators = $supportedOperators;
 
@@ -237,9 +247,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setDefaultOperator(Operator $defaultOperator): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultOperator = $defaultOperator;
 
@@ -253,9 +261,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setOperatorSelectable(bool $operatorSelectable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->operatorSelectable = $operatorSelectable;
 
@@ -269,9 +275,7 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function setEmptyData(FilterData $emptyData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->emptyData = $emptyData;
 
@@ -280,20 +284,11 @@ class FilterConfigBuilder implements FilterConfigBuilderInterface
 
     public function getFilterConfig(): FilterConfigInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $config = clone $this;
         $config->locked = true;
 
         return $config;
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'FilterConfigBuilder methods cannot be accessed anymore once the builder is turned into a FilterConfigInterface instance.',
-        );
     }
 }

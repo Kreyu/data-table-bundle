@@ -194,6 +194,7 @@ class FilterClearUrlGeneratorTest extends TestCase
         $filterView->vars['operator_selectable'] = $operatorSelectable;
 
         $filterView->parent = $this->createDataTableViewMock();
+        $filterView->data = null;
 
         return $filterView;
     }

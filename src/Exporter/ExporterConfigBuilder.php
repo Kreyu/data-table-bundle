@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Exporter;
 
-use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeInterface;
+use Kreyu\Bundle\DataTableBundle\LockableBuilderTrait;
 
 class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 {
+    use LockableBuilderTrait;
+
     private array $attributes = [];
 
-    protected bool $locked = false;
-
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         private string $name,
         private ResolvedExporterTypeInterface $type,
@@ -26,9 +29,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function setName(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->name = $name;
 
@@ -42,15 +43,16 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function setType(ResolvedExporterTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->type = $type;
 
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -66,11 +68,12 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function setOptions(array $options): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options = $options;
 
@@ -79,9 +82,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function setOption(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options[$name] = $value;
 
@@ -105,9 +106,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function setAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes[$name] = $value;
 
@@ -116,9 +115,7 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function setAttributes(array $attributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes = $attributes;
 
@@ -127,20 +124,11 @@ class ExporterConfigBuilder implements ExporterConfigBuilderInterface
 
     public function getExporterConfig(): ExporterConfigInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $config = clone $this;
         $config->locked = true;
 
         return $config;
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'ExporterConfigBuilder methods cannot be accessed anymore once the builder is turned into a ExporterConfigInterface instance.',
-        );
     }
 }

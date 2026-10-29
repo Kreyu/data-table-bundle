@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Action;
 
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeInterface;
-use Kreyu\Bundle\DataTableBundle\Exception\BadMethodCallException;
+use Kreyu\Bundle\DataTableBundle\LockableBuilderTrait;
 
 class ActionConfigBuilder implements ActionConfigBuilderInterface
 {
-    protected bool $locked = false;
+    use LockableBuilderTrait;
 
     private ActionContext $context = ActionContext::Global;
     private array $attributes = [];
@@ -28,9 +28,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setName(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->name = $name;
 
@@ -44,9 +42,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setType(ResolvedActionTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->type = $type;
 
@@ -70,9 +66,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setOptions(array $options): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options = $options;
 
@@ -81,9 +75,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setOption(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options[$name] = $value;
 
@@ -107,9 +99,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setAttributes(array $attributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes = $attributes;
 
@@ -118,9 +108,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes[$name] = $value;
 
@@ -134,9 +122,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setContext(ActionContext $context): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->context = $context;
 
@@ -150,9 +136,7 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function setConfirmable(bool $confirmable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->confirmable = $confirmable;
 
@@ -161,20 +145,11 @@ class ActionConfigBuilder implements ActionConfigBuilderInterface
 
     public function getActionConfig(): ActionConfigInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $config = clone $this;
         $config->locked = true;
 
         return $config;
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'ActionConfigBuilder methods cannot be accessed anymore once the builder is turned into a ActionConfigInterface instance.',
-        );
     }
 }

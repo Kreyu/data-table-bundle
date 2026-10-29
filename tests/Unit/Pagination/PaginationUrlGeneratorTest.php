@@ -77,7 +77,7 @@ class PaginationUrlGeneratorTest extends TestCase
             ])
         ;
 
-        $this->generate($this->createDataTableViewMock(['foo' => 'bar']));
+        $this->generate($this->createDataTableView(['foo' => 'bar']));
     }
 
     public function testItIncludesGivenPage()
@@ -92,7 +92,7 @@ class PaginationUrlGeneratorTest extends TestCase
             ])
         ;
 
-        $this->generate($this->createDataTableViewMock([self::PAGE_PARAMETER_NAME => 2]), page: 5);
+        $this->generate($this->createDataTableView([self::PAGE_PARAMETER_NAME => 2]), page: 5);
     }
 
     public function testItMergesEverythingTogether(): void
@@ -111,20 +111,23 @@ class PaginationUrlGeneratorTest extends TestCase
             ])
         ;
 
-        $this->generate($this->createDataTableViewMock(['foo' => 'bar']), page: 5);
+        $this->generate($this->createDataTableView(['foo' => 'bar']), page: 5);
     }
 
     private function generate(?DataTableView $dataTableView = null, int $page = 1): void
     {
-        $dataTableView ??= $this->createDataTableViewMock();
+        $dataTableView ??= $this->createDataTableView();
 
         $paginationUrlGenerator = new PaginationUrlGenerator($this->requestStack, $this->urlGenerator);
         $paginationUrlGenerator->generate($dataTableView, $page);
     }
 
-    private function createDataTableViewMock(array $urlQueryParameters = []): MockObject&DataTableView
+    /**
+     * @param array<string, mixed> $urlQueryParameters
+     */
+    private function createDataTableView(array $urlQueryParameters = []): DataTableView
     {
-        $dataTableView = $this->createMock(DataTableView::class);
+        $dataTableView = new DataTableView();
         $dataTableView->vars['page_parameter_name'] = self::PAGE_PARAMETER_NAME;
         $dataTableView->vars['url_query_parameters'] = $urlQueryParameters;
 

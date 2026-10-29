@@ -5,54 +5,42 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Column;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Kreyu\Bundle\DataTableBundle\Request\AbstractUrlGenerator;
 
-class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
+class ColumnSortUrlGenerator extends AbstractUrlGenerator implements ColumnSortUrlGeneratorInterface
 {
-    public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly UrlGeneratorInterface $urlGenerator,
-    ) {}
-
     public function generate(DataTableView $dataTableView, ColumnHeaderView ...$columnHeaderViews): string
     {
-        $request = $this->getRequest();
+        $parameters = $this->getUrlParameters($dataTableView);
 
-        $route = $request->attributes->get('_route');
-        $routeParams = $request->attributes->get('_route_params', []);
-        $queryParams = $request->query->all();
+        /** @var string $sortParameterName */
+        $sortParameterName = $dataTableView->vars['sort_parameter_name'];
 
-        $parameters = [...$routeParams, ...$queryParams];
-
-        // Recursively replace/merge with the URL query parameters defined in the data table view.
-        // This allows the user to define custom query parameters that should be preserved when sorting columns.
-        $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
-
-        // Remove all sort-related parameters to only apply sorting on given columns.
-        unset($parameters[$dataTableView->vars['sort_parameter_name']]);
+        unset($parameters[$sortParameterName]);
 
         foreach ($columnHeaderViews as $columnHeaderView) {
             $parameters = array_replace_recursive($parameters, $this->getColumnSortQueryParameters($columnHeaderView));
         }
 
-        // Clearing the filters should reset the pagination to the first page.
-        if ($dataTableView->vars['pagination_enabled'] ?? false) {
-            $parameters[$dataTableView->vars['page_parameter_name']] = 1;
-        }
+        $parameters = [...$parameters, ...$this->getFirstPageParameters($dataTableView)];
 
-        return $this->urlGenerator->generate($route, $parameters);
+        return $this->generateUrl($parameters);
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     private function getColumnSortQueryParameters(ColumnHeaderView $columnHeaderView): array
     {
-        $dataTableView = $columnHeaderView->parent->parent;
+        /** @var string $sortParameterName */
+        $sortParameterName = $columnHeaderView->getDataTable()->vars['sort_parameter_name'];
+
+        /** @var string $columnName */
+        $columnName = $columnHeaderView->vars['name'];
 
         return [
-            $dataTableView->vars['sort_parameter_name'] => [
-                $columnHeaderView->vars['name'] => $this->getOppositeSortDirection($columnHeaderView),
+            $sortParameterName => [
+                $columnName => $this->getOppositeSortDirection($columnHeaderView),
             ],
         ];
     }
@@ -61,6 +49,7 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
     {
         $sortDirection = mb_strtolower((string) $columnHeaderView->vars['sort_direction']);
 
+        /** @var bool $isSortingClearable */
         $isSortingClearable = $columnHeaderView->getDataTable()->vars['sorting_clearable'] ?? true;
 
         return match ($sortDirection) {
@@ -68,14 +57,5 @@ class ColumnSortUrlGenerator implements ColumnSortUrlGeneratorInterface
             'desc' => $isSortingClearable ? 'none' : 'asc',
             default => 'asc',
         };
-    }
-
-    private function getRequest(): Request
-    {
-        if (null === ($request = $this->requestStack->getCurrentRequest())) {
-            throw new LogicException('Unable to retrieve current request.');
-        }
-
-        return $request;
     }
 }

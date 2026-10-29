@@ -27,6 +27,8 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 {
+    use LockableBuilderTrait;
+
     private bool $paginationEnabled = false;
     private bool $sortingEnabled = false;
     private bool $filtrationEnabled = false;
@@ -48,7 +50,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider = null;
     private ?PersistenceSubjectProviderInterface $personalizationPersistenceSubjectProvider = null;
 
-    private FormFactoryInterface $filtrationFormFactory;
+    private ?FormFactoryInterface $filtrationFormFactory = null;
     private ?FormFactoryInterface $personalizationFormFactory = null;
     private ?FormFactoryInterface $exportFormFactory = null;
 
@@ -82,8 +84,9 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private array $headerRowAttributes = [];
     private array $valueRowAttributes = [];
 
-    protected bool $locked = false;
-
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         /* readonly */ private string $name,
         private ResolvedDataTableTypeInterface $type,
@@ -121,9 +124,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setName(string $name): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->name = $name;
 
@@ -137,15 +138,16 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setType(ResolvedDataTableTypeInterface $type): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->type = $type;
 
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -161,11 +163,12 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function setOptions(array $options): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options = $options;
 
@@ -174,9 +177,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setOption(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->options[$name] = $value;
 
@@ -185,7 +186,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getColumnFactory(): ColumnFactoryInterface
     {
-        if (!isset($this->columnFactory)) {
+        if ($this->columnFactory === null) {
             throw new BadMethodCallException(sprintf(
                 'The column factory is not set, use the "%s::setColumnFactory()" method to set the column factory.',
                 $this::class,
@@ -197,9 +198,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setColumnFactory(ColumnFactoryInterface $columnFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->columnFactory = $columnFactory;
 
@@ -208,7 +207,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getFilterFactory(): FilterFactoryInterface
     {
-        if (!isset($this->filterFactory)) {
+        if ($this->filterFactory === null) {
             throw new BadMethodCallException(sprintf(
                 'The filter factory is not set, use the "%s::setFilterFactory()" method to set the filter factory.',
                 $this::class,
@@ -220,9 +219,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFilterFactory(FilterFactoryInterface $filterFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filterFactory = $filterFactory;
 
@@ -231,7 +228,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getActionFactory(): ActionFactoryInterface
     {
-        if (!isset($this->actionFactory)) {
+        if ($this->actionFactory === null) {
             throw new BadMethodCallException(sprintf(
                 'The action factory is not set, use the "%s::setActionFactory()" method to set the action factory.',
                 $this::class,
@@ -243,9 +240,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setActionFactory(ActionFactoryInterface $actionFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->actionFactory = $actionFactory;
 
@@ -254,7 +249,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getExporterFactory(): ExporterFactoryInterface
     {
-        if (!isset($this->exporterFactory)) {
+        if ($this->exporterFactory === null) {
             throw new BadMethodCallException(sprintf(
                 'The exporter factory is not set, use the "%s::setExporterFactory()" method to set the exporter factory.',
                 $this::class,
@@ -266,9 +261,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setExporterFactory(ExporterFactoryInterface $exporterFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->exporterFactory = $exporterFactory;
 
@@ -282,9 +275,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setExportingEnabled(bool $exportingEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->exportingEnabled = $exportingEnabled;
 
@@ -298,9 +289,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setExportFormFactory(?FormFactoryInterface $exportFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->exportFormFactory = $exportFormFactory;
 
@@ -314,9 +303,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setDefaultExportData(?ExportData $defaultExportData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultExportData = $defaultExportData;
 
@@ -330,9 +317,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPersonalizationEnabled(bool $personalizationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizationEnabled = $personalizationEnabled;
 
@@ -346,9 +331,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPersonalizationPersistenceEnabled(bool $personalizationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizationPersistenceEnabled = $personalizationPersistenceEnabled;
 
@@ -362,9 +345,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPersonalizationPersistenceAdapter(?PersistenceAdapterInterface $personalizationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizationPersistenceAdapter = $personalizationPersistenceAdapter;
 
@@ -378,9 +359,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPersonalizationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $personalizationPersistenceSubjectProvider): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizationPersistenceSubjectProvider = $personalizationPersistenceSubjectProvider;
 
@@ -389,14 +368,16 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getPersonalizationFormFactory(): FormFactoryInterface
     {
+        if ($this->personalizationFormFactory === null) {
+            throw new BadMethodCallException('The personalization form factory must be set before retrieving it.');
+        }
+
         return $this->personalizationFormFactory;
     }
 
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->personalizationFormFactory = $personalizationFormFactory;
 
@@ -410,9 +391,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultPersonalizationData = $defaultPersonalizationData;
 
@@ -426,9 +405,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setColumnVisibilityGroups(array $columnVisibilityGroups): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->columnVisibilityGroups = $columnVisibilityGroups;
 
@@ -442,9 +419,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFiltrationEnabled(bool $filtrationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filtrationEnabled = $filtrationEnabled;
 
@@ -458,9 +433,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFiltrationPersistenceEnabled(bool $filtrationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filtrationPersistenceEnabled = $filtrationPersistenceEnabled;
 
@@ -474,9 +447,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFiltrationPersistenceAdapter(?PersistenceAdapterInterface $filtrationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filtrationPersistenceAdapter = $filtrationPersistenceAdapter;
 
@@ -490,9 +461,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFiltrationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $filtrationPersistenceSubjectProvider): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filtrationPersistenceSubjectProvider = $filtrationPersistenceSubjectProvider;
 
@@ -501,7 +470,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getFiltrationFormFactory(): FormFactoryInterface
     {
-        if (!isset($this->filtrationFormFactory)) {
+        if ($this->filtrationFormFactory === null) {
             throw new BadMethodCallException('The filtration form factory must be set before retrieving it.');
         }
 
@@ -510,9 +479,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setFiltrationFormFactory(?FormFactoryInterface $filtrationFormFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->filtrationFormFactory = $filtrationFormFactory;
 
@@ -526,9 +493,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setDefaultFiltrationData(?FiltrationData $defaultFiltrationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultFiltrationData = $defaultFiltrationData;
 
@@ -542,9 +507,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setSortingEnabled(bool $sortingEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortingEnabled = $sortingEnabled;
 
@@ -558,9 +521,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setSortingPersistenceEnabled(bool $sortingPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortingPersistenceEnabled = $sortingPersistenceEnabled;
 
@@ -574,9 +535,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setSortingClearable(bool $sortingClearable): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortingClearable = $sortingClearable;
 
@@ -590,9 +549,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setSortingPersistenceAdapter(?PersistenceAdapterInterface $sortingPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortingPersistenceAdapter = $sortingPersistenceAdapter;
 
@@ -606,9 +563,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setSortingPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $sortingPersistenceSubjectProvider): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->sortingPersistenceSubjectProvider = $sortingPersistenceSubjectProvider;
 
@@ -622,9 +577,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setDefaultSortingData(?SortingData $defaultSortingData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultSortingData = $defaultSortingData;
 
@@ -638,9 +591,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPaginationEnabled(bool $paginationEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->paginationEnabled = $paginationEnabled;
 
@@ -654,9 +605,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPaginationPersistenceEnabled(bool $paginationPersistenceEnabled): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->paginationPersistenceEnabled = $paginationPersistenceEnabled;
 
@@ -670,9 +619,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPaginationPersistenceAdapter(?PersistenceAdapterInterface $paginationPersistenceAdapter): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->paginationPersistenceAdapter = $paginationPersistenceAdapter;
 
@@ -686,9 +633,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPaginationPersistenceSubjectProvider(?PersistenceSubjectProviderInterface $paginationPersistenceSubjectProvider): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->paginationPersistenceSubjectProvider = $paginationPersistenceSubjectProvider;
 
@@ -702,9 +647,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setDefaultPaginationData(?PaginationData $defaultPaginationData): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->defaultPaginationData = $defaultPaginationData;
 
@@ -718,9 +661,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->requestHandler = $requestHandler;
 
@@ -734,9 +675,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setPaginationFactory(?PaginationFactoryInterface $paginationFactory): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->paginationFactory = $paginationFactory;
 
@@ -750,9 +689,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setGroupBy(string|callable|null $groupBy): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->groupBy = $groupBy;
 
@@ -766,9 +703,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function addTheme(string $theme): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->themes[] = $theme;
 
@@ -777,9 +712,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setThemes(array $themes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->themes = $themes;
 
@@ -803,9 +736,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes[$name] = $value;
 
@@ -814,9 +745,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setAttributes(array $attributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->attributes = $attributes;
 
@@ -840,9 +769,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setHeaderRowAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->headerRowAttributes[$name] = $value;
 
@@ -851,9 +778,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setHeaderRowAttributes(array $headerRowAttributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->headerRowAttributes = $headerRowAttributes;
 
@@ -877,9 +802,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setValueRowAttribute(string $name, mixed $value): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->valueRowAttributes[$name] = $value;
 
@@ -888,9 +811,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function setValueRowAttributes(array $valueRowAttributes): static
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $this->valueRowAttributes = $valueRowAttributes;
 
@@ -934,9 +855,7 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 
     public function getDataTableConfig(): DataTableConfigInterface
     {
-        if ($this->locked) {
-            throw $this->createBuilderLockedException();
-        }
+        $this->ensureNotLocked();
 
         $config = clone $this;
         $config->locked = true;
@@ -947,12 +866,5 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private function getParameterName(string $prefix): string
     {
         return implode('_', array_filter([$prefix, $this->name]));
-    }
-
-    private function createBuilderLockedException(): BadMethodCallException
-    {
-        return new BadMethodCallException(
-            'DataTableConfigBuilder methods cannot be accessed anymore once the builder is turned into a DataTableConfigInterface instance.',
-        );
     }
 }

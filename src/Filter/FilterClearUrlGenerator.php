@@ -5,72 +5,59 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableView;
-use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Kreyu\Bundle\DataTableBundle\Request\AbstractUrlGenerator;
 
-class FilterClearUrlGenerator implements FilterClearUrlGeneratorInterface
+class FilterClearUrlGenerator extends AbstractUrlGenerator implements FilterClearUrlGeneratorInterface
 {
-    public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly UrlGeneratorInterface $urlGenerator,
-    ) {}
-
     public function generate(DataTableView $dataTableView, FilterView ...$filterViews): string
     {
-        $request = $this->getRequest();
-
-        $route = $request->attributes->get('_route');
-        $routeParams = $request->attributes->get('_route_params', []);
-        $queryParams = $request->query->all();
-
-        $parameters = [...$routeParams, ...$queryParams];
-
-        // Recursively replace/merge with the URL query parameters defined in the data table view.
-        // This allows the user to define custom query parameters that should be preserved when clearing filters.
-        $parameters = array_replace_recursive($parameters, $dataTableView->vars['url_query_parameters'] ?? []);
+        $parameters = $this->getUrlParameters($dataTableView);
 
         foreach ($filterViews as $filterView) {
             $parameters = array_replace_recursive($parameters, $this->getFilterClearQueryParameters($filterView));
         }
 
-        // Clearing the filters should reset the pagination to the first page.
-        if ($dataTableView->vars['pagination_enabled'] ?? false) {
-            $parameters[$dataTableView->vars['page_parameter_name']] = 1;
-        }
+        $parameters = [...$parameters, ...$this->getFirstPageParameters($dataTableView)];
 
-        return $this->urlGenerator->generate($route, $parameters);
+        return $this->generateUrl($parameters);
     }
 
+    /**
+     * @return array<string, array<string, array<string, mixed>>>
+     */
     private function getFilterClearQueryParameters(FilterView $filterView): array
     {
-        $value = isset($filterView->data) ? $filterView->data->getValue() : null;
-        if (is_array($value)) {
-            $parameters = ['value' => array_map(static fn () => '', $value)];
-        } else {
-            $parameters = ['value' => ''];
-        }
+        $parameters = ['value' => $this->getClearedValue($filterView->data?->getValue())];
 
-        if ($filterView->vars['operator_selectable']) {
+        /** @var bool $operatorSelectable */
+        $operatorSelectable = $filterView->vars['operator_selectable'];
+
+        if ($operatorSelectable) {
             $parameters['operator'] = null;
         }
 
-        $dataTableView = $filterView->parent;
+        /** @var string $filtrationParameterName */
+        $filtrationParameterName = $filterView->parent->vars['filtration_parameter_name'];
+
+        /** @var string $formName */
+        $formName = $filterView->vars['form_name'];
 
         return [
-            $dataTableView->vars['filtration_parameter_name'] => [
-                $filterView->vars['form_name'] => $parameters,
+            $filtrationParameterName => [
+                $formName => $parameters,
             ],
         ];
     }
 
-    private function getRequest(): Request
+    /**
+     * @return string|array<array-key, string>
+     */
+    private function getClearedValue(mixed $value): string|array
     {
-        if (null === ($request = $this->requestStack->getCurrentRequest())) {
-            throw new LogicException('Unable to retrieve current request.');
+        if (!is_array($value)) {
+            return '';
         }
 
-        return $request;
+        return array_map(static fn (): string => '', $value);
     }
 }

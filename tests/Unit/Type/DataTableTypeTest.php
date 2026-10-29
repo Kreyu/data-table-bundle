@@ -15,11 +15,13 @@ use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\SearchFilterType;
 use Kreyu\Bundle\DataTableBundle\Pagination\Pagination;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\RowIterator;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CountingProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormView;
 
 class DataTableTypeTest extends DataTableIntegrationTestCase
 {
@@ -115,6 +117,46 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         ];
 
         $this->assertSame($expectedFiltrationParameters, $urlQueryParameters[$filtrationParameterName]);
+    }
+
+    public function testPersonalizationFormSupportsDottedColumnNames(): void
+    {
+        $options = [
+            'personalization_enabled' => true,
+            'personalization_form_factory' => Forms::createFormFactory(),
+        ];
+
+        $builder = $this->dataTableFactory->createBuilder(DataTableType::class, [['id' => 1]], $options);
+        $builder->addColumn('id', options: ['priority' => 2]);
+        $builder->addColumn('author.name', options: ['priority' => 1]);
+
+        $dataTable = $builder->getDataTable();
+
+        /** @var FormView $personalizationForm */
+        $personalizationForm = $dataTable->createView()->vars['personalization_form'];
+
+        $this->assertSame(['id', 'author__name'], array_keys($personalizationForm['columns']->children));
+        $this->assertSame('Author.name', $personalizationForm['columns']['author__name']->vars['label']);
+
+        $form = $dataTable->createPersonalizationFormBuilder()->getForm();
+        $form->submit([
+            'columns' => [
+                'id' => ['name' => 'id', 'priority' => '1', 'visible' => '0'],
+                'author__name' => ['name' => 'author.name', 'priority' => '2', 'visible' => '1'],
+            ],
+        ]);
+
+        /** @var PersonalizationData $submittedData */
+        $submittedData = $form->getData();
+
+        $this->assertTrue($form->isValid());
+
+        $dataTable->personalize($submittedData);
+
+        $this->assertSame(['id', 'author.name'], array_keys($submittedData->getColumns()));
+        $this->assertSame(['author.name', 'id'], array_keys($dataTable->getColumns()));
+        $this->assertSame(['author.name'], array_keys($dataTable->getVisibleColumns()));
+        $this->assertSame(['id'], array_keys($dataTable->getHiddenColumns()));
     }
 
     private function createCountingDataTable(array $options, array $data = []): DataTableInterface

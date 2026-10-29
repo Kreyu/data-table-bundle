@@ -14,23 +14,28 @@ class DateTimeActiveFilterFormatter
         $value = $data->getValue();
 
         if ($value instanceof \DateTimeInterface) {
+            /** @var array{input_format?: string|null, with_minutes?: bool, with_seconds?: bool} $formOptions */
             $formOptions = $filter->getConfig()->getOption('form_options');
 
-            $format = $formOptions['input_format'] ?? null;
+            $inputFormat = $formOptions['input_format'] ?? null;
 
-            if (null === $format) {
-                $format = 'Y-m-d H';
-
-                if ($formOptions['with_minutes'] ?? true) {
-                    $format .= ':i';
-                }
-
-                if ($formOptions['with_seconds'] ?? true) {
-                    $format .= ':s';
-                }
+            if ($inputFormat !== null) {
+                return $value->format($inputFormat);
             }
 
-            return $value->format($format);
+            $withMinutes = $formOptions['with_minutes'] ?? true;
+            $withSeconds = $formOptions['with_seconds'] ?? true;
+
+            $timeSkeleton = match (true) {
+                $withSeconds => 'jms',
+                $withMinutes => 'jm',
+                default => 'j',
+            };
+
+            return (new DateActiveFilterFormatter())->format(
+                $value,
+                DateActiveFilterFormatter::DATE_SKELETON.$timeSkeleton,
+            );
         }
 
         return (string) $value;

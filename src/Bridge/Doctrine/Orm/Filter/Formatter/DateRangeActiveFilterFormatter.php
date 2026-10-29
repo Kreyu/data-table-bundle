@@ -11,23 +11,30 @@ class DateRangeActiveFilterFormatter
 {
     public function __invoke(FilterData $data)
     {
+        /** @var array{from: ?\DateTimeInterface, to: ?\DateTimeInterface} $value */
         $value = $data->getValue();
 
         $dateFrom = $value['from'];
         $dateTo = $value['to'];
 
-        if (null !== $dateFrom && null === $dateTo) {
-            return new TranslatableMessage('After %date%', ['%date%' => $dateFrom->format('Y-m-d')], 'KreyuDataTable');
+        $dateFormatter = new DateActiveFilterFormatter();
+        $skeleton = DateActiveFilterFormatter::DATE_SKELETON;
+
+        $formattedFrom = $dateFrom === null ? null : $dateFormatter->format($dateFrom, $skeleton);
+        $formattedTo = $dateTo === null ? null : $dateFormatter->format($dateTo, $skeleton);
+
+        if ($formattedTo === null) {
+            return new TranslatableMessage('After %date%', ['%date%' => $formattedFrom], 'KreyuDataTable');
         }
 
-        if (null === $dateFrom && null !== $dateTo) {
-            return new TranslatableMessage('Before %date%', ['%date%' => $dateTo->format('Y-m-d')], 'KreyuDataTable');
+        if ($formattedFrom === null) {
+            return new TranslatableMessage('Before %date%', ['%date%' => $formattedTo], 'KreyuDataTable');
         }
 
-        if ($dateFrom == $dateTo) {
-            return $dateFrom->format('Y-m-d');
+        if ($formattedFrom === $formattedTo) {
+            return $formattedFrom;
         }
 
-        return $dateFrom->format('Y-m-d').' - '.$dateTo->format('Y-m-d');
+        return $formattedFrom.' - '.$formattedTo;
     }
 }

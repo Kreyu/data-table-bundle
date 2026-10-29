@@ -12,14 +12,42 @@ use PHPUnit\Framework\TestCase;
 
 class DateTimeActiveFilterFormatterTest extends TestCase
 {
+    private string $previousLocale;
+
+    protected function setUp(): void
+    {
+        $isIntlLoaded = extension_loaded('intl');
+
+        if (!$isIntlLoaded) {
+            return;
+        }
+
+        $this->previousLocale = \Locale::getDefault();
+
+        \Locale::setDefault('en');
+    }
+
+    protected function tearDown(): void
+    {
+        $isIntlLoaded = extension_loaded('intl');
+
+        if (!$isIntlLoaded) {
+            return;
+        }
+
+        \Locale::setDefault($this->previousLocale);
+    }
+
     public function testItCastsValueToStringIfNotDateTime()
     {
         $this->assertSame('123', $this->format(123));
     }
 
-    public function testItFormatsDateTimeToDefaultFormatIfInputFormatFormOptionIsNotGiven()
+    public function testItFormatsDateTimeByLocaleIfInputFormatFormOptionIsNotGiven()
     {
-        $this->assertSame('2023-01-01 11:22:33', $this->format(new \DateTime('2023-01-01 11:22:33')));
+        $expected = extension_loaded('intl') ? 'Jan 1, 2023, 11:22:33 AM' : '2023-01-01 11:22:33';
+
+        $this->assertSame($expected, $this->format(new \DateTime('2023-01-01 11:22:33')));
     }
 
     public function testItFormatsDateTimeUsingInputFormatFormOption()
@@ -31,9 +59,22 @@ class DateTimeActiveFilterFormatterTest extends TestCase
         ]));
     }
 
+    public function testItFormatsDateTimeWithSecondsFormOptionSetToFalse()
+    {
+        $expected = extension_loaded('intl') ? 'Jan 1, 2023, 11:22 AM' : '2023-01-01 11:22';
+
+        $this->assertSame($expected, $this->format(new \DateTime('2023-01-01 11:22:33'), [
+            'form_options' => [
+                'with_seconds' => false,
+            ],
+        ]));
+    }
+
     public function testItFormatsDateTimeWithMinutesAndSecondsFormOptionsSetToFalse()
     {
-        $this->assertSame('2023-01-01 11', $this->format(new \DateTime('2023-01-01 11:22:33'), [
+        $expected = extension_loaded('intl') ? 'Jan 1, 2023, 11 AM' : '2023-01-01 11';
+
+        $this->assertSame($expected, $this->format(new \DateTime('2023-01-01 11:22:33'), [
             'form_options' => [
                 'with_minutes' => false,
                 'with_seconds' => false,
@@ -58,6 +99,8 @@ class DateTimeActiveFilterFormatterTest extends TestCase
 
         $filter->method('getConfig')->willReturn($filterConfig);
 
-        return $formatter($data, $filter);
+        $formatted = $formatter($data, $filter);
+
+        return str_replace(search: "\u{202F}", replace: ' ', subject: $formatted);
     }
 }

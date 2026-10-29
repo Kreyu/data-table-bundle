@@ -12,14 +12,42 @@ use PHPUnit\Framework\TestCase;
 
 class DateActiveFilterFormatterTest extends TestCase
 {
+    private string $previousLocale;
+
+    protected function setUp(): void
+    {
+        $isIntlLoaded = extension_loaded('intl');
+
+        if (!$isIntlLoaded) {
+            return;
+        }
+
+        $this->previousLocale = \Locale::getDefault();
+
+        \Locale::setDefault('en');
+    }
+
+    protected function tearDown(): void
+    {
+        $isIntlLoaded = extension_loaded('intl');
+
+        if (!$isIntlLoaded) {
+            return;
+        }
+
+        \Locale::setDefault($this->previousLocale);
+    }
+
     public function testItCastsValueToStringIfNotDateTime()
     {
         $this->assertSame('123', $this->format(123));
     }
 
-    public function testItFormatsDateTimeToDefaultFormatIfInputFormatFormOptionIsNotGiven()
+    public function testItFormatsDateTimeByLocaleIfInputFormatFormOptionIsNotGiven()
     {
-        $this->assertSame('2023-01-01', $this->format(new \DateTime('2023-01-01')));
+        $expected = extension_loaded('intl') ? 'Jan 1, 2023' : '2023-01-01';
+
+        $this->assertSame($expected, $this->format(new \DateTime('2023-01-01')));
     }
 
     public function testItFormatsDateTimeUsingInputFormatFormOption()

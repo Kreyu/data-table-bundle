@@ -117,7 +117,7 @@ class ProductController extends AbstractController
 ### The N+1 problem with unused one-to-one relations
 
 If your entity contains a one-to-one relationship that is **not** used in the data table,
-the additional queries will be generated anyway, because the [Doctrine Paginator](https://www.doctrine-project.org/projects/doctrine-orm/en/2.15/tutorials/pagination.html) is **always** loading them.
+the additional queries will be generated anyway, because the [Doctrine paginator](https://www.doctrine-project.org/projects/doctrine-orm/en/3.7/tutorials/pagination.html) is **always** loading them.
 To prevent that, add a hint to force a partial load:
 
 ```php

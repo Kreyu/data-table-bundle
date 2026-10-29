@@ -4,61 +4,54 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
+use Doctrine\ORM\Tools\Pagination\Window;
+use Doctrine\ORM\Tools\Pagination\WindowPage;
 use Kreyu\Bundle\DataTableBundle\Query\ResultSet;
 use Kreyu\Bundle\DataTableBundle\Util\RewindableGeneratorIterator;
 
 class DoctrineOrmResultSetFactory implements DoctrineOrmResultSetFactoryInterface
 {
-    public function create(Paginator $paginator, int $batchSize = 5000): ResultSet
+    public function create(OffsetPaginator $paginator, Query $query, int $batchSize = 5000): ResultSet
     {
-        $items = new RewindableGeneratorIterator(fn () => $this->getPaginatorItems($paginator, $batchSize));
+        $firstResult = $query->getFirstResult();
+        $maxResults = $query->getMaxResults() ?? 0;
 
-        $currentPageItemCount = $totalItemCount = $paginator->count();
+        if ($maxResults > 0) {
+            $page = $paginator->paginate($query, new Window($firstResult, $maxResults));
 
-        if ($paginator->getQuery()->getMaxResults() > 0) {
-            $items = new \ArrayIterator(iterator_to_array($items));
-            $currentPageItemCount = iterator_count($items);
+            return new ResultSet(new \ArrayIterator($page->getItems()), $page->count(), $page->getTotalCount());
         }
 
-        return new ResultSet($items, $currentPageItemCount, $totalItemCount);
+        $firstBatch = $paginator->paginate($query, new Window($firstResult, $batchSize));
+        $totalItemCount = $firstBatch->getTotalCount();
+
+        $items = new RewindableGeneratorIterator(fn () => $this->getBatchedItems($paginator, $query, $firstBatch));
+
+        return new ResultSet($items, $totalItemCount, $totalItemCount);
     }
 
-    private function getPaginatorItems(Paginator $paginator, int $batchSize): \Generator
+    /**
+     * @param WindowPage<mixed> $firstBatch
+     */
+    private function getBatchedItems(OffsetPaginator $paginator, Query $query, WindowPage $firstBatch): \Generator
     {
-        $query = $paginator->getQuery();
+        $batch = $firstBatch;
 
-        $firstResult = $query->getFirstResult();
-        $maxResults = $limit = $query->getMaxResults();
-
-        if (null === $maxResults || $maxResults > $batchSize) {
-            $maxResults = $batchSize;
-        }
-
-        $hasItems = true;
-
-        $cursorPosition = 0;
-
-        while ($hasItems && $firstResult < $paginator->count() && (null === $limit || $cursorPosition < $limit)) {
-            $hasItems = false;
-
-            $query
-                ->setMaxResults($maxResults)
-                ->setFirstResult($firstResult)
-            ;
-
-            $itemCount = 0;
-
-            foreach ($paginator as $item) {
+        while (true) {
+            /** @var mixed $item */
+            foreach ($batch as $item) {
                 yield $item;
-
-                $hasItems = true;
-
-                ++$cursorPosition;
-                ++$itemCount;
             }
 
-            $firstResult += $itemCount;
+            $hasNextPage = $batch->hasNextPage();
+
+            if (!$hasNextPage) {
+                return;
+            }
+
+            $batch = $paginator->paginate($query, $batch->getNextWindow());
         }
     }
 }

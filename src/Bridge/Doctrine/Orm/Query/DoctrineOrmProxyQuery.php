@@ -25,7 +25,8 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
     private DoctrineOrmResultSetFactoryInterface $resultSetFactory;
 
     /**
-     * @param array<string, mixed> $hints
+     * @param array<string, mixed>              $hints
+     * @param string|AbstractQuery::HYDRATE_* $hydrationMode
      */
     public function __construct(
         private QueryBuilder $queryBuilder,
@@ -35,7 +36,7 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 
     public function __call(string $name, array $args): mixed
     {
-        return $this->queryBuilder->$name(...$args);
+        return [$this->queryBuilder, $name](...$args);
     }
 
     public function __clone(): void
@@ -71,10 +72,12 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
 
     public function getResult(): ResultSetInterface
     {
-        $paginator = $this->getPaginatorFactory()->create($this->queryBuilder, $this->hints);
-        $paginator->getQuery()->setHydrationMode($this->hydrationMode);
+        $query = $this->queryBuilder->getQuery();
+        $query->setHydrationMode($this->hydrationMode);
 
-        return $this->getResultSetFactory()->create($paginator, $this->batchSize);
+        $paginator = $this->getPaginatorFactory()->create($this->queryBuilder, $query, $this->hints);
+
+        return $this->getResultSetFactory()->create($paginator, $query, $this->batchSize);
     }
 
     public function getQueryBuilder(): QueryBuilder
@@ -97,11 +100,17 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
         $this->hints[$name] = $value;
     }
 
+    /**
+     * @return string|AbstractQuery::HYDRATE_*
+     */
     public function getHydrationMode(): int|string
     {
         return $this->hydrationMode;
     }
 
+    /**
+     * @param string|AbstractQuery::HYDRATE_* $hydrationMode
+     */
     public function setHydrationMode(int|string $hydrationMode): void
     {
         $this->hydrationMode = $hydrationMode;

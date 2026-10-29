@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 
 interface PaginatorFactoryInterface
 {
-    public function create(QueryBuilder $queryBuilder, array $hints = []): Paginator;
+    /**
+     * @param array<string, mixed> $hints
+     */
+    public function create(QueryBuilder $queryBuilder, Query $query, array $hints = []): OffsetPaginator;
 }

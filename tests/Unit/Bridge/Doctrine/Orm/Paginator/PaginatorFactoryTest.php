@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Paginator;
 
 use Doctrine\ORM\Tools\Pagination\CountWalker;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator\PaginatorFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Fixtures\Entity\Car;
 use Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Fixtures\Entity\Category;
@@ -28,7 +29,7 @@ class PaginatorFactoryTest extends TestCase
 
         $this->expectExceptionObject(new \RuntimeException('There are no root entities defined in the query.'));
 
-        $this->paginatorFactory->create($queryBuilder);
+        $this->paginatorFactory->create($queryBuilder, $queryBuilder->getQuery());
     }
 
     public function testCreateWithoutJoins(): void
@@ -38,9 +39,11 @@ class PaginatorFactoryTest extends TestCase
             ->from(Product::class, 'product')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
+        $query = $queryBuilder->getQuery();
 
-        $this->assertFalse($paginator->getQuery()->getHint(CountWalker::HINT_DISTINCT));
+        $this->paginatorFactory->create($queryBuilder, $query);
+
+        $this->assertFalse($query->getHint(CountWalker::HINT_DISTINCT));
     }
 
     public function testCreateWithHints(): void
@@ -50,9 +53,11 @@ class PaginatorFactoryTest extends TestCase
             ->from(Product::class, 'product')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder, ['foo' => 'bar']);
+        $query = $queryBuilder->getQuery();
 
-        $this->assertSame('bar', $paginator->getQuery()->getHint('foo'));
+        $this->paginatorFactory->create($queryBuilder, $query, ['foo' => 'bar']);
+
+        $this->assertSame('bar', $query->getHint('foo'));
     }
 
     public function testCreateWithSingleIdentifierAndJoins()
@@ -63,10 +68,11 @@ class PaginatorFactoryTest extends TestCase
             ->leftJoin('product.category', 'category')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
+        $paginator = $this->paginatorFactory->create($queryBuilder, $queryBuilder->getQuery());
 
         $this->assertTrue($paginator->getFetchJoinCollection());
-        $this->assertFalse($paginator->getUseOutputWalkers());
+        $this->assertFalse($this->getUseOutputWalkers($paginator));
+        $this->assertTrue($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithCompositeIdentifier()
@@ -76,10 +82,11 @@ class PaginatorFactoryTest extends TestCase
             ->from(Car::class, 'car')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
+        $paginator = $this->paginatorFactory->create($queryBuilder, $queryBuilder->getQuery());
 
         $this->assertFalse($paginator->getFetchJoinCollection());
-        $this->assertNull($paginator->getUseOutputWalkers());
+        $this->assertNull($this->getUseOutputWalkers($paginator));
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithCompositeIdentifierAndJoins()
@@ -90,10 +97,11 @@ class PaginatorFactoryTest extends TestCase
             ->leftJoin(Product::class, 'product')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
+        $paginator = $this->paginatorFactory->create($queryBuilder, $queryBuilder->getQuery());
 
         $this->assertFalse($paginator->getFetchJoinCollection());
-        $this->assertNull($paginator->getUseOutputWalkers());
+        $this->assertNull($this->getUseOutputWalkers($paginator));
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithHaving()
@@ -104,9 +112,7 @@ class PaginatorFactoryTest extends TestCase
             ->having('product.name <> "test"')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
-
-        $this->assertNull($paginator->getUseOutputWalkers());
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithMultipleFrom()
@@ -117,9 +123,7 @@ class PaginatorFactoryTest extends TestCase
             ->from(Category::class, 'category')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
-
-        $this->assertNull($paginator->getUseOutputWalkers());
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithForeignKeyAsIdentifier()
@@ -129,9 +133,7 @@ class PaginatorFactoryTest extends TestCase
             ->from(ProductAttribute::class, 'productAttribute')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
-
-        $this->assertNull($paginator->getUseOutputWalkers());
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithJoinsAndOrderBy()
@@ -143,9 +145,7 @@ class PaginatorFactoryTest extends TestCase
             ->orderBy('product.id', 'ASC')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
-
-        $this->assertFalse($paginator->getUseOutputWalkers());
+        $this->assertTrue($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
     }
 
     public function testCreateWithOrderByAssociation()
@@ -157,8 +157,13 @@ class PaginatorFactoryTest extends TestCase
             ->orderBy('category.id', 'ASC')
         ;
 
-        $paginator = $this->paginatorFactory->create($queryBuilder);
+        $this->assertFalse($this->paginatorFactory->canDisableOutputWalkers($queryBuilder));
+    }
 
-        $this->assertNull($paginator->getUseOutputWalkers());
+    private function getUseOutputWalkers(OffsetPaginator $paginator): mixed
+    {
+        $property = new \ReflectionProperty(OffsetPaginator::class, 'useOutputWalkers');
+
+        return $property->getValue($paginator);
     }
 }

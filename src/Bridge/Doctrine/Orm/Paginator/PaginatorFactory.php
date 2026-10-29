@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\From;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 
 class PaginatorFactory implements PaginatorFactoryInterface
 {
-    public function create(QueryBuilder $queryBuilder, array $hints = []): Paginator
+    /**
+     * @param array<string, mixed> $hints
+     */
+    public function create(QueryBuilder $queryBuilder, Query $query, array $hints = []): OffsetPaginator
     {
         $rootEntity = current($queryBuilder->getRootEntities());
 
@@ -25,14 +32,15 @@ class PaginatorFactory implements PaginatorFactoryInterface
         ;
 
         $hasSingleIdentifierName = 1 === \count($identifierFieldNames);
-        $hasJoins = \count($queryBuilder->getDQLPart('join')) > 0;
-
-        $query = $queryBuilder->getQuery();
+        /** @var array<string, list<Join>> $joinParts */
+        $joinParts = $queryBuilder->getDQLPart('join');
+        $hasJoins = \count($joinParts) > 0;
 
         if (!$hasJoins) {
             $query->setHint(CountWalker::HINT_DISTINCT, false);
         }
 
+        /** @var mixed $value */
         foreach ($hints as $name => $value) {
             $query->setHint($name, $value);
         }
@@ -40,14 +48,16 @@ class PaginatorFactory implements PaginatorFactoryInterface
         // Paginator with fetchJoinCollection doesn't work with composite primary keys
         // https://github.com/doctrine/orm/issues/2910
         // To stay safe fetch join only when we have single primary key and joins
-        $paginator = new Paginator($query, $hasSingleIdentifierName && $hasJoins);
+        $fetchJoinCollection = $hasSingleIdentifierName && $hasJoins;
 
         // it is only safe to disable output walkers for really simple queries
+        $useOutputWalkers = null;
+
         if ($this->canDisableOutputWalkers($queryBuilder)) {
-            $paginator->setUseOutputWalkers(false);
+            $useOutputWalkers = false;
         }
 
-        return $paginator;
+        return new OffsetPaginator($fetchJoinCollection, $useOutputWalkers);
     }
 
     /**
@@ -60,14 +70,15 @@ class PaginatorFactory implements PaginatorFactoryInterface
             return false;
         }
 
+        /** @var list<From> $fromParts */
         $fromParts = $queryBuilder->getDQLPart('from');
 
         // Do not support queries using multiple entities in FROM
-        if (1 !== \count($fromParts)) {
+        if (\count($fromParts) !== 1) {
             return false;
         }
 
-        $fromPart = current($fromParts);
+        $fromPart = $fromParts[0];
 
         $classMetadata = $queryBuilder
             ->getEntityManager()
@@ -77,11 +88,15 @@ class PaginatorFactory implements PaginatorFactoryInterface
         $identifierFieldNames = $classMetadata->getIdentifierFieldNames();
 
         // Do not support entities using a composite identifier
-        if (1 !== \count($identifierFieldNames)) {
+        if (\count($identifierFieldNames) !== 1) {
             return false;
         }
 
         $identifierName = current($identifierFieldNames);
+
+        if ($identifierName === false) {
+            return false;
+        }
 
         // Do not support entities using a foreign key as identifier
         if ($classMetadata->hasAssociation($identifierName)) {
@@ -98,15 +113,17 @@ class PaginatorFactory implements PaginatorFactoryInterface
 
     public function hasOrderByAssociation(QueryBuilder $queryBuilder): bool
     {
+        /** @var array<string, list<Join>> $joinParts */
         $joinParts = $queryBuilder->getDQLPart('join');
 
-        if (0 === \count($joinParts)) {
+        if ($joinParts === []) {
             return false;
         }
 
+        /** @var list<OrderBy> $orderByParts */
         $orderByParts = $queryBuilder->getDQLPart('orderBy');
 
-        if (empty($orderByParts)) {
+        if ($orderByParts === []) {
             return false;
         }
 
@@ -114,7 +131,11 @@ class PaginatorFactory implements PaginatorFactoryInterface
 
         foreach ($joinParts as $joinPart) {
             foreach ($joinPart as $join) {
-                $joinAliases[] = $join->getAlias();
+                $joinAlias = $join->getAlias();
+
+                if ($joinAlias !== null) {
+                    $joinAliases[] = $joinAlias;
+                }
             }
         }
 

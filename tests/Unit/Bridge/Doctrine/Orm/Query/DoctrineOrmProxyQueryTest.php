@@ -6,8 +6,9 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Bridge\Doctrine\Orm\Query;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator\PaginatorFactory;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Paginator\PaginatorFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query\AliasResolver;
@@ -58,6 +59,7 @@ class DoctrineOrmProxyQueryTest extends TestCase
             new SortingColumnData('category?.name', 'DESC'),
         ]));
 
+        /** @var list<OrderBy> $orderBy */
         $orderBy = $queryBuilder->getDQLPart('orderBy');
 
         $this->assertCount(2, $orderBy);
@@ -81,16 +83,18 @@ class DoctrineOrmProxyQueryTest extends TestCase
 
     public function testGetResult()
     {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $query = $this->createStub(Query::class);
 
-        $paginator = $this->createMock(Paginator::class);
-        $paginator->method('getQuery')->willReturn($this->createMock(Query::class));
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('getQuery')->willReturn($query);
+
+        $paginator = $this->createStub(OffsetPaginator::class);
 
         $paginationFactory = $this->createMock(PaginatorFactoryInterface::class);
         $paginationFactory
             ->expects($this->once())
             ->method('create')
-            ->with($queryBuilder, ['foo' => 'bar'])
+            ->with($queryBuilder, $query, ['foo' => 'bar'])
             ->willReturn($paginator)
         ;
 
@@ -98,7 +102,7 @@ class DoctrineOrmProxyQueryTest extends TestCase
         $resultSetFactory
             ->expects($this->once())
             ->method('create')
-            ->with($paginator, 5000)
+            ->with($paginator, $query, 5000)
         ;
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder, ['foo' => 'bar']);
@@ -148,16 +152,14 @@ class DoctrineOrmProxyQueryTest extends TestCase
 
     public function testGetDefaultHydrationMode()
     {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('setHydrationMode')->with(AbstractQuery::HYDRATE_OBJECT);
 
-        $paginator = $this->createMock(Paginator::class);
-        $paginator->method('getQuery')->willReturn($query);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('getQuery')->willReturn($query);
 
-        $paginatorFactory = $this->createMock(PaginatorFactoryInterface::class);
-        $paginatorFactory->method('create')->willReturn($paginator);
+        $paginatorFactory = $this->createStub(PaginatorFactoryInterface::class);
+        $paginatorFactory->method('create')->willReturn($this->createStub(OffsetPaginator::class));
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->setPaginatorFactory($paginatorFactory);
@@ -169,16 +171,14 @@ class DoctrineOrmProxyQueryTest extends TestCase
 
     public function testSetHydrationMode()
     {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('setHydrationMode')->with(AbstractQuery::HYDRATE_ARRAY);
 
-        $paginator = $this->createMock(Paginator::class);
-        $paginator->method('getQuery')->willReturn($query);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('getQuery')->willReturn($query);
 
-        $paginatorFactory = $this->createMock(PaginatorFactoryInterface::class);
-        $paginatorFactory->method('create')->willReturn($paginator);
+        $paginatorFactory = $this->createStub(PaginatorFactoryInterface::class);
+        $paginatorFactory->method('create')->willReturn($this->createStub(OffsetPaginator::class));
 
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->setPaginatorFactory($paginatorFactory);

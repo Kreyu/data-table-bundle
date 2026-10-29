@@ -20,7 +20,7 @@ abstract class AbstractActionType implements ActionTypeInterface
 
     public function getBlockPrefix(): string
     {
-        return StringUtil::fqcnToShortName(static::class, ['ActionType', 'Type']) ?: '';
+        return StringUtil::fqcnToShortName(static::class, ['ActionType', 'Type']) ?? '';
     }
 
     public function getParent(): ?string

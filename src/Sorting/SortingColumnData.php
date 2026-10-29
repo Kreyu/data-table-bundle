@@ -22,7 +22,7 @@ class SortingColumnData
     }
 
     /**
-     * @param array{name: string, direction: string, property_path: ?string} $data
+     * @param array<array-key, mixed> $data
      */
     public static function fromArray(array $data): self
     {
@@ -33,14 +33,13 @@ class SortingColumnData
             ->setAllowedTypes('name', 'string')
             ->setAllowedTypes('property_path', ['null', 'string'])
             ->setAllowedValues('direction', ['asc', 'desc', 'none'])
-            ->addNormalizer('direction', static function (Options $options, mixed $value) {
-                return strtolower((string) $value);
-            })
+            ->addNormalizer('direction', static fn (Options $options, mixed $value) => strtolower((string) $value))
         ;
 
-        $data = $resolver->resolve($data);
+        /** @var array{name: string, direction: string, property_path: string|null} $resolvedData */
+        $resolvedData = $resolver->resolve($data);
 
-        return new self($data['name'], $data['direction'], $data['property_path']);
+        return new self($resolvedData['name'], $resolvedData['direction'], $resolvedData['property_path']);
     }
 
     public function getName(): string

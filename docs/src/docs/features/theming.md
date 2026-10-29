@@ -250,7 +250,7 @@ When creating your own theme, you can either create a template that extends one 
 Remember that in the second case, you cannot call the `parent()` function in the block.
 
 ::: warning Upgrading a custom theme
-- **Link, button, form and dropdown item actions now render their own confirmation dialog in `base`.**
+- **Link, button, form and dropdown item actions with `confirmation` set now render their dialog in `base`.** Confirmation stays opt-in.
   Your block renders its own confirmation, then calls `parent()`? Turn the built-in one off:
   ```twig
   {% with { confirmation: false } %}

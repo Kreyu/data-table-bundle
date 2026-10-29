@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Bridge\PhpSpreadsheet\Exporter\Type;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportFile;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\AbstractExporterType;
@@ -20,6 +21,8 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
     abstract protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter;
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @throws Exception
      */
     public function export(
@@ -28,10 +31,13 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
         string $filename,
         array $options = [],
     ): ExportFile {
+        /** @var bool $preCalculateFormulas */
+        $preCalculateFormulas = $options['pre_calculate_formulas'];
+
         $spreadsheet = $this->createSpreadsheet($view, $options);
 
         $writer = $this->getWriter($spreadsheet, $options);
-        $writer->setPreCalculateFormulas($options['pre_calculate_formulas']);
+        $writer->setPreCalculateFormulas($preCalculateFormulas);
 
         $writer->save($tempnam = $this->getTempnam($options));
 
@@ -49,10 +55,14 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
 
         $worksheet = $spreadsheet->getActiveSheet();
 
-        if ($options['use_headers']) {
+        /** @var bool $useHeaders */
+        $useHeaders = $options['use_headers'];
+        $headerRow = $useHeaders ? $view->headerRow : null;
+
+        if ($headerRow !== null) {
             $this->appendRow($worksheet, array_map(
                 static fn (ColumnHeaderView $view) => $view->vars['label'],
-                $view->headerRow->children,
+                $headerRow->children,
             ));
         }
 
@@ -67,6 +77,8 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
     }
 
     /**
+     * @param array<array-key, mixed> $data
+     *
      * @throws Exception
      */
     protected function appendRow(Worksheet $worksheet, array $data): void
@@ -77,17 +89,44 @@ abstract class AbstractPhpSpreadsheetExporterType extends AbstractExporterType
 
         $index = 0;
 
+        /** @var mixed $value */
         foreach ($data as $value) {
-            if (is_array($value)) {
-                $value = implode(', ', $value);
-            }
-
-            $worksheet->setCellValue([++$index, $row], $value);
+            $worksheet->setCellValue([++$index, $row], $this->getCellValue($value));
         }
     }
 
     public function getParent(): ?string
     {
         return PhpSpreadsheetExporterType::class;
+    }
+
+    private function getCellValue(mixed $value): mixed
+    {
+        $isArray = is_array($value);
+
+        if (!$isArray) {
+            return $value;
+        }
+
+        return implode(', ', array_map($this->getImplodableValue(...), $value));
+    }
+
+    private function getImplodableValue(mixed $value): \Stringable|bool|float|int|string|null
+    {
+        if ($value instanceof \Stringable) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        $isScalar = is_scalar($value);
+
+        if ($isScalar) {
+            return $value;
+        }
+
+        throw new UnexpectedTypeException($value, 'scalar, \Stringable or null');
     }
 }

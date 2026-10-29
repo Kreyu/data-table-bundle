@@ -21,6 +21,7 @@ trait DataTableFactoryAwareTrait
 
     /**
      * @param class-string<DataTableTypeInterface> $type
+     * @param array<string, mixed>                 $options
      */
     protected function createDataTable(string $type, mixed $query = null, array $options = []): DataTableInterface
     {
@@ -36,6 +37,7 @@ trait DataTableFactoryAwareTrait
 
     /**
      * @param class-string<DataTableTypeInterface> $type
+     * @param array<string, mixed>                 $options
      */
     protected function createNamedDataTable(
         string $name,
@@ -53,6 +55,9 @@ trait DataTableFactoryAwareTrait
         return $this->dataTableFactory->createNamed($name, $type, $query, $options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     protected function createDataTableBuilder(mixed $query = null, array $options = []): DataTableBuilderInterface
     {
         if (null === $this->dataTableFactory) {
@@ -65,6 +70,9 @@ trait DataTableFactoryAwareTrait
         return $this->dataTableFactory->createBuilder(DataTableType::class, $query, $options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     protected function createNamedDataTableBuilder(
         string $name,
         mixed $query = null,

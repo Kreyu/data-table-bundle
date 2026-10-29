@@ -13,15 +13,15 @@ final class LinkActionType extends AbstractActionType
 {
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        if ($view->parent instanceof ColumnValueView) {
-            $value = $view->parent->value;
+        $columnValueView = $view->parent;
 
+        if ($columnValueView instanceof ColumnValueView) {
             foreach (['href', 'target'] as $optionName) {
                 if (!$options[$optionName] instanceof \Closure) {
                     continue;
                 }
 
-                $options[$optionName] = $options[$optionName]($value);
+                $options[$optionName] = $options[$optionName]($columnValueView->value);
             }
         }
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Filter;
 
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\DoctrineOrmFilterEvent;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\DoctrineOrmFilterEvents;
 use Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Event\PreApplyExpressionEvent;
@@ -41,16 +43,18 @@ class DoctrineOrmFilterHandler implements FilterHandlerInterface
         $queryBuilder = $query->getQueryBuilder();
 
         foreach ($event->getParameters() as $parameter) {
-            $queryBuilder->setParameter(
-                $parameter->getName(),
-                $parameter->getValue(),
-                $parameter->typeWasSpecified() ? $parameter->getType() : null,
-            );
+            /** @var ParameterType|ArrayParameterType|string|int|null $type */
+            $type = $parameter->typeWasSpecified() ? $parameter->getType() : null;
+
+            $queryBuilder->setParameter($parameter->getName(), $parameter->getValue(), $type);
         }
 
-        $expression = $this->expressionFactory->create($query, $data, $filter, $event->getParameters());
-
-        $event = new PreApplyExpressionEvent($query, $data, $filter, $expression);
+        $event = new PreApplyExpressionEvent(
+            $query,
+            $data,
+            $filter,
+            $this->expressionFactory->create($query, $data, $filter, $event->getParameters()),
+        );
 
         $this->dispatch(DoctrineOrmFilterEvents::PRE_APPLY_EXPRESSION, $event);
 

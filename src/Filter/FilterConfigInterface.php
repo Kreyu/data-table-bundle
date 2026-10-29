@@ -35,6 +35,9 @@ interface FilterConfigInterface
      */
     public function getFormType(): string;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFormOptions(): array;
 
     /**
@@ -42,6 +45,9 @@ interface FilterConfigInterface
      */
     public function getOperatorFormType(): string;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOperatorFormOptions(): array;
 
     /**

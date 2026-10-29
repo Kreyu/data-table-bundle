@@ -87,9 +87,7 @@ class ApplyExpressionTransformersTest extends TestCase
         $filterConfig = $this->createMock(FilterConfigInterface::class);
         $filterConfig
             ->method('getOption')
-            ->willReturnCallback(static function (string $option) use ($options) {
-                return $options[$option] ?? null;
-            })
+            ->willReturnCallback(static fn (string $option) => $options[$option] ?? null)
         ;
 
         $filter = $this->createMock(FilterInterface::class);

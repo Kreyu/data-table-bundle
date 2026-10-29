@@ -32,11 +32,11 @@ class FilterRegistry implements FilterRegistryInterface
     /**
      * @var array<class-string<FilterTypeInterface>, bool>
      */
-    private array $checkedTypes;
+    private array $checkedTypes = [];
 
     /**
-     * @param iterable<FilterTypeInterface>          $types
-     * @param iterable<FilterTypeExtensionInterface> $typeExtensions
+     * @param iterable<object> $types
+     * @param iterable<object> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -54,7 +54,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
     private function resolveType(string $name): ResolvedFilterTypeInterface
@@ -64,7 +64,9 @@ class FilterRegistry implements FilterRegistryInterface
             $name,
         ));
 
-        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+        $fqcn = $type::class;
+
+        if (array_key_exists($fqcn, $this->checkedTypes)) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
             throw new LogicException(sprintf('Circular reference detected for filter type "%s" (%s).', $fqcn, $types));
         }
@@ -84,6 +86,9 @@ class FilterRegistry implements FilterRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $types
+     */
     private function setTypes(iterable $types): void
     {
         $this->types = [];
@@ -97,6 +102,9 @@ class FilterRegistry implements FilterRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $typeExtensions
+     */
     private function setTypeExtensions(iterable $typeExtensions): void
     {
         $this->typeExtensions = [];

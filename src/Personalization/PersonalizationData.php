@@ -12,8 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalizationData
 {
-    private static OptionsResolver $optionsResolver;
+    private static ?OptionsResolver $optionsResolver = null;
 
+    /**
+     * @var array<string, PersonalizationColumnData>
+     */
     private array $columns = [];
 
     /**
@@ -26,15 +29,19 @@ class PersonalizationData
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): self
     {
-        $resolver = self::$optionsResolver ??= self::createOptionsResolver();
+        $resolver = self::getOptionsResolver();
 
-        $data = $resolver->resolve($data);
+        /** @var array{columns: array<array{name: string, priority: int, visible: bool}>} $resolvedData */
+        $resolvedData = $resolver->resolve($data);
 
         return new self(array_map(
             PersonalizationColumnData::fromArray(...),
-            $data['columns'],
+            $resolvedData['columns'],
         ));
     }
 
@@ -46,6 +53,9 @@ class PersonalizationData
         ));
     }
 
+    /**
+     * @return array<string, PersonalizationColumnData>
+     */
     public function getColumns(): array
     {
         return $this->columns;
@@ -125,6 +135,11 @@ class PersonalizationData
         }
     }
 
+    private static function getOptionsResolver(): OptionsResolver
+    {
+        return self::$optionsResolver ??= self::createOptionsResolver();
+    }
+
     private static function createOptionsResolver(): OptionsResolver
     {
         $configureColumns = static function (OptionsResolver $resolver): void {
@@ -143,13 +158,7 @@ class PersonalizationData
 
         $resolver = (new OptionsResolver())
             ->setDefined('columns')
-            ->addNormalizer('columns', static function (Options $options, array $value) {
-                foreach ($value as $name => $column) {
-                    $value[$name]['name'] ??= $name;
-                }
-
-                return $value;
-            })
+            ->addNormalizer('columns', self::normalizeColumnNames(...))
         ;
 
         $supportsNestedOptions = method_exists($resolver, 'setOptions');
@@ -159,5 +168,20 @@ class PersonalizationData
         }
 
         return $resolver->setDefault('columns', $configureColumns);
+    }
+
+    /**
+     * @param array<array-key, array<string, mixed>> $columns
+     *
+     * @return array<array-key, array<string, mixed>>
+     */
+    private static function normalizeColumnNames(Options $options, array $columns): array
+    {
+        foreach ($columns as $name => $column) {
+            $column['name'] ??= $name;
+            $columns[$name] = $column;
+        }
+
+        return $columns;
     }
 }

@@ -483,6 +483,9 @@ class DataTableConfigBuilderTest extends TestCase
         $this->assertTrue($this->getPrivatePropertyValue($config, 'locked'));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createBuilder(
         ?ResolvedDataTableTypeInterface $type = null,
         ?EventDispatcherInterface $dispatcher = null,

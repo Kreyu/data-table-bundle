@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Query;
 
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
+
 class ResultSet implements ResultSetInterface
 {
     public function __construct(
@@ -29,6 +31,14 @@ class ResultSet implements ResultSetInterface
 
     public function count(): int
     {
-        return $this->getCurrentPageItemCount() ?? $this->getTotalItemCount();
+        $itemCount = $this->getCurrentPageItemCount() ?? $this->getTotalItemCount();
+
+        if ($itemCount === null) {
+            throw new LogicException(
+                'Unable to count the result set without a current page item count or a total item count.',
+            );
+        }
+
+        return $itemCount;
     }
 }

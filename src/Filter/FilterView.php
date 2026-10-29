@@ -8,6 +8,9 @@ use Kreyu\Bundle\DataTableBundle\DataTableView;
 
 class FilterView
 {
+    /**
+     * @var array<string, mixed>
+     */
     public array $vars = [
         'attr' => [],
     ];

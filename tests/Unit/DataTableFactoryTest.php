@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 
 use Kreyu\Bundle\DataTableBundle\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\CustomQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQueryFactory;
@@ -105,6 +106,9 @@ class DataTableFactoryTest extends TestCase
         $this->assertInstanceOf(ConfigurableDataTableType::class, $dataTable->getConfig()->getType()->getInnerType());
     }
 
+    /**
+     * @param list<ProxyQueryFactoryInterface> $proxyQueryFactories
+     */
     private function createFactory(array $proxyQueryFactories = []): DataTableFactory
     {
         $registry = new DataTableRegistry(

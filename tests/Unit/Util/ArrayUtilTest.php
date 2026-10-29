@@ -26,6 +26,7 @@ class ArrayUtilTest extends TestCase
         ];
 
         $output = ArrayUtil::mapWithKeys(
+            /** @param array{id: int, name: string} $array */
             callback: static fn (array $array) => [$array['id'] => $array['name']],
             array: $input,
         );

@@ -36,6 +36,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setType(ResolvedDataTableTypeInterface $type): static;
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @deprecated since 0.14.0, modifying the options dynamically will be removed as it creates unexpected behaviors
      */
     public function setOptions(array $options): static;

@@ -21,7 +21,7 @@ abstract class AbstractFilterType implements FilterTypeInterface
 
     public function getBlockPrefix(): string
     {
-        return StringUtil::fqcnToShortName(static::class, ['FilterType', 'Type']) ?: '';
+        return StringUtil::fqcnToShortName(static::class, ['FilterType', 'Type']) ?? '';
     }
 
     public function getParent(): ?string

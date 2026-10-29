@@ -23,7 +23,9 @@ class CallbackFilterType extends AbstractDoctrineOrmFilterType
             throw new UnexpectedTypeException($query, DoctrineOrmProxyQueryInterface::class);
         }
 
-        $options['callback']($query, $data, $filter);
+        /** @var callable(DoctrineOrmProxyQueryInterface, FilterData, FilterInterface): void $callback */
+        $callback = $options['callback'];
+        $callback($query, $data, $filter);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

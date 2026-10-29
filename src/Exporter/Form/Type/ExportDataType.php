@@ -19,6 +19,9 @@ class ExportDataType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var array<ExporterInterface> $exporters */
+        $exporters = $options['exporters'];
+
         $builder
             ->add('filename', TextType::class, [
                 'constraints' => [
@@ -38,12 +41,7 @@ class ExportDataType extends AbstractType
                 ],
             ])
             ->add('exporter', ChoiceType::class, [
-                'choices' => array_flip(array_map(
-                    static fn (ExporterInterface $exporter) => (
-                        $exporter->getConfig()->getOption('label') ?? $exporter->getName()
-                    ),
-                    $options['exporters'],
-                )),
+                'choices' => array_flip(array_map($this->getExporterLabel(...), $exporters)),
             ])
             ->add('strategy', ExportStrategyType::class)
             ->add('includePersonalization', CheckboxType::class, [
@@ -62,7 +60,6 @@ class ExportDataType extends AbstractType
 
         $resolver->setAllowedTypes('exporters', ExporterInterface::class.'[]');
 
-        // TODO: Remove deprecated default filename option
         $resolver->setDefault('default_filename', null);
         $resolver->setDeprecated(
             'default_filename',
@@ -70,5 +67,13 @@ class ExportDataType extends AbstractType
             '0.14',
             'The "%name%" option is deprecated.',
         );
+    }
+
+    private function getExporterLabel(ExporterInterface $exporter): string
+    {
+        /** @var string|null $label */
+        $label = $exporter->getConfig()->getOption('label');
+
+        return $label ?? $exporter->getName();
     }
 }

@@ -55,6 +55,7 @@ class DataTableBundleIntegrationTest extends KernelTestCase
         self::bootKernel(['debug' => false]);
 
         $factory = self::getContainer()->get(DataTableFactoryInterface::class);
+        $this->assertInstanceOf(DataTableFactoryInterface::class, $factory);
 
         $this->assertInstanceOf(DataTableInterface::class, $factory->create(DataTableType::class, []));
     }

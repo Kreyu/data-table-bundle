@@ -50,7 +50,8 @@ Sort it so equal values sit next to each other, e.g. with [default sorting](sort
 ## How rows are grouped
 
 - **A new header starts whenever the value changes** from the previous row.
-- Values are compared with `==`, so two `DateTime` objects with the same date are one group.
+- Values are compared with `===`. Two `DateTime` objects with the same date and time are one group, even as separate objects.
+- Other objects are one group only when they're the same instance. Grouping by a value object (UUID, money)? Return a scalar from a `group_by` callable.
 - Each page starts with a header, even when its group began on the previous page.
 - Exports and the [profiler](profiler.md) list only the data rows.
 

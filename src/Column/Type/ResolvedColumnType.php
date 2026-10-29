@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\HeaderRowView;
 use Kreyu\Bundle\DataTableBundle\ValueRowView;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedColumnType implements ResolvedColumnTypeInterface
 {
-    private OptionsResolver $optionsResolver;
+    private ?OptionsResolver $optionsResolver = null;
 
     /**
      * @param array<ColumnTypeExtensionInterface> $typeExtensions
@@ -76,22 +77,22 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
 
     public function createHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView
     {
-        return new ColumnHeaderView($parent);
+        return $this->createHeaderViewWithParent($parent);
     }
 
     public function createValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView
     {
-        return new ColumnValueView($parent);
+        return $this->createValueViewWithParent($parent);
     }
 
     public function createExportHeaderView(ColumnInterface $column, ?HeaderRowView $parent = null): ColumnHeaderView
     {
-        return new ColumnHeaderView($parent);
+        return $this->createHeaderViewWithParent($parent);
     }
 
     public function createExportValueView(ColumnInterface $column, ?ValueRowView $parent = null): ColumnValueView
     {
-        return new ColumnValueView($parent);
+        return $this->createValueViewWithParent($parent);
     }
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
@@ -151,20 +152,39 @@ class ResolvedColumnType implements ResolvedColumnTypeInterface
 
     public function getOptionsResolver(): OptionsResolver
     {
-        if (!isset($this->optionsResolver)) {
-            if (null !== $this->parent) {
-                $this->optionsResolver = clone $this->parent->getOptionsResolver();
-            } else {
-                $this->optionsResolver = new OptionsResolver();
-            }
-
-            $this->innerType->configureOptions($this->optionsResolver);
-
-            foreach ($this->typeExtensions as $extension) {
-                $extension->configureOptions($this->optionsResolver);
-            }
+        if ($this->optionsResolver !== null) {
+            return $this->optionsResolver;
         }
 
-        return $this->optionsResolver;
+        $parentOptionsResolver = $this->parent?->getOptionsResolver();
+        $optionsResolver = $parentOptionsResolver === null ? new OptionsResolver() : clone $parentOptionsResolver;
+
+        $this->innerType->configureOptions($optionsResolver);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->configureOptions($optionsResolver);
+        }
+
+        $this->optionsResolver = $optionsResolver;
+
+        return $optionsResolver;
+    }
+
+    private function createHeaderViewWithParent(?HeaderRowView $parent): ColumnHeaderView
+    {
+        if ($parent === null) {
+            throw new InvalidArgumentException('Creating a column header view requires a parent header row view.');
+        }
+
+        return new ColumnHeaderView($parent);
+    }
+
+    private function createValueViewWithParent(?ValueRowView $parent): ColumnValueView
+    {
+        if ($parent === null) {
+            throw new InvalidArgumentException('Creating a column value view requires a parent value row view.');
+        }
+
+        return new ColumnValueView($parent);
     }
 }

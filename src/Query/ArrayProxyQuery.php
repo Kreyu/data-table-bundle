@@ -10,8 +10,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ArrayProxyQuery implements ProxyQueryInterface
 {
-    private ?array $originalData = null;
-    private ?array $sortedData = null;
+    private array $originalData;
+    private array $sortedData;
     private ?PaginationData $paginationData = null;
 
     public function __construct(
@@ -27,23 +27,30 @@ class ArrayProxyQuery implements ProxyQueryInterface
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        $this->originalData ??= $this->data;
-
         $this->data = $this->originalData;
 
-        usort($this->data, static function ($a, $b) use ($sortingData, $propertyAccessor) {
+        usort($this->data, static function (array|object $itemA, array|object $itemB) use (
+            $sortingData,
+            $propertyAccessor,
+        ): int {
             foreach ($sortingData->getColumns() as $sortingColumnData) {
                 $propertyPath = $sortingColumnData->getPropertyPath();
-                $direction = $sortingColumnData->getDirection();
 
-                $valueA = $propertyAccessor->getValue($a, $propertyPath);
-                $valueB = $propertyAccessor->getValue($b, $propertyPath);
+                /** @var mixed $valueA */
+                $valueA = $propertyAccessor->getValue($itemA, $propertyPath);
 
-                if ($valueA < $valueB) {
-                    return 'asc' === $direction ? -1 : 1;
-                } elseif ($valueA > $valueB) {
-                    return 'asc' === $direction ? 1 : -1;
+                /** @var mixed $valueB */
+                $valueB = $propertyAccessor->getValue($itemB, $propertyPath);
+
+                $comparison = $valueA <=> $valueB;
+
+                if ($comparison === 0) {
+                    continue;
                 }
+
+                $isAscending = $sortingColumnData->getDirection() === 'asc';
+
+                return $isAscending ? $comparison : -$comparison;
             }
 
             return 0;
@@ -61,7 +68,7 @@ class ArrayProxyQuery implements ProxyQueryInterface
         $this->paginationData = $paginationData;
 
         $this->data = array_slice(
-            $this->sortedData ?? $this->originalData,
+            $this->sortedData,
             $paginationData->getOffset(),
             $paginationData->getPerPage(),
         );

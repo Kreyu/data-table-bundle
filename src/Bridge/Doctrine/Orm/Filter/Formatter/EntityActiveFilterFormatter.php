@@ -12,10 +12,14 @@ class EntityActiveFilterFormatter
 {
     public function __invoke(FilterData $data, FilterInterface $filter)
     {
+        /** @var string|callable|null $choiceLabel */
         $choiceLabel = $filter->getConfig()->getOption('choice_label');
 
         if (is_string($choiceLabel)) {
-            return PropertyAccess::createPropertyAccessor()->getValue($data->getValue(), $choiceLabel);
+            /** @var object|array<array-key, mixed> $entity */
+            $entity = $data->getValue();
+
+            return PropertyAccess::createPropertyAccessor()->getValue($entity, $choiceLabel);
         }
 
         if (is_callable($choiceLabel)) {

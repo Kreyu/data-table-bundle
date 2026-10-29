@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class StringUtilTest extends TestCase
 {
+    /**
+     * @param list<string> $suffixes
+     */
     #[DataProvider('provideFqcnToShortNameCases')]
     public function testFqcnToShortName(string $fqcn, array $suffixes, string $shortName)
     {

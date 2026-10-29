@@ -11,6 +11,9 @@ use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 
 class PreSetParametersEvent extends DoctrineOrmFilterEvent
 {
+    /**
+     * @param array<Parameter> $parameters
+     */
     public function __construct(
         ProxyQueryInterface $query,
         FilterData $data,
@@ -28,6 +31,9 @@ class PreSetParametersEvent extends DoctrineOrmFilterEvent
         return $this->parameters;
     }
 
+    /**
+     * @param array<Parameter> $parameters
+     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;

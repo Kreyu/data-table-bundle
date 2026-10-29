@@ -16,7 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Util\FormUtil;
 
 class Filter implements FilterInterface
 {
-    private DataTableInterface $dataTable;
+    private ?DataTableInterface $dataTable = null;
 
     public function __construct(
         private readonly FilterConfigInterface $config,
@@ -34,7 +34,7 @@ class Filter implements FilterInterface
 
     public function getDataTable(): DataTableInterface
     {
-        if (!isset($this->dataTable)) {
+        if ($this->dataTable === null) {
             throw new BadMethodCallException('Filter is not attached to any data table.');
         }
 
@@ -68,7 +68,10 @@ class Filter implements FilterInterface
 
     public function getQueryPath(): string
     {
-        return $this->config->getOption('query_path') ?? $this->getName();
+        /** @var string|null $queryPath */
+        $queryPath = $this->config->getOption('query_path');
+
+        return $queryPath ?? $this->getName();
     }
 
     public function handle(ProxyQueryInterface $query, FilterData $data): void
@@ -105,9 +108,9 @@ class Filter implements FilterInterface
     {
         $query ??= $this->getDataTable()->getQuery();
 
-        $data ??= $this->getDataTable()->getFiltrationData()->getFilterData($this);
+        $data ??= $this->getDataTable()->getFiltrationData()?->getFilterData($this);
 
-        if (null === $data) {
+        if ($data === null) {
             $error = 'Unable to apply filter without filter data.';
             $error .= ' Either ensure the related data table has filter data or pass one explicitly.';
 

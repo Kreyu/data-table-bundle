@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -40,34 +41,33 @@ final class CollectionColumnType extends AbstractColumnType
 
     public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (!is_array($options['export'])) {
-            $options['export'] = [];
+        /** @var bool|array<array-key, mixed> $exportOptions */
+        $exportOptions = $options['export'];
+
+        if (!is_array($exportOptions)) {
+            $exportOptions = [];
         }
 
-        $options['export'] += [
+        $exportOptions += [
             'entry_type' => $options['entry_type'],
             'entry_options' => $options['entry_options'],
             'separator' => $options['separator'],
             'separator_html' => $options['separator_html'],
         ];
 
-        $separator = $options['export']['separator'] ?? '';
+        /** @var string|TranslatableInterface $separator */
+        $separator = $exportOptions['separator'] ?? '';
 
-        if ($this->translator && $separator instanceof TranslatableInterface) {
-            $locale = null;
+        /** @var list<scalar|\Stringable|null> $childrenValues */
+        $childrenValues = array_map(
+            static fn (ColumnValueView $childView): mixed => $childView->vars['value'],
+            $this->createChildrenColumnValueViews($view, $column, $exportOptions),
+        );
 
-            if (method_exists(TranslatableInterface::class, 'getLocale')) {
-                $locale = $this->translator->getLocale();
-            }
+        $value = implode($this->translateSeparator($separator), $childrenValues);
 
-            $separator = $separator->trans($this->translator, $locale);
-        }
-
-        $view->value =
-            $view->vars['value'] = implode($separator, array_map(
-                static fn (ColumnValueView $view) => $view->vars['value'],
-                $this->createChildrenColumnValueViews($view, $column, $options['export']),
-            ));
+        $view->value = $value;
+        $view->vars['value'] = $value;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -105,6 +105,26 @@ final class CollectionColumnType extends AbstractColumnType
         ;
     }
 
+    private function translateSeparator(string|TranslatableInterface $separator): string
+    {
+        if (is_string($separator)) {
+            return $separator;
+        }
+
+        $translator = $this->translator;
+
+        if ($translator === null) {
+            return $separator instanceof \Stringable ? (string) $separator : '';
+        }
+
+        return $separator->trans($translator);
+    }
+
+    /**
+     * @param array<array-key, mixed> $options
+     *
+     * @return list<ColumnValueView>
+     */
     private function createChildrenColumnValueViews(
         ColumnValueView $view,
         ColumnInterface $column,
@@ -113,25 +133,35 @@ final class CollectionColumnType extends AbstractColumnType
         /** @var ColumnFactoryInterface $prototypeFactory */
         $prototypeFactory = $column->getConfig()->getAttribute('prototype_factory');
 
+        /** @var class-string<ColumnTypeInterface> $entryType */
+        $entryType = $options['entry_type'];
+
+        /** @var array<string, mixed> $entryOptions */
+        $entryOptions = $options['entry_options'];
+
+        $hasEntryPropertyPath = ($entryOptions['property_path'] ?? false) !== false;
+
+        if (!$hasEntryPropertyPath) {
+            $entryOptions += ['getter' => static fn (mixed $value): mixed => $value];
+        }
+
+        /** @var iterable<array-key, mixed> $collection */
+        $collection = $view->vars['value'] ?? [];
+
         $children = [];
 
-        foreach ($view->vars['value'] ?? [] as $index => $data) {
-            // Create a virtual row view for the child column.
+        /** @var mixed $data */
+        foreach ($collection as $index => $data) {
+            if (!is_int($index)) {
+                throw new UnexpectedTypeException($index, 'int');
+            }
+
             $valueRowView = clone $view->parent;
             $valueRowView->origin = $view->parent;
             $valueRowView->index = $index;
             $valueRowView->data = $data;
 
-            // If there's no property path, default to getter that simply returns the value
-            if (false === ($options['entry_options']['property_path'] ?? false)) {
-                $options['entry_options'] += ['getter' => static fn ($value) => $value];
-            }
-
-            $prototype = $prototypeFactory->createNamed(
-                (string) $index,
-                $options['entry_type'],
-                $options['entry_options'],
-            );
+            $prototype = $prototypeFactory->createNamed((string) $index, $entryType, $entryOptions);
             $prototype->setDataTable($column->getDataTable());
 
             $children[] = $prototype->createValueView($valueRowView);

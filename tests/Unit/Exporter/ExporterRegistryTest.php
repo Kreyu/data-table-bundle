@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\CallbackExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterType;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Extension\SimpleExporterTypeBarExtension;
@@ -33,7 +34,7 @@ class ExporterRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->createRegistry()->getType('stdClass');
+        $this->createRegistry()->getType(CallbackExporterType::class);
     }
 
     public function testGetTypeWithTypeExtensions()
@@ -52,8 +53,11 @@ class ExporterRegistryTest extends TestCase
     {
         $resolvedType = $this->createRegistry()->getType(SimpleSubExporterType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertInstanceOf(SimpleSubExporterType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(SimpleExporterType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertNotNull($parentType);
+        $this->assertInstanceOf(SimpleExporterType::class, $parentType->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
@@ -65,16 +69,18 @@ class ExporterRegistryTest extends TestCase
 
         $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubExporterType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertEmpty($resolvedType->getTypeExtensions());
-        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+        $this->assertNotNull($parentType);
+        $this->assertSame($typeExtensions, $parentType->getTypeExtensions());
     }
 
     public function testTypeCannotHaveItselfAsParent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\ExporterTypeWithSameParentType).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [new ExporterTypeWithSameParentType()]);
         $registry->getType(ExporterTypeWithSameParentType::class);
@@ -82,10 +88,9 @@ class ExporterRegistryTest extends TestCase
 
     public function testRecursiveTypeReferences()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for exporter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Exporter\Type\RecursiveExporterTypeFoo).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [
             new RecursiveExporterTypeFoo(),
@@ -103,7 +108,7 @@ class ExporterRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
+        $this->assertFalse($this->createRegistry()->hasType(CallbackExporterType::class));
     }
 
     public function testCreatingRegistryWithInvalidType()
@@ -118,15 +123,20 @@ class ExporterRegistryTest extends TestCase
         $this->createRegistry(typeExtensions: [new \stdClass()]);
     }
 
+    /**
+     * @param list<object> $types
+     * @param list<object> $typeExtensions
+     */
     private function createRegistry(array $types = [], array $typeExtensions = []): ExporterRegistry
     {
+        $defaultTypes = [
+            new ExporterType(),
+            new SimpleExporterType(),
+            new SimpleSubExporterType(),
+        ];
+
         return new ExporterRegistry(
-            types: $types
-            ?: [
-                new ExporterType(),
-                new SimpleExporterType(),
-                new SimpleSubExporterType(),
-            ],
+            types: $types === [] ? $defaultTypes : $types,
             typeExtensions: $typeExtensions,
             resolvedTypeFactory: new ResolvedExporterTypeFactory(),
         );

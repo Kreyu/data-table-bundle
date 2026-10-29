@@ -9,6 +9,9 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class DateRangeActiveFilterFormatter
 {
+    /**
+     * @return TranslatableMessage|string
+     */
     public function __invoke(FilterData $data)
     {
         /** @var array{from: ?\DateTimeInterface, to: ?\DateTimeInterface} $value */

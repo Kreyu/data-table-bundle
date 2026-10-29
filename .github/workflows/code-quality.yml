@@ -16,8 +16,8 @@ jobs:
       matrix:
         command:
           - fmt --check
-          - lint --fail-on-out-of-sync-baseline
-          - analyze --fail-on-out-of-sync-baseline
+          - lint
+          - analyze
     steps:
       - name: Checkout
         uses: actions/checkout@v4

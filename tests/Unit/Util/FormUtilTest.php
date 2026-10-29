@@ -15,9 +15,7 @@ class FormUtilTest extends TestCase
         $formView = new FormView();
         $formView->vars['value'] = 'foo';
 
-        $result = FormUtil::getFormViewValueRecursive($formView);
-
-        $this->assertSame('foo', $result);
+        $this->assertSame('foo', FormUtil::getFormViewValueRecursive($formView));
     }
 
     public function testGetFormViewValueRecursiveWithChildren()
@@ -36,8 +34,9 @@ class FormUtilTest extends TestCase
             $formViewTo->vars['name'] => $formViewTo,
         ];
 
-        $result = FormUtil::getFormViewValueRecursive($formView);
-
-        $this->assertEquals(['from' => '2020-01-01', 'to' => '2020-12-31'], $result);
+        $this->assertEquals(
+            ['from' => '2020-01-01', 'to' => '2020-12-31'],
+            FormUtil::getFormViewValueRecursive($formView),
+        );
     }
 }

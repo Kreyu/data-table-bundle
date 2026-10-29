@@ -35,12 +35,27 @@ final class XlsxExporterType extends AbstractOpenSpoutExporterType
 
     protected function getWriterOptions(array $options): XLSX\Options
     {
+        /** @var Style $defaultRowStyle */
+        $defaultRowStyle = $options['default_row_style'];
+
+        /** @var bool $shouldCreateNewSheetsAutomatically */
+        $shouldCreateNewSheetsAutomatically = $options['should_create_new_sheets_automatically'];
+
+        /** @var bool $shouldUseInlineStrings */
+        $shouldUseInlineStrings = $options['should_use_inline_strings'];
+
+        /** @var float|null $defaultColumnWidth */
+        $defaultColumnWidth = $options['default_column_width'];
+
+        /** @var float|null $defaultRowHeight */
+        $defaultRowHeight = $options['default_row_height'];
+
         $writerOptions = new XLSX\Options();
-        $writerOptions->DEFAULT_ROW_STYLE = $options['default_row_style'];
-        $writerOptions->SHOULD_CREATE_NEW_SHEETS_AUTOMATICALLY = $options['should_create_new_sheets_automatically'];
-        $writerOptions->SHOULD_USE_INLINE_STRINGS = $options['should_use_inline_strings'];
-        $writerOptions->DEFAULT_COLUMN_WIDTH = $options['default_column_width'];
-        $writerOptions->DEFAULT_ROW_HEIGHT = $options['default_row_height'];
+        $writerOptions->DEFAULT_ROW_STYLE = $defaultRowStyle;
+        $writerOptions->SHOULD_CREATE_NEW_SHEETS_AUTOMATICALLY = $shouldCreateNewSheetsAutomatically;
+        $writerOptions->SHOULD_USE_INLINE_STRINGS = $shouldUseInlineStrings;
+        $writerOptions->DEFAULT_COLUMN_WIDTH = $defaultColumnWidth;
+        $writerOptions->DEFAULT_ROW_HEIGHT = $defaultRowHeight;
 
         return $writerOptions;
     }

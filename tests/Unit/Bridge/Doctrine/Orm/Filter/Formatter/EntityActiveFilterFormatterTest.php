@@ -27,7 +27,10 @@ class EntityActiveFilterFormatterTest extends TestCase
         $this->assertSame('bar', $this->format('foo', ['choice_label' => static fn () => 'bar']));
     }
 
-    private function format(mixed $value, array $filterOptions = []): string
+    /**
+     * @param array<string, mixed> $filterOptions
+     */
+    private function format(mixed $value, array $filterOptions = []): mixed
     {
         $formatter = new EntityActiveFilterFormatter();
         $data = new FilterData($value);
@@ -37,9 +40,7 @@ class EntityActiveFilterFormatterTest extends TestCase
 
         $filterConfig
             ->method('getOption')
-            ->willReturnCallback(static function (string $name) use ($filterOptions) {
-                return $filterOptions[$name] ?? null;
-            })
+            ->willReturnCallback(static fn (string $name) => $filterOptions[$name] ?? null)
         ;
 
         $filter->method('getConfig')->willReturn($filterConfig);

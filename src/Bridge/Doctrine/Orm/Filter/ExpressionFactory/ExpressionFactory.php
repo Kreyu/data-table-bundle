@@ -19,7 +19,7 @@ class ExpressionFactory implements ExpressionFactoryInterface
         FilterInterface $filter,
         array $parameters,
     ): mixed {
-        if (empty($parameters)) {
+        if ($parameters === []) {
             throw new InvalidArgumentException('The expression factory requires at least one parameter.');
         }
 

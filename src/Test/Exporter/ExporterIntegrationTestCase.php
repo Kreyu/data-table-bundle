@@ -6,6 +6,8 @@ namespace Kreyu\Bundle\DataTableBundle\Test\Exporter;
 
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterFactory;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterRegistry;
+use Kreyu\Bundle\DataTableBundle\Exporter\Extension\ExporterTypeExtensionInterface;
+use Kreyu\Bundle\DataTableBundle\Exporter\Type\ExporterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Exporter\Type\ResolvedExporterTypeFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -30,11 +32,17 @@ abstract class ExporterIntegrationTestCase extends TestCase
         return [];
     }
 
+    /**
+     * @return array<ExporterTypeExtensionInterface>
+     */
     protected function getTypeExtensions(): array
     {
         return [];
     }
 
+    /**
+     * @return array<ExporterTypeInterface>
+     */
     protected function getTypes(): array
     {
         return [];

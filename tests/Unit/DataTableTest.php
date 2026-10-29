@@ -438,6 +438,9 @@ class DataTableTest extends DataTableIntegrationTestCase
         $this->assertSame(['id', 'street'], array_keys($dataTable->getExportableColumns()));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createDataTableBuilder(array $options = []): DataTableBuilderInterface
     {
         return $this->dataTableFactory->createBuilder(DataTableType::class, [], $options);

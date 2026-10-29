@@ -17,12 +17,22 @@ final class MoneyColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (is_callable($currency = $options['currency'])) {
-            $currency = $currency($view->parent->data);
+        /** @var string|callable $currency */
+        $currency = $options['currency'];
+
+        if (is_callable($currency)) {
+            /** @var string $currency */
+            $currency = $currency($view->getRowData());
         }
 
-        if (null !== ($divisor = $options['divisor'])) {
-            $view->vars['value'] /= $divisor;
+        /** @var int|null $divisor */
+        $divisor = $options['divisor'];
+
+        if ($divisor !== null) {
+            /** @var int|float|numeric-string|null $value */
+            $value = $view->vars['value'];
+
+            $view->vars['value'] = ($value ?? 0) / $divisor;
         }
 
         $view->vars = array_merge($view->vars, [

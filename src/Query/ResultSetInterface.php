@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Query;
 
+/**
+ * @extends \IteratorAggregate<mixed, mixed>
+ */
 interface ResultSetInterface extends \IteratorAggregate, \Countable
 {
     public function getCurrentPageItemCount(): ?int;

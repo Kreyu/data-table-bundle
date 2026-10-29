@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Test\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Filter\Extension\FilterTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterFactory;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -30,11 +32,17 @@ abstract class FilterIntegrationTestCase extends TestCase
         return [];
     }
 
+    /**
+     * @return array<FilterTypeExtensionInterface>
+     */
     protected function getTypeExtensions(): array
     {
         return [];
     }
 
+    /**
+     * @return array<FilterTypeInterface>
+     */
     protected function getTypes(): array
     {
         return [];

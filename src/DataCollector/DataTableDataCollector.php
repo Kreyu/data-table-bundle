@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableView;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterInterface;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterView;
@@ -25,6 +26,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
+/**
+ * @psalm-type CollectedData = array<string, array{
+ *     columns?: array<string, array<string, mixed>>,
+ *     filters?: array<string, array<string, mixed>>,
+ *     actions?: array<string, array<string, mixed>>,
+ *     row_actions?: array<string, array<string, mixed>>,
+ *     batch_actions?: array<string, array<string, mixed>>,
+ *     ...<string, mixed>
+ * }>
+ */
 class DataTableDataCollector extends AbstractDataCollector implements DataTableDataCollectorInterface
 {
     public function __construct(
@@ -46,11 +57,6 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
     {
         $this->data = $this->cloneVar($this->data)->withMaxDepth($this->maxDepth);
 
-        if (method_exists(parent::class, '__serialize')) {
-            return parent::__serialize();
-        }
-
-        // Symfony 7: __serialize() does not exist yet, replicate __sleep() behavior
         return ['data' => $this->data];
     }
 
@@ -63,8 +69,11 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
 
     public function collectDataTable(DataTableInterface $dataTable): void
     {
-        $this->data[$dataTable->getName()] = array_merge(
-            $this->data[$dataTable->getName()] ?? [],
+        $dataTableName = $dataTable->getName();
+        $collectedData = $this->getCollectedData();
+
+        $collectedData[$dataTableName] = array_merge(
+            $collectedData[$dataTableName] ?? [],
             $this->dataExtractor->extractDataTableConfiguration($dataTable),
             [
                 'columns' => ArrayUtil::mapWithKeys(
@@ -106,88 +115,125 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             ],
         );
 
-        if (!$dataTable->getConfig()->isPaginationEnabled()) {
-            $this->data[$dataTable->getName()]['total_count'] = $dataTable->isDeferred()
+        $isPaginationEnabled = $dataTable->getConfig()->isPaginationEnabled();
+
+        if (!$isPaginationEnabled) {
+            $collectedData[$dataTableName]['total_count'] = $dataTable->isDeferred()
                 ? null
                 : iterator_count($dataTable->getItems());
         }
+
+        $this->data = $collectedData;
     }
 
     public function collectDataTableView(DataTableInterface $dataTable, DataTableView $view): void
     {
-        $this->data[$dataTable->getName()] += [
+        $collectedData = $this->getCollectedData();
+
+        $collectedData[$dataTable->getName()] += [
             'view_vars' => ArrayUtil::ksort($view->vars),
             'value_rows' => $this->dataExtractor->extractValueRows($view),
         ];
+
+        $this->data = $collectedData;
     }
 
     public function collectColumnHeaderView(ColumnInterface $column, ColumnHeaderView $view): void
     {
-        $this->data[$column
-            ->getDataTable()
-            ->getName()]['columns'][$column->getName()]['header_view_vars'] = ArrayUtil::ksort($view->vars);
+        $dataTableName = $column->getDataTable()->getName();
+        $collectedData = $this->getCollectedData();
+
+        $collectedData[$dataTableName]['columns'][$column->getName()]['header_view_vars'] = ArrayUtil::ksort($view->vars);
+
+        $this->data = $collectedData;
     }
 
     public function collectColumnValueView(ColumnInterface $column, ColumnValueView $view): void
     {
-        // TODO: Support nested columns from CollectionColumnType
-        if (null !== $view->parent->origin) {
+        $isNestedColumnView = $view->parent->origin !== null;
+
+        if ($isNestedColumnView) {
             return;
         }
 
-        $this->data[$column
-            ->getDataTable()
-            ->getName()]['columns'][$column->getName()]['value_view_vars'] = ArrayUtil::ksort($view->vars);
+        $dataTableName = $column->getDataTable()->getName();
+        $collectedData = $this->getCollectedData();
+
+        $collectedData[$dataTableName]['columns'][$column->getName()]['value_view_vars'] = ArrayUtil::ksort($view->vars);
+
+        $this->data = $collectedData;
     }
 
     public function collectSortingData(DataTableInterface $dataTable, SortingData $data): void
     {
-        foreach ($data->getColumns() as $columnName => $columnSortingData) {
-            if (!$dataTable->hasColumn($columnName)) {
+        $collectedData = $this->getCollectedData();
+
+        foreach ($data->getColumns() as $columnSortingData) {
+            $columnName = $columnSortingData->getName();
+            $hasColumn = $dataTable->hasColumn($columnName);
+
+            if (!$hasColumn) {
                 continue;
             }
 
             $column = $dataTable->getColumn($columnName);
+            $dataTableName = $column->getDataTable()->getName();
 
-            $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()] ??= [];
-            $this->data[$column->getDataTable()->getName()]['columns'][$column->getName()] += [
+            $collectedData[$dataTableName]['columns'][$column->getName()] ??= [];
+            $collectedData[$dataTableName]['columns'][$column->getName()] += [
                 'sort_direction' => $columnSortingData->getDirection(),
             ];
         }
+
+        $this->data = $collectedData;
     }
 
     public function collectPaginationData(DataTableInterface $dataTable, PaginationData $data): void
     {
-        $this->data[$dataTable->getName()]['page'] = $data->getPage();
-        $this->data[$dataTable->getName()]['per_page'] = $data->getPerPage();
+        $dataTableName = $dataTable->getName();
+        $collectedData = $this->getCollectedData();
 
-        $this->data[$dataTable->getName()]['total_count'] = $dataTable->isDeferred()
+        $collectedData[$dataTableName]['page'] = $data->getPage();
+        $collectedData[$dataTableName]['per_page'] = $data->getPerPage();
+        $collectedData[$dataTableName]['total_count'] = $dataTable->isDeferred()
             ? null
             : $dataTable->getPagination()->getTotalItemCount();
+
+        $this->data = $collectedData;
     }
 
     public function collectFilterView(FilterInterface $filter, FilterView $view): void
     {
-        $this->data[$filter
-            ->getDataTable()
-            ->getName()]['filters'][$filter->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+        $dataTableName = $filter->getDataTable()->getName();
+        $collectedData = $this->getCollectedData();
+
+        $collectedData[$dataTableName]['filters'][$filter->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+
+        $this->data = $collectedData;
     }
 
     public function collectFiltrationData(DataTableInterface $dataTable, FiltrationData $data): void
     {
-        foreach ($data->getFilters() as $filterName => $filterData) {
-            if (!$dataTable->hasFilter($filterName)) {
+        $collectedData = $this->getCollectedData();
+
+        foreach ($data->getFilters() as $filterName => $filterFiltrationData) {
+            $hasFilter = $dataTable->hasFilter($filterName);
+
+            if (!$hasFilter) {
                 continue;
             }
 
             $filter = $dataTable->getFilter($filterName);
+            $dataTableName = $filter->getDataTable()->getName();
 
-            $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()] ??= [];
-            $this->data[$filter->getDataTable()->getName()]['filters'][$filter->getName()] += [
-                'data' => $filterData,
-                'operator_label' => $filterData->getOperator()?->getLabel(),
+            $collectedData[$dataTableName]['filters'][$filter->getName()] ??= [];
+            $collectedData[$dataTableName]['filters'][$filter->getName()] += [
+                'data' => $filterFiltrationData,
+                'operator_label' => $filterFiltrationData->getOperator()?->getLabel(),
             ];
         }
+
+        $this->data = $collectedData;
     }
 
     public function collectActionView(ActionInterface $action, ActionView $view): void
@@ -198,13 +244,33 @@ class DataTableDataCollector extends AbstractDataCollector implements DataTableD
             ActionContext::Batch => 'batch_actions',
         };
 
-        $this->data[$action
-            ->getDataTable()
-            ->getName()][$actionsKey][$action->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+        $dataTableName = $action->getDataTable()->getName();
+        $collectedData = $this->getCollectedData();
+
+        /** @var array<string, array<string, mixed>> $actionsData */
+        $actionsData = $collectedData[$dataTableName][$actionsKey] ?? [];
+        $actionsData[$action->getName()]['view_vars'] = ArrayUtil::ksort($view->vars);
+
+        $collectedData[$dataTableName][$actionsKey] = $actionsData;
+
+        $this->data = $collectedData;
     }
 
     public function getData(): array|Data
     {
+        return $this->data;
+    }
+
+    /**
+     * @return CollectedData
+     */
+    private function getCollectedData(): array
+    {
+        if ($this->data instanceof Data) {
+            throw new LogicException('Data table data cannot be collected after the collector has been serialized.');
+        }
+
+        /** @var CollectedData */
         return $this->data;
     }
 }

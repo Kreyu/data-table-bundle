@@ -26,6 +26,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class KreyuDataTableExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * @var array<class-string, string>
+     */
     private array $autoconfiguration = [
         DataTableTypeInterface::class => 'kreyu_data_table.type',
         DataTableTypeExtensionInterface::class => 'kreyu_data_table.type_extension',
@@ -105,6 +108,11 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         }
     }
 
+    /**
+     * @param array<array<mixed>> $configs
+     *
+     * @return array{defaults: array<string, mixed>, profiler: array{max_depth: mixed}}
+     */
     private function resolveConfiguration(array $configs, ContainerBuilder $container): array
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
@@ -121,12 +129,17 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
             'pagination_factory',
         ];
 
-        array_walk_recursive($config, static function (&$item, $key) use ($serviceReferenceNodes) {
-            if (in_array($key, $serviceReferenceNodes) && is_string($item)) {
+        array_walk_recursive($config, static function (mixed &$item, int|string $key) use (
+            $serviceReferenceNodes,
+        ): void {
+            $isServiceReferenceNode = in_array($key, $serviceReferenceNodes, strict: true);
+
+            if ($isServiceReferenceNode && is_string($item)) {
                 $item = new Reference($item);
             }
         });
 
+        /** @var array{defaults: array<string, mixed>, profiler: array{max_depth: mixed}} $config */
         return $config;
     }
 
@@ -137,12 +150,15 @@ class KreyuDataTableExtension extends Extension implements PrependExtensionInter
         }
 
         // check that FrameworkBundle 6.3 or higher is installed
+        /** @var array<string, array{path: string, namespace: string}> $bundlesMetadata */
         $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
 
-        if (!isset($bundlesMetadata['FrameworkBundle'])) {
+        $frameworkBundleMetadata = $bundlesMetadata['FrameworkBundle'] ?? null;
+
+        if ($frameworkBundleMetadata === null) {
             return false;
         }
 
-        return is_file($bundlesMetadata['FrameworkBundle']['path'].'/Resources/config/asset_mapper.php');
+        return is_file($frameworkBundleMetadata['path'].'/Resources/config/asset_mapper.php');
     }
 }

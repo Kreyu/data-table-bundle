@@ -22,23 +22,18 @@ class PaginationData
         ($resolver = new OptionsResolver())
             ->setDefault('page', null)
             ->setDefault('perPage', null)
-            ->addNormalizer('page', static function (Options $options, mixed $value) {
-                return null !== $value ? (int) $value : null;
-            })
-            ->addNormalizer('perPage', static function (Options $options, mixed $value) {
-                return null !== $value ? (int) $value : null;
-            })
-            ->setAllowedValues('page', static function (int $value): bool {
-                return $value > 0;
-            })
-            ->setAllowedValues('perPage', static function (?int $value): bool {
-                return null === $value || $value > 0;
-            })
+            ->addNormalizer('page', static fn (Options $options, mixed $value) => $value !== null ? (int) $value : null)
+            ->addNormalizer('perPage', static fn (Options $options, mixed $value) => $value !== null
+                ? (int) $value
+                : null)
+            ->setAllowedValues('page', static fn (int $value): bool => $value > 0)
+            ->setAllowedValues('perPage', static fn (?int $value): bool => $value === null || $value > 0)
         ;
 
-        $data = $resolver->resolve($data);
+        /** @var array{page: int, perPage: int|null} $resolvedData */
+        $resolvedData = $resolver->resolve($data);
 
-        return new self($data['page'], $data['perPage']);
+        return new self($resolvedData['page'], $resolvedData['perPage']);
     }
 
     public function getPage(): int
@@ -63,6 +58,10 @@ class PaginationData
 
     public function getOffset(): int
     {
+        if ($this->perPage === null) {
+            return 0;
+        }
+
         return $this->perPage * ($this->page - 1);
     }
 }

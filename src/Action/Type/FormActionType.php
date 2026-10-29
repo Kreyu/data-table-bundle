@@ -20,15 +20,15 @@ final class FormActionType extends AbstractActionType
 
     public function buildView(ActionView $view, ActionInterface $action, array $options): void
     {
-        if ($view->parent instanceof ColumnValueView) {
-            $value = $view->parent->value;
+        $columnValueView = $view->parent;
 
+        if ($columnValueView instanceof ColumnValueView) {
             foreach (['method', 'action', 'button_attr', 'csrf_token_id'] as $optionName) {
                 if (!$options[$optionName] instanceof \Closure) {
                     continue;
                 }
 
-                $options[$optionName] = $options[$optionName]($value);
+                $options[$optionName] = $options[$optionName]($columnValueView->value);
             }
         }
 
@@ -38,9 +38,13 @@ final class FormActionType extends AbstractActionType
             );
         }
 
-        $method = $htmlFriendlyMethod = strtoupper($options['method']);
+        /** @var string $methodOption */
+        $methodOption = $options['method'];
 
-        if (!in_array($method, ['GET', 'POST'])) {
+        $method = strtoupper($methodOption);
+        $htmlFriendlyMethod = $method;
+
+        if (!in_array($method, ['GET', 'POST'], strict: true)) {
             $htmlFriendlyMethod = 'POST';
         }
 
@@ -99,7 +103,10 @@ final class FormActionType extends AbstractActionType
         /** @var DataTableView $dataTable */
         $dataTable = $view->vars['data_table'];
 
-        $formId = $dataTable->vars['name'].'-action-'.$action->getName().'-form';
+        /** @var string $dataTableName */
+        $dataTableName = $dataTable->vars['name'];
+
+        $formId = $dataTableName.'-action-'.$action->getName().'-form';
 
         if ($view->parent instanceof ColumnValueView) {
             $formId .= '-'.$view->parent->parent->index;

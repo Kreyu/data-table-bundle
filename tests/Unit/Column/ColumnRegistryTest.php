@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Column;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\NumberColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
@@ -33,7 +34,7 @@ class ColumnRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->createRegistry()->getType('stdClass');
+        $this->createRegistry()->getType(NumberColumnType::class);
     }
 
     public function testGetTypeWithTypeExtensions()
@@ -52,8 +53,11 @@ class ColumnRegistryTest extends TestCase
     {
         $resolvedType = $this->createRegistry()->getType(SimpleSubColumnType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertInstanceOf(SimpleSubColumnType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(SimpleColumnType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertNotNull($parentType);
+        $this->assertInstanceOf(SimpleColumnType::class, $parentType->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
@@ -65,16 +69,18 @@ class ColumnRegistryTest extends TestCase
 
         $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubColumnType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertEmpty($resolvedType->getTypeExtensions());
-        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+        $this->assertNotNull($parentType);
+        $this->assertSame($typeExtensions, $parentType->getTypeExtensions());
     }
 
     public function testTypeCannotHaveItselfAsParent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\ColumnTypeWithSameParentType).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [new ColumnTypeWithSameParentType()]);
         $registry->getType(ColumnTypeWithSameParentType::class);
@@ -82,10 +88,9 @@ class ColumnRegistryTest extends TestCase
 
     public function testRecursiveTypeReferences()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for column type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Column\Type\RecursiveColumnTypeFoo).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [
             new RecursiveColumnTypeFoo(),
@@ -103,7 +108,7 @@ class ColumnRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
+        $this->assertFalse($this->createRegistry()->hasType(NumberColumnType::class));
     }
 
     public function testCreatingRegistryWithInvalidType()
@@ -118,15 +123,20 @@ class ColumnRegistryTest extends TestCase
         $this->createRegistry(typeExtensions: [new \stdClass()]);
     }
 
+    /**
+     * @param list<object> $types
+     * @param list<object> $typeExtensions
+     */
     private function createRegistry(array $types = [], array $typeExtensions = []): ColumnRegistry
     {
+        $defaultTypes = [
+            new ColumnType(),
+            new SimpleColumnType(),
+            new SimpleSubColumnType(),
+        ];
+
         return new ColumnRegistry(
-            types: $types
-            ?: [
-                new ColumnType(),
-                new SimpleColumnType(),
-                new SimpleSubColumnType(),
-            ],
+            types: $types === [] ? $defaultTypes : $types,
             typeExtensions: $typeExtensions,
             resolvedTypeFactory: new ResolvedColumnTypeFactory(),
         );

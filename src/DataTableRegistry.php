@@ -9,7 +9,6 @@ use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
-use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
@@ -34,17 +33,17 @@ class DataTableRegistry implements DataTableRegistryInterface
     /**
      * @var array<ResolvedDataTableTypeInterface>
      */
-    private array $resolvedTypes;
+    private array $resolvedTypes = [];
 
     /**
      * @var array<class-string<DataTableTypeInterface>, bool>
      */
-    private array $checkedTypes;
+    private array $checkedTypes = [];
 
     /**
-     * @param iterable<DataTableTypeInterface>          $types
-     * @param iterable<DataTableTypeExtensionInterface> $typeExtensions
-     * @param iterable<ProxyQueryInterface>             $proxyQueryFactories
+     * @param iterable<object> $types
+     * @param iterable<object> $typeExtensions
+     * @param iterable<object> $proxyQueryFactories
      */
     public function __construct(
         iterable $types,
@@ -64,7 +63,7 @@ class DataTableRegistry implements DataTableRegistryInterface
 
     public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
     public function getProxyQueryFactories(): array
@@ -79,7 +78,9 @@ class DataTableRegistry implements DataTableRegistryInterface
             $name,
         ));
 
-        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+        $fqcn = $type::class;
+
+        if (array_key_exists($fqcn, $this->checkedTypes)) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
             throw new LogicException(sprintf(
                 'Circular reference detected for data table type "%s" (%s).',
@@ -103,6 +104,9 @@ class DataTableRegistry implements DataTableRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $types
+     */
     private function setTypes(iterable $types): void
     {
         $this->types = [];
@@ -116,6 +120,9 @@ class DataTableRegistry implements DataTableRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $typeExtensions
+     */
     private function setTypeExtensions(iterable $typeExtensions): void
     {
         $this->typeExtensions = [];
@@ -131,6 +138,9 @@ class DataTableRegistry implements DataTableRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $proxyQueryFactories
+     */
     private function setProxyQueryFactories(iterable $proxyQueryFactories): void
     {
         $this->proxyQueryFactories = [];

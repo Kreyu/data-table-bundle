@@ -27,6 +27,9 @@ interface FilterConfigBuilderInterface extends FilterConfigInterface
      */
     public function setFormType(string $formType): static;
 
+    /**
+     * @param array<string, mixed> $formOptions
+     */
     public function setFormOptions(array $formOptions): static;
 
     /**
@@ -34,6 +37,9 @@ interface FilterConfigBuilderInterface extends FilterConfigInterface
      */
     public function setOperatorFormType(string $operatorFormType): static;
 
+    /**
+     * @param array<string, mixed> $operatorFormOptions
+     */
     public function setOperatorFormOptions(array $operatorFormOptions): static;
 
     /**

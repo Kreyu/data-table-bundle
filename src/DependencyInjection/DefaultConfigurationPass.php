@@ -17,6 +17,7 @@ class DefaultConfigurationPass implements CompilerPassInterface
     {
         $extension = $container->getDefinition('kreyu_data_table.type.data_table');
 
+        /** @var array<string, array<string, mixed>> $defaults */
         $defaults = $extension->getArgument('$defaults');
 
         foreach (PersistenceContext::cases() as $context) {

@@ -15,20 +15,23 @@ class FormUtil
 
     public static function getFormViewValueRecursive(FormView $view): mixed
     {
-        $value = $view->vars['value'];
+        $value = [];
 
-        if (!empty($view->children)) {
-            $value = [];
-
-            foreach ($view->children as $child) {
-                if (isset($child->vars['checked'])) {
-                    continue;
-                }
-
-                $value[$child->vars['name']] = static::getFormViewValueRecursive($child);
+        foreach ($view->children as $child) {
+            if (array_key_exists('checked', $child->vars)) {
+                continue;
             }
+
+            /** @var string $childName */
+            $childName = $child->vars['name'];
+
+            $value[$childName] = static::getFormViewValueRecursive($child);
         }
 
-        return empty($value) ? $view->vars['value'] : $value;
+        if ($value === []) {
+            return $view->vars['value'];
+        }
+
+        return $value;
     }
 }

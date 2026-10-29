@@ -6,6 +6,9 @@ namespace Kreyu\Bundle\DataTableBundle\Filter;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 
+/**
+ * @implements \ArrayAccess<string, FilterData>
+ */
 class FiltrationData implements \ArrayAccess
 {
     /**
@@ -29,24 +32,19 @@ class FiltrationData implements \ArrayAccess
      *
      * - an instance of {@see FilterData}
      * - an array of filter data
+     *
+     * @param array<string, mixed> $data
      */
     public static function fromArray(array $data): self
     {
-        $filters = [];
-
-        foreach ($data as $key => $value) {
-            if (!$value instanceof FilterData) {
-                $value = ['value' => $value];
-            }
-
-            if (is_array($value)) {
-                $value = FilterData::fromArray($value);
-            }
-
-            $filters[$key] = $value;
-        }
-
-        return new self($filters);
+        return new self(array_map(
+            static fn (mixed $value): FilterData => (
+                $value instanceof FilterData
+                    ? $value
+                    : FilterData::fromArray(['value' => $value])
+            ),
+            $data,
+        ));
     }
 
     public static function fromDataTable(DataTableInterface $dataTable): self
@@ -161,24 +159,37 @@ class FiltrationData implements \ArrayAccess
 
     public function isEmpty(): bool
     {
-        return empty($this->filters);
+        return $this->filters === [];
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->filters);
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetGet(mixed $offset): FilterData
     {
         return $this->filters[$offset];
     }
 
+    /**
+     * @param string     $offset
+     * @param FilterData $value
+     */
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->setFilterData($offset, $value);
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetUnset(mixed $offset): void
     {
         $this->removeFilter($offset);

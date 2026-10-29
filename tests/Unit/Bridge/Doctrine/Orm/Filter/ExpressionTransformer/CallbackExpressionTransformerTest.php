@@ -13,7 +13,7 @@ class CallbackExpressionTransformerTest extends ExpressionTransformerTestCase
 {
     public static function createTransformer(?callable $callback = null): ExpressionTransformerInterface
     {
-        return new CallbackExpressionTransformer($callback);
+        return new CallbackExpressionTransformer($callback ?? static fn (mixed $expression): mixed => $expression);
     }
 
     public static function expressionTransformationProvider(): iterable
@@ -25,9 +25,10 @@ class CallbackExpressionTransformerTest extends ExpressionTransformerTestCase
         yield [self::createTransformer(static fn ($expression) => "{$expression} bar"), 'foo', 'foo bar'];
 
         yield [
-            self::createTransformer(static function (Expr\Comparison $comparison) use ($expr) {
-                return $expr->eq($expr->lower($comparison->getLeftExpr()), $expr->upper($comparison->getRightExpr()));
-            }),
+            self::createTransformer(static fn (Expr\Comparison $comparison) => $expr->eq(
+                $expr->lower($comparison->getLeftExpr()),
+                $expr->upper($comparison->getRightExpr()),
+            )),
             $expr->eq('foo', 'bar'),
             $expr->eq($expr->lower('foo'), $expr->upper('bar')),
         ];

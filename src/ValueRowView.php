@@ -6,6 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
 
+/**
+ * @implements \ArrayAccess<string, ColumnValueView>
+ * @implements \IteratorAggregate<string, ColumnValueView>
+ */
 class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     public array $vars = [
@@ -14,7 +18,7 @@ class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
     ];
 
     /**
-     * @var array<ColumnValueView>
+     * @var array<string, ColumnValueView>
      */
     public array $children = [];
 
@@ -26,6 +30,9 @@ class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
         public mixed $data,
     ) {}
 
+    /**
+     * @return \ArrayIterator<string, ColumnValueView>
+     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->children);

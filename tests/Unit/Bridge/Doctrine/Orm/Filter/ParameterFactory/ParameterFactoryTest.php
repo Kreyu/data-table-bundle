@@ -155,6 +155,9 @@ class ParameterFactoryTest extends TestCase
         $this->assertEquals($expected, $this->createParameters($data));
     }
 
+    /**
+     * @return array<Parameter>
+     */
     private function createParameters(FilterData $data = new FilterData()): array
     {
         return (new ParameterFactory())->create($this->query, $data, $this->filter);

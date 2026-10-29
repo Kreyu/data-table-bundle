@@ -28,6 +28,9 @@ final class CallbackFilterType extends AbstractFilterType implements FilterHandl
 
     public function handle(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
     {
-        $filter->getConfig()->getOption('callback')($query, $data, $filter);
+        /** @var callable(ProxyQueryInterface, FilterData, FilterInterface): mixed $callback */
+        $callback = $filter->getConfig()->getOption('callback');
+
+        $callback($query, $data, $filter);
     }
 }

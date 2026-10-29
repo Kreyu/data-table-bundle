@@ -6,8 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryAwareTrait;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\CustomProxyQuery;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\SimpleDataTableType;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTableFactoryAwareController;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -16,79 +18,101 @@ class DataTableFactoryAwareTraitTest extends TestCase
 {
     public function testCreateDataTable()
     {
-        $arguments = [SimpleDataTableType::class, new CustomProxyQuery(), ['bar' => 'baz']];
+        $query = new CustomProxyQuery();
 
         $factory = $this->createMock(DataTableFactoryInterface::class);
-        $factory->expects($this->once())->method('create')->with(...$arguments);
+        $factory->expects($this->once())->method('create')->with(SimpleDataTableType::class, $query, ['bar' => 'baz']);
 
-        $this->createClassUsingTrait($factory)->execute('createDataTable', $arguments);
+        $this->createController($factory)->createDataTable(SimpleDataTableType::class, $query, ['bar' => 'baz']);
     }
 
     public function testCreateNamedDataTable()
     {
-        $arguments = ['foo', SimpleDataTableType::class, new CustomProxyQuery(), ['bar' => 'baz']];
+        $query = new CustomProxyQuery();
 
         $factory = $this->createMock(DataTableFactoryInterface::class);
-        $factory->expects($this->once())->method('createNamed')->with(...$arguments);
+        $factory
+            ->expects($this->once())
+            ->method('createNamed')
+            ->with('foo', SimpleDataTableType::class, $query, ['bar' => 'baz'])
+        ;
 
-        $this->createClassUsingTrait($factory)->execute('createNamedDataTable', $arguments);
+        $this->createController($factory)->createNamedDataTable('foo', SimpleDataTableType::class, $query, [
+            'bar' => 'baz',
+        ]);
     }
 
     public function testCreateDataTableBuilder()
     {
-        $arguments = [new CustomProxyQuery(), ['bar' => 'baz']];
+        $query = new CustomProxyQuery();
 
         $factory = $this->createMock(DataTableFactoryInterface::class);
-        $factory->expects($this->once())->method('createBuilder')->with(DataTableType::class, ...$arguments);
+        $factory->expects($this->once())->method('createBuilder')->with(DataTableType::class, $query, ['bar' => 'baz']);
 
-        $this->createClassUsingTrait($factory)->execute('createDataTableBuilder', $arguments);
+        $this->createController($factory)->createDataTableBuilder($query, ['bar' => 'baz']);
     }
 
     public function testCreateNamedDataTableBuilder()
     {
-        $arguments = ['foo', new CustomProxyQuery(), ['bar' => 'baz']];
+        $query = new CustomProxyQuery();
 
         $factory = $this->createMock(DataTableFactoryInterface::class);
         $factory
             ->expects($this->once())
             ->method('createNamedBuilder')
-            ->with($arguments[0], DataTableType::class, $arguments[1], $arguments[2])
+            ->with('foo', DataTableType::class, $query, ['bar' => 'baz'])
         ;
 
-        $this->createClassUsingTrait($factory)->execute('createNamedDataTableBuilder', $arguments);
+        $this->createController($factory)->createNamedDataTableBuilder('foo', $query, ['bar' => 'baz']);
     }
 
+    /**
+     * @param \Closure(DataTableFactoryAwareController): mixed $execute
+     */
     #[DataProvider('provideTraitCreateMethods')]
-    public function testExecutingMethodsWithoutFactoryThrows(string $method, array $arguments)
+    public function testExecutingMethodsWithoutFactoryThrows(string $method, \Closure $execute)
     {
-        $this->expectExceptionMessage(vsprintf('You cannot use the "%s" method on controller without data table factory.', [
+        $this->expectExceptionObject(new LogicException(sprintf(
+            'You cannot use the "%s" method on controller without data table factory.',
             DataTableFactoryAwareTrait::class.'::'.$method,
-        ]));
+        )));
 
-        $this->createClassUsingTrait()->execute($method, $arguments);
+        $execute($this->createController());
     }
 
     public static function provideTraitCreateMethods(): iterable
     {
-        yield 'createDataTable' => ['createDataTable', [DataTableType::class]];
-        yield 'createNamedDataTable' => ['createNamedDataTable', ['foo', DataTableType::class]];
-        yield 'createDataTableBuilder' => ['createDataTableBuilder', []];
-        yield 'createNamedDataTableBuilder' => ['createNamedDataTableBuilder', ['foo']];
+        yield 'createDataTable' => [
+            'createDataTable',
+            static fn (DataTableFactoryAwareController $controller) => $controller->createDataTable(
+                DataTableType::class,
+            ),
+        ];
+
+        yield 'createNamedDataTable' => [
+            'createNamedDataTable',
+            static fn (DataTableFactoryAwareController $controller) => $controller->createNamedDataTable(
+                'foo',
+                DataTableType::class,
+            ),
+        ];
+
+        yield 'createDataTableBuilder' => [
+            'createDataTableBuilder',
+            static fn (DataTableFactoryAwareController $controller) => $controller->createDataTableBuilder(),
+        ];
+
+        yield 'createNamedDataTableBuilder' => [
+            'createNamedDataTableBuilder',
+            static fn (DataTableFactoryAwareController $controller) => $controller->createNamedDataTableBuilder('foo'),
+        ];
     }
 
-    private function createClassUsingTrait(?DataTableFactoryInterface $factory = null): object
+    private function createController(?DataTableFactoryInterface $factory = null): DataTableFactoryAwareController
     {
-        $class = new class {
-            use DataTableFactoryAwareTrait;
+        $controller = new DataTableFactoryAwareController();
+        $controller->setDataTableFactory($factory);
 
-            public function execute(string $method, array $arguments): void
-            {
-                $this->{$method}(...$arguments);
-            }
-        };
-
-        $class->setDataTableFactory($factory);
-
-        return $class;
+        return $controller;
     }
 }

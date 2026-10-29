@@ -29,31 +29,46 @@ abstract class ExporterTypeTestCase extends ExporterIntegrationTestCase
         return $this->factory->createNamed($name, $this->getTestedType(), $options);
     }
 
+    /**
+     * @param array<array-key, string>              $headers
+     * @param list<array<array-key, mixed>>         $valueRows
+     */
     protected function createDataTableView(array $headers = [], array $valueRows = []): DataTableView
     {
         $view = new DataTableView();
-        $view->headerRow = new HeaderRowView($view);
+        $headerRow = new HeaderRowView($view);
+        $view->headerRow = $headerRow;
 
-        foreach ($headers as $label) {
-            $headerRow = new ColumnHeaderView($view->headerRow);
-            $headerRow->vars['label'] = $label;
+        foreach ($headers as $columnKey => $label) {
+            $columnHeaderView = new ColumnHeaderView($headerRow);
+            $columnHeaderView->vars['label'] = $label;
 
-            $view->headerRow->children[] = $headerRow;
+            $headerRow->children[self::getColumnName($columnKey)] = $columnHeaderView;
         }
 
-        foreach ($valueRows as $index => $data) {
-            $valueRow = new ValueRowView($view, $index, $data);
+        $valueRowViews = [];
 
-            foreach ($data as $value) {
+        foreach ($valueRows as $rowIndex => $data) {
+            $valueRow = new ValueRowView($view, $rowIndex, $data);
+
+            foreach (array_keys($data) as $columnKey) {
                 $valueView = new ColumnValueView($valueRow);
-                $valueView->data = $valueView->value = $value;
+                $valueView->data = $data[$columnKey];
+                $valueView->value = $data[$columnKey];
 
-                $valueRow->children[] = $valueView;
+                $valueRow->children[self::getColumnName($columnKey)] = $valueView;
             }
 
-            $view->valueRows[] = $valueRow;
+            $valueRowViews[] = $valueRow;
         }
 
+        $view->valueRows = $valueRowViews;
+
         return $view;
+    }
+
+    private static function getColumnName(int|string $columnKey): string
+    {
+        return sprintf('column_%s', $columnKey);
     }
 }

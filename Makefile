@@ -34,10 +34,10 @@ fmt-check: ## Check formatting (dry-run)
 	$(MAGO) fmt --check
 
 lint: ## Run Mago linter
-	$(MAGO) lint --fail-on-out-of-sync-baseline
+	$(MAGO) lint
 
 analyze: ## Run Mago static analysis (CI uses PHP 8.5 dependencies)
-	$(MAGO) analyze --fail-on-out-of-sync-baseline
+	$(MAGO) analyze
 
 quality: fmt-check lint analyze ## Run all code-quality checks
 

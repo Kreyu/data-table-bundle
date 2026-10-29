@@ -36,19 +36,35 @@ final class EntityFilterType extends AbstractDoctrineOrmFilterType
 
         // The persistence feature is saving the identifier of the entity, not the entire selected entity.
         // Therefore, the EntityType requires "choice_value" option with a name of the entity identifier field.
-        if (null !== $this->managerRegistry) {
-            $resolver->addNormalizer('form_options', function (Options $options, array $formOptions) {
-                if (EntityType::class !== $options['form_type'] || null === ($class = $formOptions['class'] ?? null)) {
+        $managerRegistry = $this->managerRegistry;
+
+        if ($managerRegistry !== null) {
+            $resolver->addNormalizer('form_options', static function (Options $options, array $formOptions) use (
+                $managerRegistry,
+            ) {
+                /** @var class-string|null $class */
+                $class = $formOptions['class'] ?? null;
+
+                /** @var string $formType */
+                $formType = $options['form_type'];
+
+                if ($formType !== EntityType::class) {
                     return $formOptions;
                 }
 
-                $identifiers = $this->managerRegistry
+                if ($class === null) {
+                    return $formOptions;
+                }
+
+                $identifiers = $managerRegistry
                     ->getManagerForClass($class)
                     ?->getClassMetadata($class)
                     ->getIdentifier() ?? []
                 ;
 
-                if (1 === count($identifiers)) {
+                $identifierCount = count($identifiers);
+
+                if ($identifierCount === 1) {
                     $formOptions += ['choice_value' => reset($identifiers)];
                 }
 

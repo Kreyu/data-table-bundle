@@ -57,6 +57,9 @@ class ExporterConfigBuilderTest extends TestCase
         $this->assertTrue($this->getPrivatePropertyValue($config, 'locked'));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createBuilder(
         ?ResolvedExporterTypeInterface $type = null,
         array $options = [],

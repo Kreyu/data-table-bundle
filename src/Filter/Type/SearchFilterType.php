@@ -30,9 +30,12 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
             ->setRequired('handler')
             ->setAllowedTypes('handler', 'callable')
             ->addNormalizer('form_options', static function (Options $options, array $value): array {
+                /** @var array<string, mixed> $attributes */
+                $attributes = $value['attr'] ?? [];
+
                 return $value
                 + [
-                    'attr' => ($value['attr'] ?? []) + ['placeholder' => 'Search...'],
+                    'attr' => $attributes + ['placeholder' => 'Search...'],
                 ];
             })
         ;
@@ -40,6 +43,9 @@ class SearchFilterType extends AbstractFilterType implements SearchFilterTypeInt
 
     public function handle(ProxyQueryInterface $query, FilterData $data, FilterInterface $filter): void
     {
-        $filter->getConfig()->getOption('handler')($query, (string) $data->getValue(), $filter);
+        /** @var callable(ProxyQueryInterface, string, FilterInterface): mixed $handler */
+        $handler = $filter->getConfig()->getOption('handler');
+
+        $handler($query, (string) $data->getValue(), $filter);
     }
 }

@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,7 +20,13 @@ class FilterDataType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('value', $options['form_type'], $options['form_options']);
+        /** @var class-string<FormTypeInterface> $formType */
+        $formType = $options['form_type'];
+
+        /** @var array<string, mixed> $formOptions */
+        $formOptions = $options['form_options'];
+
+        $builder->add('value', $formType, $formOptions);
 
         $builder->get('value')->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
             if ('' === $event->getData()) {
@@ -28,10 +35,16 @@ class FilterDataType extends AbstractType
         });
 
         if ($options['operator_selectable']) {
+            /** @var class-string<FormTypeInterface> $operatorFormType */
+            $operatorFormType = $options['operator_form_type'];
+
+            /** @var array<string, mixed> $operatorFormOptions */
+            $operatorFormOptions = $options['operator_form_options'];
+
             $builder->add(
                 'operator',
-                $options['operator_form_type'],
-                $options['operator_form_options']
+                $operatorFormType,
+                $operatorFormOptions
                 + [
                     'empty_data' => $options['default_operator'],
                     'choices' => $options['supported_operators'],
@@ -58,8 +71,11 @@ class FilterDataType extends AbstractType
                 'supported_operators' => [],
                 'operator_selectable' => false,
                 'default_operator' => Operator::Equals,
-                'empty_data' => static function (Options $options) {
-                    return new FilterData(operator: $options['default_operator']);
+                'empty_data' => static function (Options $options): FilterData {
+                    /** @var Operator $defaultOperator */
+                    $defaultOperator = $options['default_operator'];
+
+                    return new FilterData(operator: $defaultOperator);
                 },
             ])
             ->setAllowedTypes('form_type', 'string')

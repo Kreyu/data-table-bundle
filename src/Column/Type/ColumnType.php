@@ -29,22 +29,26 @@ final class ColumnType implements ColumnTypeInterface
 
     public function buildColumn(ColumnBuilderInterface $builder, array $options): void
     {
-        $sortPropertyPath = null;
+        /** @var bool|string $sort */
+        $sort = $options['sort'];
 
-        if (true === $options['sort']) {
-            $sortPropertyPath = $builder->getName();
-        } elseif (is_string($options['sort'])) {
-            $sortPropertyPath = $options['sort'];
-        }
+        /** @var int $priority */
+        $priority = $options['priority'];
+
+        /** @var bool $visible */
+        $visible = $options['visible'];
+
+        /** @var bool $personalizable */
+        $personalizable = $options['personalizable'];
 
         $builder
-            ->setPropertyPath($options['property_path'] ?? $builder->getName() ?: null)
-            ->setSortPropertyPath($sortPropertyPath)
-            ->setPriority($options['priority'])
-            ->setVisible($options['visible'])
-            ->setPersonalizable($options['personalizable'])
-            ->setSortable(false !== $options['sort'])
-            ->setExportable(false !== $options['export'])
+            ->setPropertyPath($this->getPropertyPath($builder, $options))
+            ->setSortPropertyPath($this->getSortPropertyPath($builder, $sort))
+            ->setPriority($priority)
+            ->setVisible($visible)
+            ->setPersonalizable($personalizable)
+            ->setSortable($sort !== false)
+            ->setExportable($options['export'] !== false)
         ;
     }
 
@@ -82,36 +86,37 @@ final class ColumnType implements ColumnTypeInterface
         $valueRowView = $view->parent;
         $dataTableView = $valueRowView->parent;
 
+        /** @var mixed $rowData */
         $rowData = $view->getRowData();
 
+        /** @var mixed $data */
         $data = $this->getColumnDataFromRowData($rowData, $column, $options);
+
+        /** @var mixed $value */
         $value = $this->getColumnValueFromColumnData($data, $rowData, $column, $options);
 
         $view->data = $data;
         $view->value = $value;
 
-        if (is_callable($attr = $options['value_attr'])) {
-            $attr = $attr($data, $rowData);
-        }
+        /** @var array<array-key, mixed>|callable $attr */
+        $attr = $options['value_attr'];
 
+        /** @var array<array-key, mixed>|callable $cellAttr */
         $cellAttr = $options['value_cell_attr'];
-        $isCellAttrCallable = is_callable($cellAttr);
 
-        if ($isCellAttrCallable) {
-            $cellAttr = $cellAttr($data, $rowData);
-        }
+        /** @var array<array-key, mixed>|callable $translationParameters */
+        $translationParameters = $options['value_translation_parameters'];
 
+        /** @var string|TranslatableInterface|null $translationKey */
         $translationKey = $options['value_translation_key'];
+
+        /** @var bool|string|null $translationDomain */
         $translationDomain = $options['value_translation_domain'] ?? $dataTableView->vars['translation_domain'] ?? null;
 
-        $translatable = $value instanceof TranslatableInterface || false !== $translationDomain;
+        $translatable = $value instanceof TranslatableInterface || $translationDomain !== false;
 
         if ($translatable && (is_string($value) || $value instanceof TranslatableInterface)) {
             $translationKey ??= $value;
-        }
-
-        if (is_callable($translationParameters = $options['value_translation_parameters'])) {
-            $translationParameters = $translationParameters($data, $rowData);
         }
 
         $view->vars = array_replace($view->vars, [
@@ -126,113 +131,70 @@ final class ColumnType implements ColumnTypeInterface
             'is_instance_of_translatable' => $value instanceof TranslatableInterface,
             'translation_key' => $translationKey,
             'translation_domain' => $translationDomain,
-            'translation_parameters' => $translationParameters ?? [],
-            'attr' => $attr,
-            'cell_attr' => $cellAttr,
+            'translation_parameters' => $this->resolveRowDataOption($translationParameters, $data, $rowData),
+            'attr' => $this->resolveRowDataOption($attr, $data, $rowData),
+            'cell_attr' => $this->resolveRowDataOption($cellAttr, $data, $rowData),
         ]);
     }
 
     public function buildExportHeaderView(ColumnHeaderView $view, ColumnInterface $column, array $options): void
     {
-        if (false === $options['export']) {
+        $exportOptions = $this->getExportOptions($options);
+
+        if ($exportOptions === null) {
             return;
         }
 
-        if (true === $options['export']) {
-            $options['export'] = [];
-        }
+        /** @var string|TranslatableInterface $label */
+        $label = $exportOptions['label'] ?? $options['label'] ?? StringUtil::camelToSentence($column->getName());
 
-        $options['export']['label'] ??= $options['label'] ?? StringUtil::camelToSentence($column->getName());
-        $options['export']['header_translation_domain'] ??=
-            $options['header_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
-        $options['export']['header_translation_parameters'] ??= $options['header_translation_parameters'] ?? [];
+        /** @var bool|string|null $translationDomain */
+        $translationDomain =
+            $exportOptions['header_translation_domain']
+            ?? $options['header_translation_domain']
+            ?? $view->getDataTable()->vars['translation_domain']
+            ?? false;
 
-        $label = $options['export']['label'];
+        /** @var array<array-key, mixed> $translationParameters */
+        $translationParameters =
+            $exportOptions['header_translation_parameters'] ?? $options['header_translation_parameters'] ?? [];
 
-        if ($this->translator) {
-            if ($label instanceof TranslatableInterface) {
-                $locale = null;
-
-                if (method_exists(TranslatableInterface::class, 'getLocale')) {
-                    $locale = $this->translator->getLocale();
-                }
-
-                $label = $label->trans($this->translator, $locale);
-            } else {
-                $translationDomain = $options['export']['header_translation_domain'];
-                $translationParameters = $options['export']['header_translation_parameters'];
-
-                if ($translationDomain) {
-                    $label = $this->translator->trans($label, $translationParameters, $translationDomain);
-                }
-            }
-        }
-
-        $view->vars['label'] = $label;
+        $view->vars['label'] = $this->translateExportLabel($label, $translationDomain, $translationParameters);
     }
 
     public function buildExportValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (false === $options['export']) {
+        $exportOptions = $this->getExportOptions($options);
+
+        if ($exportOptions === null) {
             return;
         }
 
-        if (true === $options['export']) {
-            $options['export'] = [];
-        }
+        $exportOptions['getter'] ??= $options['getter'];
+        $exportOptions['property_path'] ??= $options['property_path'];
+        $exportOptions['property_accessor'] ??= $options['property_accessor'];
+        $exportOptions['formatter'] ??= $options['formatter'];
+        $exportOptions['value_translation_key'] ??= $options['value_translation_key'];
+        $exportOptions['value_translation_domain'] ??=
+            $options['value_translation_domain'] ?? $view->getDataTable()->vars['translation_domain'] ?? false;
+        $exportOptions['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
 
-        $options['export']['getter'] ??= $options['getter'];
-        $options['export']['property_path'] ??= $options['property_path'];
-        $options['export']['property_accessor'] ??= $options['property_accessor'];
-        $options['export']['formatter'] ??= $options['formatter'];
-        $options['export']['value_translation_key'] ??= $options['value_translation_key'];
-        $options['export']['value_translation_domain'] ??=
-            $options['value_translation_domain'] ?? $view->parent->parent->vars['translation_domain'] ?? false;
-        $options['export']['value_translation_parameters'] ??= $options['value_translation_parameters'] ?? [];
+        /** @var mixed $rowData */
+        $rowData = $view->getRowData();
 
-        $rowData = $view->parent->data;
+        /** @var mixed $data */
+        $data = $this->getColumnDataFromRowData($rowData, $column, $exportOptions);
 
-        $data = $this->getColumnDataFromRowData($rowData, $column, $options['export']);
-        $value = $this->getColumnValueFromColumnData($data, $rowData, $column, $options['export']);
+        /** @var mixed $value */
+        $value = $this->getColumnValueFromColumnData($data, $rowData, $column, $exportOptions);
 
-        if (
-            $this->translator
-            && (false !== $options['export']['value_translation_domain'] || $value instanceof TranslatableInterface)
-        ) {
-            $locale = null;
+        /** @var mixed $translatedValue */
+        $translatedValue = $this->translateExportValue($value, $data, $rowData, $exportOptions);
 
-            if (method_exists(TranslatableInterface::class, 'getLocale')) {
-                $locale = $this->translator->getLocale();
-            }
-
-            if ($value instanceof TranslatableInterface) {
-                $value = $value->trans($this->translator, $locale);
-            } else {
-                $translationKey = $options['export']['value_translation_key'];
-                $translationDomain = $options['export']['value_translation_domain'];
-                $translationParameters = $options['export']['value_translation_parameters'];
-
-                if (is_callable($translationParameters)) {
-                    $translationParameters = $translationParameters($data, $rowData);
-                }
-
-                if (is_string($value)) {
-                    $translationKey ??= $value;
-                }
-
-                if ($translationDomain && null !== $translationKey) {
-                    $value = $this->translator->trans(
-                        $translationKey,
-                        $translationParameters,
-                        $translationDomain,
-                        $locale,
-                    );
-                }
-            }
-        }
-
-        $view->vars['data'] = $view->data = $data;
-        $view->vars['value'] = $view->value = $value;
+        $view->data = $data;
+        $view->value = $translatedValue;
+        $view->vars['data'] = $data;
+        $view->vars['value'] = $translatedValue;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -412,52 +374,209 @@ final class ColumnType implements ColumnTypeInterface
         return null;
     }
 
-    private function getColumnDataFromRowData(mixed $rowData, ColumnInterface $column, array $options): mixed
+    /**
+     * @param array<array-key, mixed> $options
+     */
+    private function getPropertyPath(ColumnBuilderInterface $builder, array $options): string|PropertyPathInterface|null
     {
-        if (null === $rowData) {
+        /** @var bool|string|PropertyPathInterface $propertyPath */
+        $propertyPath = $options['property_path'] ?? $builder->getName();
+
+        if (is_bool($propertyPath)) {
             return null;
         }
 
-        if (is_callable($getter = $options['getter'])) {
+        if ($propertyPath === '') {
+            return null;
+        }
+
+        return $propertyPath;
+    }
+
+    private function getSortPropertyPath(ColumnBuilderInterface $builder, bool|string $sort): ?string
+    {
+        if ($sort === true) {
+            return $builder->getName();
+        }
+
+        if (is_string($sort)) {
+            return $sort;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<array-key, mixed> $options
+     *
+     * @return array<array-key, mixed>|null
+     */
+    private function getExportOptions(array $options): ?array
+    {
+        /** @var bool|array<array-key, mixed> $export */
+        $export = $options['export'];
+
+        if ($export === false) {
+            return null;
+        }
+
+        if ($export === true) {
+            return [];
+        }
+
+        return $export;
+    }
+
+    /**
+     * @param array<array-key, mixed> $translationParameters
+     */
+    private function translateExportLabel(
+        string|TranslatableInterface $label,
+        bool|string|null $translationDomain,
+        array $translationParameters,
+    ): string|TranslatableInterface {
+        $translator = $this->translator;
+
+        if ($translator === null) {
+            return $label;
+        }
+
+        if ($label instanceof TranslatableInterface) {
+            return $label->trans($translator);
+        }
+
+        if (!is_string($translationDomain)) {
+            return $label;
+        }
+
+        if ($translationDomain === '') {
+            return $label;
+        }
+
+        return $translator->trans($label, $translationParameters, $translationDomain);
+    }
+
+    /**
+     * @param array<array-key, mixed> $exportOptions
+     */
+    private function translateExportValue(mixed $value, mixed $data, mixed $rowData, array $exportOptions): mixed
+    {
+        $translator = $this->translator;
+
+        if ($translator === null) {
+            return $value;
+        }
+
+        if ($value instanceof TranslatableInterface) {
+            return $value->trans($translator);
+        }
+
+        /** @var bool|string|null $translationDomain */
+        $translationDomain = $exportOptions['value_translation_domain'];
+
+        if (!is_string($translationDomain)) {
+            return $value;
+        }
+
+        if ($translationDomain === '') {
+            return $value;
+        }
+
+        /** @var string|null $translationKey */
+        $translationKey = $exportOptions['value_translation_key'];
+
+        if (is_string($value)) {
+            $translationKey ??= $value;
+        }
+
+        if ($translationKey === null) {
+            return $value;
+        }
+
+        /** @var array<array-key, mixed>|callable $translationParameters */
+        $translationParameters = $exportOptions['value_translation_parameters'];
+
+        return $translator->trans(
+            $translationKey,
+            $this->resolveRowDataOption($translationParameters, $data, $rowData),
+            $translationDomain,
+        );
+    }
+
+    /**
+     * @param array<array-key, mixed>|callable $option
+     *
+     * @return array<array-key, mixed>
+     */
+    private function resolveRowDataOption(array|callable $option, mixed $data, mixed $rowData): array
+    {
+        if (!is_callable($option)) {
+            return $option;
+        }
+
+        /** @var array<array-key, mixed>|null $resolvedOption */
+        $resolvedOption = $option($data, $rowData);
+
+        return $resolvedOption ?? [];
+    }
+
+    /**
+     * @param array<array-key, mixed> $options
+     */
+    private function getColumnDataFromRowData(mixed $rowData, ColumnInterface $column, array $options): mixed
+    {
+        if ($rowData === null) {
+            return null;
+        }
+
+        /** @var callable|false|null $getter */
+        $getter = $options['getter'];
+
+        if (is_callable($getter)) {
             return $getter($rowData, $column, $options);
         }
 
+        /** @var bool|string|PropertyPathInterface $propertyPath */
         $propertyPath = $options['property_path'] ?? $column->getName();
 
         if (
             (is_string($propertyPath) || $propertyPath instanceof PropertyPathInterface)
             && (is_array($rowData) || is_object($rowData))
         ) {
-            return $options['property_accessor']->getValue($rowData, $propertyPath);
+            /** @var PropertyAccessorInterface $propertyAccessor */
+            $propertyAccessor = $options['property_accessor'];
+
+            return $propertyAccessor->getValue($rowData, $propertyPath);
         }
 
         return $rowData;
     }
 
+    /**
+     * @param array<array-key, mixed> $options
+     */
     private function getColumnValueFromColumnData(
         mixed $data,
         mixed $rowData,
         ColumnInterface $column,
         array $options,
     ): mixed {
-        if (null === $data) {
+        if ($data === null) {
             return null;
         }
 
-        $value = $data;
+        /** @var callable|false|null $formatter */
+        $formatter = $options['formatter'];
 
-        if (is_callable($formatter = $options['formatter'])) {
-            $value = $formatter($data, $rowData, $column, $options);
+        if (!is_callable($formatter)) {
+            return $data;
         }
 
-        return $value;
+        return $formatter($data, $rowData, $column, $options);
     }
 
     /**
-     * Retrieves the column block prefixes, respecting the type hierarchy.
-     *
-     * For example, take a look at the NumberColumnType. It is based on the ColumnType,
-     * therefore its block prefixes are: ["number", "column"].
+     * @param array<array-key, mixed> $options
      *
      * @return array<string>
      */
@@ -469,11 +588,17 @@ final class ColumnType implements ColumnTypeInterface
             $type->getBlockPrefix(),
         ];
 
-        while (null !== $type->getParent()) {
-            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
+        $parentType = $type->getParent();
+
+        while ($parentType !== null) {
+            $blockPrefixes[] = $parentType->getBlockPrefix();
+            $parentType = $parentType->getParent();
         }
 
-        if ($blockPrefix = $options['block_prefix']) {
+        /** @var string $blockPrefix */
+        $blockPrefix = $options['block_prefix'] ?? '';
+
+        if ($blockPrefix !== '') {
             array_unshift($blockPrefixes, $blockPrefix);
         }
 

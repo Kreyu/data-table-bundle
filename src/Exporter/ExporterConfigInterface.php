@@ -12,6 +12,9 @@ interface ExporterConfigInterface
 
     public function getType(): ResolvedExporterTypeInterface;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array;
 
     public function hasOption(string $name): bool;

@@ -22,7 +22,10 @@ class DropdownActionType extends AbstractActionType
             $options['actions'] = $options['actions']($view->parent->value);
         }
 
-        foreach ($options['actions'] as $itemActionBuilder) {
+        /** @var iterable<object> $itemActionBuilders */
+        $itemActionBuilders = $options['actions'];
+
+        foreach ($itemActionBuilders as $itemActionBuilder) {
             if (!$itemActionBuilder instanceof ActionBuilderInterface) {
                 throw new UnexpectedTypeException($itemActionBuilder, ActionBuilderInterface::class);
             }

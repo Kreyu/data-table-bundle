@@ -8,6 +8,7 @@ use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Kreyu\Bundle\DataTableBundle\Filter\FilterRegistry;
+use Kreyu\Bundle\DataTableBundle\Filter\Type\CallbackFilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\FilterType;
 use Kreyu\Bundle\DataTableBundle\Filter\Type\ResolvedFilterTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Extension\SimpleFilterTypeBarExtension;
@@ -33,7 +34,7 @@ class FilterRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->createRegistry()->getType('stdClass');
+        $this->createRegistry()->getType(CallbackFilterType::class);
     }
 
     public function testGetTypeWithTypeExtensions()
@@ -52,8 +53,11 @@ class FilterRegistryTest extends TestCase
     {
         $resolvedType = $this->createRegistry()->getType(SimpleSubFilterType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertInstanceOf(SimpleSubFilterType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(SimpleFilterType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertNotNull($parentType);
+        $this->assertInstanceOf(SimpleFilterType::class, $parentType->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
@@ -65,16 +69,18 @@ class FilterRegistryTest extends TestCase
 
         $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubFilterType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertEmpty($resolvedType->getTypeExtensions());
-        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+        $this->assertNotNull($parentType);
+        $this->assertSame($typeExtensions, $parentType->getTypeExtensions());
     }
 
     public function testTypeCannotHaveItselfAsParent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\FilterTypeWithSameParentType).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [new FilterTypeWithSameParentType()]);
         $registry->getType(FilterTypeWithSameParentType::class);
@@ -82,10 +88,9 @@ class FilterRegistryTest extends TestCase
 
     public function testRecursiveTypeReferences()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for filter type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Filter\Type\RecursiveFilterTypeFoo).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [
             new RecursiveFilterTypeFoo(),
@@ -103,7 +108,7 @@ class FilterRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
+        $this->assertFalse($this->createRegistry()->hasType(CallbackFilterType::class));
     }
 
     public function testCreatingRegistryWithInvalidType()
@@ -118,15 +123,20 @@ class FilterRegistryTest extends TestCase
         $this->createRegistry(typeExtensions: [new \stdClass()]);
     }
 
+    /**
+     * @param list<object> $types
+     * @param list<object> $typeExtensions
+     */
     private function createRegistry(array $types = [], array $typeExtensions = []): FilterRegistry
     {
+        $defaultTypes = [
+            new FilterType(),
+            new SimpleFilterType(),
+            new SimpleSubFilterType(),
+        ];
+
         return new FilterRegistry(
-            types: $types
-            ?: [
-                new FilterType(),
-                new SimpleFilterType(),
-                new SimpleSubFilterType(),
-            ],
+            types: $types === [] ? $defaultTypes : $types,
             typeExtensions: $typeExtensions,
             resolvedTypeFactory: new ResolvedFilterTypeFactory(),
         );

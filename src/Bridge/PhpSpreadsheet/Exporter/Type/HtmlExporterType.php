@@ -38,23 +38,49 @@ final class HtmlExporterType extends AbstractPhpSpreadsheetExporterType
 
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter
     {
-        StringHelper::setDecimalSeparator($options['decimal_separator']);
-        StringHelper::setThousandsSeparator($options['thousands_separator']);
+        /** @var string $decimalSeparator */
+        $decimalSeparator = $options['decimal_separator'];
+
+        /** @var string $thousandsSeparator */
+        $thousandsSeparator = $options['thousands_separator'];
+
+        /** @var string $imagesRoot */
+        $imagesRoot = $options['images_root'];
+
+        /** @var bool $embedImages */
+        $embedImages = $options['embed_images'];
+
+        /** @var bool $useInlineCss */
+        $useInlineCss = $options['use_inline_css'];
+
+        /** @var bool $generateSheetNavigationBlock */
+        $generateSheetNavigationBlock = $options['generate_sheet_navigation_block'];
+
+        /** @var int|null $sheetIndex */
+        $sheetIndex = $options['sheet_index'];
+
+        /** @var callable|null $editHtmlCallback */
+        $editHtmlCallback = $options['edit_html_callback'];
+
+        StringHelper::setDecimalSeparator($decimalSeparator);
+        StringHelper::setThousandsSeparator($thousandsSeparator);
 
         $writer = (new Html($spreadsheet))
-            ->setImagesRoot($options['images_root'])
-            ->setEmbedImages($options['embed_images'])
-            ->setUseInlineCss($options['use_inline_css'])
-            ->setGenerateSheetNavigationBlock($options['generate_sheet_navigation_block'])
+            ->setImagesRoot($imagesRoot)
+            ->setEmbedImages($embedImages)
+            ->setUseInlineCss($useInlineCss)
+            ->setGenerateSheetNavigationBlock($generateSheetNavigationBlock)
         ;
 
-        if (null !== $options['sheet_index']) {
-            $writer->setSheetIndex($options['sheet_index']);
-        } else {
+        $writer->setEditHtmlCallback($editHtmlCallback);
+
+        if ($sheetIndex === null) {
             $writer->writeAllSheets();
+
+            return $writer;
         }
 
-        $writer->setEditHtmlCallback($options['edit_html_callback']);
+        $writer->setSheetIndex($sheetIndex);
 
         return $writer;
     }

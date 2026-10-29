@@ -20,12 +20,20 @@ final class LinkColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (is_callable($href = $options['href'])) {
-            $href = $href($view->vars['data'], $view->parent->data, $column);
+        /** @var string|callable $href */
+        $href = $options['href'];
+
+        if (is_callable($href)) {
+            /** @var string $href */
+            $href = $href($view->vars['data'], $view->getRowData(), $column);
         }
 
-        if (is_callable($target = $options['target'])) {
-            $target = $target($view->vars['data'], $view->parent->data, $column);
+        /** @var string|callable|null $target */
+        $target = $options['target'];
+
+        if (is_callable($target)) {
+            /** @var string|null $target */
+            $target = $target($view->vars['data'], $view->getRowData(), $column);
         }
 
         $view->vars = array_replace($view->vars, [

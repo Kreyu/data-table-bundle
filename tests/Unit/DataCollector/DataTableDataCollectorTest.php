@@ -94,16 +94,14 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectDataTable($dataTable);
 
-        $data = $this->collector->getData();
-
-        $this->assertArrayHasKey('users', $data);
-        $this->assertSame('App\\DataTable', $data['users']['type_class']);
-        $this->assertSame(['column_config' => true], $data['users']['columns']['id']);
-        $this->assertSame(['filter_config' => true], $data['users']['filters']['name']);
-        $this->assertSame(['action_name' => 'edit'], $data['users']['actions']['edit']);
-        $this->assertSame(['action_name' => 'view'], $data['users']['row_actions']['view']);
-        $this->assertSame(['action_name' => 'delete'], $data['users']['batch_actions']['delete']);
-        $this->assertSame(['exporter_config' => true], $data['users']['exporters']['csv']);
+        $this->assertArrayHasKey('users', $this->getCollectedArray());
+        $this->assertSame('App\\DataTable', $this->getCollectedArray('users')['type_class']);
+        $this->assertSame(['column_config' => true], $this->getCollectedArray('users', 'columns')['id']);
+        $this->assertSame(['filter_config' => true], $this->getCollectedArray('users', 'filters')['name']);
+        $this->assertSame(['action_name' => 'edit'], $this->getCollectedArray('users', 'actions')['edit']);
+        $this->assertSame(['action_name' => 'view'], $this->getCollectedArray('users', 'row_actions')['view']);
+        $this->assertSame(['action_name' => 'delete'], $this->getCollectedArray('users', 'batch_actions')['delete']);
+        $this->assertSame(['exporter_config' => true], $this->getCollectedArray('users', 'exporters')['csv']);
     }
 
     public function testCollectDataTableWithPaginationDisabledCollectsTotalCount(): void
@@ -125,8 +123,7 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectDataTable($dataTable);
 
-        $data = $this->collector->getData();
-        $this->assertSame(3, $data['products']['total_count']);
+        $this->assertSame(3, $this->getCollectedArray('products')['total_count']);
     }
 
     public function testCollectDataTableView(): void
@@ -141,9 +138,9 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectDataTableView($dataTable, $view);
 
-        $data = $this->collector->getData();
-        $this->assertSame(['baz' => 'qux', 'foo' => 'bar'], $data['orders']['view_vars']);
-        $this->assertSame([['row1'], ['row2']], $data['orders']['value_rows']);
+        $ordersData = $this->getCollectedArray('orders');
+        $this->assertSame(['baz' => 'qux', 'foo' => 'bar'], $ordersData['view_vars']);
+        $this->assertSame([['row1'], ['row2']], $ordersData['value_rows']);
     }
 
     public function testCollectColumnHeaderView(): void
@@ -159,10 +156,9 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectColumnHeaderView($column, $headerView);
 
-        $data = $this->collector->getData();
         $this->assertSame(
             ['attr' => ['class' => 'email'], 'label' => 'Email'],
-            $data['users']['columns']['email']['header_view_vars'],
+            $this->getCollectedArray('users', 'columns', 'email')['header_view_vars'],
         );
     }
 
@@ -183,8 +179,7 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectColumnValueView($column, $valueView);
 
-        $data = $this->collector->getData();
-        $this->assertArrayNotHasKey('value_view_vars', $data['users']['columns']['tags']);
+        $this->assertArrayNotHasKey('value_view_vars', $this->getCollectedArray('users', 'columns', 'tags'));
     }
 
     public function testCollectColumnValueViewCollectsTopLevelColumns(): void
@@ -203,10 +198,9 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectColumnValueView($column, $valueView);
 
-        $data = $this->collector->getData();
         $this->assertSame(
             ['attr' => [], 'value' => 'John'],
-            $data['users']['columns']['name']['value_view_vars'],
+            $this->getCollectedArray('users', 'columns', 'name')['value_view_vars'],
         );
     }
 
@@ -217,7 +211,7 @@ class DataTableDataCollectorTest extends TestCase
         $dataTable = $this->createDataTableMock('users');
         $dataTable
             ->method('hasColumn')
-            ->willReturnCallback(static fn (string $name) => in_array($name, ['name', 'email']))
+            ->willReturnCallback(static fn (string $name) => in_array($name, ['name', 'email'], strict: true))
         ;
 
         $nameColumn = $this->createColumnMock('name');
@@ -243,9 +237,8 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectSortingData($dataTable, $sortingData);
 
-        $data = $this->collector->getData();
-        $this->assertSame('asc', $data['users']['columns']['name']['sort_direction']);
-        $this->assertSame('desc', $data['users']['columns']['email']['sort_direction']);
+        $this->assertSame('asc', $this->getCollectedArray('users', 'columns', 'name')['sort_direction']);
+        $this->assertSame('desc', $this->getCollectedArray('users', 'columns', 'email')['sort_direction']);
     }
 
     public function testCollectSortingDataSkipsUnknownColumns(): void
@@ -261,8 +254,7 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectSortingData($dataTable, $sortingData);
 
-        $data = $this->collector->getData();
-        $this->assertArrayNotHasKey('nonexistent', $data['users']['columns']);
+        $this->assertArrayNotHasKey('nonexistent', $this->getCollectedArray('users', 'columns'));
     }
 
     public function testCollectPaginationData(): void
@@ -279,10 +271,10 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectPaginationData($dataTable, $paginationData);
 
-        $data = $this->collector->getData();
-        $this->assertSame(3, $data['users']['page']);
-        $this->assertSame(25, $data['users']['per_page']);
-        $this->assertSame(100, $data['users']['total_count']);
+        $usersData = $this->getCollectedArray('users');
+        $this->assertSame(3, $usersData['page']);
+        $this->assertSame(25, $usersData['per_page']);
+        $this->assertSame(100, $usersData['total_count']);
     }
 
     public function testCollectFilterView(): void
@@ -298,10 +290,9 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectFilterView($filter, $filterView);
 
-        $data = $this->collector->getData();
         $this->assertSame(
             ['attr' => [], 'label' => 'Status'],
-            $data['users']['filters']['status']['view_vars'],
+            $this->getCollectedArray('users', 'filters', 'status')['view_vars'],
         );
     }
 
@@ -312,7 +303,7 @@ class DataTableDataCollectorTest extends TestCase
         $dataTable = $this->createDataTableMock('users');
         $dataTable
             ->method('hasFilter')
-            ->willReturnCallback(static fn (string $name) => in_array($name, ['status', 'role']))
+            ->willReturnCallback(static fn (string $name) => in_array($name, ['status', 'role'], strict: true))
         ;
 
         $statusFilter = $this->createFilterMock('status');
@@ -341,11 +332,13 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectFiltrationData($dataTable, $filtrationData);
 
-        $data = $this->collector->getData();
-        $this->assertSame($statusFilterData, $data['users']['filters']['status']['data']);
-        $this->assertSame('Equals', $data['users']['filters']['status']['operator_label']);
-        $this->assertSame($roleFilterData, $data['users']['filters']['role']['data']);
-        $this->assertNull($data['users']['filters']['role']['operator_label']);
+        $statusData = $this->getCollectedArray('users', 'filters', 'status');
+        $this->assertSame($statusFilterData, $statusData['data']);
+        $this->assertSame('Equals', $statusData['operator_label']);
+
+        $roleData = $this->getCollectedArray('users', 'filters', 'role');
+        $this->assertSame($roleFilterData, $roleData['data']);
+        $this->assertNull($roleData['operator_label']);
     }
 
     public function testCollectFiltrationDataSkipsUnknownFilters(): void
@@ -361,8 +354,7 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectFiltrationData($dataTable, $filtrationData);
 
-        $data = $this->collector->getData();
-        $this->assertArrayNotHasKey('nonexistent', $data['users']['filters']);
+        $this->assertArrayNotHasKey('nonexistent', $this->getCollectedArray('users', 'filters'));
     }
 
     public function testCollectActionViewForGlobalAction(): void
@@ -405,9 +397,8 @@ class DataTableDataCollectorTest extends TestCase
         $this->collector->collectDataTable($dataTable);
         $this->collector->collectDataTable($dataTable);
 
-        $data = $this->collector->getData();
-        $this->assertArrayHasKey('users', $data);
-        $this->assertSame('App\\DataTable', $data['users']['type_class']);
+        $this->assertArrayHasKey('users', $this->getCollectedArray());
+        $this->assertSame('App\\DataTable', $this->getCollectedArray('users')['type_class']);
     }
 
     public function testReset(): void
@@ -433,6 +424,7 @@ class DataTableDataCollectorTest extends TestCase
         $headerView->vars = ['label' => 'Name', 'attr' => []];
         $this->collector->collectColumnHeaderView($column, $headerView);
 
+        /** @var DataTableDataCollector $restoredCollector */
         $restoredCollector = unserialize(serialize($this->collector));
 
         $this->assertInstanceOf(DataTableDataCollector::class, $restoredCollector);
@@ -454,13 +446,33 @@ class DataTableDataCollectorTest extends TestCase
 
         $this->collector->collectActionView($action, $actionView);
 
-        $data = $this->collector->getData();
         $this->assertSame(
             ['attr' => [], 'label' => 'Test'],
-            $data['users'][$dataKey]['test_action']['view_vars'],
+            $this->getCollectedArray('users', $dataKey, 'test_action')['view_vars'],
         );
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
+    private function getCollectedArray(string ...$keys): array
+    {
+        $data = $this->collector->getData();
+        $this->assertIsArray($data);
+
+        foreach ($keys as $key) {
+            $this->assertArrayHasKey($key, $data);
+            $this->assertIsArray($data[$key]);
+            $data = $data[$key];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param list<string> $columns
+     * @param list<string> $filters
+     */
     private function initializeCollectorWithDataTable(
         string $name,
         array $columns = [],

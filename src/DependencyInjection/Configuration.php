@@ -11,22 +11,18 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
+        /** @var TreeBuilder<'array'> $treeBuilder */
         $treeBuilder = new TreeBuilder('kreyu_data_table');
 
-        $treeBuilder
-            ->getRootNode()
-            // TODO: Remove this whole validation block after removing the root "themes" node
-            //       as it works as a backwards compatibility layer
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
             ->validate()
             ->always()
-            ->then(static function (array $config) {
-                if (empty($config['defaults']['themes']) && !empty($config['themes'])) {
-                    $config['defaults']['themes'] = $config['themes'];
-                }
+            ->then(self::moveDeprecatedThemesToDefaults(...))
+        ;
 
-                return $config;
-            })
-            ->end()
+        $rootNode
             ->children()
             ->arrayNode('themes')
             ->scalarPrototype()
@@ -181,5 +177,35 @@ class Configuration implements ConfigurationInterface
         ;
 
         return $treeBuilder;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @return array<string, mixed>
+     */
+    private static function moveDeprecatedThemesToDefaults(array $config): array
+    {
+        /** @var array<string, mixed> $defaults */
+        $defaults = $config['defaults'];
+
+        /** @var list<string> $defaultThemes */
+        $defaultThemes = $defaults['themes'] ?? [];
+
+        /** @var list<string> $deprecatedThemes */
+        $deprecatedThemes = $config['themes'] ?? [];
+
+        if ($defaultThemes !== []) {
+            return $config;
+        }
+
+        if ($deprecatedThemes === []) {
+            return $config;
+        }
+
+        $defaults['themes'] = $deprecatedThemes;
+        $config['defaults'] = $defaults;
+
+        return $config;
     }
 }

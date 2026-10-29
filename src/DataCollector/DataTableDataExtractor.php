@@ -16,10 +16,13 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
 {
     public function extractDataTableConfiguration(DataTableInterface $dataTable): array
     {
+        /** @var array<string, mixed> $passedOptions */
+        $passedOptions = $dataTable->getConfig()->getAttribute('data_collector/passed_options', []);
+
         $data = [
             'name' => $dataTable->getName(),
             'type_class' => new ClassStub($dataTable->getConfig()->getType()->getInnerType()::class),
-            'passed_options' => $dataTable->getConfig()->getAttribute('data_collector/passed_options', []),
+            'passed_options' => $passedOptions,
             'resolved_options' => $dataTable->getConfig()->getOptions(),
             'features' => [
                 'pagination' => [
@@ -52,10 +55,13 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
 
     public function extractColumnConfiguration(ColumnInterface $column): array
     {
+        /** @var array<string, mixed> $passedOptions */
+        $passedOptions = $column->getConfig()->getAttribute('data_collector/passed_options', []);
+
         $data = [
             'name' => $column->getName(),
             'type_class' => new ClassStub($column->getConfig()->getType()->getInnerType()::class),
-            'passed_options' => $column->getConfig()->getAttribute('data_collector/passed_options', []),
+            'passed_options' => $passedOptions,
             'resolved_options' => $column->getConfig()->getOptions(),
         ];
 
@@ -67,10 +73,13 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
 
     public function extractFilterConfiguration(FilterInterface $filter): array
     {
+        /** @var array<string, mixed> $passedOptions */
+        $passedOptions = $filter->getConfig()->getAttribute('data_collector/passed_options', []);
+
         $data = [
             'name' => $filter->getName(),
             'type_class' => new ClassStub($filter->getConfig()->getType()->getInnerType()::class),
-            'passed_options' => $filter->getConfig()->getAttribute('data_collector/passed_options', []),
+            'passed_options' => $passedOptions,
             'resolved_options' => $filter->getConfig()->getOptions(),
         ];
 
@@ -82,10 +91,13 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
 
     public function extractActionConfiguration(ActionInterface $action): array
     {
+        /** @var array<string, mixed> $passedOptions */
+        $passedOptions = $action->getConfig()->getAttribute('data_collector/passed_options', []);
+
         $data = [
             'name' => $action->getName(),
             'type_class' => new ClassStub($action->getConfig()->getType()->getInnerType()::class),
-            'passed_options' => $action->getConfig()->getAttribute('data_collector/passed_options', []),
+            'passed_options' => $passedOptions,
             'resolved_options' => $action->getConfig()->getOptions(),
         ];
 
@@ -97,10 +109,13 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
 
     public function extractExporterConfiguration(ExporterInterface $exporter): array
     {
+        /** @var array<string, mixed> $passedOptions */
+        $passedOptions = $exporter->getConfig()->getAttribute('data_collector/passed_options', []);
+
         $data = [
             'name' => $exporter->getName(),
             'type_class' => new ClassStub($exporter->getConfig()->getType()->getInnerType()::class),
-            'passed_options' => $exporter->getConfig()->getAttribute('data_collector/passed_options', []),
+            'passed_options' => $passedOptions,
             'resolved_options' => $exporter->getConfig()->getOptions(),
         ];
 

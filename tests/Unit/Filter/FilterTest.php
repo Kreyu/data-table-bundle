@@ -68,6 +68,7 @@ class FilterTest extends TestCase
                     match ($matcher->numberOfInvocations()) {
                         1 => PreHandleEvent::class,
                         2 => PostHandleEvent::class,
+                        default => $this->fail('Unexpected event dispatch.'),
                     },
                     $event,
                 );
@@ -76,6 +77,7 @@ class FilterTest extends TestCase
                     match ($matcher->numberOfInvocations()) {
                         1 => FilterEvents::PRE_HANDLE,
                         2 => FilterEvents::POST_HANDLE,
+                        default => $this->fail('Unexpected event dispatch.'),
                     },
                     $eventName,
                 );

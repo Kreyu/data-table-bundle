@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Filter\Form\Type\OperatorType;
 use Kreyu\Bundle\DataTableBundle\Filter\Operator;
 use Kreyu\Bundle\DataTableBundle\Util\StringUtil;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -19,35 +20,42 @@ final class FilterType implements FilterTypeInterface
 {
     public function buildFilter(FilterBuilderInterface $builder, array $options): void
     {
-        $setters = [
-            'form_type' => $builder->setFormType(...),
-            'form_options' => $builder->setFormOptions(...),
-            'operator_form_type' => $builder->setOperatorFormType(...),
-            'operator_form_options' => $builder->setOperatorFormOptions(...),
-            'default_operator' => $builder->setDefaultOperator(...),
-            'supported_operators' => $builder->setSupportedOperators(...),
-            'operator_selectable' => $builder->setOperatorSelectable(...),
-        ];
+        /** @var class-string<FormTypeInterface> $formType */
+        $formType = $options['form_type'];
 
-        foreach ($setters as $option => $setter) {
-            $setter($options[$option]);
-        }
+        /** @var array<string, mixed> $formOptions */
+        $formOptions = $options['form_options'];
+
+        /** @var class-string<FormTypeInterface> $operatorFormType */
+        $operatorFormType = $options['operator_form_type'];
+
+        /** @var array<string, mixed> $operatorFormOptions */
+        $operatorFormOptions = $options['operator_form_options'];
+
+        /** @var Operator $defaultOperator */
+        $defaultOperator = $options['default_operator'];
+
+        /** @var array<Operator> $supportedOperators */
+        $supportedOperators = $options['supported_operators'];
+
+        /** @var bool $operatorSelectable */
+        $operatorSelectable = $options['operator_selectable'];
+
+        $builder
+            ->setFormType($formType)
+            ->setFormOptions($formOptions)
+            ->setOperatorFormType($operatorFormType)
+            ->setOperatorFormOptions($operatorFormOptions)
+            ->setDefaultOperator($defaultOperator)
+            ->setSupportedOperators($supportedOperators)
+            ->setOperatorSelectable($operatorSelectable)
+        ;
     }
 
     public function buildView(FilterView $view, FilterInterface $filter, FilterData $data, array $options): void
     {
-        $value = null;
-
-        if ($data->hasValue()) {
-            $value = $data->getValue();
-
-            if ($formatter = $options['active_filter_formatter']) {
-                $value = $formatter($data, $filter, $options);
-            }
-        }
-
         $view->data = $data;
-        $view->value = $value;
+        $view->value = $this->getActiveFilterValue($data, $filter, $options);
 
         $view->vars = array_replace($view->vars, [
             'name' => $filter->getName(),
@@ -97,9 +105,10 @@ final class FilterType implements FilterTypeInterface
             ->setAllowedTypes('supported_operators', Operator::class.'[]')
             ->setAllowedTypes('operator_selectable', 'bool')
             ->setAllowedTypes('active_filter_formatter', ['null', 'callable'])
-            ->setAllowedValues('translation_domain', static function (mixed $value): bool {
-                return is_null($value) || false === $value || is_string($value);
-            })
+            ->setAllowedValues(
+                'translation_domain',
+                static fn (mixed $value): bool => $value === null || $value === false || is_string($value),
+            )
         ;
     }
 
@@ -111,5 +120,21 @@ final class FilterType implements FilterTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function getActiveFilterValue(FilterData $data, FilterInterface $filter, array $options): mixed
+    {
+        if (!$data->hasValue()) {
+            return null;
+        }
+
+        /** @var (callable(FilterData, FilterInterface, array<array-key, mixed>): mixed)|null $formatter */
+        $formatter = $options['active_filter_formatter'];
+
+        if ($formatter === null) {
+            return $data->getValue();
+        }
+
+        return $formatter($data, $filter, $options);
     }
 }

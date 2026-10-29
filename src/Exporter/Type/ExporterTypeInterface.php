@@ -12,6 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface ExporterTypeInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function export(
         DataTableView $view,
         ExporterInterface $exporter,

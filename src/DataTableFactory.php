@@ -49,9 +49,7 @@ class DataTableFactory implements DataTableFactoryInterface
 
         $builder = $type->createBuilder($this, $name, null, $options);
 
-        $data ??= $type->createDefaultQuery($builder->getOptions());
-
-        $builder->setQuery($this->createProxyQuery($data));
+        $builder->setQuery($this->createProxyQuery($data ?? $type->createDefaultQuery($builder->getOptions())));
 
         $type->buildDataTable($builder, $builder->getOptions());
 

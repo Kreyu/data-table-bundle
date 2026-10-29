@@ -18,28 +18,17 @@ class PersonalizationColumnData
     ) {}
 
     /**
-     * @param array{name: string, order: int, visible: bool} $data
+     * @param array{name: string, priority?: int, visible?: bool} $data
      */
     public static function fromArray(array $data): self
     {
-        $resolver =
-            self::$optionsResolver ??= (new OptionsResolver())
-                ->setRequired('name')
-                ->setDefaults([
-                    'priority' => 0,
-                    'visible' => true,
-                ])
-                ->setAllowedTypes('name', 'string')
-                ->setAllowedTypes('priority', 'int')
-                ->setAllowedTypes('visible', 'bool')
-        ;
-
-        $data = $resolver->resolve($data);
+        /** @var array{name: string, priority: int, visible: bool} $resolvedData */
+        $resolvedData = self::getOptionsResolver()->resolve($data);
 
         return new self(
-            $data['name'],
-            $data['priority'],
-            $data['visible'],
+            $resolvedData['name'],
+            $resolvedData['priority'],
+            $resolvedData['visible'],
         );
     }
 
@@ -59,9 +48,13 @@ class PersonalizationColumnData
 
     public function getPriority(): int
     {
-        // TODO: Remove BC layer made for easier update to version 0.14
-        if (isset($this->order)) {
-            $this->priority = (int) $this->order;
+        $properties = get_object_vars($this);
+
+        /** @var int|null $legacyOrder */
+        $legacyOrder = $properties['order'] ?? null;
+
+        if ($legacyOrder !== null) {
+            $this->priority = $legacyOrder;
         }
 
         return $this->priority;
@@ -80,5 +73,19 @@ class PersonalizationColumnData
     public function setVisible(bool $visible): void
     {
         $this->visible = $visible;
+    }
+
+    private static function getOptionsResolver(): OptionsResolver
+    {
+        return self::$optionsResolver ??= (new OptionsResolver())
+            ->setRequired('name')
+            ->setDefaults([
+                'priority' => 0,
+                'visible' => true,
+            ])
+            ->setAllowedTypes('name', 'string')
+            ->setAllowedTypes('priority', 'int')
+            ->setAllowedTypes('visible', 'bool')
+        ;
     }
 }

@@ -17,11 +17,19 @@ final class TemplateColumnType extends AbstractColumnType
 {
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
-        if (is_callable($templatePath = $options['template_path'])) {
+        /** @var string|callable $templatePath */
+        $templatePath = $options['template_path'];
+
+        if (is_callable($templatePath)) {
+            /** @var string $templatePath */
             $templatePath = $templatePath($view->data, $column);
         }
 
-        if (is_callable($templateVars = $options['template_vars'])) {
+        /** @var array<array-key, mixed>|callable $templateVars */
+        $templateVars = $options['template_vars'];
+
+        if (is_callable($templateVars)) {
+            /** @var array<array-key, mixed> $templateVars */
             $templateVars = $templateVars($view->data, $column);
         }
 

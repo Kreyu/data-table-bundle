@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Twig;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
+use Twig\TokenStream;
 
 class DataTableThemeTokenParser extends AbstractTokenParser
 {
@@ -15,32 +16,29 @@ class DataTableThemeTokenParser extends AbstractTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $dataTable = $this->parser->getExpressionParser()->parseExpression();
-        $only = false;
-
-        if ($this->parser->getStream()->test(Token::NAME_TYPE, 'with')) {
-            $this->parser->getStream()->next();
-
-            $themes = $this->parser->getExpressionParser()->parseExpression();
-
-            if ($this->parser->getStream()->nextIf(Token::NAME_TYPE, 'only')) {
-                $only = true;
-            }
-        } else {
-            $themes = new ArrayExpression([], $stream->getCurrent()->getLine());
-
-            do {
-                $themes->addElement($this->parser->getExpressionParser()->parseExpression());
-            } while (!$stream->test(Token::BLOCK_END_TYPE));
-        }
+        $dataTable = $this->parser->parseExpression();
+        $withToken = $stream->nextIf(Token::NAME_TYPE, 'with');
+        $themes = $withToken === null ? $this->parseThemeList($stream) : $this->parser->parseExpression();
+        $onlyToken = $stream->nextIf(Token::NAME_TYPE, 'only');
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new DataTableThemeNode($dataTable, $themes, $lineno, $this->getTag(), $only);
+        return new DataTableThemeNode($dataTable, $themes, $lineno, $this->getTag(), $onlyToken !== null);
     }
 
     public function getTag(): string
     {
         return 'data_table_theme';
+    }
+
+    private function parseThemeList(TokenStream $stream): ArrayExpression
+    {
+        $themes = new ArrayExpression([], $stream->getCurrent()->getLine());
+
+        do {
+            $themes->addElement($this->parser->parseExpression());
+        } while (!$stream->test(Token::BLOCK_END_TYPE));
+
+        return $themes;
     }
 }

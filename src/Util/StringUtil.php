@@ -21,16 +21,24 @@ class StringUtil
     public static function fqcnToShortName(string $fqcn, array $suffixes): ?string
     {
         $suffixesExpression = implode('|', $suffixes);
+        $matches = [];
+        $matchCount = preg_match("~([^\\\\]+?)({$suffixesExpression})?$~i", $fqcn, $matches);
 
-        if (preg_match("~([^\\\\]+?)({$suffixesExpression})?$~i", $fqcn, $matches)) {
-            return strtolower(preg_replace(
-                ['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'],
-                ['\\1_\\2', '\\1_\\2'],
-                $matches[1],
-            ));
+        if ($matchCount !== 1) {
+            return null;
         }
 
-        return null;
+        $snakeCasedName = preg_replace(
+            ['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'],
+            ['\\1_\\2', '\\1_\\2'],
+            $matches[1],
+        );
+
+        if ($snakeCasedName === null) {
+            return null;
+        }
+
+        return strtolower($snakeCasedName);
     }
 
     /**
@@ -39,10 +47,16 @@ class StringUtil
      */
     public static function camelToSentence(string $string): string
     {
-        return ucfirst(strtolower(preg_replace_callback(
+        $spacedString = preg_replace_callback(
             pattern: '/([A-Z]|\d+)/',
             callback: static fn (array $matches) => ' '.$matches[0],
             subject: $string,
-        )));
+        );
+
+        if ($spacedString === null) {
+            return $string;
+        }
+
+        return ucfirst(strtolower($spacedString));
     }
 }

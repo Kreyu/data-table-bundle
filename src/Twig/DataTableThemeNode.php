@@ -11,11 +11,17 @@ class DataTableThemeNode extends Node
 {
     public function __construct(Node $dataTable, Node $themes, int $lineno, ?string $tag = null, bool $only = false)
     {
-        if ($this->requiresTagBackwardsCompatibility()) {
-            parent::__construct(['data_table' => $dataTable, 'themes' => $themes], ['only' => $only], $lineno, $tag);
-        } else {
-            parent::__construct(['data_table' => $dataTable, 'themes' => $themes], ['only' => $only], $lineno);
+        $nodes = ['data_table' => $dataTable, 'themes' => $themes];
+        $attributes = ['only' => $only];
+        $requiresTag = $this->requiresTagBackwardsCompatibility();
+
+        if ($requiresTag) {
+            parent::__construct($nodes, $attributes, $lineno, $tag);
+
+            return;
         }
+
+        parent::__construct($nodes, $attributes, $lineno);
     }
 
     public function compile(Compiler $compiler): void
@@ -32,9 +38,8 @@ class DataTableThemeNode extends Node
 
     public function requiresTagBackwardsCompatibility(): bool
     {
-        $reflection = new \ReflectionClass($this);
-
-        $parentConstructorParameters = $reflection->getParentClass()->getConstructor()->getParameters();
+        $parentConstructor = new \ReflectionMethod(Node::class, '__construct');
+        $parentConstructorParameters = $parentConstructor->getParameters();
 
         foreach ($parentConstructorParameters as $parentConstructorParameter) {
             if ('tag' === $parentConstructorParameter->getName()) {

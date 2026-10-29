@@ -33,11 +33,23 @@ final class OdsExporterType extends AbstractOpenSpoutExporterType
 
     protected function getWriterOptions(array $options): ODS\Options
     {
+        /** @var Style $defaultRowStyle */
+        $defaultRowStyle = $options['default_row_style'];
+
+        /** @var bool $shouldCreateNewSheetsAutomatically */
+        $shouldCreateNewSheetsAutomatically = $options['should_create_new_sheets_automatically'];
+
+        /** @var float|null $defaultColumnWidth */
+        $defaultColumnWidth = $options['default_column_width'];
+
+        /** @var float|null $defaultRowHeight */
+        $defaultRowHeight = $options['default_row_height'];
+
         $writerOptions = new ODS\Options();
-        $writerOptions->DEFAULT_ROW_STYLE = $options['default_row_style'];
-        $writerOptions->SHOULD_CREATE_NEW_SHEETS_AUTOMATICALLY = $options['should_create_new_sheets_automatically'];
-        $writerOptions->DEFAULT_COLUMN_WIDTH = $options['default_column_width'];
-        $writerOptions->DEFAULT_ROW_HEIGHT = $options['default_row_height'];
+        $writerOptions->DEFAULT_ROW_STYLE = $defaultRowStyle;
+        $writerOptions->SHOULD_CREATE_NEW_SHEETS_AUTOMATICALLY = $shouldCreateNewSheetsAutomatically;
+        $writerOptions->DEFAULT_COLUMN_WIDTH = $defaultColumnWidth;
+        $writerOptions->DEFAULT_ROW_HEIGHT = $defaultRowHeight;
 
         return $writerOptions;
     }

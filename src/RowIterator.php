@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle;
 
+/**
+ * @template TValue
+ *
+ * @implements \Iterator<mixed, TValue>
+ */
 class RowIterator implements \Iterator
 {
+    /**
+     * @var \Closure(): \Generator<mixed, TValue, mixed, mixed>
+     */
     private \Closure $callable;
+
+    /**
+     * @var \Generator<mixed, TValue, mixed, mixed>
+     */
     private \Generator $generator;
 
+    /**
+     * @param callable(): \Generator<mixed, TValue, mixed, mixed> $callable
+     */
     public function __construct(callable $callable)
     {
         $this->callable = $callable(...);
@@ -21,6 +36,9 @@ class RowIterator implements \Iterator
         $this->generator = ($this->callable)();
     }
 
+    /**
+     * @return TValue
+     */
     public function current(): mixed
     {
         return $this->generator->current();

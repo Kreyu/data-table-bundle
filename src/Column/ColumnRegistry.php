@@ -32,11 +32,11 @@ class ColumnRegistry implements ColumnRegistryInterface
     /**
      * @var array<class-string<ColumnTypeInterface>, bool>
      */
-    private array $checkedTypes;
+    private array $checkedTypes = [];
 
     /**
-     * @param iterable<ColumnTypeInterface>          $types
-     * @param iterable<ColumnTypeExtensionInterface> $typeExtensions
+     * @param iterable<object> $types
+     * @param iterable<object> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -54,7 +54,7 @@ class ColumnRegistry implements ColumnRegistryInterface
 
     public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
     private function resolveType(string $name): ResolvedColumnTypeInterface
@@ -64,7 +64,9 @@ class ColumnRegistry implements ColumnRegistryInterface
             $name,
         ));
 
-        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+        $fqcn = $type::class;
+
+        if (array_key_exists($fqcn, $this->checkedTypes)) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
             throw new LogicException(sprintf('Circular reference detected for column type "%s" (%s).', $fqcn, $types));
         }
@@ -84,6 +86,9 @@ class ColumnRegistry implements ColumnRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $types
+     */
     private function setTypes(iterable $types): void
     {
         $this->types = [];
@@ -97,6 +102,9 @@ class ColumnRegistry implements ColumnRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $typeExtensions
+     */
     private function setTypeExtensions(iterable $typeExtensions): void
     {
         $this->typeExtensions = [];

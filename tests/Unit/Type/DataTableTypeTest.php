@@ -159,6 +159,9 @@ class DataTableTypeTest extends DataTableIntegrationTestCase
         $this->assertSame(['id'], array_keys($dataTable->getHiddenColumns()));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createCountingDataTable(array $options, array $data = []): DataTableInterface
     {
         CountingProxyQuery::reset();

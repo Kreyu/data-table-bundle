@@ -6,6 +6,7 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit\Action;
 
 use Kreyu\Bundle\DataTableBundle\Action\ActionRegistry;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ActionType;
+use Kreyu\Bundle\DataTableBundle\Action\Type\LinkActionType;
 use Kreyu\Bundle\DataTableBundle\Action\Type\ResolvedActionTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\LogicException;
@@ -33,7 +34,7 @@ class ActionRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->createRegistry()->getType('stdClass');
+        $this->createRegistry()->getType(LinkActionType::class);
     }
 
     public function testGetTypeWithTypeExtensions()
@@ -52,8 +53,11 @@ class ActionRegistryTest extends TestCase
     {
         $resolvedType = $this->createRegistry()->getType(SimpleSubActionType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertInstanceOf(SimpleSubActionType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(SimpleActionType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertNotNull($parentType);
+        $this->assertInstanceOf(SimpleActionType::class, $parentType->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
@@ -65,16 +69,18 @@ class ActionRegistryTest extends TestCase
 
         $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubActionType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertEmpty($resolvedType->getTypeExtensions());
-        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+        $this->assertNotNull($parentType);
+        $this->assertSame($typeExtensions, $parentType->getTypeExtensions());
     }
 
     public function testTypeCannotHaveItselfAsParent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\ActionTypeWithSameParentType).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [new ActionTypeWithSameParentType()]);
         $registry->getType(ActionTypeWithSameParentType::class);
@@ -82,10 +88,9 @@ class ActionRegistryTest extends TestCase
 
     public function testRecursiveTypeReferences()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for action type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\Action\Type\RecursiveActionTypeFoo).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [
             new RecursiveActionTypeFoo(),
@@ -103,7 +108,7 @@ class ActionRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
+        $this->assertFalse($this->createRegistry()->hasType(LinkActionType::class));
     }
 
     public function testCreatingRegistryWithInvalidType()
@@ -118,15 +123,20 @@ class ActionRegistryTest extends TestCase
         $this->createRegistry(typeExtensions: [new \stdClass()]);
     }
 
+    /**
+     * @param list<object> $types
+     * @param list<object> $typeExtensions
+     */
     private function createRegistry(array $types = [], array $typeExtensions = []): ActionRegistry
     {
+        $defaultTypes = [
+            new ActionType(),
+            new SimpleActionType(),
+            new SimpleSubActionType(),
+        ];
+
         return new ActionRegistry(
-            types: $types
-            ?: [
-                new ActionType(),
-                new SimpleActionType(),
-                new SimpleSubActionType(),
-            ],
+            types: $types === [] ? $defaultTypes : $types,
             typeExtensions: $typeExtensions,
             resolvedTypeFactory: new ResolvedActionTypeFactory(),
         );

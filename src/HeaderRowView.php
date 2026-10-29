@@ -6,6 +6,10 @@ namespace Kreyu\Bundle\DataTableBundle;
 
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 
+/**
+ * @implements \ArrayAccess<string, ColumnHeaderView>
+ * @implements \IteratorAggregate<string, ColumnHeaderView>
+ */
 class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     public array $vars = [
@@ -13,7 +17,7 @@ class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
     ];
 
     /**
-     * @var array<ColumnHeaderView>
+     * @var array<string, ColumnHeaderView>
      */
     public array $children = [];
 
@@ -21,6 +25,9 @@ class HeaderRowView implements \ArrayAccess, \IteratorAggregate, \Countable
         public DataTableView $parent,
     ) {}
 
+    /**
+     * @return \ArrayIterator<string, ColumnHeaderView>
+     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->children);

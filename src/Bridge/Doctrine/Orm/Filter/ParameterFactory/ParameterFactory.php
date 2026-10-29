@@ -18,15 +18,22 @@ class ParameterFactory implements ParameterFactoryInterface
 
         $name = $filter->getName().'_'.$query->getUniqueParameterId();
 
+        /** @var mixed $value */
         $value = $data->getValue();
         $operator = $data->getOperator();
 
-        if (Operator::Between === $operator) {
-            if (null !== ($from = $value['from'] ?? null)) {
+        if ($operator === Operator::Between) {
+            /** @var mixed $from */
+            $from = $value['from'] ?? null;
+
+            /** @var mixed $to */
+            $to = $value['to'] ?? null;
+
+            if ($from !== null) {
                 $parameters['from'] = new Parameter($name.'_from', $from);
             }
 
-            if (null !== ($to = $value['to'] ?? null)) {
+            if ($to !== null) {
                 $parameters['to'] = new Parameter($name.'_to', $to);
             }
 

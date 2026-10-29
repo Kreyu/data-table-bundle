@@ -23,28 +23,35 @@ final class ModalActionType extends AbstractActionType
             throw new LogicException('No "route" or "href" provided.');
         }
 
-        if ($view->parent instanceof ColumnValueView) {
-            $value = $view->parent->value;
+        $columnValueView = $view->parent;
 
-            foreach (['href', 'route', 'route_params'] as $optionName) {
-                if (!(isset($options[$optionName]) && $options[$optionName] instanceof \Closure)) {
-                    continue;
-                }
+        foreach (['href', 'route', 'route_params'] as $optionName) {
+            if (!$options[$optionName] instanceof \Closure) {
+                continue;
+            }
 
-                $options[$optionName] = $options[$optionName]($value);
+            if (!$columnValueView instanceof ColumnValueView) {
+                throw new LogicException(sprintf(
+                    'Closure used for option "%s", but it\'s only available for row actions.',
+                    $optionName,
+                ));
             }
-        } else {
-            foreach (['href', 'route', 'route_params'] as $optionName) {
-                if (isset($options[$optionName]) && $options[$optionName] instanceof \Closure) {
-                    throw new LogicException(sprintf(
-                        'Closure used for option "%s", but it\'s only available for row actions.',
-                        $optionName,
-                    ));
-                }
-            }
+
+            $options[$optionName] = $options[$optionName]($columnValueView->value);
         }
 
-        $href = $options['href'] ?? $this->urlGenerator->generate($options['route'], $options['route_params']);
+        /** @var string|null $href */
+        $href = $options['href'];
+
+        if ($href === null) {
+            /** @var string $route */
+            $route = $options['route'];
+
+            /** @var array<string, mixed> $routeParameters */
+            $routeParameters = $options['route_params'];
+
+            $href = $this->urlGenerator->generate($route, $routeParameters);
+        }
 
         $view->vars = array_replace($view->vars, [
             'href' => $href,

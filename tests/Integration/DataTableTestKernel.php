@@ -36,7 +36,7 @@ final class DataTableTestKernel extends Kernel
 
     public function getProjectDir(): string
     {
-        return \dirname(__DIR__, 2);
+        return \dirname(__DIR__, levels: 2);
     }
 
     public function getCacheDir(): string
@@ -51,15 +51,22 @@ final class DataTableTestKernel extends Kernel
 
     public static function tempDir(): string
     {
-        return sys_get_temp_dir().'/kreyu_dtb_integration_'.getmypid();
+        $processId = getmypid();
+
+        if ($processId === false) {
+            throw new \RuntimeException('Unable to read the current process ID.');
+        }
+
+        return sys_get_temp_dir().'/kreyu_dtb_integration_'.$processId;
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
         $container->loadFromExtension('framework', [
-            'secret' => 'test',
+            'secret' => bin2hex(random_bytes(16)),
             'test' => true,
             'http_method_override' => false,
+            'asset_mapper' => ['enabled' => false],
         ]);
 
         $container->loadFromExtension('twig', [
@@ -78,9 +85,17 @@ final class DataTableTestKernel extends Kernel
             public function process(ContainerBuilder $container): void
             {
                 foreach ([DataTableFactoryInterface::class, 'kreyu_data_table.twig.data_table_extension'] as $id) {
-                    if ($container->hasAlias($id)) {
+                    $hasAlias = $container->hasAlias($id);
+
+                    if ($hasAlias) {
                         $container->getAlias($id)->setPublic(true);
-                    } elseif ($container->hasDefinition($id)) {
+
+                        continue;
+                    }
+
+                    $hasDefinition = $container->hasDefinition($id);
+
+                    if ($hasDefinition) {
                         $container->getDefinition($id)->setPublic(true);
                     }
                 }

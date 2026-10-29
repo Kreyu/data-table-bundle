@@ -27,7 +27,7 @@ abstract class AbstractDataTableType implements DataTableTypeInterface
 
     public function getName(): string
     {
-        return StringUtil::fqcnToShortName(static::class, ['DataTableType', 'Type']) ?: '';
+        return StringUtil::fqcnToShortName(static::class, ['DataTableType', 'Type']) ?? '';
     }
 
     public function getParent(): string

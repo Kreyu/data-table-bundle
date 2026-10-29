@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreyu\Bundle\DataTableBundle\Maker;
 
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\RuntimeException;
 use Kreyu\Bundle\DataTableBundle\Type\AbstractDataTableType;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -32,6 +33,13 @@ class MakeDataTable extends AbstractMaker
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
+        $helpPath = __DIR__.'/../Resources/help/MakeDataTable.txt';
+        $help = file_get_contents($helpPath);
+
+        if ($help === false) {
+            throw new RuntimeException(sprintf('Unable to read the help file "%s".', $helpPath));
+        }
+
         $command
             ->addArgument(
                 'data-table-class',
@@ -41,14 +49,17 @@ class MakeDataTable extends AbstractMaker
                     Str::asClassName(Str::getRandomTerm()),
                 ),
             )
-            ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeDataTable.txt'))
+            ->setHelp($help)
         ;
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        /** @var string $dataTableClass */
+        $dataTableClass = $input->getArgument('data-table-class');
+
         $dataTableClassNameDetails = $generator->createClassNameDetails(
-            $input->getArgument('data-table-class'),
+            $dataTableClass,
             'DataTable\\Type\\',
             'DataTableType',
         );

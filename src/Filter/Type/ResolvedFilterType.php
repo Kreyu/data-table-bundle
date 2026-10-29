@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedFilterType implements ResolvedFilterTypeInterface
 {
-    private OptionsResolver $optionsResolver;
+    private ?OptionsResolver $optionsResolver = null;
 
     /**
      * @param array<FilterTypeExtensionInterface> $typeExtensions
@@ -100,20 +100,21 @@ class ResolvedFilterType implements ResolvedFilterTypeInterface
 
     public function getOptionsResolver(): OptionsResolver
     {
-        if (!isset($this->optionsResolver)) {
-            if (null !== $this->parent) {
-                $this->optionsResolver = clone $this->parent->getOptionsResolver();
-            } else {
-                $this->optionsResolver = new OptionsResolver();
-            }
-
-            $this->innerType->configureOptions($this->optionsResolver);
-
-            foreach ($this->typeExtensions as $extension) {
-                $extension->configureOptions($this->optionsResolver);
-            }
+        if ($this->optionsResolver !== null) {
+            return $this->optionsResolver;
         }
 
-        return $this->optionsResolver;
+        $parentOptionsResolver = $this->parent?->getOptionsResolver();
+        $optionsResolver = $parentOptionsResolver === null ? new OptionsResolver() : clone $parentOptionsResolver;
+
+        $this->innerType->configureOptions($optionsResolver);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->configureOptions($optionsResolver);
+        }
+
+        $this->optionsResolver = $optionsResolver;
+
+        return $optionsResolver;
     }
 }

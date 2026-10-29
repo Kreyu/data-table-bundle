@@ -215,45 +215,21 @@ class DataTable implements DataTableInterface
 
     public function getExportableColumns(): array
     {
-        $columns = array_filter($this->columns, function (ColumnInterface $column): bool {
-            if (!$column->getConfig()->isExportable()) {
-                return false;
-            }
+        $columns = array_filter($this->columns, $this->isColumnExportable(...));
 
-            $export = $column->getConfig()->getOption('export');
-
-            /** @var array{visible?: bool, personalizable?: bool} $exportOptions */
-            $exportOptions = is_array($export) ? $export : [];
-
-            return $this->isColumnVisible($column, $exportOptions);
-        });
-
-        uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB): int {
-            $exportOptionsA = $columnA->getConfig()->getOption('export') ?: [];
-            $exportOptionsB = $columnB->getConfig()->getOption('export') ?: [];
-
-            $priorityA = $exportOptionsA['priority'] ?? $columnA->getConfig()->getPriority();
-            $priorityB = $exportOptionsB['priority'] ?? $columnB->getConfig()->getPriority();
-
-            if ($this->getConfig()->isPersonalizationEnabled()) {
-                if ($exportOptionsA['personalizable'] ?? $columnA->getConfig()->isPersonalizable()) {
-                    $priorityA = $this->personalizationData?->getColumn($columnA)?->getPriority() ?? $priorityA;
-                }
-
-                if ($exportOptionsB['personalizable'] ?? $columnB->getConfig()->isPersonalizable()) {
-                    $priorityB = $this->personalizationData?->getColumn($columnB)?->getPriority() ?? $priorityB;
-                }
-            }
-
-            return $priorityB <=> $priorityA;
-        });
+        uasort(
+            $columns,
+            fn (ColumnInterface $columnA, ColumnInterface $columnB): int => (
+                $this->getColumnExportPriority($columnB) <=> $this->getColumnExportPriority($columnA)
+            ),
+        );
 
         return $columns;
     }
 
     public function getColumn(string $name): ColumnInterface
     {
-        if (isset($this->columns[$name])) {
+        if (array_key_exists($name, $this->columns)) {
             return $this->columns[$name];
         }
 
@@ -305,7 +281,7 @@ class DataTable implements DataTableInterface
 
     public function getFilter(string $name): FilterInterface
     {
-        if (isset($this->filters[$name])) {
+        if (array_key_exists($name, $this->filters)) {
             return $this->filters[$name];
         }
 
@@ -351,7 +327,7 @@ class DataTable implements DataTableInterface
 
     public function getAction(string $name): ActionInterface
     {
-        if (isset($this->actions[$name])) {
+        if (array_key_exists($name, $this->actions)) {
             return $this->actions[$name];
         }
 
@@ -396,7 +372,7 @@ class DataTable implements DataTableInterface
 
     public function getBatchAction(string $name): ActionInterface
     {
-        if (isset($this->batchActions[$name])) {
+        if (array_key_exists($name, $this->batchActions)) {
             return $this->batchActions[$name];
         }
 
@@ -441,7 +417,7 @@ class DataTable implements DataTableInterface
 
     public function getRowAction(string $name): ActionInterface
     {
-        if (isset($this->rowActions[$name])) {
+        if (array_key_exists($name, $this->rowActions)) {
             return $this->rowActions[$name];
         }
 
@@ -486,7 +462,7 @@ class DataTable implements DataTableInterface
 
     public function getExporter(string $name): ExporterInterface
     {
-        if (isset($this->exporters[$name])) {
+        if (array_key_exists($name, $this->exporters)) {
             return $this->exporters[$name];
         }
 
@@ -647,7 +623,6 @@ class DataTable implements DataTableInterface
 
         $data ??= $this->exportData ?? $this->config->getDefaultExportData() ?? ExportData::fromDataTable($this);
 
-        // TODO: Remove "getNonDeprecatedCase()" call once the deprecated strategies are removed.
         $data->strategy = $data->strategy->getNonDeprecatedCase();
 
         $this->dispatch(DataTableEvents::PRE_EXPORT, $event = new DataTableExportEvent($dataTable, $data));
@@ -662,13 +637,10 @@ class DataTable implements DataTableInterface
             $dataTable->personalizationData = PersonalizationData::fromDataTable($dataTable);
         }
 
-        if (null === $data->exporter) {
-            $exporter = $this->exporters[array_key_first($this->exporters)];
-        } else {
-            $exporter = $this->getExporter($data->exporter);
-        }
+        $exporter = $this->getExportExporter($data->exporter);
+        $filename = $data->filename ?? $this->getName();
 
-        return $exporter->export($dataTable->createExportView(), $data->filename);
+        return $exporter->export($dataTable->createExportView(), $filename);
     }
 
     public function getItems(): iterable
@@ -693,16 +665,29 @@ class DataTable implements DataTableInterface
     private function createPagination(): PaginationInterface
     {
         $resultSet = $this->getResultSet();
+        $currentPageItemCount = $resultSet->getCurrentPageItemCount();
+        $totalItemCount = $resultSet->getTotalItemCount();
+
+        if ($currentPageItemCount === null) {
+            throw new RuntimeException('The result set must provide the current page item count to paginate.');
+        }
+
+        if ($totalItemCount === null) {
+            throw new RuntimeException('The result set must provide the total item count to paginate.');
+        }
+
+        /** @var int $visiblePagesRange */
+        $visiblePagesRange = $this->config->getOption('page_visible_range', 3);
 
         $factory = $this->config->getPaginationFactory() ?? new PaginationFactory();
 
         try {
             return $factory->create(new PaginationContext(
                 currentPageNumber: $this->paginationData?->getPage() ?? 1,
-                currentPageItemCount: $resultSet->getCurrentPageItemCount(),
-                totalItemCount: $resultSet->getTotalItemCount(),
+                currentPageItemCount: $currentPageItemCount,
+                totalItemCount: $totalItemCount,
                 itemNumberPerPage: $this->paginationData?->getPerPage(),
-                visiblePagesRange: $this->config->getOption('page_visible_range', 3),
+                visiblePagesRange: $visiblePagesRange,
             ));
         } catch (CurrentPageOutOfRangeException) {
             $this->paginationData ??= new PaginationData();
@@ -917,6 +902,7 @@ class DataTable implements DataTableInterface
 
     public function isDeferred(): bool
     {
+        /** @var bool $async */
         $async = $this->config->getOption('async', false);
         $requestFromTurboFrame = $this->isRequestFromTurboFrame();
 
@@ -933,7 +919,7 @@ class DataTable implements DataTableInterface
     }
 
     /**
-     * @param array{visible?: bool, personalizable?: bool} $exportOptions
+     * @param array{visible?: bool|null, personalizable?: bool|null, priority?: int|null} $exportOptions
      */
     private function isColumnVisible(ColumnInterface $column, array $exportOptions = []): bool
     {
@@ -956,6 +942,67 @@ class DataTable implements DataTableInterface
         }
 
         return in_array($this->getColumnVisibilityGroup(), $columnVisibilityGroups, strict: true);
+    }
+
+    private function isColumnExportable(ColumnInterface $column): bool
+    {
+        $isExportable = $column->getConfig()->isExportable();
+
+        if (!$isExportable) {
+            return false;
+        }
+
+        return $this->isColumnVisible($column, $this->getColumnExportOptions($column));
+    }
+
+    private function getColumnExportPriority(ColumnInterface $column): int
+    {
+        $exportOptions = $this->getColumnExportOptions($column);
+        $priority = $exportOptions['priority'] ?? $column->getConfig()->getPriority();
+        $personalizable = $exportOptions['personalizable'] ?? $column->getConfig()->isPersonalizable();
+        $personalized = $personalizable && $this->config->isPersonalizationEnabled();
+
+        if (!$personalized) {
+            return $priority;
+        }
+
+        return $this->personalizationData?->getColumn($column)?->getPriority() ?? $priority;
+    }
+
+    /**
+     * @return array{visible?: bool|null, personalizable?: bool|null, priority?: int|null}
+     */
+    private function getColumnExportOptions(ColumnInterface $column): array
+    {
+        /** @var bool|array<array-key, mixed> $export */
+        $export = $column->getConfig()->getOption('export');
+
+        if (!is_array($export)) {
+            return [];
+        }
+
+        $export += ['visible' => null, 'personalizable' => null, 'priority' => null];
+
+        return [
+            'visible' => is_bool($export['visible']) ? $export['visible'] : null,
+            'personalizable' => is_bool($export['personalizable']) ? $export['personalizable'] : null,
+            'priority' => is_int($export['priority']) ? $export['priority'] : null,
+        ];
+    }
+
+    private function getExportExporter(?string $exporterName): ExporterInterface
+    {
+        if ($exporterName !== null) {
+            return $this->getExporter($exporterName);
+        }
+
+        $firstExporterName = array_key_first($this->exporters);
+
+        if ($firstExporterName === null) {
+            throw new RuntimeException('The data table has no exporters.');
+        }
+
+        return $this->exporters[$firstExporterName];
     }
 
     /**
@@ -997,7 +1044,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isPaginationPersistenceEnabled()) {
-            $data = $this->getPersistenceData(PersistenceContext::Pagination);
+            $data = $this->getPersistenceData(PersistenceContext::Pagination, PaginationData::class);
         }
 
         return $data ?? $this->config->getDefaultPaginationData() ?? new PaginationData();
@@ -1012,7 +1059,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isSortingPersistenceEnabled()) {
-            $data = $this->getPersistenceData(PersistenceContext::Sorting);
+            $data = $this->getPersistenceData(PersistenceContext::Sorting, SortingData::class);
         }
 
         return $data ?? $this->config->getDefaultSortingData() ?? $this->getGroupSortingData();
@@ -1067,7 +1114,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isFiltrationPersistenceEnabled()) {
-            $data = $this->getPersistenceData(PersistenceContext::Filtration);
+            $data = $this->getPersistenceData(PersistenceContext::Filtration, FiltrationData::class);
         }
 
         $data ??= $this->config->getDefaultFiltrationData();
@@ -1087,7 +1134,7 @@ class DataTable implements DataTableInterface
         $data = null;
 
         if ($this->config->isPersonalizationPersistenceEnabled()) {
-            $data = $this->getPersistenceData(PersistenceContext::Personalization);
+            $data = $this->getPersistenceData(PersistenceContext::Personalization, PersonalizationData::class);
         }
 
         return $data ?? $this->config->getDefaultPersonalizationData() ?? PersonalizationData::fromDataTable($this);
@@ -1103,23 +1150,69 @@ class DataTable implements DataTableInterface
         };
     }
 
-    private function getPersistenceData(PersistenceContext $context): mixed
+    private function ensurePersistenceEnabled(PersistenceContext $context): void
     {
-        if (!$this->isPersistenceEnabled($context)) {
-            throw new RuntimeException(sprintf('The data table has %s persistence disabled.', $context->value));
+        $isPersistenceEnabled = $this->isPersistenceEnabled($context);
+
+        if ($isPersistenceEnabled) {
+            return;
         }
+
+        throw new RuntimeException(sprintf('The data table has %s persistence disabled.', $context->value));
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $dataClass
+     *
+     * @return T|null
+     */
+    private function getPersistenceData(PersistenceContext $context, string $dataClass): ?object
+    {
+        $this->ensurePersistenceEnabled($context);
 
         $persistenceAdapter = $this->getPersistenceAdapter($context);
         $persistenceSubject = $this->getPersistenceSubject($context);
 
-        return $persistenceAdapter->read($this, $persistenceSubject);
+        return $this->assertPersistenceDataClass(
+            $context,
+            $dataClass,
+            $persistenceAdapter->read(
+                $this,
+                $persistenceSubject,
+            ),
+        );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $dataClass
+     *
+     * @return T|null
+     */
+    private function assertPersistenceDataClass(PersistenceContext $context, string $dataClass, mixed $data): ?object
+    {
+        if ($data === null) {
+            return null;
+        }
+
+        if ($data instanceof $dataClass) {
+            return $data;
+        }
+
+        throw new RuntimeException(sprintf(
+            'The %s persistence data must be an instance of "%s", "%s" given.',
+            $context->value,
+            $dataClass,
+            get_debug_type($data),
+        ));
     }
 
     private function setPersistenceData(PersistenceContext $context, mixed $data): void
     {
-        if (!$this->isPersistenceEnabled($context)) {
-            throw new RuntimeException(sprintf('The data table has %s persistence disabled.', $context->value));
-        }
+        $this->ensurePersistenceEnabled($context);
 
         $persistenceAdapter = $this->getPersistenceAdapter($context);
         $persistenceSubject = $this->getPersistenceSubject($context);

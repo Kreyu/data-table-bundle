@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Filter;
 
+use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,6 +15,9 @@ class FilterData
         private ?Operator $operator = null,
     ) {}
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data = []): self
     {
         ($resolver = new OptionsResolver())
@@ -22,17 +26,23 @@ class FilterData
                 'operator' => null,
             ])
             ->setAllowedTypes('operator', ['null', 'string', Operator::class])
-            ->setNormalizer('operator', static function (Options $options, mixed $value): ?Operator {
-                return is_string($value) ? Operator::from($value) : $value;
-            })
+            ->setNormalizer(
+                'operator',
+                static fn (Options $options, string|Operator|null $value): ?Operator => is_string($value)
+                    ? Operator::from($value)
+                    : $value,
+            )
             ->setIgnoreUndefined()
         ;
 
         $data = $resolver->resolve($data);
 
+        /** @var Operator|null $operator */
+        $operator = $data['operator'];
+
         return new self(
             value: $data['value'],
-            operator: $data['operator'],
+            operator: $operator,
         );
     }
 
@@ -53,6 +63,16 @@ class FilterData
 
     public function setOperator(mixed $operator): void
     {
+        if ($operator === null) {
+            $this->operator = null;
+
+            return;
+        }
+
+        if (!$operator instanceof Operator) {
+            throw new UnexpectedTypeException($operator, Operator::class);
+        }
+
         $this->operator = $operator;
     }
 

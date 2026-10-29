@@ -15,6 +15,9 @@ class ExportData
     public ExportStrategy $strategy = ExportStrategy::IncludeAll;
     public bool $includePersonalization = true;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): self
     {
         $resolver = (new OptionsResolver())
@@ -28,10 +31,14 @@ class ExportData
             ->setAllowedTypes('filename', ['null', 'string'])
             ->setAllowedTypes('strategy', ['string', ExportStrategy::class])
             ->setAllowedTypes('include_personalization', 'bool')
-            ->addNormalizer('strategy', static function (Options $options, $value): ExportStrategy {
-                return $value instanceof ExportStrategy ? $value : ExportStrategy::from($value);
-            })
-            ->addNormalizer('exporter', static function (Options $options, $value): ?string {
+            ->addNormalizer('strategy', static fn (
+                Options $options,
+                ExportStrategy|string $value,
+            ): ExportStrategy => $value instanceof ExportStrategy ? $value : ExportStrategy::from($value))
+            ->addNormalizer('exporter', static function (
+                Options $options,
+                ExporterInterface|string|null $value,
+            ): ?string {
                 if ($value instanceof ExporterInterface) {
                     return $value->getName();
                 }
@@ -42,13 +49,14 @@ class ExportData
 
         $data = array_intersect_key($data, array_flip($resolver->getDefinedOptions()));
 
-        $data = $resolver->resolve($data);
+        /** @var array{filename: ?string, exporter: ?string, strategy: ExportStrategy, include_personalization: bool} $resolvedData */
+        $resolvedData = $resolver->resolve($data);
 
         $self = new self();
-        $self->filename = $data['filename'];
-        $self->exporter = $data['exporter'];
-        $self->strategy = $data['strategy'];
-        $self->includePersonalization = $data['include_personalization'];
+        $self->filename = $resolvedData['filename'];
+        $self->exporter = $resolvedData['exporter'];
+        $self->strategy = $resolvedData['strategy'];
+        $self->includePersonalization = $resolvedData['include_personalization'];
 
         return $self;
     }

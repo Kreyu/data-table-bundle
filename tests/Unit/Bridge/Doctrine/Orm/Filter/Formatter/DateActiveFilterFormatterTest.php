@@ -69,9 +69,7 @@ class DateActiveFilterFormatterTest extends TestCase
 
         $filterConfig
             ->method('getOption')
-            ->willReturnCallback(static function (string $name) use ($filterOptions) {
-                return $filterOptions[$name] ?? null;
-            })
+            ->willReturnCallback(static fn (string $name) => $filterOptions[$name] ?? null)
         ;
 
         $filter->method('getConfig')->willReturn($filterConfig);

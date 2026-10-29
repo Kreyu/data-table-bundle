@@ -47,15 +47,18 @@ class FiltrationDataType extends AbstractType
          */
         $dataTable = $options['data_table'];
 
+        /** @var DataTableView|null $dataTableView */
         $dataTableView = $options['data_table_view'];
 
-        if (!$dataTableView instanceof DataTableView) {
+        if ($dataTableView === null) {
             throw new \LogicException('Unable to create filtration form view without the data table view.');
         }
 
-        $this->applyFormAttributeRecursively($view, $id = $view->vars['id']);
+        /** @var string $id */
+        $id = $view->vars['id'];
 
-        $view->vars['attr']['id'] = $id;
+        $this->applyFormAttributeRecursively($view, $id);
+        $this->setAttribute($view, 'id', $id);
 
         $searchFields = [];
 
@@ -146,10 +149,19 @@ class FiltrationDataType extends AbstractType
 
     private function applyFormAttributeRecursively(FormView $view, string $id): void
     {
-        $view->vars['attr']['form'] = $id;
+        $this->setAttribute($view, 'form', $id);
 
         foreach ($view->children as $child) {
             $this->applyFormAttributeRecursively($child, $id);
         }
+    }
+
+    private function setAttribute(FormView $view, string $name, string $value): void
+    {
+        /** @var array<string, mixed> $attributes */
+        $attributes = $view->vars['attr'];
+        $attributes[$name] = $value;
+
+        $view->vars['attr'] = $attributes;
     }
 }

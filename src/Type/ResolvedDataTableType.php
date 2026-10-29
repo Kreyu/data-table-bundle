@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedDataTableType implements ResolvedDataTableTypeInterface
 {
-    private OptionsResolver $optionsResolver;
+    private ?OptionsResolver $optionsResolver = null;
 
     /**
      * @param array<DataTableTypeExtensionInterface> $typeExtensions
@@ -58,7 +58,8 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
         array $options = [],
     ): DataTableBuilderInterface {
         try {
-            $options = $this->getOptionsResolver()->resolve($options);
+            /** @var array<string, mixed> $resolvedOptions */
+            $resolvedOptions = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
             throw new $exception(
                 sprintf(
@@ -71,7 +72,7 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
             );
         }
 
-        return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $options);
+        return new DataTableBuilder($name, $this, $query, new EventDispatcher(), $resolvedOptions);
     }
 
     public function createDefaultQuery(array $options): mixed
@@ -122,20 +123,21 @@ class ResolvedDataTableType implements ResolvedDataTableTypeInterface
 
     public function getOptionsResolver(): OptionsResolver
     {
-        if (!isset($this->optionsResolver)) {
-            if (null !== $this->parent) {
-                $this->optionsResolver = clone $this->parent->getOptionsResolver();
-            } else {
-                $this->optionsResolver = new OptionsResolver();
-            }
-
-            $this->innerType->configureOptions($this->optionsResolver);
-
-            foreach ($this->typeExtensions as $extension) {
-                $extension->configureOptions($this->optionsResolver);
-            }
+        if ($this->optionsResolver !== null) {
+            return $this->optionsResolver;
         }
 
-        return $this->optionsResolver;
+        $parentOptionsResolver = $this->parent?->getOptionsResolver();
+        $optionsResolver = $parentOptionsResolver === null ? new OptionsResolver() : clone $parentOptionsResolver;
+
+        $this->innerType->configureOptions($optionsResolver);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->configureOptions($optionsResolver);
+        }
+
+        $this->optionsResolver = $optionsResolver;
+
+        return $optionsResolver;
     }
 }

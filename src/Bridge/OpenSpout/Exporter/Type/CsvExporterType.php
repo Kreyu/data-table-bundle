@@ -32,11 +32,23 @@ final class CsvExporterType extends AbstractOpenSpoutExporterType
 
     protected function getWriterOptions(array $options): CSV\Options
     {
+        /** @var string $fieldDelimiter */
+        $fieldDelimiter = $options['field_delimiter'];
+
+        /** @var string $fieldEnclosure */
+        $fieldEnclosure = $options['field_enclosure'];
+
+        /** @var bool $shouldAddBom */
+        $shouldAddBom = $options['should_add_bom'];
+
+        /** @var positive-int $flushThreshold */
+        $flushThreshold = $options['flush_threshold'];
+
         $writerOptions = new CSV\Options();
-        $writerOptions->FIELD_DELIMITER = $options['field_delimiter'];
-        $writerOptions->FIELD_ENCLOSURE = $options['field_enclosure'];
-        $writerOptions->SHOULD_ADD_BOM = $options['should_add_bom'];
-        $writerOptions->FLUSH_THRESHOLD = $options['flush_threshold'];
+        $writerOptions->FIELD_DELIMITER = $fieldDelimiter;
+        $writerOptions->FIELD_ENCLOSURE = $fieldEnclosure;
+        $writerOptions->SHOULD_ADD_BOM = $shouldAddBom;
+        $writerOptions->FLUSH_THRESHOLD = $flushThreshold;
 
         return $writerOptions;
     }

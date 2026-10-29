@@ -45,11 +45,13 @@ class Pagination implements PaginationInterface
 
     public function getPageCount(): int
     {
-        if ($this->itemNumberPerPage < 1) {
+        $itemNumberPerPage = $this->itemNumberPerPage ?? 0;
+
+        if ($itemNumberPerPage < 1) {
             return 1;
         }
 
-        return (int) ceil($this->totalItemCount / $this->itemNumberPerPage);
+        return (int) ceil($this->totalItemCount / $itemNumberPerPage);
     }
 
     public function hasPreviousPage(): bool
@@ -76,7 +78,9 @@ class Pagination implements PaginationInterface
 
     public function getCurrentPageFirstItemIndex(): int
     {
-        return ($this->itemNumberPerPage * ($this->currentPageNumber - 1)) + 1;
+        $itemNumberPerPage = $this->itemNumberPerPage ?? 0;
+
+        return ($itemNumberPerPage * ($this->currentPageNumber - 1)) + 1;
     }
 
     public function getCurrentPageLastItemIndex(): int

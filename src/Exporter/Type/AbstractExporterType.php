@@ -17,7 +17,7 @@ abstract class AbstractExporterType implements ExporterTypeInterface
 
     public function getName(): string
     {
-        return StringUtil::fqcnToShortName(static::class, ['ExporterType', 'Type']) ?: '';
+        return StringUtil::fqcnToShortName(static::class, ['ExporterType', 'Type']) ?? '';
     }
 
     public function getParent(): ?string
@@ -25,8 +25,17 @@ abstract class AbstractExporterType implements ExporterTypeInterface
         return ExporterType::class;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     protected function getTempnam(array $options): string
     {
-        return (new Filesystem())->tempnam($options['tempnam_dir'], $options['tempnam_prefix']);
+        /** @var string $directory */
+        $directory = $options['tempnam_dir'];
+
+        /** @var string $prefix */
+        $prefix = $options['tempnam_prefix'];
+
+        return (new Filesystem())->tempnam($directory, $prefix);
     }
 }

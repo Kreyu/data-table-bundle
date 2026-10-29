@@ -17,7 +17,10 @@ final class CallbackExporterType extends AbstractExporterType
         string $filename,
         array $options = [],
     ): ExportFile {
-        return $options['callback']($view, $exporter, $filename, $options);
+        /** @var callable(DataTableView, ExporterInterface, string, array<string, mixed>): ExportFile $callback */
+        $callback = $options['callback'];
+
+        return $callback($view, $exporter, $filename, $options);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

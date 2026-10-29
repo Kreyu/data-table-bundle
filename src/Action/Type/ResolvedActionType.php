@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedActionType implements ResolvedActionTypeInterface
 {
-    private OptionsResolver $optionsResolver;
+    private ?OptionsResolver $optionsResolver = null;
 
     /**
      * @param array<ActionTypeExtensionInterface> $typeExtensions
@@ -39,10 +39,11 @@ class ResolvedActionType implements ResolvedActionTypeInterface
             $this->getBlockPrefix(),
         ];
 
-        $type = $this;
+        $type = $this->getParent();
 
-        while (null !== $type->getParent()) {
-            $blockPrefixes[] = ($type = $type->getParent())->getBlockPrefix();
+        while ($type !== null) {
+            $blockPrefixes[] = $type->getBlockPrefix();
+            $type = $type->getParent();
         }
 
         return array_unique($blockPrefixes);
@@ -114,20 +115,21 @@ class ResolvedActionType implements ResolvedActionTypeInterface
 
     public function getOptionsResolver(): OptionsResolver
     {
-        if (!isset($this->optionsResolver)) {
-            if (null !== $this->parent) {
-                $this->optionsResolver = clone $this->parent->getOptionsResolver();
-            } else {
-                $this->optionsResolver = new OptionsResolver();
-            }
-
-            $this->innerType->configureOptions($this->optionsResolver);
-
-            foreach ($this->typeExtensions as $extension) {
-                $extension->configureOptions($this->optionsResolver);
-            }
+        if ($this->optionsResolver !== null) {
+            return $this->optionsResolver;
         }
 
-        return $this->optionsResolver;
+        $parentOptionsResolver = $this->parent?->getOptionsResolver();
+        $optionsResolver = $parentOptionsResolver === null ? new OptionsResolver() : clone $parentOptionsResolver;
+
+        $this->innerType->configureOptions($optionsResolver);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->configureOptions($optionsResolver);
+        }
+
+        $this->optionsResolver = $optionsResolver;
+
+        return $optionsResolver;
     }
 }

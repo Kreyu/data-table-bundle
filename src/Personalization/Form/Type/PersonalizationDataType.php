@@ -31,16 +31,23 @@ class PersonalizationDataType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
+        /** @var DataTableView|null $dataTableView */
         $dataTableView = $options['data_table_view'];
 
-        if (!$dataTableView instanceof DataTableView) {
+        if ($dataTableView === null) {
             throw new \LogicException('Unable to create personalization form view without the data table view.');
+        }
+
+        $headerRow = $dataTableView->nonPersonalizedHeaderRow;
+
+        if ($headerRow === null) {
+            throw new \LogicException('Unable to create personalization form view without the header row view.');
         }
 
         foreach ($view['columns'] as $columnFormView) {
             /** @var string $columnName */
             $columnName = $columnFormView['name']->vars['value'];
-            $columnView = $dataTableView->nonPersonalizedHeaderRow[$columnName];
+            $columnView = $headerRow[$columnName];
 
             $columnFormView->vars = array_replace($columnFormView->vars, [
                 'label' => $columnView->vars['label'],

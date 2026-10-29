@@ -32,11 +32,11 @@ class ActionRegistry implements ActionRegistryInterface
     /**
      * @var array<class-string<ActionTypeInterface>, bool>
      */
-    private array $checkedTypes;
+    private array $checkedTypes = [];
 
     /**
-     * @param iterable<ActionTypeInterface>          $types
-     * @param iterable<ActionTypeExtensionInterface> $typeExtensions
+     * @param iterable<object> $types
+     * @param iterable<object> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -54,7 +54,7 @@ class ActionRegistry implements ActionRegistryInterface
 
     public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
     private function resolveType(string $name): ResolvedActionTypeInterface
@@ -64,7 +64,9 @@ class ActionRegistry implements ActionRegistryInterface
             $name,
         ));
 
-        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+        $fqcn = $type::class;
+
+        if (array_key_exists($fqcn, $this->checkedTypes)) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
             throw new LogicException(sprintf('Circular reference detected for action type "%s" (%s).', $fqcn, $types));
         }
@@ -84,6 +86,9 @@ class ActionRegistry implements ActionRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $types
+     */
     private function setTypes(iterable $types): void
     {
         $this->types = [];
@@ -97,6 +102,9 @@ class ActionRegistry implements ActionRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $typeExtensions
+     */
     private function setTypeExtensions(iterable $typeExtensions): void
     {
         $this->typeExtensions = [];

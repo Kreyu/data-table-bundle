@@ -24,7 +24,14 @@ class ArrayUtil
      * var_dump($map); // array(2) { [1] => string(4) "John" [2] => string(4) "Jane" }
      * </code>
      *
-     * @param callable(mixed): array<int|string, mixed> $callback
+     * @template TValue
+     * @template TMapKey of array-key
+     * @template TMapValue
+     *
+     * @param callable(TValue): array<TMapKey, TMapValue> $callback
+     * @param array<TValue>                               $array
+     *
+     * @return array<TMapKey, TMapValue>
      */
     public static function mapWithKeys(callable $callback, array $array): array
     {

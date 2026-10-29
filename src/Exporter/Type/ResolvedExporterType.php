@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResolvedExporterType implements ResolvedExporterTypeInterface
 {
-    private OptionsResolver $optionsResolver;
+    private ?OptionsResolver $optionsResolver = null;
 
     /**
      * @param array<ExporterTypeExtensionInterface> $typeExtensions
@@ -53,7 +53,8 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
         array $options,
     ): ExporterBuilderInterface {
         try {
-            $options = $this->getOptionsResolver()->resolve($options);
+            /** @var array<string, mixed> $resolvedOptions */
+            $resolvedOptions = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $exception) {
             throw new $exception(
                 sprintf(
@@ -66,7 +67,7 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
             );
         }
 
-        return new ExporterBuilder($name, $this, $options);
+        return new ExporterBuilder($name, $this, $resolvedOptions);
     }
 
     public function buildExporter(ExporterBuilderInterface $builder, array $options): void
@@ -82,20 +83,21 @@ class ResolvedExporterType implements ResolvedExporterTypeInterface
 
     public function getOptionsResolver(): OptionsResolver
     {
-        if (!isset($this->optionsResolver)) {
-            if (null !== $this->parent) {
-                $this->optionsResolver = clone $this->parent->getOptionsResolver();
-            } else {
-                $this->optionsResolver = new OptionsResolver();
-            }
-
-            $this->innerType->configureOptions($this->optionsResolver);
-
-            foreach ($this->typeExtensions as $extension) {
-                $extension->configureOptions($this->optionsResolver);
-            }
+        if ($this->optionsResolver !== null) {
+            return $this->optionsResolver;
         }
 
-        return $this->optionsResolver;
+        $parentOptionsResolver = $this->parent?->getOptionsResolver();
+        $optionsResolver = $parentOptionsResolver === null ? new OptionsResolver() : clone $parentOptionsResolver;
+
+        $this->innerType->configureOptions($optionsResolver);
+
+        foreach ($this->typeExtensions as $extension) {
+            $extension->configureOptions($optionsResolver);
+        }
+
+        $this->optionsResolver = $optionsResolver;
+
+        return $optionsResolver;
     }
 }

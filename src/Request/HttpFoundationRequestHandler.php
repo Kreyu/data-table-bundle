@@ -6,9 +6,13 @@ namespace Kreyu\Bundle\DataTableBundle\Request;
 
 use Kreyu\Bundle\DataTableBundle\DataTableInterface;
 use Kreyu\Bundle\DataTableBundle\Exception\UnexpectedTypeException;
+use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
+use Kreyu\Bundle\DataTableBundle\Filter\FiltrationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationData;
 use Kreyu\Bundle\DataTableBundle\Pagination\PaginationInterface;
+use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -24,7 +28,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     public function handle(DataTableInterface $dataTable, mixed $request = null): void
     {
-        if (null === $request) {
+        if ($request === null) {
             return;
         }
 
@@ -32,6 +36,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             throw new UnexpectedTypeException($request, Request::class);
         }
 
+        $this->handleRequest($dataTable, $request);
+    }
+
+    private function handleRequest(DataTableInterface $dataTable, Request $request): void
+    {
         $this->filter($dataTable, $request);
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
@@ -48,14 +57,16 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form = $dataTable->createFiltrationFormBuilder()->getForm();
+        $isSubmittedAndValid = $this->submitForm($form, $request);
 
-        if ($data = $this->getRequestParameter($request, $form->getName())) {
-            $form->submit($data);
+        if (!$isSubmittedAndValid) {
+            return;
         }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dataTable->filter($form->getData());
-        }
+        /** @var FiltrationData $filtrationData */
+        $filtrationData = $form->getData();
+
+        $dataTable->filter($filtrationData);
     }
 
     private function sort(DataTableInterface $dataTable, Request $request): void
@@ -65,10 +76,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $parameterName = $dataTable->getConfig()->getSortParameterName();
+        $sortingData = $this->extractQueryParameter($request, $parameterName);
 
-        $sortingData = $this->extractQueryParameter($request, "[{$parameterName}]");
+        if (!is_array($sortingData)) {
+            return;
+        }
 
-        if (empty($sortingData)) {
+        if ($sortingData === []) {
             return;
         }
 
@@ -86,12 +100,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $pageParameterName = $dataTable->getConfig()->getPageParameterName();
         $perPageParameterName = $dataTable->getConfig()->getPerPageParameterName();
 
-        $page = $this->extractQueryParameter($request, "[{$pageParameterName}]");
-        $perPage = $this->extractQueryParameter($request, "[{$perPageParameterName}]");
+        $page = $this->extractQueryParameter($request, $pageParameterName);
+        $perPage = $this->extractQueryParameter($request, $perPageParameterName);
 
         $perPage ??= $defaultPaginationData?->getPerPage() ?? PaginationInterface::DEFAULT_PER_PAGE;
 
-        if (null === $page) {
+        if ($page === null) {
             return;
         }
 
@@ -105,20 +119,22 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form = $dataTable->createPersonalizationFormBuilder()->getForm();
+        $isSubmittedAndValid = $this->submitForm($form, $request);
 
-        if ($data = $this->getRequestParameter($request, $form->getName())) {
-            $form->submit($data);
+        if (!$isSubmittedAndValid) {
+            return;
         }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dataTable->personalize($form->getData());
-        }
+        /** @var PersonalizationData $personalizationData */
+        $personalizationData = $form->getData();
+
+        $dataTable->personalize($personalizationData);
     }
 
     private function selectColumnVisibilityGroup(DataTableInterface $dataTable, Request $request): void
     {
         $parameterName = $dataTable->getConfig()->getColumnVisibilityGroupParameterName();
-        $columnVisibilityGroup = $this->extractQueryParameter($request, "[{$parameterName}]");
+        $columnVisibilityGroup = $this->extractQueryParameter($request, $parameterName);
         $columnVisibilityGroups = $dataTable->getConfig()->getColumnVisibilityGroups();
 
         if (!is_string($columnVisibilityGroup)) {
@@ -139,36 +155,71 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form = $dataTable->createExportFormBuilder()->getForm();
+        $isSubmittedAndValid = $this->submitForm($form, $request);
 
-        if ($data = $this->getRequestParameter($request, $form->getName())) {
-            $form->submit($data);
+        if (!$isSubmittedAndValid) {
+            return;
         }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dataTable->setExportData($form->getData());
-        }
-    }
+        /** @var ExportData|null $exportData */
+        $exportData = $form->getData();
 
-    private function getRequestParameter(Request $request, string $name): mixed
-    {
-        if ($request->query->has($name)) {
-            return $request->query->all()[$name];
-        }
-
-        if ($request->request->has($name)) {
-            return $request->request->all()[$name];
-        }
-
-        return null;
-    }
-
-    private function extractQueryParameter(Request $request, string $path): mixed
-    {
-        return $this->propertyAccessor->getValue($request->query->all(), $path);
+        $dataTable->setExportData($exportData);
     }
 
     private function turbo(DataTableInterface $dataTable, Request $request): void
     {
-        $dataTable->setTurboFrameId($request->headers->get('Turbo-Frame'));
+        $turboFrameId = $request->headers->get('Turbo-Frame');
+
+        if ($turboFrameId === null) {
+            return;
+        }
+
+        $dataTable->setTurboFrameId($turboFrameId);
+    }
+
+    private function submitForm(FormInterface $form, Request $request): bool
+    {
+        $data = $this->getRequestParameter($request, $form->getName());
+        $isDataEmpty = in_array($data, [null, [], '', '0'], strict: true);
+
+        if ($isDataEmpty) {
+            return false;
+        }
+
+        $form->submit($data);
+
+        return $form->isValid();
+    }
+
+    /**
+     * @return array<mixed>|string|null
+     */
+    private function getRequestParameter(Request $request, string $name): array|string|null
+    {
+        $parameterBag = $request->query->has($name) ? $request->query : $request->request;
+        $parameters = $parameterBag->all();
+
+        return $this->getArrayOrStringValue($parameters[$name] ?? null);
+    }
+
+    /**
+     * @return array<mixed>|string|null
+     */
+    private function extractQueryParameter(Request $request, string $name): array|string|null
+    {
+        $parameters = $request->query->all();
+
+        return $this->getArrayOrStringValue($this->propertyAccessor->getValue($parameters, "[{$name}]"));
+    }
+
+    /**
+     * @return array<mixed>|string|null
+     */
+    private function getArrayOrStringValue(mixed $value): array|string|null
+    {
+        $isArrayOrString = is_array($value) || is_string($value);
+
+        return $isArrayOrString ? $value : null;
     }
 }

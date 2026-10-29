@@ -128,6 +128,7 @@ class DoctrineOrmFilterHandlerTest extends TestCase
                     match ($matcher->numberOfInvocations()) {
                         1 => PreSetParametersEvent::class,
                         2 => PreApplyExpressionEvent::class,
+                        default => $this->fail('Unexpected dispatch.'),
                     },
                     $event,
                 );
@@ -136,6 +137,7 @@ class DoctrineOrmFilterHandlerTest extends TestCase
                     match ($matcher->numberOfInvocations()) {
                         1 => DoctrineOrmFilterEvents::PRE_SET_PARAMETERS,
                         2 => DoctrineOrmFilterEvents::PRE_APPLY_EXPRESSION,
+                        default => $this->fail('Unexpected dispatch.'),
                     },
                     $eventName,
                 );

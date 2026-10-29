@@ -8,14 +8,18 @@ use Kreyu\Bundle\DataTableBundle\Column\ColumnFactory;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistry;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnRegistryInterface;
+use Kreyu\Bundle\DataTableBundle\Column\Extension\ColumnTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
+use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactory;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ResolvedColumnTypeFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\TextColumnType;
 use Kreyu\Bundle\DataTableBundle\DataTableFactory;
 use Kreyu\Bundle\DataTableBundle\DataTableFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\DataTableRegistry;
+use Kreyu\Bundle\DataTableBundle\Extension\DataTableTypeExtensionInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ArrayProxyQueryFactory;
+use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeFactory;
@@ -58,11 +62,17 @@ abstract class DataTableIntegrationTestCase extends TestCase
         ];
     }
 
+    /**
+     * @return array<DataTableTypeExtensionInterface>
+     */
     protected function getDataTableTypeExtensions(): array
     {
         return [];
     }
 
+    /**
+     * @return array<ProxyQueryFactoryInterface>
+     */
     protected function getProxyQueryFactories(): array
     {
         return [
@@ -89,6 +99,9 @@ abstract class DataTableIntegrationTestCase extends TestCase
         );
     }
 
+    /**
+     * @return array<ColumnTypeInterface>
+     */
     protected function getColumnTypes(): array
     {
         return [
@@ -97,6 +110,9 @@ abstract class DataTableIntegrationTestCase extends TestCase
         ];
     }
 
+    /**
+     * @return array<ColumnTypeExtensionInterface>
+     */
     protected function getColumnTypeExtensions(): array
     {
         return [];

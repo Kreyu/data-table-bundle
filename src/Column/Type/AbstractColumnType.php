@@ -27,7 +27,7 @@ abstract class AbstractColumnType implements ColumnTypeInterface
 
     public function getBlockPrefix(): string
     {
-        return StringUtil::fqcnToShortName(static::class, ['ColumnType', 'Type']) ?: '';
+        return StringUtil::fqcnToShortName(static::class, ['ColumnType', 'Type']) ?? '';
     }
 
     public function getParent(): ?string

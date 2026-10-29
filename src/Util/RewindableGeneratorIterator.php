@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Util;
 
+/**
+ * @implements \Iterator<mixed, mixed>
+ */
 class RewindableGeneratorIterator implements \Iterator
 {
+    /**
+     * @var \Closure(): \Generator<mixed, mixed, mixed, mixed>
+     */
     private \Closure $callable;
+
+    /**
+     * @var \Generator<mixed, mixed, mixed, mixed>
+     */
     private \Generator $generator;
 
     /**
-     * @param callable(): \Generator $callable
+     * @param callable(): \Generator<mixed, mixed, mixed, mixed> $callable
      */
     public function __construct(callable $callable)
     {

@@ -44,19 +44,52 @@ final class CsvExporterType extends AbstractPhpSpreadsheetExporterType
 
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter
     {
-        StringHelper::setDecimalSeparator($options['decimal_separator']);
-        StringHelper::setThousandsSeparator($options['thousands_separator']);
+        /** @var string $decimalSeparator */
+        $decimalSeparator = $options['decimal_separator'];
+
+        /** @var string $thousandsSeparator */
+        $thousandsSeparator = $options['thousands_separator'];
+
+        /** @var string $delimiter */
+        $delimiter = $options['delimiter'];
+
+        /** @var string $enclosure */
+        $enclosure = $options['enclosure'];
+
+        /** @var bool $enclosureRequired */
+        $enclosureRequired = $options['enclosure_required'];
+
+        /** @var string $lineEnding */
+        $lineEnding = $options['line_ending'];
+
+        /** @var int $sheetIndex */
+        $sheetIndex = $options['sheet_index'];
+
+        /** @var bool $useBom */
+        $useBom = $options['use_bom'];
+
+        /** @var bool $includeSeparatorLine */
+        $includeSeparatorLine = $options['include_separator_line'];
+
+        /** @var bool $excelCompatibility */
+        $excelCompatibility = $options['excel_compatibility'];
+
+        /** @var string $outputEncoding */
+        $outputEncoding = $options['output_encoding'];
+
+        StringHelper::setDecimalSeparator($decimalSeparator);
+        StringHelper::setThousandsSeparator($thousandsSeparator);
 
         return (new Csv($spreadsheet))
-            ->setDelimiter($options['delimiter'])
-            ->setEnclosure($options['enclosure'])
-            ->setEnclosureRequired($options['enclosure_required'])
-            ->setLineEnding($options['line_ending'])
-            ->setSheetIndex($options['sheet_index'])
-            ->setUseBOM($options['use_bom'])
-            ->setIncludeSeparatorLine($options['include_separator_line'])
-            ->setExcelCompatibility($options['excel_compatibility'])
-            ->setOutputEncoding($options['output_encoding'])
+            ->setDelimiter($delimiter)
+            ->setEnclosure($enclosure)
+            ->setEnclosureRequired($enclosureRequired)
+            ->setLineEnding($lineEnding)
+            ->setSheetIndex($sheetIndex)
+            ->setUseBOM($useBom)
+            ->setIncludeSeparatorLine($includeSeparatorLine)
+            ->setExcelCompatibility($excelCompatibility)
+            ->setOutputEncoding($outputEncoding)
         ;
     }
 }

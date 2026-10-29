@@ -17,7 +17,6 @@ class ExportStrategyType extends AbstractType
             'class' => ExportStrategy::class,
             'choice_translation_domain' => 'KreyuDataTable',
             'choice_label' => 'label',
-            // TODO: Remove after removing deprecated export strategy enum cases
             'choices' => [
                 ExportStrategy::IncludeCurrentPage,
                 ExportStrategy::IncludeAll,

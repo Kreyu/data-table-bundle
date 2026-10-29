@@ -7,6 +7,7 @@ namespace Kreyu\Bundle\DataTableBundle\Column\Type;
 use Kreyu\Bundle\DataTableBundle\Action\ActionBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionFactoryInterface;
 use Kreyu\Bundle\DataTableBundle\Action\ActionInterface;
+use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnHeaderView;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnValueView;
@@ -31,12 +32,15 @@ final class ActionsColumnType extends AbstractColumnType
 
     public function buildValueView(ColumnValueView $view, ColumnInterface $column, array $options): void
     {
+        /** @var array<string, array<array-key, mixed>|ActionBuilderInterface|ActionInterface> $actionDefinitions */
+        $actionDefinitions = $options['actions'];
+
         $actions = [];
 
-        foreach ($options['actions'] as $name => $action) {
-            $action = $this->resolveAction($name, $action, $view);
+        foreach ($actionDefinitions as $name => $actionDefinition) {
+            $action = $this->resolveAction($name, $actionDefinition, $view);
 
-            if (null === $action) {
+            if ($action === null) {
                 continue;
             }
 
@@ -55,33 +59,40 @@ final class ActionsColumnType extends AbstractColumnType
             ->default([])
             ->allowedTypes('actions', 'array[]', ActionBuilderInterface::class.'[]', ActionInterface::class.'[]')
             ->info('An array of actions to render in the column.')
-            ->normalize(static function (Options $options, mixed $value) {
-                ($resolver = new OptionsResolver())
-                    ->setRequired([
-                        'type',
-                    ])
-                    ->setDefaults([
-                        'type_options' => [],
-                        'visible' => true,
-                    ])
-                    ->setAllowedTypes('type', ['string'])
-                    ->setAllowedTypes('type_options', ['array', 'callable'])
-                    ->setAllowedTypes('visible', ['bool', 'callable'])
-                    ->setInfo('type', 'A fully-qualified class name of the action type.')
-                    ->setInfo('type_options', 'An array of options passed to the action type.')
-                    ->setInfo('visible', 'Determines whether the action should be visible.')
-                ;
+            ->normalize(
+                /**
+                 * @param array<array-key, array<array-key, mixed>|ActionBuilderInterface|ActionInterface> $value
+                 *
+                 * @return array<array-key, array<array-key, mixed>|ActionBuilderInterface|ActionInterface>
+                 */
+                static function (Options $options, array $value): array {
+                    ($resolver = new OptionsResolver())
+                        ->setRequired([
+                            'type',
+                        ])
+                        ->setDefaults([
+                            'type_options' => [],
+                            'visible' => true,
+                        ])
+                        ->setAllowedTypes('type', ['string'])
+                        ->setAllowedTypes('type_options', ['array'])
+                        ->setAllowedTypes('visible', ['bool', 'callable'])
+                        ->setInfo('type', 'A fully-qualified class name of the action type.')
+                        ->setInfo('type_options', 'An array of options passed to the action type.')
+                        ->setInfo('visible', 'Determines whether the action should be visible.')
+                    ;
 
-                foreach ($value as $name => $action) {
-                    if (!is_array($action)) {
-                        continue;
+                    foreach ($value as $name => $action) {
+                        if (!is_array($action)) {
+                            continue;
+                        }
+
+                        $value[$name] = $resolver->resolve($action);
                     }
 
-                    $value[$name] = $resolver->resolve($action);
-                }
-
-                return $value;
-            })
+                    return $value;
+                },
+            )
         ;
 
         $resolver->setDefaults([
@@ -91,6 +102,9 @@ final class ActionsColumnType extends AbstractColumnType
         ]);
     }
 
+    /**
+     * @param array<array-key, mixed>|ActionBuilderInterface|ActionInterface $action
+     */
     private function resolveAction(
         string $name,
         array|ActionBuilderInterface|ActionInterface $action,
@@ -104,6 +118,7 @@ final class ActionsColumnType extends AbstractColumnType
             return $action->getAction();
         }
 
+        /** @var bool|callable(mixed): bool $visible */
         $visible = $action['visible'];
 
         if ($view instanceof ColumnValueView && is_callable($visible)) {
@@ -114,6 +129,12 @@ final class ActionsColumnType extends AbstractColumnType
             return null;
         }
 
-        return $this->actionFactory->createNamed($name, $action['type'], $action['type_options']);
+        /** @var class-string<ActionTypeInterface> $type */
+        $type = $action['type'];
+
+        /** @var array<array-key, mixed> $typeOptions */
+        $typeOptions = $action['type_options'];
+
+        return $this->actionFactory->createNamed($name, $type, $typeOptions);
     }
 }

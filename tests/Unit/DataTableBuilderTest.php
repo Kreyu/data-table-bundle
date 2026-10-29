@@ -702,9 +702,10 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedColumns = array_map(static function (ColumnBuilderInterface $columnBuilder) use ($dataTable) {
-            return $columnBuilder->getColumn()->setDataTable($dataTable);
-        }, $builder->getColumns());
+        $expectedColumns = array_map(
+            static fn (ColumnBuilderInterface $columnBuilder) => $columnBuilder->getColumn()->setDataTable($dataTable),
+            $builder->getColumns(),
+        );
 
         $this->assertEquals($expectedColumns, $dataTable->getColumns());
     }
@@ -718,9 +719,10 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedFilters = array_map(static function (FilterBuilderInterface $columnBuilder) use ($dataTable) {
-            return $columnBuilder->getFilter()->setDataTable($dataTable);
-        }, $builder->getFilters());
+        $expectedFilters = array_map(
+            static fn (FilterBuilderInterface $filterBuilder) => $filterBuilder->getFilter()->setDataTable($dataTable),
+            $builder->getFilters(),
+        );
 
         $this->assertEquals($expectedFilters, $dataTable->getFilters());
     }
@@ -734,9 +736,10 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedActions = array_map(static function (ActionBuilderInterface $columnBuilder) use ($dataTable) {
-            return $columnBuilder->getAction()->setDataTable($dataTable);
-        }, $builder->getActions());
+        $expectedActions = array_map(
+            static fn (ActionBuilderInterface $actionBuilder) => $actionBuilder->getAction()->setDataTable($dataTable),
+            $builder->getActions(),
+        );
 
         $this->assertEquals($expectedActions, $dataTable->getActions());
     }
@@ -750,9 +753,12 @@ class DataTableBuilderTest extends TestCase
 
         $dataTable = $builder->getDataTable();
 
-        $expectedExporters = array_map(static function (ExporterBuilderInterface $columnBuilder) use ($dataTable) {
-            return $columnBuilder->getExporter()->setDataTable($dataTable);
-        }, $builder->getExporters());
+        $expectedExporters = array_map(
+            static fn (ExporterBuilderInterface $exporterBuilder) => $exporterBuilder
+                ->getExporter()
+                ->setDataTable($dataTable),
+            $builder->getExporters(),
+        );
 
         $this->assertEquals($expectedExporters, $dataTable->getExporters());
     }

@@ -24,9 +24,9 @@ final class ActionType implements ActionTypeInterface
     {
         $dataTable = $view->getDataTable();
 
-        if ($view->parent instanceof ColumnValueView) {
-            $value = $view->parent->value;
+        $columnValueView = $view->parent;
 
+        if ($columnValueView instanceof ColumnValueView) {
             $callableOptions = [
                 'label',
                 'translation_domain',
@@ -45,23 +45,26 @@ final class ActionType implements ActionTypeInterface
                     continue;
                 }
 
-                $options[$optionName] = $options[$optionName]($value);
+                $options[$optionName] = $options[$optionName]($columnValueView->value);
             }
-        }
-
-        if (false !== $options['confirmation']) {
-            $options['confirmation'] = $this->resolveConfirmationOption($options['confirmation']);
         }
 
         $identifier = $this->getIdentifier($view, $action);
 
-        if ($action->getConfig()->isConfirmable()) {
-            $options['confirmation']['identifier'] = $identifier;
+        /** @var bool|array<string, mixed> $confirmation */
+        $confirmation = $options['confirmation'];
+
+        if ($confirmation !== false) {
+            $confirmation = $this->resolveConfirmationOption($confirmation);
+            $confirmation['identifier'] = $identifier;
         }
 
         $blockPrefixes = $action->getConfig()->getType()->getBlockPrefixHierarchy();
 
-        if (null !== ($blockPrefix = $options['block_prefix'])) {
+        /** @var string|null $blockPrefix */
+        $blockPrefix = $options['block_prefix'];
+
+        if ($blockPrefix !== null) {
             array_unshift($blockPrefixes, $blockPrefix);
         }
 
@@ -76,7 +79,7 @@ final class ActionType implements ActionTypeInterface
             'attr' => $options['attr'],
             'icon' => $options['icon'],
             'icon_attr' => $options['icon_attr'],
-            'confirmation' => $options['confirmation'],
+            'confirmation' => $confirmation,
             'context' => $action->getConfig()->getContext(),
             'batch' => ActionContext::Batch === $action->getConfig()->getContext(),
             'visible' => $options['visible'],
@@ -124,8 +127,11 @@ final class ActionType implements ActionTypeInterface
 
     private function getIdentifier(ActionView $view, ActionInterface $action): string
     {
+        /** @var string $dataTableName */
+        $dataTableName = $view->getDataTable()->vars['name'];
+
         $identifierParts = [
-            $view->getDataTable()->vars['name'],
+            $dataTableName,
             $action->getConfig()->getContext()->value.'-action',
             $action->getName(),
         ];
@@ -137,11 +143,14 @@ final class ActionType implements ActionTypeInterface
         return implode('--', $identifierParts);
     }
 
+    /**
+     * @param bool|array<string, mixed> $confirmation
+     *
+     * @return array<array-key, mixed>
+     */
     private function resolveConfirmationOption(bool|array $confirmation): array
     {
-        if (true === $confirmation) {
-            $confirmation = [];
-        }
+        $confirmation = is_array($confirmation) ? $confirmation : [];
 
         $optionsResolver = (new OptionsResolver())
             ->setDefaults([
@@ -161,6 +170,6 @@ final class ActionType implements ActionTypeInterface
             ->setAllowedValues('type', [null, 'danger', 'warning', 'info'])
         ;
 
-        return $optionsResolver->resolve($confirmation ?: []);
+        return $optionsResolver->resolve($confirmation);
     }
 }

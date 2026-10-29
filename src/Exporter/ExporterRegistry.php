@@ -32,11 +32,11 @@ class ExporterRegistry implements ExporterRegistryInterface
     /**
      * @var array<class-string<ExporterTypeInterface>, bool>
      */
-    private array $checkedTypes;
+    private array $checkedTypes = [];
 
     /**
-     * @param iterable<ExporterTypeInterface>          $types
-     * @param iterable<ExporterTypeExtensionInterface> $typeExtensions
+     * @param iterable<object> $types
+     * @param iterable<object> $typeExtensions
      */
     public function __construct(
         iterable $types,
@@ -54,7 +54,7 @@ class ExporterRegistry implements ExporterRegistryInterface
 
     public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
     private function resolveType(string $name): ResolvedExporterTypeInterface
@@ -64,7 +64,9 @@ class ExporterRegistry implements ExporterRegistryInterface
             $name,
         ));
 
-        if (isset($this->checkedTypes[$fqcn = $type::class])) {
+        $fqcn = $type::class;
+
+        if (array_key_exists($fqcn, $this->checkedTypes)) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
             throw new LogicException(sprintf(
                 'Circular reference detected for exporter type "%s" (%s).',
@@ -88,6 +90,9 @@ class ExporterRegistry implements ExporterRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $types
+     */
     private function setTypes(iterable $types): void
     {
         $this->types = [];
@@ -101,6 +106,9 @@ class ExporterRegistry implements ExporterRegistryInterface
         }
     }
 
+    /**
+     * @param iterable<object> $typeExtensions
+     */
     private function setTypeExtensions(iterable $typeExtensions): void
     {
         $this->typeExtensions = [];

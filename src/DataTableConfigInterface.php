@@ -38,6 +38,9 @@ interface DataTableConfigInterface
 
     public function getType(): ResolvedDataTableTypeInterface;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array;
 
     public function hasOption(string $name): bool;

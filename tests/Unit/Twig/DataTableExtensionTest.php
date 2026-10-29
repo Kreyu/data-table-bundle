@@ -11,6 +11,7 @@ use Kreyu\Bundle\DataTableBundle\Pagination\PaginationUrlGeneratorInterface;
 use Kreyu\Bundle\DataTableBundle\Twig\DataTableExtension;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Loader\ArrayLoader;
 
 class DataTableExtensionTest extends TestCase
@@ -77,9 +78,9 @@ class DataTableExtensionTest extends TestCase
         $dataTable = new DataTableView();
         $dataTable->vars['themes'] = ['base.html.twig', 'bootstrap_5.html.twig', 'tabler.html.twig'];
 
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new RuntimeError(
             'Block "content" does not exist on any of the configured data table themes: "base.html.twig", "bootstrap_5.html.twig", "tabler.html.twig"',
-        );
+        ));
 
         $this->createExtension()->renderThemeBlock(
             environment: $environment,

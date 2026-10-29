@@ -147,12 +147,14 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
         $valueRowView = $this->createValueRowView(data: $data);
         $columnValueView = $this->createColumnValueView($column, $valueRowView);
 
-        $this->assertCount(3, $columnValueView->vars['children']);
-        $this->assertContainsOnlyInstancesOf(ColumnValueView::class, $columnValueView->vars['children']);
+        /** @var list<ColumnValueView> $children */
+        $children = $columnValueView->vars['children'];
+
+        $this->assertCount(3, $children);
+        $this->assertContainsOnlyInstancesOf(ColumnValueView::class, $children);
 
         for ($i = 0; $i <= 2; ++$i) {
-            /** @var ColumnValueView $child */
-            $child = $columnValueView->vars['children'][$i];
+            $child = $children[$i];
 
             $expectedValueRowView = clone $valueRowView;
             $expectedValueRowView->origin = $valueRowView;
@@ -180,8 +182,11 @@ class CollectionColumnTypeTest extends ColumnTypeTestCase
         $valueRowView = $this->createValueRowView(data: $data);
         $columnValueView = $this->createColumnValueView($column, $valueRowView);
 
-        $this->assertEquals($collection[0], $columnValueView->vars['children'][0]->vars['value']);
-        $this->assertEquals($collection[1], $columnValueView->vars['children'][1]->vars['value']);
+        /** @var list<ColumnValueView> $children */
+        $children = $columnValueView->vars['children'];
+
+        $this->assertEquals($collection[0], $children[0]->vars['value']);
+        $this->assertEquals($collection[1], $children[1]->vars['value']);
     }
 
     public static function provideNonScalarValuesCases(): iterable

@@ -34,41 +34,54 @@ abstract class AbstractDateTimeColumnType extends AbstractColumnType
             ->info('Target timezone - null to use the default, false to leave unchanged.')
         ;
 
-        // When exporting, we ensure the export "formatter" option is present, so the value gets pre-formatted.
-        $resolver->addNormalizer('export', static function (Options $options, mixed $export) {
-            if (false === $export) {
-                return false;
-            }
-
-            if (true === $export) {
-                $export = [];
-            }
-
-            $export['formatter'] ??= $options['formatter'] ?? static function (mixed $value) use ($options) {
-                if (!$value instanceof \DateTimeInterface) {
-                    return '';
+        $resolver->addNormalizer(
+            'export',
+            /**
+             * @param bool|array<array-key, mixed> $export
+             *
+             * @return false|array<array-key, mixed>
+             */
+            static function (Options $options, bool|array $export): false|array {
+                if ($export === false) {
+                    return false;
                 }
 
-                $timezone = $options['timezone'];
-
-                if (null === $timezone) {
-                    $timezone = date_default_timezone_get();
+                if ($export === true) {
+                    $export = [];
                 }
 
-                if (is_string($timezone)) {
-                    $timezone = new \DateTimeZone($timezone);
-                }
+                $export['formatter'] ??= $options['formatter'] ?? static function (mixed $value) use (
+                    $options,
+                ): string {
+                    if (!$value instanceof \DateTimeInterface) {
+                        return '';
+                    }
 
-                $dateTime = \DateTime::createFromInterface($value);
+                    /** @var bool|string|\DateTimeZone|null $timezone */
+                    $timezone = $options['timezone'];
 
-                if ($timezone instanceof \DateTimeZone) {
-                    $dateTime->setTimezone($timezone);
-                }
+                    if ($timezone === null) {
+                        $timezone = date_default_timezone_get();
+                    }
 
-                return $dateTime->format($options['format']);
-            };
+                    if (is_string($timezone)) {
+                        $timezone = new \DateTimeZone($timezone);
+                    }
 
-            return $export;
-        });
+                    $dateTime = \DateTime::createFromInterface($value);
+
+                    if ($timezone instanceof \DateTimeZone) {
+                        $dateTime->setTimezone($timezone);
+                    }
+
+                    /** @var string $format */
+                    $format = $options['format'];
+
+                    return $dateTime->format($format);
+                };
+
+                return $export;
+            },
+        );
     }
 }

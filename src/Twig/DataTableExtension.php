@@ -84,13 +84,21 @@ class DataTableExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @param list<string> $themes
+     */
     public function setDataTableThemes(DataTableView $view, array $themes, bool $only = false): void
     {
         if ($only) {
             $view->vars['themes'] = $themes;
-        } else {
-            array_push($view->vars['themes'], ...$themes);
+
+            return;
         }
+
+        /** @var list<string> $currentThemes */
+        $currentThemes = $view->vars['themes'];
+
+        $view->vars['themes'] = [...$currentThemes, ...$themes];
     }
 
     /**
@@ -268,7 +276,10 @@ class DataTableExtension extends AbstractExtension
         array $variables = [],
     ): string {
         if ($view instanceof DataTableView) {
-            $view = $view->vars['pagination'];
+            /** @var PaginationView|null $paginationView */
+            $paginationView = $view->vars['pagination'];
+
+            $view = $paginationView ?? throw new RuntimeError('The data table has no pagination to render.');
         }
 
         return $this->renderThemeBlock(
@@ -280,6 +291,8 @@ class DataTableExtension extends AbstractExtension
     }
 
     /**
+     * @param array<string, mixed> $variables
+     *
      * @throws TwigException|\Throwable
      */
     public function renderFiltersForm(
@@ -294,12 +307,14 @@ class DataTableExtension extends AbstractExtension
         return $this->renderThemeBlock(
             environment: $environment,
             context: ['form' => $form],
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
+            dataTable: $this->getDecoratedFormDataTable($form, $variables),
             blockName: 'kreyu_data_table_filters_form',
         );
     }
 
     /**
+     * @param array<string, mixed> $variables
+     *
      * @throws TwigException|\Throwable
      */
     public function renderPersonalizationForm(
@@ -314,12 +329,14 @@ class DataTableExtension extends AbstractExtension
         return $this->renderThemeBlock(
             environment: $environment,
             context: ['form' => $form],
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
+            dataTable: $this->getDecoratedFormDataTable($form, $variables),
             blockName: 'kreyu_data_table_personalization_form',
         );
     }
 
     /**
+     * @param array<string, mixed> $variables
+     *
      * @throws TwigException|\Throwable
      */
     public function renderExportForm(
@@ -334,11 +351,14 @@ class DataTableExtension extends AbstractExtension
         return $this->renderThemeBlock(
             environment: $environment,
             context: ['form' => $form],
-            dataTable: $this->getDecoratedDataTable($form->vars['data_table_view'], $variables),
+            dataTable: $this->getDecoratedFormDataTable($form, $variables),
             blockName: 'kreyu_data_table_export_form',
         );
     }
 
+    /**
+     * @param FilterView|array<FilterView> $filterViews
+     */
     public function generateFilterClearUrl(DataTableView $dataTableView, FilterView|array $filterViews): string
     {
         if ($filterViews instanceof FilterView) {
@@ -348,6 +368,9 @@ class DataTableExtension extends AbstractExtension
         return $this->filterClearUrlGenerator->generate($dataTableView, ...$filterViews);
     }
 
+    /**
+     * @param ColumnHeaderView|array<ColumnHeaderView> $columnHeaderViews
+     */
     public function generateColumnSortUrl(
         DataTableView $dataTableView,
         ColumnHeaderView|array $columnHeaderViews,
@@ -417,9 +440,11 @@ class DataTableExtension extends AbstractExtension
         string $blockName,
         bool $resetAttr = false,
     ): string {
+        /** @var list<string> $themes */
         $themes = $dataTable->vars['themes'];
+        $hasAttributes = array_key_exists('attr', $context);
 
-        if (!empty($context['attr']) && $resetAttr) {
+        if ($resetAttr && $hasAttributes) {
             $context['attr'] = [];
         }
 
@@ -456,17 +481,24 @@ class DataTableExtension extends AbstractExtension
     ): array {
         $dataTable = $view->getDataTable();
 
+        /** @var list<string> $blockPrefixes */
+        $blockPrefixes = $view->vars['block_prefixes'];
+
+        /** @var list<string> $themes */
+        $themes = $dataTable->vars['themes'];
+
+        /** @var array<string, mixed> $context */
         $context = array_merge($view->vars, $variables);
         $context['block_name'] = $prefix.'_'.$suffix;
 
-        foreach ($view->vars['block_prefixes'] as $blockPrefix) {
+        foreach ($blockPrefixes as $blockPrefix) {
             $blockName = $blockPrefix.'_'.$suffix;
 
             if ($prefix !== $blockPrefix) {
                 $blockName = $prefix.'_'.$blockName;
             }
 
-            foreach ($dataTable->vars['themes'] as $theme) {
+            foreach ($themes as $theme) {
                 $wrapper = $environment->load($theme);
 
                 if ($wrapper->hasBlock($blockName, $context)) {
@@ -481,16 +513,34 @@ class DataTableExtension extends AbstractExtension
         return $context;
     }
 
+    /**
+     * @param array<string, mixed> $variables
+     */
     private function getDecoratedDataTable(DataTableView $view, array $variables = []): DataTableView
     {
-        if (!empty($themes = $variables['themes'] ?? [])) {
-            if (!is_array($themes)) {
-                throw new RuntimeError('The "themes" option passed in the template must be an array.');
-            }
+        $hasNoThemes = in_array($variables['themes'] ?? null, [null, false, '', '0', 0, []], strict: true);
 
-            $view->vars['themes'] = $themes;
+        if ($hasNoThemes) {
+            return $view;
         }
 
+        if (!is_array($variables['themes'])) {
+            throw new RuntimeError('The "themes" option passed in the template must be an array.');
+        }
+
+        $view->vars['themes'] = $variables['themes'];
+
         return $view;
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    private function getDecoratedFormDataTable(FormView $form, array $variables): DataTableView
+    {
+        /** @var DataTableView $dataTableView */
+        $dataTableView = $form->vars['data_table_view'];
+
+        return $this->getDecoratedDataTable($dataTableView, $variables);
     }
 }

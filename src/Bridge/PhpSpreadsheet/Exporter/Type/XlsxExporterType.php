@@ -23,8 +23,11 @@ final class XlsxExporterType extends AbstractPhpSpreadsheetExporterType
 
     protected function getWriter(Spreadsheet $spreadsheet, array $options): IWriter
     {
+        /** @var bool $office2003Compatibility */
+        $office2003Compatibility = $options['office_2003_compatibility'];
+
         return (new Xlsx($spreadsheet))
-            ->setOffice2003Compatibility($options['office_2003_compatibility'])
+            ->setOffice2003Compatibility($office2003Compatibility)
         ;
     }
 }

@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 namespace Kreyu\Bundle\DataTableBundle\Bridge\Doctrine\Orm\Query;
 
+use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 
 class AliasResolver implements AliasResolverInterface
 {
     public function resolve(string $queryPath, QueryBuilder $queryBuilder): string
     {
-        if ($this->isResolvable($queryPath, $queryBuilder)) {
-            $queryPath = current($queryBuilder->getRootAliases()).'.'.$queryPath;
+        $isResolvable = $this->isResolvable($queryPath, $queryBuilder);
+
+        if (!$isResolvable) {
+            return $queryPath;
         }
 
-        return $queryPath;
+        $rootAlias = current($queryBuilder->getRootAliases());
+
+        if ($rootAlias === false) {
+            return $queryPath;
+        }
+
+        return $rootAlias.'.'.$queryPath;
     }
 
     private function isResolvable(string $path, QueryBuilder $queryBuilder): bool
@@ -23,11 +32,17 @@ class AliasResolver implements AliasResolverInterface
             return false;
         }
 
-        foreach ($queryBuilder->getDQLPart('select') ?? [] as $select) {
-            foreach ($select->getParts() as $clause) {
-                preg_match_all('/([^,]+)\s+AS\s+(HIDDEN\s+)?([^,]+)?/i', $clause, $matches);
+        /** @var list<Select> $selects */
+        $selects = $queryBuilder->getDQLPart('select');
 
-                if (in_array($path, $matches[3])) {
+        foreach ($selects as $select) {
+            foreach ($select->getParts() as $clause) {
+                $matches = [];
+                preg_match_all('/([^,]+)\s+AS\s+(HIDDEN\s+)?([^,]+)?/i', (string) $clause, $matches);
+
+                $isAliasedInSelect = in_array($path, $matches[3], strict: true);
+
+                if ($isAliasedInSelect) {
                     return false;
                 }
             }

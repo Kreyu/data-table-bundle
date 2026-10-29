@@ -54,7 +54,10 @@ class NumberColumnTypeTest extends ColumnTypeTestCase
 
         $valueView = $this->createColumnValueView($column);
 
-        $this->assertSame(['foo' => 'bar'], $valueView->vars['intl_formatter_options']['attrs']);
-        $this->assertSame('currency', $valueView->vars['intl_formatter_options']['style']);
+        /** @var array<string, mixed> $intlFormatterOptions */
+        $intlFormatterOptions = $valueView->vars['intl_formatter_options'];
+
+        $this->assertSame(['foo' => 'bar'], $intlFormatterOptions['attrs']);
+        $this->assertSame('currency', $intlFormatterOptions['style']);
     }
 }

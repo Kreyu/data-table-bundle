@@ -12,6 +12,7 @@ use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTa
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Extension\SimpleDataTableTypeBazExtension;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\BarProxyQueryFactory;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Query\FooProxyQueryFactory;
+use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\ConfigurableDataTableType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar;
 use Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz;
@@ -35,7 +36,7 @@ class DataTableRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->createRegistry()->getType('stdClass');
+        $this->createRegistry()->getType(ConfigurableDataTableType::class);
     }
 
     public function testGetTypeWithTypeExtensions()
@@ -54,8 +55,11 @@ class DataTableRegistryTest extends TestCase
     {
         $resolvedType = $this->createRegistry()->getType(SimpleSubDataTableType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertInstanceOf(SimpleSubDataTableType::class, $resolvedType->getInnerType());
-        $this->assertInstanceOf(SimpleDataTableType::class, $resolvedType->getParent()->getInnerType());
+        $this->assertNotNull($parentType);
+        $this->assertInstanceOf(SimpleDataTableType::class, $parentType->getInnerType());
     }
 
     public function testGetTypeWithParentTypeExtensions()
@@ -67,16 +71,18 @@ class DataTableRegistryTest extends TestCase
 
         $resolvedType = $this->createRegistry(typeExtensions: $typeExtensions)->getType(SimpleSubDataTableType::class);
 
+        $parentType = $resolvedType->getParent();
+
         $this->assertEmpty($resolvedType->getTypeExtensions());
-        $this->assertSame($typeExtensions, $resolvedType->getParent()->getTypeExtensions());
+        $this->assertNotNull($parentType);
+        $this->assertSame($typeExtensions, $parentType->getTypeExtensions());
     }
 
     public function testTypeCannotHaveItselfAsParent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\DataTableTypeWithSameParentType).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [new DataTableTypeWithSameParentType()]);
         $registry->getType(DataTableTypeWithSameParentType::class);
@@ -84,10 +90,9 @@ class DataTableRegistryTest extends TestCase
 
     public function testRecursiveTypeReferences()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new LogicException(
             'Circular reference detected for data table type "Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo" (Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBar > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeBaz > Kreyu\Bundle\DataTableBundle\Tests\Fixtures\DataTable\Type\RecursiveDataTableTypeFoo).',
-        );
+        ));
 
         $registry = $this->createRegistry(types: [
             new RecursiveDataTableTypeFoo(),
@@ -105,7 +110,7 @@ class DataTableRegistryTest extends TestCase
 
     public function testHasTypeWithNonExistentType()
     {
-        $this->assertFalse($this->createRegistry()->hasType('stdClass'));
+        $this->assertFalse($this->createRegistry()->hasType(ConfigurableDataTableType::class));
     }
 
     public function testGetProxyQueryFactories()
@@ -138,18 +143,24 @@ class DataTableRegistryTest extends TestCase
         $this->createRegistry(proxyQueryFactories: [new \stdClass()]);
     }
 
+    /**
+     * @param list<object> $types
+     * @param list<object> $typeExtensions
+     * @param list<object> $proxyQueryFactories
+     */
     private function createRegistry(
         array $types = [],
         array $typeExtensions = [],
         array $proxyQueryFactories = [],
     ): DataTableRegistry {
+        $defaultTypes = [
+            new DataTableType(),
+            new SimpleDataTableType(),
+            new SimpleSubDataTableType(),
+        ];
+
         return new DataTableRegistry(
-            types: $types
-            ?: [
-                new DataTableType(),
-                new SimpleDataTableType(),
-                new SimpleSubDataTableType(),
-            ],
+            types: $types === [] ? $defaultTypes : $types,
             typeExtensions: $typeExtensions,
             proxyQueryFactories: $proxyQueryFactories,
             resolvedTypeFactory: new ResolvedDataTableTypeFactory(),

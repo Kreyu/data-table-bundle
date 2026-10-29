@@ -14,6 +14,8 @@ class User
 
     public function getFirstNameUppercased(): string
     {
-        return strtoupper($this->firstName);
+        $firstName = $this->firstName;
+
+        return is_string($firstName) ? strtoupper($firstName) : '';
     }
 }

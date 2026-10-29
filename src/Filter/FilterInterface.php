@@ -20,6 +20,9 @@ interface FilterInterface
 
     public function getFormName(): string;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFormOptions(): array;
 
     public function getQueryPath(): string;

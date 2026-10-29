@@ -34,6 +34,9 @@ class ExpressionFactoryTest extends TestCase
         $this->query->method('getAliasResolver')->willReturn($this->aliasResolver);
     }
 
+    /**
+     * @param array<Parameter> $parameters
+     */
     #[DataProvider('expectedExpressionProvider')]
     public function testItCreatesExpression(
         string $queryPath,
@@ -196,13 +199,15 @@ class ExpressionFactoryTest extends TestCase
         $this->filter->method('getConfig')->willReturn($filterConfig);
         $this->aliasResolver->method('resolve')->willReturn('foo');
 
-        $expression = $this->createExpression(new FilterData(), [
-            new Parameter('bar', null),
-        ]);
-
-        $this->assertEquals(new Comparison('foo', '<>', ':bar'), $expression);
+        $this->assertEquals(
+            new Comparison('foo', '<>', ':bar'),
+            $this->createExpression(new FilterData(), [new Parameter('bar', null)]),
+        );
     }
 
+    /**
+     * @param array<Parameter> $parameters
+     */
     private function createExpression(FilterData $data = new FilterData(), array $parameters = []): mixed
     {
         return (new ExpressionFactory())->create($this->query, $data, $this->filter, $parameters);

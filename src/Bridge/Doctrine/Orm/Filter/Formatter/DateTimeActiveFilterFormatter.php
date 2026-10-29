@@ -11,6 +11,7 @@ class DateTimeActiveFilterFormatter
 {
     public function __invoke(FilterData $data, FilterInterface $filter): string
     {
+        /** @var mixed $value */
         $value = $data->getValue();
 
         if ($value instanceof \DateTimeInterface) {

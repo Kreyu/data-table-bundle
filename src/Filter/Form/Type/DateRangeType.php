@@ -39,7 +39,7 @@ class DateRangeType extends AbstractType implements DataMapperInterface
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
-        if (null === $viewData) {
+        if (!is_array($viewData)) {
             return;
         }
 
@@ -53,18 +53,23 @@ class DateRangeType extends AbstractType implements DataMapperInterface
     {
         $forms = iterator_to_array($forms);
 
+        /** @var \DateTimeInterface|null $from */
         $from = $forms['from']->getData();
+
+        /** @var \DateTimeInterface|null $to */
         $to = $forms['to']->getData();
 
-        if (null === $from && null === $to) {
+        $isEmpty = $from === null && $to === null;
+
+        if ($isEmpty) {
             $viewData = '';
 
             return;
         }
 
         $viewData = [
-            'from' => $forms['from']->getData(),
-            'to' => $forms['to']->getData(),
+            'from' => $from,
+            'to' => $to,
         ];
     }
 }

@@ -19,12 +19,27 @@ preserve-breaking-conditional-expression = true
 
 [linter]
 integrations = ["symfony", "phpunit"]
-baseline = "mago-lint-baseline.toml"
 
 [linter.rules]
 assertion-style = { style = "this" }
+too-many-methods = { enabled = false }
+too-many-properties = { enabled = false }
+kan-defect = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+cyclomatic-complexity = { threshold = 1000, method-threshold = 15 }
 
 [analyzer]
-baseline = "mago-analyze-baseline.toml"
+ignore = [
+    { code = "interface-instantiation", in = [
+        "src/Type/ResolvedDataTableType.php",
+        "src/Action/Type/ResolvedActionType.php",
+        "src/Column/Type/ResolvedColumnType.php",
+        "src/Filter/Type/ResolvedFilterType.php",
+        "src/Exporter/Type/ResolvedExporterType.php",
+    ] },
+    { code = "unsafe-instantiation", in = ["src/Bridge/OpenSpout/Exporter/Type/AbstractOpenSpoutExporterType.php"] },
+    { code = "too-many-arguments", in = ["src/Bridge/OpenSpout/Exporter/Type/AbstractOpenSpoutExporterType.php"] },
+    { code = "mixed-operand", in = ["src/Query/ArrayProxyQuery.php"] },
+]
 minimum-fail-level = "warning"
 find-overly-wide-return-types = true

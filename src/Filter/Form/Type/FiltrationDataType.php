@@ -61,7 +61,12 @@ class FiltrationDataType extends AbstractType
 
         foreach ($dataTable->getFilters() as $filterName => $filter) {
             $formName = $filter->getFormName();
-            $filterFormView = $view[$formName];
+            $filterFormView = $view->children[$formName] ?? null;
+
+            if ($filterFormView === null) {
+                continue;
+            }
+
             $filterView = $dataTableView->filters[$filterName];
 
             $filterFormView->vars['label'] = $filterView->vars['label'];

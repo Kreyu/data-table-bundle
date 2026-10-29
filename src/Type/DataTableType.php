@@ -501,9 +501,8 @@ final class DataTableType implements DataTableTypeInterface
             foreach ($view->filters as $filterView) {
                 $value = null;
 
-                /** @var string $filterName */
-                $filterName = $filterView->vars['name'];
-                $formName = $dataTable->getFilter($filterName)->getFormName();
+                /** @var string $formName */
+                $formName = $filterView->vars['form_name'];
                 $panelFormView = $filtrationFormView[$formName] ?? null;
                 $searchFormView = $searchFields[$formName] ?? null;
                 $filterFormView = $panelFormView ?? $searchFormView;

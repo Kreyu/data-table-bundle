@@ -1,3 +1,49 @@
+# Unreleased
+
+## Breaking changes
+
+- **Symfony 6.4 or higher is required.** Symfony 6.0–6.3 are no longer supported. PHP 8.1 stays the minimum.
+- **New interface methods.** Custom implementations of these interfaces must add them:
+  - `DataTableInterface`: `setColumnVisibilityGroup()`, `getColumnVisibilityGroup()`, `isDeferred()`
+  - `DataTableConfigInterface`: `getPaginationFactory()`, `getColumnVisibilityGroups()`, `getColumnVisibilityGroupParameterName()`, `getGroupBy()`
+  - `DataTableConfigBuilderInterface`: `setPaginationFactory()`, `setColumnVisibilityGroups()`, `setGroupBy()`
+  - `DataTableTypeInterface` and `ResolvedDataTableTypeInterface`: `createDefaultQuery()`
+- **Dotted filter names use `:` in URLs.** `filter_products[author.name]` is now sent as `filter_products[author:name]` instead of `filter_products[author__name]`. Bookmarked URLs with the old key no longer apply that filter.
+- **`base` renders confirmation dialogs for link, button, form and dropdown item actions.** Custom themes that render their own confirmation must turn it off with `{% with { confirmation: false } %}{{ parent() }}{% endwith %}`.
+- **`base` shows active filter chips in `action_bar`.** Custom themes that render chips elsewhere show them twice.
+- **The `bootstrap-modal` Stimulus controller is deprecated.** Modals and confirmations use the native `<dialog>` element through the new `dialog` controller. Enable it in `assets/controllers.json`.
+- **`MoneyColumnType` extends `NumberColumnType`** through `getParent()`, so `NumberColumnType` type extensions now apply to money columns too.
+
+## Features
+
+- **[Feature]** Symfony 8, PHP 8.5 and Twig 4 support
+- **[Feature]** Column header filters: the column `filter` and `filter_options` options render a filter in the column header (https://github.com/Kreyu/data-table-bundle/pull/239)
+- **[Feature]** Column visibility groups: the data table `column_visibility_groups` option and the column `column_visibility_groups` option (https://github.com/Kreyu/data-table-bundle/pull/241)
+- **[Feature]** Row grouping with the data table `group_by` option (https://github.com/Kreyu/data-table-bundle/pull/257)
+- **[Feature]** Data table types can provide their own query with `createDefaultQuery()` (https://github.com/Kreyu/data-table-bundle/pull/252)
+- **[Feature]** Deferred data table loading through lazy Turbo frames, with the `async` and `async_loading` options
+- **[Feature]** Replaceable pagination factory (`PaginationFactoryInterface`) and the `page_visible_range` option (https://github.com/Kreyu/data-table-bundle/issues/219)
+- **[Feature]** daisyUI 5 theme: `@KreyuDataTable/themes/daisyui.html.twig`
+- **[Feature]** Native `<dialog>` modals and confirmations, with attribute hooks for the modal, its box, title, description, close and cancel buttons
+- **[Feature]** Theme attribute hooks: `root_attr`, `cell_attr`, `value_cell_attr`, `active_filters_attr`, `disabled_attr`
+- **[Feature]** `FormActionType` `csrf_token_id` option
+- **[Feature]** The action `identifier` view variable
+- **[Feature]** `has_active_non_search_filters` view variable and `FiltrationData::hasActiveFiltersExcept()`
+- **[Feature]** Date filter chips are formatted in the current locale
+- **[Feature]** Personalization supports dotted column names (`author.name`)
+
+## Bugfixes
+
+- **[Bugfix]** Sort and pagination links keep the search term and dotted filter names
+- **[Bugfix]** Clear filter links work for dotted filter names
+- **[Bugfix]** Dotted filter names no longer throw in the filtration view
+- **[Bugfix]** Array data keeps its pagination when sorted after paginating
+- **[Bugfix]** Personalization and intl number formatter options work on Symfony 8
+- **[Bugfix]** Confirmations on dropdown item actions are no longer ignored
+- **[Bugfix]** Dialogs no longer stay open after navigating back with Turbo
+- **[Bugfix]** Resolved type factory service aliases point to existing services
+- **[Bugfix]** A `null` confirmation type no longer breaks the Bootstrap 5 theme
+
 # 0.17
 
 ## Breaking changes

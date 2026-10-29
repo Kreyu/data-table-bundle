@@ -10,6 +10,7 @@ class ValueRowView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     public array $vars = [
         'attr' => [],
+        'row_type' => 'value',
     ];
 
     /**

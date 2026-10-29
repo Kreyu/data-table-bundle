@@ -114,6 +114,8 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 
     public function setPaginationFactory(?PaginationFactoryInterface $paginationFactory): static;
 
+    public function setGroupBy(string|callable|null $groupBy): static;
+
     public function addTheme(string $theme): static;
 
     public function setThemes(array $themes): static;

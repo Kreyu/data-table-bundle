@@ -143,6 +143,16 @@ The following variables are common to every data table type:
 | `personalization_form`           | Holds an instance of the personalization form view.                                                                                    |
 | `export_form`                    | Holds an instance of the export form view.                                                                                             |
 
+### Value row variables
+
+Each item of `value_rows`:
+
+| Variable      | Usage                                                                                                                       |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------|
+| `attr`        | Attributes of the row `<tr>`.                                                                                               |
+| `row_type`    | `value`, or `group_header` for a [group](../docs/features/grouping.md) header (block `table_body_row_group_header`).        |
+| `group_value` | Group header rows only: the group value.                                                                                    |
+
 ### Column header variables
 
 The following variables are common to every column type header:
@@ -222,10 +232,11 @@ The following variables are common to every action type:
 
 No type sets these. Pass them to `data_table()`, or set them with `{% with %}` in your theme:
 
-| Variable              | Rendered on                                                          |
-|-----------------------|----------------------------------------------------------------------|
-| `root_attr`           | Root `<div>`. Its `data-controller` is appended to the bundle's own. |
-| `active_filters_attr` | Filter chips wrapper.                                                |
+| Variable                           | Rendered on                                                          |
+|------------------------------------|----------------------------------------------------------------------|
+| `root_attr`                        | Root `<div>`. Its `data-controller` is appended to the bundle's own. |
+| `active_filters_attr`              | Filter chips wrapper.                                                |
+| `table_body_row_group_header_attr` | Group header `<th>`. Bootstrap 5 default: `class="table-light"`.     |
 
 ```twig
 {{ data_table(products, {

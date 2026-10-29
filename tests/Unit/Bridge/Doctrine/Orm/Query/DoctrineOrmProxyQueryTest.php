@@ -55,7 +55,7 @@ class DoctrineOrmProxyQueryTest extends TestCase
         $proxyQuery = new DoctrineOrmProxyQuery($queryBuilder);
         $proxyQuery->sort(new SortingData([
             new SortingColumnData('product.name', 'ASC'),
-            new SortingColumnData('category.name', 'DESC'),
+            new SortingColumnData('category?.name', 'DESC'),
         ]));
 
         $orderBy = $queryBuilder->getDQLPart('orderBy');

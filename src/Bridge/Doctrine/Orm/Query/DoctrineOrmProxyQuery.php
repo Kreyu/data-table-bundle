@@ -52,8 +52,10 @@ class DoctrineOrmProxyQuery implements DoctrineOrmProxyQueryInterface
                 continue;
             }
 
+            $queryPath = strtr((string) $sortCriterion->getPropertyPath(), ['?' => '']);
+
             $this->queryBuilder->addOrderBy(
-                $this->getAliasResolver()->resolve((string) $sortCriterion->getPropertyPath(), $this->queryBuilder),
+                $this->getAliasResolver()->resolve($queryPath, $this->queryBuilder),
                 $sortCriterion->getDirection(),
             );
         }

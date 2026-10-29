@@ -31,6 +31,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DataTableType implements DataTableTypeInterface
@@ -72,6 +74,7 @@ final class DataTableType implements DataTableTypeInterface
             'exporting_form_factory' => $builder->setExportFormFactory(...),
             'request_handler' => $builder->setRequestHandler(...),
             'pagination_factory' => $builder->setPaginationFactory(...),
+            'group_by' => $builder->setGroupBy(...),
         ];
 
         foreach ($setters as $option => $setter) {
@@ -135,7 +138,7 @@ final class DataTableType implements DataTableTypeInterface
             $view->pagination = null;
         } else {
             $view->valueRows = new RowIterator(
-                fn () => $this->createValueRowsViews($view, $dataTable, $visibleColumns),
+                fn () => $this->createGroupedValueRowsViews($view, $dataTable, $visibleColumns),
             );
             $view->pagination = $this->createPaginationView($view, $dataTable);
         }
@@ -230,6 +233,7 @@ final class DataTableType implements DataTableTypeInterface
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
                 'async' => $this->defaults['async'] ?? false,
                 'async_loading' => $this->defaults['async_loading'] ?? 'lazy',
+                'group_by' => null,
             ])
             ->setAllowedTypes('title', ['null', 'string', TranslatableInterface::class])
             ->setAllowedTypes('title_translation_parameters', ['array'])
@@ -281,6 +285,7 @@ final class DataTableType implements DataTableTypeInterface
             ->setAllowedTypes('async', 'bool')
             ->setAllowedTypes('async_loading', 'string')
             ->setAllowedValues('async_loading', ['lazy', 'eager'])
+            ->setAllowedTypes('group_by', ['null', 'string', 'callable'])
         ;
     }
 
@@ -441,6 +446,74 @@ final class DataTableType implements DataTableTypeInterface
         }
 
         yield from [];
+    }
+
+    /**
+     * @param array<ColumnInterface> $columns
+     *
+     * @return iterable<ValueRowView>
+     */
+    private function createGroupedValueRowsViews(
+        DataTableView $view,
+        DataTableInterface $dataTable,
+        array $columns,
+    ): iterable {
+        $valueRowViews = $this->createValueRowsViews($view, $dataTable, $columns);
+        $groupBy = $dataTable->getConfig()->getGroupBy();
+
+        if ($groupBy === null) {
+            yield from $valueRowViews;
+
+            return;
+        }
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $isFirstRow = true;
+        $previousGroupValue = null;
+
+        foreach ($valueRowViews as $valueRowView) {
+            $groupValue = $this->getGroupValue($valueRowView->data, $groupBy, $propertyAccessor);
+            $isSameGroup = $groupValue == $previousGroupValue;
+
+            if ($isFirstRow || !$isSameGroup) {
+                yield $this->createGroupHeaderRowView($view, $valueRowView->index, $groupValue);
+            }
+
+            yield $valueRowView;
+
+            $isFirstRow = false;
+            $previousGroupValue = $groupValue;
+        }
+    }
+
+    private function getGroupValue(
+        mixed $data,
+        string|callable $groupBy,
+        PropertyAccessorInterface $propertyAccessor,
+    ): mixed {
+        $isPropertyPath = is_string($groupBy);
+
+        if (!$isPropertyPath) {
+            return $groupBy($data);
+        }
+
+        $isReadable = is_array($data) || is_object($data);
+
+        if (!$isReadable) {
+            return null;
+        }
+
+        return $propertyAccessor->getValue($data, $groupBy);
+    }
+
+    private function createGroupHeaderRowView(DataTableView $view, int $index, mixed $groupValue): ValueRowView
+    {
+        $groupHeaderRowView = new ValueRowView($view, $index, null);
+        $groupHeaderRowView->vars['row'] = $groupHeaderRowView;
+        $groupHeaderRowView->vars['row_type'] = 'group_header';
+        $groupHeaderRowView->vars['group_value'] = $groupValue;
+
+        return $groupHeaderRowView;
     }
 
     /**

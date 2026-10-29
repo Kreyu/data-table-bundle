@@ -156,3 +156,10 @@ See [column visibility groups](../../docs/features/column-visibility-groups.md).
 
 - **type**: `null` or `FormFactoryInterface`
 - **default**: value defined in [`defaults` configuration](../configuration.md#data-table-builder-defaults)
+
+### `group_by`
+
+- **type**: `null`, `string` or `callable`
+- **default**: `null`
+
+Property path or callable for the group value. Shows a header row above each group, see [Grouping](../../docs/features/grouping.md).

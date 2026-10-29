@@ -167,8 +167,18 @@
 
 {% block table_body_row_results %}
     {% for value_row in value_rows %}
-        <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {% if value_row.vars.row_type == 'group_header' %}
+            {{ block('table_body_row_group_header', theme) }}
+        {% else %}
+            <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>{{ data_table_value_row(value_row) }}</tr>
+        {% endif %}
     {% endfor %}
+{% endblock %}
+
+{% block table_body_row_group_header %}
+    <tr {% with { attr: value_row.vars.attr } %}{{ block('attributes') }}{% endwith %}>
+        <th colspan="{{ column_count }}" scope="colgroup" {% with { attr: table_body_row_group_header_attr|default({}) } %}{{- block('attributes') -}}{% endwith %}>{{ value_row.vars.group_value }}</th>
+    </tr>
 {% endblock %}
 
 {% block table_body_row_no_results %}

@@ -113,6 +113,8 @@ interface DataTableConfigInterface
 
     public function getPaginationFactory(): ?PaginationFactoryInterface;
 
+    public function getGroupBy(): string|callable|null;
+
     public function getRequestHandler(): ?RequestHandlerInterface;
 
     public function getAttributes(): array;

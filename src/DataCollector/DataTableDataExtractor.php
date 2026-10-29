@@ -115,6 +115,10 @@ class DataTableDataExtractor implements DataTableDataExtractorInterface
         $data = [];
 
         foreach ($view->valueRows as $valueRow) {
+            if ($valueRow->vars['row_type'] === 'group_header') {
+                continue;
+            }
+
             $data[] = $valueRow->data;
         }
 

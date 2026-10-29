@@ -49,6 +49,7 @@ export default defineConfig({
             { text: 'Filtering', link: '/docs/features/filtering' },
             { text: 'Exporting', link: '/docs/features/exporting' },
             { text: 'Pagination', link: '/docs/features/pagination' },
+            { text: 'Grouping', link: '/docs/features/grouping' },
             { text: 'Personalization', link: '/docs/features/personalization' },
             { text: 'Column visibility groups', link: '/docs/features/column-visibility-groups' },
             { text: 'Persistence', link: '/docs/features/persistence' },

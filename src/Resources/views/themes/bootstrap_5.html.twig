@@ -11,6 +11,12 @@
     </div>
 {% endblock %}
 
+{% block table_body_row_group_header %}
+    {% with { table_body_row_group_header_attr: { class: 'table-light' }|merge(table_body_row_group_header_attr|default({})) } %}
+        {{ parent() }}
+    {% endwith %}
+{% endblock %}
+
 {% block async_placeholder %}
     <div class="d-flex justify-content-center p-4">
         <div class="spinner-border" role="status">

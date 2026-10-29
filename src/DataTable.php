@@ -41,11 +41,14 @@ use Kreyu\Bundle\DataTableBundle\Personalization\Form\Type\PersonalizationDataTy
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
 use Kreyu\Bundle\DataTableBundle\Query\ProxyQueryInterface;
 use Kreyu\Bundle\DataTableBundle\Query\ResultSetInterface;
+use Kreyu\Bundle\DataTableBundle\Sorting\SortingColumnData;
 use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class DataTable implements DataTableInterface
 {
+    private const GROUP_BY_SORTING_COLUMN_NAME = '__group_by';
+
     /**
      * @var array<string, ColumnInterface>
      */
@@ -561,7 +564,7 @@ class DataTable implements DataTableInterface
         $data->removeRedundantColumns($columns);
         $data->ensureValidPropertyPaths($columns);
 
-        $this->query->sort($data);
+        $this->query->sort($this->createQuerySortingData($data));
 
         $this->originalQuery = $this->query;
 
@@ -1012,7 +1015,47 @@ class DataTable implements DataTableInterface
             $data = $this->getPersistenceData(PersistenceContext::Sorting);
         }
 
-        return $data ?? $this->config->getDefaultSortingData();
+        return $data ?? $this->config->getDefaultSortingData() ?? $this->getGroupSortingData();
+    }
+
+    private function getGroupSortingData(): ?SortingData
+    {
+        $groupBy = $this->config->getGroupBy();
+        $isPropertyPath = is_string($groupBy);
+
+        if (!$isPropertyPath) {
+            return null;
+        }
+
+        return new SortingData();
+    }
+
+    private function createQuerySortingData(SortingData $data): SortingData
+    {
+        $groupBy = $this->config->getGroupBy();
+        $isPropertyPath = is_string($groupBy);
+
+        if (!$isPropertyPath) {
+            return $data;
+        }
+
+        $groupDirection = 'asc';
+        $groupPath = strtr($groupBy, ['?' => '']);
+
+        foreach ($data->getColumns() as $sortingColumn) {
+            $propertyPath = strtr((string) $sortingColumn->getPropertyPath(), ['?' => '']);
+            $direction = $sortingColumn->getDirection();
+            $isGroupColumn = $propertyPath === $groupPath;
+            $isCleared = $direction === 'none';
+
+            if ($isGroupColumn && !$isCleared) {
+                $groupDirection = $direction;
+            }
+        }
+
+        $groupSortingColumn = new SortingColumnData(self::GROUP_BY_SORTING_COLUMN_NAME, $groupDirection, $groupBy);
+
+        return new SortingData([$groupSortingColumn, ...$data->getColumns()]);
     }
 
     private function getInitialFiltrationData(): ?FiltrationData

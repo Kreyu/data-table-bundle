@@ -65,6 +65,11 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?RequestHandlerInterface $requestHandler = null;
     private ?PaginationFactoryInterface $paginationFactory = null;
 
+    /**
+     * @var string|callable|null
+     */
+    private mixed $groupBy = null;
+
     private bool $sortingClearable = false;
 
     /**
@@ -734,6 +739,22 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->paginationFactory = $paginationFactory;
+
+        return $this;
+    }
+
+    public function getGroupBy(): string|callable|null
+    {
+        return $this->groupBy;
+    }
+
+    public function setGroupBy(string|callable|null $groupBy): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->groupBy = $groupBy;
 
         return $this;
     }

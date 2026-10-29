@@ -866,6 +866,12 @@ count = 2
 
 [[issues]]
 file = "src/Type/DataTableType.php"
+code = "identity-comparison"
+message = "Use identity comparison `===` instead of equality comparison `==`."
+count = 1
+
+[[issues]]
+file = "src/Type/DataTableType.php"
 code = "kan-defect"
 message = "Class has a high kan defect score."
 count = 1

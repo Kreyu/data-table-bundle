@@ -7,7 +7,7 @@ This bundle can be installed at any moment during a project’s lifecycle.
 ## Prerequisites
 
 - PHP version 8.1 or higher
-- Symfony version 6.0 or higher
+- Symfony version 6.4 or higher
 
 ## Download the bundle
 

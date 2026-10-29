@@ -91,7 +91,6 @@ class DataTableBundleIntegrationTest extends KernelTestCase
                 'filter_options' => ['callback' => $recordAppliedValue],
             ])
             ->addColumn('author.name', TextColumnType::class, [
-                'personalizable' => false,
                 'filter' => CallbackFilterType::class,
                 'filter_options' => ['callback' => $recordAppliedValue],
             ])
@@ -102,7 +101,7 @@ class DataTableBundleIntegrationTest extends KernelTestCase
         $dataTable->handleRequest(new Request([
             'filter_products' => [
                 'name' => ['value' => 'Ann'],
-                'author__name' => ['value' => 'Bob'],
+                'author:name' => ['value' => 'Bob'],
                 'city' => ['value' => 'Paris'],
             ],
         ]));
@@ -127,7 +126,7 @@ class DataTableBundleIntegrationTest extends KernelTestCase
                 'filter_products' => [
                     'city' => ['value' => 'Paris'],
                     'name' => ['value' => 'Ann'],
-                    'author__name' => ['value' => 'Bob'],
+                    'author:name' => ['value' => 'Bob'],
                 ],
                 'page_products' => 1,
                 'limit_products' => 25,
@@ -152,6 +151,6 @@ class DataTableBundleIntegrationTest extends KernelTestCase
         /** @var array<string, FormView> $personalizedHeaderFields */
         $personalizedHeaderFields = $personalizedFiltrationForm->vars['header_fields'];
 
-        $this->assertSame(['author__name'], array_keys($personalizedHeaderFields));
+        $this->assertSame(['author:name'], array_keys($personalizedHeaderFields));
     }
 }

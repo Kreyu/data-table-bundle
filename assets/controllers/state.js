@@ -10,6 +10,10 @@ export default class extends Controller {
         this.#appendUrlQueryParameters();
     }
 
+    submit(event) {
+        event.target.form.requestSubmit();
+    }
+
     #appendUrlQueryParameters() {
         const url = new URL(window.location.href);
 

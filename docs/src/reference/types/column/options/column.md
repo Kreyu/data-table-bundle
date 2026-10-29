@@ -307,3 +307,10 @@ Determines whether the column is visible to the user.
 
 Determines whether the column is personalizable.
 The non-personalizable columns are not modifiable by the [personalization feature](../../../../docs/features/personalization.md).
+
+### `column_visibility_groups`
+
+- **type**: `string[]`
+- **default**: `[]`
+
+Names of the [column visibility groups](../../../../docs/features/column-visibility-groups.md) that show the column. `[]` = shown in every group.

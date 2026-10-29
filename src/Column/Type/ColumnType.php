@@ -378,6 +378,13 @@ final class ColumnType implements ColumnTypeInterface
             ->allowedTypes('bool')
             ->info('Defines whether the column can be personalized by the user in personalization feature.')
         ;
+
+        $resolver
+            ->define('column_visibility_groups')
+            ->default([])
+            ->allowedTypes('string[]')
+            ->info('Defines the column visibility groups that show the column. Empty shows it in every group.')
+        ;
     }
 
     public function getBlockPrefix(): string

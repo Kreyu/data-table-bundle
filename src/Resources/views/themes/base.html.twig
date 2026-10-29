@@ -90,9 +90,52 @@
 {% endblock %}
 
 {% block action_bar %}
+    {% if column_visibility_groups|length > 1 %}
+        {{ data_table_theme_block(data_table, 'column_visibility_group_selector') }}
+    {% endif %}
+
     {% if has_active_filters %}
         {{ data_table_theme_block(data_table, 'active_filters') }}
     {% endif %}
+{% endblock %}
+
+{% block column_visibility_group_selector %}
+    {% with {
+        select_attr: {
+            name: column_visibility_group_parameter_name,
+            'aria-label': 'Column group'|trans,
+        }|merge(select_attr|default({})),
+        choices: column_visibility_groups|keys,
+        choice_labels: column_visibility_groups|map(label => translation_domain is same as false ? label : label|trans({}, translation_domain)),
+        selected_choice: column_visibility_group,
+    } %}
+        {{ block('select_form', theme) }}
+    {% endwith %}
+{% endblock %}
+
+{% block select_form %}
+    {% set form_attr = {
+        'data-controller': 'kreyu--data-table-bundle--state',
+        'data-turbo-frame': '_self',
+        'data-turbo-action': 'advance',
+    }|merge(form_attr ?? {}) %}
+
+    {% set select_attr = {
+        autocomplete: 'off',
+        'data-action': 'kreyu--data-table-bundle--state#submit',
+    }|merge(select_attr) %}
+
+    {% set select_name = select_attr.name %}
+
+    <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
+        {{ _self.array_to_form_inputs(url_query_parameters|filter((value, key) => key is not same as select_name)|merge(form_parameters ?? {})) }}
+
+        <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
+            {% for choice in choices %}
+                <option value="{{ choice }}"{{ choice == selected_choice ? ' selected' }}>{{ choice_labels[choice] ?? choice }}</option>
+            {% endfor %}
+        </select>
+    </form>
 {% endblock %}
 
 {% block table %}
@@ -242,40 +285,30 @@
 {% block pagination_per_page_message 'Items per page'|trans %}
 
 {% block pagination_per_page_form %}
-    {% set form_attr = { 'data-turbo-frame': '_self', 'data-turbo-action': 'advance' }|merge(form_attr ?? {}) %}
+    {% set form_parameters = {} %}
 
-    <form {% with { attr: form_attr } %}{{ block('attributes') }}{% endwith %}>
-        {% set url_query_parameters = [] %}
+    {#
+        Changing the "per page" parameter automatically changes page to the first one.
+        You can disable this behavior by in your own theme that extends this one, for example:
 
-        {#
-            Changing the "per page" parameter automatically changes page to the first one.
-            You can disable this behavior by in your own theme that extends this one, for example:
+        {% block pagination_per_page_form %}
+            {% with { should_reset_to_first_page: false } %}
+                {{ parent() }}
+            {% endwith %}
+        {% endblock %}
+    #}
 
-            {% block pagination_per_page_form %}
-                {% with { should_reset_to_first_page: false } %}
-                    {{ parent() }}
-                {% endwith %}
-            {% endblock %}
-        #}
+    {% if should_reset_to_first_page ?? true %}
+        {% set form_parameters = { (data_table.vars.page_parameter_name): 1 } %}
+    {% endif %}
 
-        {% if should_reset_to_first_page ?? true %}
-            {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
-        {% endif %}
-
-        {{ _self.array_to_form_inputs(url_query_parameters) }}
-
-        {% set select_attr = {
-            name: data_table.vars.per_page_parameter_name,
-            onchange: 'this.form.requestSubmit()',
-            autocomplete: 'off',
-        }|merge(select_attr|default({})) %}
-
-        <select {% with { attr: select_attr } %}{{ block('attributes') }}{% endwith %}>
-            {% for choice in choices %}
-                <option value="{{ choice }}"{{ item_number_per_page == choice ? ' selected' }}>{{ choice }}</option>
-            {% endfor %}
-        </select>
-    </form>
+    {% with {
+        url_query_parameters: data_table.vars.url_query_parameters,
+        select_attr: { name: data_table.vars.per_page_parameter_name }|merge(select_attr|default({})),
+        selected_choice: item_number_per_page,
+    } %}
+        {{ block('select_form', theme) }}
+    {% endwith %}
 {% endblock %}
 
 {% block pagination_counters %}
@@ -383,10 +416,13 @@
     #}
 
     {% set data_table = form.vars.data_table_view %}
+    {% set url_query_parameters = [] %}
+
+    {% if data_table.vars.column_visibility_group is not null %}
+        {% set url_query_parameters = { (data_table.vars.column_visibility_group_parameter_name): data_table.vars.column_visibility_group } %}
+    {% endif %}
 
     {% if data_table.vars.pagination_enabled %}
-        {% set url_query_parameters = [] %}
-
         {% if should_reset_to_first_page ?? true %}
             {% set url_query_parameters = url_query_parameters|merge({ (data_table.vars.page_parameter_name): 1 }) %}
         {% endif %}
@@ -396,9 +432,9 @@
                 (data_table.vars.per_page_parameter_name): data_table.vars.pagination.vars.item_number_per_page,
             }) %}
         {% endif %}
-
-        {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
     {% endif %}
+
+    {{ _self.array_to_form_inputs(url_query_parameters, { form: form.vars.id }) }}
 {% endblock %}
 
 {% block filtration_widget %}

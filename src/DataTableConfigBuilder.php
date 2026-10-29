@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class DataTableConfigBuilder implements DataTableConfigBuilderInterface
 {
@@ -65,6 +66,11 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     private ?PaginationFactoryInterface $paginationFactory = null;
 
     private bool $sortingClearable = false;
+
+    /**
+     * @var array<string, string|TranslatableInterface>
+     */
+    private array $columnVisibilityGroups = [];
 
     private array $themes = [];
     private array $attributes = [];
@@ -404,6 +410,22 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
         }
 
         $this->defaultPersonalizationData = $defaultPersonalizationData;
+
+        return $this;
+    }
+
+    public function getColumnVisibilityGroups(): array
+    {
+        return $this->columnVisibilityGroups;
+    }
+
+    public function setColumnVisibilityGroups(array $columnVisibilityGroups): static
+    {
+        if ($this->locked) {
+            throw $this->createBuilderLockedException();
+        }
+
+        $this->columnVisibilityGroups = $columnVisibilityGroups;
 
         return $this;
     }
@@ -882,6 +904,11 @@ class DataTableConfigBuilder implements DataTableConfigBuilderInterface
     public function getExportParameterName(): string
     {
         return $this->getParameterName(static::EXPORT_PARAMETER);
+    }
+
+    public function getColumnVisibilityGroupParameterName(): string
+    {
+        return $this->getParameterName(static::COLUMN_VISIBILITY_GROUP_PARAMETER);
     }
 
     public function getDataTableConfig(): DataTableConfigInterface

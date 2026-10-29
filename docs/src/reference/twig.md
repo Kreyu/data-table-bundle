@@ -124,6 +124,9 @@ The following variables are common to every data table type:
 | `filtration_parameter_name`      | Name of the parameter that holds the filtration form data.                                                                             |
 | `personalization_parameter_name` | Name of the parameter that holds the personalization form data.                                                                        |
 | `export_parameter_name`          | Name of the parameter that holds the export form data.                                                                                 |
+| `column_visibility_group_parameter_name` | Name of the parameter that holds the selected column visibility group.                                                         |
+| `column_visibility_groups`       | Column visibility groups, name → label. Rendered by the `column_visibility_group_selector` block when there are two or more.          |
+| `column_visibility_group`        | Name of the selected column visibility group; `null` if the table defines none.                                                        |
 | `has_active_filters`             | If at least one filter is active, this value will equal `true`.                                                                        |
 | `has_active_non_search_filters`  | `true` if a filter other than a search filter is active. Use it to open the filter panel when the page loads.                          |
 | `filtration_data`                | An instance of filtration data, that contains applied filters values.                                                                  |

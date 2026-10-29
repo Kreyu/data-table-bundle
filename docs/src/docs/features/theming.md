@@ -229,6 +229,10 @@ Remember that in the second case, you cannot call the `parent()` function in the
       }
   }
   ```
+- **The per-page select now submits through the `state` controller's `submit` action**, not an inline `onchange`.
+  - Refresh the bundle's JS assets. Encore with `file:vendor/kreyu/data-table-bundle/assets`? Reinstall the package (`npm install --force` or `yarn install --force`).
+  - Your theme sets `form_attr['data-controller']` on `pagination_per_page_form`? Keep `kreyu--data-table-bundle--state` in it.
+  - Your theme sets `select_attr.onchange`? Remove it, or the form submits twice.
 :::
 
 ### Adding HTML attributes

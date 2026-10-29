@@ -16,6 +16,7 @@ use Kreyu\Bundle\DataTableBundle\Event\DataTableFiltrationEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTablePaginationEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTablePersonalizationEvent;
 use Kreyu\Bundle\DataTableBundle\Event\DataTableSortingEvent;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exception\RuntimeException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
@@ -99,6 +100,8 @@ class DataTable implements DataTableInterface
      * The export data currently applied to the data table.
      */
     private ?ExportData $exportData = null;
+
+    private ?string $columnVisibilityGroup = null;
 
     /**
      * The pagination used to retrieve the current page results.
@@ -196,47 +199,30 @@ class DataTable implements DataTableInterface
 
     public function getVisibleColumns(): array
     {
-        return array_filter($this->getColumns(), function (ColumnInterface $column) {
-            $visible = $column->getConfig()->isVisible();
-
-            if ($this->getConfig()->isPersonalizationEnabled() && $column->getConfig()->isPersonalizable()) {
-                $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
-            }
-
-            return $visible;
-        });
+        return array_filter($this->getColumns(), $this->isColumnVisible(...));
     }
 
     public function getHiddenColumns(): array
     {
-        return array_filter($this->getColumns(), function (ColumnInterface $column) {
-            $visible = $column->getConfig()->isVisible();
-
-            if ($this->getConfig()->isPersonalizationEnabled() && $column->getConfig()->isPersonalizable()) {
-                $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
-            }
-
-            return !$visible;
-        });
+        return array_filter(
+            $this->getColumns(),
+            fn (ColumnInterface $column): bool => !$this->isColumnVisible($column),
+        );
     }
 
     public function getExportableColumns(): array
     {
-        $columns = array_filter($this->columns, function (ColumnInterface $column) {
+        $columns = array_filter($this->columns, function (ColumnInterface $column): bool {
             if (!$column->getConfig()->isExportable()) {
                 return false;
             }
 
-            $exportOptions = $column->getConfig()->getOption('export') ?: [];
+            $export = $column->getConfig()->getOption('export');
 
-            $columnPersonalizable = $exportOptions['personalizable'] ?? $column->getConfig()->isPersonalizable();
-            $columnVisible = $exportOptions['visible'] ?? $column->getConfig()->isVisible();
+            /** @var array{visible?: bool, personalizable?: bool} $exportOptions */
+            $exportOptions = is_array($export) ? $export : [];
 
-            if ($this->getConfig()->isPersonalizationEnabled() && $columnPersonalizable) {
-                $columnVisible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $columnVisible;
-            }
-
-            return $columnVisible;
+            return $this->isColumnVisible($column, $exportOptions);
         });
 
         uasort($columns, function (ColumnInterface $columnA, ColumnInterface $columnB): int {
@@ -287,6 +273,12 @@ class DataTable implements DataTableInterface
                 ->createNamedBuilder($column, $type, $options)
                 ->getColumn()
             ;
+        }
+
+        $columnVisibilityGroups = $this->getColumnVisibilityGroupsOfColumn($column);
+
+        foreach ($columnVisibilityGroups as $columnVisibilityGroup) {
+            $this->assertColumnVisibilityGroupDefined($columnVisibilityGroup);
         }
 
         $this->columns[$column->getName()] = $column;
@@ -769,6 +761,22 @@ class DataTable implements DataTableInterface
         return $this;
     }
 
+    public function getColumnVisibilityGroup(): ?string
+    {
+        return $this->columnVisibilityGroup ?? array_key_first($this->config->getColumnVisibilityGroups());
+    }
+
+    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): static
+    {
+        if ($columnVisibilityGroup !== null) {
+            $this->assertColumnVisibilityGroupDefined($columnVisibilityGroup);
+        }
+
+        $this->columnVisibilityGroup = $columnVisibilityGroup;
+
+        return $this;
+    }
+
     public function getExportData(): ?ExportData
     {
         return $this->exportData;
@@ -919,6 +927,56 @@ class DataTable implements DataTableInterface
         if ($dispatcher->hasListeners($eventName)) {
             $dispatcher->dispatch($event, $eventName);
         }
+    }
+
+    /**
+     * @param array{visible?: bool, personalizable?: bool} $exportOptions
+     */
+    private function isColumnVisible(ColumnInterface $column, array $exportOptions = []): bool
+    {
+        $visible = $exportOptions['visible'] ?? $column->getConfig()->isVisible();
+        $personalizable = $exportOptions['personalizable'] ?? $column->getConfig()->isPersonalizable();
+        $personalized = $personalizable && $this->config->isPersonalizationEnabled();
+
+        if ($personalized) {
+            $visible = $this->personalizationData?->getColumn($column)?->isVisible() ?? $visible;
+        }
+
+        if (!$visible) {
+            return false;
+        }
+
+        $columnVisibilityGroups = $this->getColumnVisibilityGroupsOfColumn($column);
+
+        if ($columnVisibilityGroups === []) {
+            return true;
+        }
+
+        return in_array($this->getColumnVisibilityGroup(), $columnVisibilityGroups, strict: true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getColumnVisibilityGroupsOfColumn(ColumnInterface $column): array
+    {
+        /** @var list<string> */
+        return $column->getConfig()->getOption('column_visibility_groups', []);
+    }
+
+    private function assertColumnVisibilityGroupDefined(string $columnVisibilityGroup): void
+    {
+        $columnVisibilityGroups = $this->config->getColumnVisibilityGroups();
+
+        if (array_key_exists($columnVisibilityGroup, $columnVisibilityGroups)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'The column visibility group "%s" does not exist. Defined groups: "%s".',
+            $columnVisibilityGroup,
+            implode('", "', array_keys($columnVisibilityGroups)),
+        ));
     }
 
     private function resetPagination(): void

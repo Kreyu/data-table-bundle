@@ -23,6 +23,7 @@ Personalization: Personalisatie
 Drag items between columns to show/hide relevant data in the list or change their order: Sleep items tussen kolommen om relevante gegevens in de lijst te tonen/verbergen of de volgorde ervan te wijzigen
 Visible columns: Zichtbare kolommen
 Hidden columns: Verborgen kolommen
+Column group: Kolomgroep
 
 # Pagination
 Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Toon %current_page_first_item_index% - %current_page_last_item_index% van %total_item_count%

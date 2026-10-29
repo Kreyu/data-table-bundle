@@ -23,6 +23,7 @@ Personalization: Personalizace
 Drag items between columns to show/hide relevant data in the list or change their order: Přetáhněte položky mezi sloupci pro zobrazení/skrytí relevantních údajů nebo změnu jejich pořadí
 Visible columns: Viditelné sloupce
 Hidden columns: Skryté sloupce
+Column group: Skupina sloupců
 
 # Pagination
 Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Zobrazeno %current_page_first_item_index% – %current_page_last_item_index% z %total_item_count%

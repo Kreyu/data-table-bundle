@@ -23,6 +23,7 @@ Personalization: Personalisierung
 Drag items between columns to show/hide relevant data in the list or change their order: Ziehen Sie Elemente zwischen Spalten, um relevante Daten in der Liste anzuzeigen/auszublenden oder ihre Reihenfolge zu ändern.
 Visible columns: Sichtbare Spalten
 Hidden columns: Ausgeblendete Spalten
+Column group: Spaltengruppe
 
 # Pagination
 Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Zeige %current_page_first_item_index% - %current_page_last_item_index% von %total_item_count%

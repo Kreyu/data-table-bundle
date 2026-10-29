@@ -23,6 +23,7 @@ Personalization: Personalització
 Drag items between columns to show/hide relevant data in the list or change their order: Arrossega els elements entre columnes per a mostrar o ocultar les dades rellevants a la llista o canviar-ne l'ordre
 Visible columns: Columnes visibles
 Hidden columns: Columnes amagades
+Column group: Grup de columnes
 
 # Pagination
 Showing %current_page_first_item_index% - %current_page_last_item_index% of %total_item_count%: Mostrant %current_page_first_item_index% - %current_page_last_item_index% de %total_item_count%

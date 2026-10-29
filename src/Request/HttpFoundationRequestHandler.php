@@ -35,6 +35,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->filter($dataTable, $request);
         $this->sort($dataTable, $request);
         $this->personalize($dataTable, $request);
+        $this->selectColumnVisibilityGroup($dataTable, $request);
         $this->paginate($dataTable, $request);
         $this->export($dataTable, $request);
         $this->turbo($dataTable, $request);
@@ -112,6 +113,23 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         if ($form->isSubmitted() && $form->isValid()) {
             $dataTable->personalize($form->getData());
         }
+    }
+
+    private function selectColumnVisibilityGroup(DataTableInterface $dataTable, Request $request): void
+    {
+        $parameterName = $dataTable->getConfig()->getColumnVisibilityGroupParameterName();
+        $columnVisibilityGroup = $this->extractQueryParameter($request, "[{$parameterName}]");
+        $columnVisibilityGroups = $dataTable->getConfig()->getColumnVisibilityGroups();
+
+        if (!is_string($columnVisibilityGroup)) {
+            return;
+        }
+
+        if (!array_key_exists($columnVisibilityGroup, $columnVisibilityGroups)) {
+            return;
+        }
+
+        $dataTable->setColumnVisibilityGroup($columnVisibilityGroup);
     }
 
     private function export(DataTableInterface $dataTable, Request $request): void

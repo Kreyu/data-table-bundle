@@ -20,6 +20,7 @@ use Kreyu\Bundle\DataTableBundle\Sorting\SortingData;
 use Kreyu\Bundle\DataTableBundle\Type\ResolvedDataTableTypeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface DataTableConfigBuilderInterface extends DataTableConfigInterface
 {
@@ -69,6 +70,11 @@ interface DataTableConfigBuilderInterface extends DataTableConfigInterface
     public function setPersonalizationFormFactory(?FormFactoryInterface $personalizationFormFactory): static;
 
     public function setDefaultPersonalizationData(?PersonalizationData $defaultPersonalizationData): static;
+
+    /**
+     * @param array<string, string|TranslatableInterface> $columnVisibilityGroups
+     */
+    public function setColumnVisibilityGroups(array $columnVisibilityGroups): static;
 
     public function setFiltrationEnabled(bool $filtrationEnabled): static;
 

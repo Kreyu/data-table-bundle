@@ -10,6 +10,7 @@ use Kreyu\Bundle\DataTableBundle\Action\Type\ActionTypeInterface;
 use Kreyu\Bundle\DataTableBundle\Column\ColumnInterface;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnType;
 use Kreyu\Bundle\DataTableBundle\Column\Type\ColumnTypeInterface;
+use Kreyu\Bundle\DataTableBundle\Exception\InvalidArgumentException;
 use Kreyu\Bundle\DataTableBundle\Exception\OutOfBoundsException;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExportData;
 use Kreyu\Bundle\DataTableBundle\Exporter\ExporterInterface;
@@ -219,6 +220,13 @@ interface DataTableInterface
     public function setPersonalizationData(?PersonalizationData $personalizationData): static;
 
     public function getPersonalizationData(): ?PersonalizationData;
+
+    /**
+     * @throws InvalidArgumentException if the group is not defined in the "column_visibility_groups" option
+     */
+    public function setColumnVisibilityGroup(?string $columnVisibilityGroup): static;
+
+    public function getColumnVisibilityGroup(): ?string;
 
     public function setExportData(?ExportData $exportData): static;
 

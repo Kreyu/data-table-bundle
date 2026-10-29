@@ -139,6 +139,14 @@ The [`DataTableType`](https://github.com/Kreyu/data-table-bundle/blob/main/src/C
 - **type**: `null` or `FormFactoryInterface`
 - **default**: value defined in [`defaults` configuration](../configuration.md#data-table-builder-defaults)
 
+### `column_visibility_groups`
+
+- **type**: `array<string, string|TranslatableInterface>`
+- **default**: `[]`
+
+Column groups the user switches between, name → label. First = default; `[]` = off.
+See [column visibility groups](../../docs/features/column-visibility-groups.md).
+
 ### `exporting_enabled`
 
 - **type**: `bool`

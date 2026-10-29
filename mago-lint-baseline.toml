@@ -340,7 +340,7 @@ count = 6
 file = "src/DataTable.php"
 code = "no-shorthand-ternary"
 message = "Use of the shorthand ternary operator."
-count = 3
+count = 2
 
 [[issues]]
 file = "src/DataTable.php"
@@ -740,6 +740,12 @@ count = 1
 
 [[issues]]
 file = "src/Request/HttpFoundationRequestHandler.php"
+code = "halstead"
+message = "Method has a high halstead difficulty"
+count = 1
+
+[[issues]]
+file = "src/Request/HttpFoundationRequestHandler.php"
 code = "no-assign-in-condition"
 message = "Avoid assignments in conditions."
 count = 3
@@ -748,6 +754,12 @@ count = 3
 file = "src/Request/HttpFoundationRequestHandler.php"
 code = "no-empty"
 message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Request/HttpFoundationRequestHandler.php"
+code = "too-many-methods"
+message = "Class has too many methods."
 count = 1
 
 [[issues]]
@@ -850,7 +862,7 @@ count = 1
 file = "src/Type/DataTableType.php"
 code = "halstead"
 message = "Method has a high halstead volume"
-count = 1
+count = 2
 
 [[issues]]
 file = "src/Type/DataTableType.php"

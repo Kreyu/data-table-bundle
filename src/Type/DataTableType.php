@@ -53,6 +53,7 @@ final class DataTableType implements DataTableTypeInterface
             'personalization_persistence_subject_provider' =>
                 $builder->setPersonalizationPersistenceSubjectProvider(...),
             'personalization_form_factory' => $builder->setPersonalizationFormFactory(...),
+            'column_visibility_groups' => $builder->setColumnVisibilityGroups(...),
             'filtration_enabled' => $builder->setFiltrationEnabled(...),
             'filtration_persistence_enabled' => $builder->setFiltrationPersistenceEnabled(...),
             'filtration_persistence_adapter' => $builder->setFiltrationPersistenceAdapter(...),
@@ -112,6 +113,11 @@ final class DataTableType implements DataTableTypeInterface
             'filtration_parameter_name' => $dataTable->getConfig()->getFiltrationParameterName(),
             'personalization_parameter_name' => $dataTable->getConfig()->getPersonalizationParameterName(),
             'export_parameter_name' => $dataTable->getConfig()->getExportParameterName(),
+            'column_visibility_group_parameter_name' => $dataTable
+                ->getConfig()
+                ->getColumnVisibilityGroupParameterName(),
+            'column_visibility_groups' => $dataTable->getConfig()->getColumnVisibilityGroups(),
+            'column_visibility_group' => $dataTable->getColumnVisibilityGroup(),
             'has_active_filters' => $dataTable->hasActiveFilters(),
             'has_active_non_search_filters' => $this->hasActiveNonSearchFilters($dataTable),
             'filtration_data' => $dataTable->getFiltrationData(),
@@ -219,6 +225,7 @@ final class DataTableType implements DataTableTypeInterface
                 'personalization_persistence_subject_provider' =>
                     $this->defaults['personalization']['persistence_subject_provider'] ?? null,
                 'personalization_form_factory' => $this->defaults['personalization']['form_factory'] ?? null,
+                'column_visibility_groups' => [],
                 'exporting_enabled' => $this->defaults['exporting']['enabled'] ?? false,
                 'exporting_form_factory' => $this->defaults['exporting']['form_factory'] ?? null,
                 'async' => $this->defaults['async'] ?? false,
@@ -267,6 +274,8 @@ final class DataTableType implements DataTableTypeInterface
                 PersistenceSubjectProviderInterface::class,
             ])
             ->setAllowedTypes('personalization_form_factory', ['null', FormFactoryInterface::class])
+            ->setAllowedTypes('column_visibility_groups', 'array')
+            ->setAllowedValues('column_visibility_groups', $this->areColumnVisibilityGroupsValid(...))
             ->setAllowedTypes('exporting_enabled', 'bool')
             ->setAllowedTypes('exporting_form_factory', ['null', FormFactoryInterface::class])
             ->setAllowedTypes('async', 'bool')
@@ -288,6 +297,25 @@ final class DataTableType implements DataTableTypeInterface
     public function getParent(): ?string
     {
         return null;
+    }
+
+    private function areColumnVisibilityGroupsValid(array $columnVisibilityGroups): bool
+    {
+        foreach ($columnVisibilityGroups as $name => $label) {
+            $nameValid = is_string($name);
+
+            if (!$nameValid) {
+                return false;
+            }
+
+            $labelValid = is_string($label) || $label instanceof TranslatableInterface;
+
+            if (!$labelValid) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function createPaginationView(DataTableView $view, DataTableInterface $dataTable): ?PaginationView
@@ -547,6 +575,12 @@ final class DataTableType implements DataTableTypeInterface
                 $parameters[$dataTable->getConfig()->getSortParameterName()][$sortingColumnData->getName()] =
                     $sortingColumnData->getDirection();
             }
+        }
+
+        $columnVisibilityGroup = $dataTable->getColumnVisibilityGroup();
+
+        if ($columnVisibilityGroup !== null) {
+            $parameters[$dataTable->getConfig()->getColumnVisibilityGroupParameterName()] = $columnVisibilityGroup;
         }
 
         return $parameters;

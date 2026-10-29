@@ -6,8 +6,12 @@ namespace Kreyu\Bundle\DataTableBundle\Tests\Unit;
 
 use Kreyu\Bundle\DataTableBundle\DataTableBuilderInterface;
 use Kreyu\Bundle\DataTableBundle\Personalization\PersonalizationData;
+use Kreyu\Bundle\DataTableBundle\Request\HttpFoundationRequestHandler;
 use Kreyu\Bundle\DataTableBundle\Test\DataTableIntegrationTestCase;
 use Kreyu\Bundle\DataTableBundle\Type\DataTableType;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class DataTableTest extends DataTableIntegrationTestCase
 {
@@ -391,6 +395,47 @@ class DataTableTest extends DataTableIntegrationTestCase
         $columns = array_keys($dataTable->getExportableColumns());
 
         $this->assertEquals(['third', 'fourth', 'first'], $columns);
+    }
+
+    public function testColumnVisibilityGroupSelectedByRequestFiltersVisibleHiddenAndExportableColumns()
+    {
+        $dataTable = $this
+            ->createDataTableBuilder([
+                'column_visibility_groups' => ['default' => 'Default', 'address' => new TranslatableMessage('Address')],
+                'personalization_enabled' => true,
+                'personalization_form_factory' => Forms::createFormFactory(),
+                'request_handler' => new HttpFoundationRequestHandler(),
+            ])
+            ->addColumn('id', options: ['priority' => 4, 'export' => true])
+            ->addColumn('name', options: ['priority' => 3, 'export' => true, 'column_visibility_groups' => ['default']])
+            ->addColumn('street', options: [
+                'priority' => 2,
+                'export' => true,
+                'column_visibility_groups' => ['address'],
+            ])
+            ->addColumn('city', options: [
+                'priority' => 1,
+                'export' => true,
+                'column_visibility_groups' => ['default', 'address'],
+            ])
+            ->getDataTable()
+        ;
+
+        $dataTable->setPersonalizationData(PersonalizationData::fromArray([
+            'columns' => [
+                'city' => ['priority' => 1, 'visible' => false],
+            ],
+        ]));
+
+        $this->assertSame('default', $dataTable->getColumnVisibilityGroup());
+
+        $parameterName = $dataTable->getConfig()->getColumnVisibilityGroupParameterName();
+        $dataTable->handleRequest(new Request([$parameterName => 'address']));
+
+        $this->assertSame('address', $dataTable->getColumnVisibilityGroup());
+        $this->assertSame(['id', 'street'], array_keys($dataTable->getVisibleColumns()));
+        $this->assertSame(['name', 'city'], array_keys($dataTable->getHiddenColumns()));
+        $this->assertSame(['id', 'street'], array_keys($dataTable->getExportableColumns()));
     }
 
     private function createDataTableBuilder(array $options = []): DataTableBuilderInterface
